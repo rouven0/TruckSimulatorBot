@@ -16,53 +16,65 @@ def main():
     registered_players = players.list_from_tuples(cur.fetchall())
 
     bot = commands.Bot(command_prefix="t.", help_command=None, case_insensitive=True)
+    
+    @bot.event
+    async def on_ready():
+        print("Connected to Discord")
 
     @bot.command()
     async def register(ctx):
-        if not user_registered(ctx.author):
+        if not user_registered(ctx.author.id):
             registered_players.append((ctx.author.id, ctx.author.name, 0))
-            cur.execute("INSERT INTO players VALUES (?,?,?,?,?)", (ctx.author.id, ctx.author.name, 0))
+            cur.execute("INSERT INTO players VALUES (?,?,?,?,?)", (ctx.author.id, ctx.author.name, 0, 0, 0))
             con.commit()
             await ctx.channel.send("Welcome to the Truckers, {}".format(ctx.author.mention))
         else:
             await ctx.channel.send("You are already registered")
  
-    @bot.command(aliases=["p"])
+    @bot.command(aliases=["p", "me"])
     async def profile(ctx, *args):
-        #TODO add mention profile
-        if args and args[0]:
-        if user_registered(ctx.author):
-            player = get_player(ctx.author)
+        requested_id = ""
+        if args and args[0].startswith("<@!"):
+            requested_id = int(args[0][args[0].find("!")+1:args[0].find(">")])
+        else:
+            requested_id = ctx.author.id
+
+        if user_registered(requested_id):
+            player = get_player(requested_id)
             profile = discord.Embed(title="{}'s Profile".format(player.name))
             profile.add_field(name="Money", value=player.money)
             await ctx.channel.send(embed=profile)
         else:
-            await ctx.channel.send("{} you are not registered yet! Try `t.register` to get started".format(ctx.author.mention))
+            await ctx.channel.send("<@!{}> is not registered yet! Try `t.register` to get started".format(requested_id))
  
     @bot.command()
     async def drive(ctx):
-        drive_embed = discord.Embed(title="{} is driving".format(ctx.author.name),
-                                    description="We hope he has fun")
-        await ctx.channel.send(embed=drive_embed)
+        if user_registered(ctx.author.id):
+            drive_embed = discord.Embed(title="{} is driving".format(ctx.author.name),
+                                        description="We hope he has fun")
+            await ctx.channel.send(embed=drive_embed)
+        else:
+            await ctx.channel.send("{} you are not registered yet! Try `t.register` to get started".format(ctx.author.mention))
 
     @bot.command(aliases=["job"])
     async def quest(ctx):
-        if user_registered(ctx.author):
-            player = get_player(ctx.author)
+        # TODO make 
+        if user_registered(ctx.author.id):
+            player = get_player(ctx.author.id)
             quest = discord.Embed(title="{}'s quest".format(player.name))
             await ctx.channel.send(embed=quest)
         else:
             await ctx.channel.send("{} you are not registered yet! Try `t.register` to get started".format(ctx.author.mention))
 
-    def user_registered(user):
+    def user_registered(user_id):
         for player in registered_players:
-            if user.id == player.user_id:
+            if user_id == player.user_id:
                 return True
         return False
  
-    def get_player(requested_player):
+    def get_player(player_id):
         for player in registered_players:
-            if player.user_id == requested_player.id:
+            if player.user_id == player_id:
                 return player
         return None
 
