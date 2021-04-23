@@ -12,11 +12,8 @@ BOT_TOKEN = os.getenv('BOT_TOKEN')
 def main():
     con = sqlite3.connect('players.db')
     cur = con.cursor()
-    cur.execute("SELECT * FROM players")
-    registered_players = players.list_from_tuples(cur.fetchall())
-
     bot = commands.Bot(command_prefix="t.", help_command=None, case_insensitive=True)
-    
+
     @bot.event
     async def on_ready():
         print("Connected to Discord")
@@ -24,13 +21,12 @@ def main():
     @bot.command()
     async def register(ctx):
         if not user_registered(ctx.author.id):
-            registered_players.append((ctx.author.id, ctx.author.name, 0))
             cur.execute("INSERT INTO players VALUES (?,?,?,?,?)", (ctx.author.id, ctx.author.name, 0, 0, 0))
             con.commit()
             await ctx.channel.send("Welcome to the Truckers, {}".format(ctx.author.mention))
         else:
             await ctx.channel.send("You are already registered")
- 
+
     @bot.command(aliases=["p", "me"])
     async def profile(ctx, *args):
         requested_id = ""
@@ -67,13 +63,15 @@ def main():
             await ctx.channel.send("{} you are not registered yet! Try `t.register` to get started".format(ctx.author.mention))
 
     def user_registered(user_id):
-        for player in registered_players:
-            if user_id == player.user_id:
+        cur.execute("SELECT * FROM players")
+        for player in cur.fetchall():
+            if user_id == player[0]:
                 return True
         return False
  
     def get_player(player_id):
-        for player in registered_players:
+        cur.execute("SELECT * FROM players")
+        for player in players.list_from_tuples(cur.fetchall()):
             if player.user_id == player_id:
                 return player
         return None
