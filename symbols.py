@@ -1,3 +1,8 @@
+LEFT="⬅️"
+DOWN="⬇️"
+UP="⬆️"
+RIGHT="➡️"
+
 def get_drive_position_symbols(position):
     x = position[0]
     y = position[1]
@@ -5,13 +10,13 @@ def get_drive_position_symbols(position):
     max_y = 16
     symbols = []
     if x > 0:
-        symbols.append("\N{LEFTWARDS BLACK ARROW}")
+        symbols.append(LEFT)
     if y > 0:
-        symbols.append("\N{DOWNWARDS BLACK ARROW}")
+        symbols.append(DOWN)
     if y < max_y:
-        symbols.append("\N{UPWARDS BLACK ARROW}")
+        symbols.append(UP)
     if x < max_x:
-        symbols.append("\N{BLACK RIGHTWARDS ARROW}")
+        symbols.append(RIGHT)
 
     symbols.append("\N{OCTAGONAL SIGN}")
     return symbols

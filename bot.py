@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 import players
 import symbols
 
+
 load_dotenv('./.env')
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 
@@ -39,19 +40,19 @@ def main():
             con.commit()
 
         position_changed = False
-        if reaction.emoji == "\N{LEFTWARDS BLACK ARROW}":
+        if reaction.emoji == symbols.LEFT:
             driving_player.player.position = [driving_player.player.position[0]-1, driving_player.player.position[1]]
             position_changed = True
 
-        if reaction.emoji == "\N{UPWARDS BLACK ARROW}":
+        if reaction.emoji == symbols.UP:
             driving_player.player.position = [driving_player.player.position[0], driving_player.player.position[1]+1]
             position_changed = True
 
-        if reaction.emoji == "\N{DOWNWARDS BLACK ARROW}":
+        if reaction.emoji == symbols.DOWN:
             driving_player.player.position = [driving_player.player.position[0], driving_player.player.position[1]-1]
             position_changed = True
 
-        if reaction.emoji == "\N{BLACK RIGHTWARDS ARROW}":
+        if reaction.emoji == symbols.RIGHT:
             driving_player.player.position = [driving_player.player.position[0]+1, driving_player.player.position[1]]
             position_changed = True
         
