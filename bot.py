@@ -5,6 +5,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 import players
+import places
 import symbols
 
 
@@ -16,7 +17,7 @@ def main():
     cur = con.cursor()
     bot = commands.Bot(command_prefix="t.", help_command=None, case_insensitive=True)
     driving_players = []
-
+    
     @bot.event
     async def on_ready():
         print("Connected to Discord")
@@ -26,7 +27,7 @@ def main():
         """
         This method is only used to process the driving
         """
-        if reaction.message.id not in get_drive_message_ids():
+        if reaction.message.id not in [p.message.id for p in driving_players]:
             return 
         driving_player = get_driving_player(user.id)
         if driving_player == None:
@@ -119,19 +120,36 @@ def main():
         else:
             await ctx.channel.send("{} you are not registered yet! Try `t.register` to get started".format(ctx.author.mention))
 
+    @bot.command(aliases=["here"])
+    async def position(ctx):
+        if user_registered(ctx.author.id):
+            player = get_player(ctx.author.id)
+            # place = places.get(player.position)
+            position_embed = discord.Embed(title="{}'s Position".format(ctx.author.name, colour=discord.Colour.gold()), 
+                description="You are at {}/{}".format(player.position[0], player.position[1]))
+            position_embed.add_field(name="What is here?", value="Nothing :(", inline=False) # TODO value  
+            position_embed.add_field(name="Available Commands", value=":(") # TODO value  
+            await ctx.channel.send(embed=position_embed)
+        else:
+            await ctx.channel.send("{} you are not registered yet! Try `t.register` to get started".format(ctx.author.mention))
+
+    @bot.command(aliases=["places"])
+    async def addressbook(ctx):
+        places_embed = discord.Embed(title="All public known Places", colour=discord.Colour.gold())   
+        for place in places.get_all():
+            places_embed.add_field(name=place.name, value=place.position)
+        await ctx.channel.send(embed=places_embed)
+
     def user_registered(user_id):
-        cur.execute("SELECT * FROM players")
-        for player in cur.fetchall():
-            if user_id == player[0]:
-                return True
-        return False
+        cur.execute("SELECT * FROM players WHERE id=:id", {"id": user_id})
+        if len(cur.fetchall()) == 1:
+            return True
+        else:
+            return False
  
-    def get_player(player_id):
-        cur.execute("SELECT * FROM players")
-        for player in players.list_from_tuples(cur.fetchall()):
-            if player.user_id == player_id:
-                return player
-        return None
+    def get_player(user_id):
+        cur.execute("SELECT * FROM players WHERE id=:id", {"id": user_id})
+        return players.from_tuple(cur.fetchone())
 
     def get_driving_player(player_id):
         for driving_player in driving_players:
@@ -139,11 +157,6 @@ def main():
                 return driving_player
         return None
 
-    def get_drive_message_ids():
-        ids = []
-        for player in driving_players:
-            ids.append(player.message.id)
-        return ids 
     bot.run(BOT_TOKEN)
 
 if __name__ == '__main__':
