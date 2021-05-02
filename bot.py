@@ -4,6 +4,8 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
+import assets
+import config
 import players
 import places
 import symbols
@@ -59,7 +61,10 @@ def main():
         
         if position_changed:
             await reaction.message.edit(embed=get_drive_embed(active_drive.player))
-            await reaction.message.clear_reactions() 
+            if (active_drive.player.position[0] or active_drive.player.position[1]) >= config.MAP_BORDER:
+                await reaction.message.clear_reactions() 
+            else:
+                await reaction.remove(user)
             for symbol in symbols.get_drive_position_symbols(active_drive.player.position):
                 await reaction.message.add_reaction(symbol)
  
@@ -92,6 +97,9 @@ def main():
     @bot.command()
     @commands.bot_has_permissions(manage_messages=True)
     async def drive(ctx):
+        if ctx.author.id in [a.player.user_id for a in active_drives]:
+            await ctx.channel.send("You can't drive on two roads at once!")
+            return
         if user_registered(ctx.author.id):
             player = get_player(ctx.author.id)
             message = await ctx.channel.send(embed=get_drive_embed(player))
@@ -114,7 +122,7 @@ def main():
         if place is not None:
             drive_embed.set_image(url=place.image_url)
         else:
-            drive_embed.set_image(url='https://cdn.discordapp.com/attachments/837784531267223552/837785502127489064/default.png')
+            drive_embed.set_image(url=assets.get_default())
         return drive_embed
 
     @bot.command(aliases=["here"])
@@ -123,7 +131,7 @@ def main():
             player = get_player(ctx.author.id)
             place = places.get(player.position)
             position_embed = discord.Embed(title="{}'s Position".format(ctx.author.name, colour=discord.Colour.gold()), 
-                description="{}You are at {}".format(symbols.LIST_TITLE, player.position),
+                description="You are at {}".format(player.position),
                 colour=discord.Colour.gold())
             if place is not None:
                 position_embed.add_field(name="What is here?", value=symbols.LIST_ITEM+place.name, inline=False)

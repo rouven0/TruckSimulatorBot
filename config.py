@@ -1,0 +1,1 @@
+MAP_BORDER = 16
