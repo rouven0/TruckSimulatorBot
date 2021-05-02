@@ -108,6 +108,19 @@ def main():
             await ctx.channel.send("<@!{}> is not registered yet! Try `t.register` to get started".format(requested_id))
  
     @bot.command()
+    async def top(ctx):
+        cur.execute('SELECT * FROM players ORDER BY miles DESC')
+        top=players.list_from_tuples(cur.fetchmany(10))
+        top_body=""
+        count = 0
+        for player in top:
+            count += 1
+            top_body = "{}**{}**. {} - {} miles\n".format(top_body, count, player.name, player.miles)
+        top_emded=discord.Embed(title="Truck Simulator top list", colour=discord.Colour.gold())
+        top_emded.add_field(name="Top miles", value=top_body)
+        await ctx.channel.send(embed=top_emded)
+
+    @bot.command()
     @commands.bot_has_permissions(manage_messages=True)
     async def drive(ctx):
         if ctx.author.id in [a.player.user_id for a in active_drives]:
