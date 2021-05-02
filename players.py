@@ -13,8 +13,8 @@ def to_tuple(player):
     return (player.user_id, player.name, player.truck_id, player.money, format_pos_to_db(player.position))
 
 def get_position(db_pos):
-    pos_x = db_pos[db_pos.find("/")+1:]
-    pos_y = db_pos[:db_pos.find("/")]
+    pos_x = db_pos[:db_pos.find("/")]
+    pos_y = db_pos[db_pos.find("/")+1:]
     return [int(pos_x), int(pos_y)]
 
 def format_pos_to_db(pos):
@@ -28,7 +28,7 @@ class Player():
     money: float
     position: list
 
-class DrivingPlayer():
+class ActiveDrive():
     def __init__(self, player, message):
         self.player = player
         self.message = message

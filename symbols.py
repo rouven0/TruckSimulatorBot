@@ -2,6 +2,8 @@ LEFT="⬅️"
 DOWN="⬇️"
 UP="⬆️"
 RIGHT="➡️"
+STOP="\N{OCTAGONAL SIGN}"
+LIST_ITEM=":small_orange_diamond:"
 
 def get_drive_position_symbols(position):
     x = position[0]
@@ -18,5 +20,5 @@ def get_drive_position_symbols(position):
     if x < max_x:
         symbols.append(RIGHT)
 
-    symbols.append("\N{OCTAGONAL SIGN}")
+    symbols.append(STOP)
     return symbols
