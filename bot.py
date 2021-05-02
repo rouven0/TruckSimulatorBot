@@ -40,6 +40,7 @@ def main():
             await reaction.message.clear_reactions() 
             await reaction.message.channel.send("You stopped driving!, {}".format(user.name))
             cur.execute("UPDATE players SET position=? WHERE id=?", (players.format_pos_to_db(active_drive.player.position), user.id))
+            cur.execute("UPDATE players SET miles=? WHERE id=?", (active_drive.player.miles, user.id))
             con.commit()
 
         position_changed = False
@@ -60,13 +61,24 @@ def main():
             position_changed = True
         
         if position_changed:
+            active_drive.player.miles+=1
             await reaction.message.edit(embed=get_drive_embed(active_drive.player))
-            if (active_drive.player.position[0] or active_drive.player.position[1]) >= config.MAP_BORDER:
+            if (active_drive.player.position[0] >= config.MAP_BORDER or
+                active_drive.player.position[1] >= config.MAP_BORDER or
+                active_drive.player.position[0] < 1 or
+                active_drive.player.position[1] < 1):
                 await reaction.message.clear_reactions() 
             else:
                 await reaction.remove(user)
+
+            missing_symbols=False
             for symbol in symbols.get_drive_position_symbols(active_drive.player.position):
-                await reaction.message.add_reaction(symbol)
+                if symbol not in [r.emoji for r in reaction.message.reactions]:
+                    missing_symbols=True
+            if missing_symbols:
+                await reaction.message.clear_reactions() 
+                for symbol in symbols.get_drive_position_symbols(active_drive.player.position):
+                    await reaction.message.add_reaction(symbol)
  
     @bot.command()
     async def register(ctx):
@@ -89,7 +101,8 @@ def main():
         if user_registered(requested_id):
             player = get_player(requested_id)
             profile = discord.Embed(title="{}'s Profile".format(player.name), colour=discord.Colour.gold())
-            profile.add_field(name="Money", value=player.money)
+            profile.add_field(name="Money", value=player.money, inline=False)
+            profile.add_field(name="Miles driven", value=player.miles)
             await ctx.channel.send(embed=profile)
         else:
             await ctx.channel.send("<@!{}> is not registered yet! Try `t.register` to get started".format(requested_id))
@@ -136,6 +149,7 @@ def main():
             if place is not None:
                 position_embed.add_field(name="What is here?", value=symbols.LIST_ITEM+place.name, inline=False)
                 position_embed.add_field(name="Available Commands", value=get_place_commands(place.commands))
+                position_embed.add_field(name="Note", value="The commands doesn't work yet :(")
             else:
                 position_embed.add_field(name="What is here?", value="Nothing :frowning:", inline=False)
             await ctx.channel.send(embed=position_embed)
