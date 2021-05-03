@@ -18,7 +18,7 @@ BOT_TOKEN = os.getenv('BOT_TOKEN')
 def main():
     con = sqlite3.connect('players.db')
     cur = con.cursor()
-    bot = commands.Bot(command_prefix="t.", help_command=discord.ext.commands.DefaultHelpCommand(),
+    bot = commands.Bot(command_prefix=["t.", "T."], help_command=discord.ext.commands.DefaultHelpCommand(),
                        case_insensitive=True)
     active_drives = []
 
@@ -26,13 +26,14 @@ def main():
     async def on_ready():
         print("Connected to Discord")
         await bot.change_presence(status=discord.Status.online,
-                                  activity=discord.Activity(type=discord.ActivityType.listening, name="the traffic-news"))
+                                  activity=discord.Activity(type=discord.ActivityType.watching, name="the hills passing by"))
 
     @bot.event
     async def on_reaction_add(reaction, user):
         """
         This method is only used to process the driving
         """
+        #TODO add timeouts
         if reaction.message.id not in [p.message.id for p in active_drives]:
             return
         active_drive = get_active_drive(user.id)
@@ -88,6 +89,7 @@ def main():
                     await reaction.message.add_reaction(symbol)
 
     @bot.command()
+    @commands.bot_has_permissions(view_channel=True, send_messages=True, manage_messages=True, embed_links=True, attach_files=True, read_message_history=True, use_external_emojis=True, add_reactions=True)
     async def register(ctx):
         if not user_registered(ctx.author.id):
             cur.execute("INSERT INTO players VALUES (?,?,?,?,?,?)", (ctx.author.id, ctx.author.name, 0, 0, "0/0", 0))
@@ -99,8 +101,8 @@ def main():
 
     @bot.command(aliases=["p", "me"])
     async def profile(ctx, *args):
-        if args and args[0].startswith("<@!"):
-            requested_id = int(args[0][args[0].find("!") + 1:args[0].find(">")])
+        if args and args[0].startswith("<@"):
+            requested_id = int(args[0][args[0].find("@") + 1:args[0].find(">")])
         else:
             requested_id = ctx.author.id
 
@@ -168,7 +170,8 @@ def main():
                                            colour=discord.Colour.gold())
             if place is not None:
                 position_embed.add_field(name="What is here?", value=symbols.LIST_ITEM + place.name, inline=False)
-                position_embed.add_field(name="Available Commands", value=get_place_commands(place.commands))
+                if len(place.commands[0])!=0:
+                    position_embed.add_field(name="Available Commands", value=get_place_commands(place.commands))
                 position_embed.add_field(name="Note", value="The commands don't work yet :(")
             else:
                 position_embed.add_field(name="What is here?", value="Nothing :frowning:", inline=False)
@@ -191,6 +194,7 @@ def main():
         await ctx.channel.send(embed=places_embed)
 
     @bot.command()
+    @commands.bot_has_permissions(view_channel=True, send_messages=True, manage_messages=True, embed_links=True, attach_files=True, read_message_history=True, use_external_emojis=True, add_reactions=True)
     async def bing(ctx):
         await ctx.channel.send("Bong")
 

@@ -33,3 +33,4 @@ class ActiveDrive():
     def __init__(self, player, message):
         self.player = player
         self.message = message
+        #TODO add start time
