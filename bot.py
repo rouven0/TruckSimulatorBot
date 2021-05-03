@@ -36,12 +36,12 @@ def main():
         #TODO add timeouts
         if reaction.message.id not in [p.message.id for p in active_drives]:
             return
-        active_drive = get_active_drive(user.id)
+        active_drive = get_active_drive(user.id, reaction.message.id)
         if active_drive is None:
             return
 
         if reaction.emoji == symbols.STOP:
-            active_drives.remove(get_active_drive(user.id))
+            active_drives.remove(get_active_drive(user.id, reaction.message.id))
             await reaction.message.clear_reactions()
             await reaction.message.channel.send("You stopped driving!, {}".format(user.name))
             cur.execute("UPDATE players SET position=? WHERE id=?",
@@ -102,7 +102,10 @@ def main():
     @bot.command(aliases=["p", "me"])
     async def profile(ctx, *args):
         if args and args[0].startswith("<@"):
-            requested_id = int(args[0][args[0].find("@") + 1:args[0].find(">")])
+            if args[0].find("!") != -1 : 
+                requested_id = int(args[0][args[0].find("!") + 1:args[0].find(">")])
+            else:
+                requested_id = int(args[0][args[0].find("@") + 1:args[0].find(">")])
         else:
             requested_id = ctx.author.id
 
@@ -198,6 +201,11 @@ def main():
     async def bing(ctx):
         await ctx.channel.send("Bong")
 
+    @bot.command()
+    @commands.is_owner()
+    async def shutdown(ctx):
+        await bot.logout()
+
     @bot.event
     async def on_command_error(ctx, error):
         if isinstance(error, discord.ext.commands.errors.BotMissingPermissions):
@@ -219,9 +227,9 @@ def main():
         cur.execute("SELECT * FROM players WHERE id=:id", {"id": user_id})
         return players.from_tuple(cur.fetchone())
 
-    def get_active_drive(player_id):
+    def get_active_drive(player_id, message_id):
         for active_drive in active_drives:
-            if active_drive.player.user_id == player_id:
+            if active_drive.player.user_id == player_id and active_drive.message.id == message_id:
                 return active_drive
         return None
 
