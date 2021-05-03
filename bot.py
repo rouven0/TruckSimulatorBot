@@ -23,6 +23,7 @@ def main():
     @bot.event
     async def on_ready():
         print("Connected to Discord")
+        await bot.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.watching, name="the damn road as you sould too"))
 
     @bot.event
     async def on_reaction_add(reaction, user):
@@ -68,6 +69,8 @@ def main():
                 active_drive.player.position[0] < 1 or
                 active_drive.player.position[1] < 1):
                 await reaction.message.clear_reactions() 
+                # clear the local list to get the missing symbols done properly
+                reaction.message.reactions = []
             else:
                 await reaction.remove(user)
 
@@ -83,7 +86,7 @@ def main():
     @bot.command()
     async def register(ctx):
         if not user_registered(ctx.author.id):
-            cur.execute("INSERT INTO players VALUES (?,?,?,?,?)", (ctx.author.id, ctx.author.name, 0, 0, "0/0"))
+            cur.execute("INSERT INTO players VALUES (?,?,?,?,?,?)", (ctx.author.id, ctx.author.name, 0, 0, "0/0", 0))
             con.commit()
             print("{} got registered".format(ctx.author.name))
             await ctx.channel.send("Welcome to the Truckers, {}".format(ctx.author.mention))
