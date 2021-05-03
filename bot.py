@@ -26,7 +26,7 @@ def main():
     async def on_ready():
         print("Connected to Discord")
         await bot.change_presence(status=discord.Status.online,
-                                  activity=discord.Activity(type=discord.ActivityType.listening, name="t.help"))
+                                  activity=discord.Activity(type=discord.ActivityType.listening, name="the traffic-news"))
 
     @bot.event
     async def on_reaction_add(reaction, user):
@@ -127,7 +127,7 @@ def main():
         await ctx.channel.send(embed=top_emded)
 
     @bot.command()
-    @commands.bot_has_permissions(manage_messages=True)
+    @commands.bot_has_permissions(view_channel=True, send_messages=True, manage_messages=True, embed_links=True, attach_files=True, read_message_history=True, use_external_emojis=True, add_reactions=True)
     async def drive(ctx):
         if ctx.author.id in [a.player.user_id for a in active_drives]:
             await ctx.channel.send("You can't drive on two roads at once!")
@@ -194,9 +194,15 @@ def main():
     async def bing(ctx):
         await ctx.channel.send("Bong")
 
-    # @bot.command()
-    # async def help(ctx):
-    #    await ctx.channel.send("Coming soon")
+    @bot.event
+    async def on_command_error(ctx, error):
+        if isinstance(error, discord.ext.commands.errors.BotMissingPermissions):
+            missing_permissions = '`'
+            for permission in error.missing_perms:
+                missing_permissions = missing_permissions + "\n"+ permission 
+            await ctx.channel.send("I'm missing the following permissions:"+ missing_permissions+'`')
+        else:
+            print(error)
 
     def user_registered(user_id):
         cur.execute("SELECT * FROM players WHERE id=:id", {"id": user_id})
