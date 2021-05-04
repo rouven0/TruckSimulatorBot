@@ -30,7 +30,7 @@ class Player():
     miles: int
 
 class ActiveDrive():
-    def __init__(self, player, message):
+    def __init__(self, player, message, last_action_time):
         self.player = player
         self.message = message
-        #TODO add start time
+        self.last_action_time = last_action_time

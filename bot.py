@@ -3,6 +3,8 @@ import sqlite3
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+from time import time
+import asyncio
 
 import assets
 import config
@@ -33,7 +35,6 @@ def main():
         """
         This method is only used to process the driving
         """
-        #TODO add timeouts
         if reaction.message.id not in [p.message.id for p in active_drives]:
             return
         active_drive = get_active_drive(user.id, reaction.message.id)
@@ -67,6 +68,7 @@ def main():
             position_changed = True
 
         if position_changed:
+            active_drive.last_action_time = time()
             active_drive.player.miles += 1
             await reaction.message.edit(embed=get_drive_embed(active_drive.player))
             if (active_drive.player.position[0] >= config.MAP_BORDER or
@@ -87,6 +89,19 @@ def main():
                 await reaction.message.clear_reactions()
                 for symbol in symbols.get_drive_position_symbols(active_drive.player.position):
                     await reaction.message.add_reaction(symbol)
+    
+    async def check_drives():
+        while True:
+            for drive in active_drives:
+                if time() -  drive.last_action_time > 300:
+                    active_drives.remove(drive)
+                    await drive.message.clear_reactions()
+                    await drive.message.channel.send("<@{}> You left your truck but forgot to stop driving. Luckily a friendly Gnome stopped you at the end of the map".format(drive.player.user_id))
+                    cur.execute("UPDATE players SET position=? WHERE id=?",
+                               ("50/50", drive.player.user_id))
+                    cur.execute("UPDATE players SET miles=? WHERE id=?", (drive.player.miles, drive.player.user_id))
+                    con.commit()
+            await asyncio.sleep(10)
 
     @bot.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True, manage_messages=True, embed_links=True, attach_files=True, read_message_history=True, use_external_emojis=True, add_reactions=True)
@@ -137,12 +152,14 @@ def main():
         if ctx.author.id in [a.player.user_id for a in active_drives]:
             await ctx.channel.send("You can't drive on two roads at once!")
             return
+
         if user_registered(ctx.author.id):
             player = get_player(ctx.author.id)
             message = await ctx.channel.send(embed=get_drive_embed(player))
             for symbol in symbols.get_drive_position_symbols(player.position):
                 await message.add_reaction(symbol)
-            active_drives.append(players.ActiveDrive(player, message))
+
+            active_drives.append(players.ActiveDrive(player, message, time()))
         else:
             await ctx.channel.send(
                 "{} you are not registered yet! Try `t.register` to get started".format(ctx.author.mention))
@@ -201,18 +218,13 @@ def main():
     async def bing(ctx):
         await ctx.channel.send("Bong")
 
-    @bot.command()
-    @commands.is_owner()
-    async def shutdown(ctx):
-        await bot.logout()
-
     @bot.event
     async def on_command_error(ctx, error):
         if isinstance(error, discord.ext.commands.errors.BotMissingPermissions):
             missing_permissions = '`'
             for permission in error.missing_perms:
                 missing_permissions = missing_permissions + "\n"+ permission 
-            await ctx.channel.send("I'm missing the following permissions:"+ missing_permissions+'`')
+            await ctx.channel.send("I'm missing the following permissions:"+missing_permissions+'`')
         else:
             print(error)
 
@@ -233,6 +245,8 @@ def main():
                 return active_drive
         return None
 
+    loop = asyncio.get_event_loop()
+    loop.create_task(check_drives())
     bot.run(BOT_TOKEN)
 
 
