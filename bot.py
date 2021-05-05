@@ -43,6 +43,8 @@ def main():
         active_drive = get_active_drive(user.id, reaction.message.id)
         if active_drive is None:
             return
+        if active_drive.islocked:
+            return
 
         if reaction.emoji == symbols.STOP:
             active_drives.remove(get_active_drive(user.id, reaction.message.id))
@@ -71,6 +73,7 @@ def main():
             position_changed = True
 
         if position_changed:
+            active_drive.islocked = True
             active_drive.last_action_time = time()
             active_drive.player.miles += 1
             await reaction.message.edit(embed=get_drive_embed(active_drive.player))
@@ -92,6 +95,7 @@ def main():
                 await reaction.message.clear_reactions()
                 for symbol in symbols.get_drive_position_symbols(active_drive.player.position):
                     await reaction.message.add_reaction(symbol)
+            active_drive.islocked = False
     
     async def check_drives():
         while True:

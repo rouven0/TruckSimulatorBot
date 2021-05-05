@@ -34,3 +34,4 @@ class ActiveDrive():
         self.player = player
         self.message = message
         self.last_action_time = last_action_time
+        self.islocked = False
