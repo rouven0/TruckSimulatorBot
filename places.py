@@ -32,6 +32,9 @@ def get(position):
 def get_all():
     return __all_places
 
+def get_public():
+    return __public_places
+
 def get_hidden():
     return __hidden_places
 
@@ -41,6 +44,10 @@ cur = con.cursor()
 __all_places = []
 cur.execute('SELECT * FROM places WHERE visibility=0')
 __generate_list(__all_places)
+
+__public_places = []
+cur.execute('SELECT * FROM places WHERE visibility=0')
+__generate_list(__public_places)
 
 __hidden_places = []
 cur.execute('SELECT * FROM places WHERE visibility=1')

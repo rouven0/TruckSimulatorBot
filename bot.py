@@ -4,6 +4,9 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 from time import time
+from datetime import datetime
+from math import floor
+from importlib import reload
 import asyncio
 
 import assets
@@ -134,16 +137,26 @@ def main():
             await ctx.channel.send("<@!{}> is not registered yet! Try `t.register` to get started".format(requested_id))
 
     @bot.command()
-    async def top(ctx):
-        cur.execute('SELECT * FROM players ORDER BY miles DESC')
+    async def top(ctx, *args):
+        if args and args[0] == "money":
+            request= "money"
+            cur.execute('SELECT * FROM players ORDER BY money DESC')
+        else: 
+            request = "miles"
+            cur.execute('SELECT * FROM players ORDER BY miles DESC')
         top_embed = players.list_from_tuples(cur.fetchmany(10))
         top_body = ""
         count = 0
         for player in top_embed:
+            if request == "miles":
+                val = player.miles
+            if request == "money":
+                val = player.money
+
             count += 1
-            top_body = "{}**{}**. {} - {} miles\n".format(top_body, count, player.name, player.miles)
+            top_body = "{}**{}**. {} - {} {}\n".format(top_body, count, player.name, val, request)
         top_emded = discord.Embed(title="Truck Simulator top list", colour=discord.Colour.gold())
-        top_emded.add_field(name="Top miles", value=top_body)
+        top_emded.add_field(name="Top {}".format(request), value=top_body)
         await ctx.channel.send(embed=top_emded)
 
     @bot.command()
@@ -209,7 +222,7 @@ def main():
     @bot.command(aliases=["places"])
     async def addressbook(ctx):
         places_embed = discord.Embed(title="All public known Places", colour=discord.Colour.gold())
-        for place in places.get_all():
+        for place in places.get_public():
             places_embed.add_field(name=place.name, value=place.position)
         await ctx.channel.send(embed=places_embed)
 
@@ -217,6 +230,26 @@ def main():
     @commands.bot_has_permissions(view_channel=True, send_messages=True, manage_messages=True, embed_links=True, attach_files=True, read_message_history=True, use_external_emojis=True, add_reactions=True)
     async def bing(ctx):
         await ctx.channel.send("Bong")
+
+    @bot.command()
+    @commands.bot_has_permissions(view_channel=True, send_messages=True, manage_messages=True, embed_links=True, attach_files=True, read_message_history=True, use_external_emojis=True, add_reactions=True)
+    async def info(ctx):
+        info_embed=discord.Embed(title="Truck Simulator info", colour=discord.Colour.gold())
+
+        # uptime
+        uptime=datetime.now()-start_time
+        days = uptime.days
+        hours = floor(uptime.seconds/3600)
+        minutes = floor(uptime.seconds/60)-hours*3600
+        seconds = uptime.seconds-hours*3600-minutes*60
+        info_embed.add_field(name="Uptime", value="{}d {}h {}m {}s".format(days, hours, minutes, seconds))
+        await ctx.channel.send(embed=info_embed)
+
+    @bot.command()
+    @commands.is_owner()
+    async def reloadplaces(ctx):
+        reload(places)
+        await ctx.channel.send("Done")
 
     @bot.event
     async def on_command_error(ctx, error):
@@ -247,6 +280,7 @@ def main():
 
     loop = asyncio.get_event_loop()
     loop.create_task(check_drives())
+    start_time = datetime.now()
     bot.run(BOT_TOKEN)
 
 
