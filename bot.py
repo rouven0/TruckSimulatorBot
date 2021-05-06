@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 from time import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from math import floor
 from importlib import reload
 import asyncio
@@ -23,6 +23,7 @@ BOT_TOKEN = os.getenv('BOT_TOKEN')
 def main():
     con = sqlite3.connect('players.db')
     cur = con.cursor()
+    # TODO make better help command
     bot = commands.Bot(command_prefix=["t.", "T."], help_command=discord.ext.commands.DefaultHelpCommand(),
                        case_insensitive=True)
     active_drives = []
@@ -210,6 +211,7 @@ def main():
                 if len(place.commands[0])!=0:
                     position_embed.add_field(name="Available Commands", value=get_place_commands(place.commands))
                 position_embed.add_field(name="Note", value="The commands don't work yet :(")
+                position_embed.set_image(url=place.image_url)
             else:
                 position_embed.add_field(name="What is here?", value="Nothing :frowning:", inline=False)
             await ctx.channel.send(embed=position_embed)
@@ -240,11 +242,10 @@ def main():
     async def info(ctx):
         info_embed=discord.Embed(title="Truck Simulator info", colour=discord.Colour.gold())
 
-        # uptime
         uptime=datetime.now()-start_time
         days = uptime.days
         hours = floor(uptime.seconds/3600)
-        minutes = floor(uptime.seconds/60)-hours*3600
+        minutes = floor(uptime.seconds/60)-hours*60
         seconds = uptime.seconds-hours*3600-minutes*60
         info_embed.add_field(name="Uptime", value="{}d {}h {}m {}s".format(days, hours, minutes, seconds))
         await ctx.channel.send(embed=info_embed)
