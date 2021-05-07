@@ -265,13 +265,26 @@ def main():
         info_embed.add_field(name="Uptime",
                              value="{}d {}h {}m {}s".format(days, hours, minutes, seconds))
         info_embed.add_field(name="Latency", value=str(round(bot.latency, 2)*1000)+" ms")
+        cur.execute("SELECT COUNT(*) FROM players")
+        info_embed.add_field(name="Registered Players", value=cur.fetchall()[0][0])
         await ctx.channel.send(embed=info_embed)
 
     @bot.command()
     @commands.is_owner()
-    async def reloadplaces(ctx):
-        reload(places)
-        await ctx.channel.send("Done")
+    async def adminctl(ctx, *args):
+        if not args:
+            await ctx.channel.send("Missing arguments")
+            return
+        if args[0] == "reloadplaces":
+            reload(places)
+            await ctx.channel.send("Done")
+
+        if args[0] == "shutdown":
+            # TODO add scheduling
+            # await ctx.channel.send("Are you sure to init the shutdown [y/N]")
+            await bot.change_presence(status=discord.Status.idle)
+            await ctx.channel.send("Shutting down")
+            await bot.logout()
 
     @bot.event
     async def on_command_error(ctx, error):
