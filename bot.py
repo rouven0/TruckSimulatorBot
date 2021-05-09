@@ -17,8 +17,11 @@ import places
 import symbols
 
 load_dotenv('./.env')
-BOT_TOKEN = os.getenv('BOT_TOKEN')
+# BOT_TOKEN = os.getenv('BOT_TOKEN')
 
+# Alternate token for testing. Uncomment if needed
+# remove this if the bot is transferred to a remote server, only the real token will be stored then
+BOT_TOKEN = os.getenv('TEST_BOT_TOKEN')
 
 def main():
     con = sqlite3.connect('players.db')
@@ -122,9 +125,10 @@ def main():
     @bot.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True, manage_messages=True, embed_links=True, attach_files=True, read_message_history=True, use_external_emojis=True, add_reactions=True)
     async def register(ctx):
+        # id, name, truck_id, money, posittion, quest_items, quest_from, quest_to, miles
         if not user_registered(ctx.author.id):
-            cur.execute("INSERT INTO players VALUES (?,?,?,?,?,?)",
-                        (ctx.author.id, ctx.author.name, 0, 0, "0/0", 0))
+            cur.execute("INSERT INTO players VALUES (?,?,?,?,?,?,?,?,?)",
+                        (ctx.author.id, ctx.author.name, 0, 0, "0/0", "", "0/0", "0/0", 0))
             con.commit()
             print("{} got registered".format(ctx.author.name))
             await ctx.channel.send("Welcome to the Truckers, {}".format(ctx.author.mention))
@@ -177,20 +181,20 @@ def main():
     @bot.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True, manage_messages=True, embed_links=True, attach_files=True, read_message_history=True, use_external_emojis=True, add_reactions=True)
     async def drive(ctx):
+        if not user_registered(ctx.author.id):
+            await ctx.channel.send(
+                "{} you are not registered yet! Try `t.register` to get started".format(ctx.author.mention))
+            return
+
         if ctx.author.id in [a.player.user_id for a in active_drives]:
             await ctx.channel.send("You can't drive on two roads at once!")
             return
 
-        if user_registered(ctx.author.id):
-            player = get_player(ctx.author.id)
-            message = await ctx.channel.send(embed=get_drive_embed(player))
-            for symbol in symbols.get_drive_position_symbols(player.position):
-                await message.add_reaction(symbol)
-
-            active_drives.append(players.ActiveDrive(player, message, time()))
-        else:
-            await ctx.channel.send(
-                "{} you are not registered yet! Try `t.register` to get started".format(ctx.author.mention))
+        player = get_player(ctx.author.id)
+        message = await ctx.channel.send(embed=get_drive_embed(player))
+        for symbol in symbols.get_drive_position_symbols(player.position):
+            await message.add_reaction(symbol)
+        active_drives.append(players.ActiveDrive(player, message, time()))
 
     def get_drive_embed(player):
         place = places.get(player.position)
@@ -212,26 +216,27 @@ def main():
 
     @bot.command(aliases=["here"])
     async def position(ctx):
-        if user_registered(ctx.author.id):
-            player = get_player(ctx.author.id)
-            place = places.get(player.position)
-            position_embed = discord.Embed(title="{}'s Position".format(ctx.author.name),
-                                           description="You are at {}".format(player.position),
-                                           colour=discord.Colour.gold())
-            if place is not None:
-                position_embed.add_field(name="What is here?",
-                                         value=symbols.LIST_ITEM + place.name, inline=False)
-                if len(place.commands[0]) != 0:
-                    position_embed.add_field(name="Available Commands",
-                                             value=get_place_commands(place.commands))
-                position_embed.add_field(name="Note", value="The commands don't work yet :(")
-                position_embed.set_image(url=place.image_url)
-            else:
-                position_embed.add_field(name="What is here?", value="Nothing :frowning:", inline=False)
-            await ctx.channel.send(embed=position_embed)
-        else:
+        if not user_registered(ctx.author.id):
             await ctx.channel.send(
                 "{} you are not registered yet! Try `t.register` to get started".format(ctx.author.mention))
+            return
+
+        player = get_player(ctx.author.id)
+        place = places.get(player.position)
+        position_embed = discord.Embed(title="{}'s Position".format(ctx.author.name),
+                                       description="You are at {}".format(player.position),
+                                       colour=discord.Colour.gold())
+        if place is not None:
+            position_embed.add_field(name="What is here?",
+                                     value=symbols.LIST_ITEM + place.name, inline=False)
+            if len(place.commands[0]) != 0:
+                position_embed.add_field(name="Available Commands",
+                                         value=get_place_commands(place.commands))
+            position_embed.add_field(name="Note", value="The commands don't work yet :(")
+            position_embed.set_image(url=place.image_url)
+        else:
+            position_embed.add_field(name="What is here?", value="Nothing :frowning:", inline=False)
+        await ctx.channel.send(embed=position_embed)
 
     def get_place_commands(command_list):
         readable = ""
@@ -247,10 +252,22 @@ def main():
         await ctx.channel.send(embed=places_embed)
 
     @bot.command()
+    async def job(ctx):
+        if not user_registered(ctx.author.id):
+            await ctx.channel.send(
+                "{} you are not registered yet! Try `t.register` to get started".format(ctx.author.mention))
+            return
+        # TODO generate Job
+        player = get_player(ctx.author.id)
+        job_emded = discord.Embed(title="{}'s Job".format(player.name), colour=discord.Colour.gold())
+        await ctx.channel.send(embed=job_emded)
+
+
+    @bot.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True, manage_messages=True, embed_links=True, attach_files=True, read_message_history=True, use_external_emojis=True, add_reactions=True)
     async def bing(ctx):
         answer = await ctx.channel.send("Bong")
-        await ctx.channel.send(str((answer.created_at-ctx.message.created_at).total_seconds()*1000)+ "  ms")
+        await ctx.channel.send(str(round((answer.created_at-ctx.message.created_at).total_seconds()*1000))+ "  ms")
 
     @bot.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True, manage_messages=True, embed_links=True, attach_files=True, read_message_history=True, use_external_emojis=True, add_reactions=True)

@@ -38,7 +38,7 @@ def get_public():
 def get_hidden():
     return __hidden_places
 
-con = sqlite3.connect('places.db')
+con = sqlite3.connect('objects.db')
 cur = con.cursor()
 
 __all_places = []
