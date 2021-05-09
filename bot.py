@@ -17,11 +17,11 @@ import places
 import symbols
 
 load_dotenv('./.env')
-# BOT_TOKEN = os.getenv('BOT_TOKEN')
+BOT_TOKEN = os.getenv('BOT_TOKEN')
 
 # Alternate token for testing. Uncomment if needed
 # remove this if the bot is transferred to a remote server, only the real token will be stored then
-BOT_TOKEN = os.getenv('TEST_BOT_TOKEN')
+# BOT_TOKEN = os.getenv('TEST_BOT_TOKEN')
 
 def main():
     con = sqlite3.connect('players.db')
@@ -46,14 +46,14 @@ def main():
         """
         if reaction.message.id not in [p.message.id for p in active_drives]:
             return
-        active_drive = get_active_drive(user.id, reaction.message.id)
+        active_drive = get_active_drive(user.id, message_id=reaction.message.id)
         if active_drive is None:
             return
         if active_drive.islocked:
             return
 
         if reaction.emoji == symbols.STOP:
-            active_drives.remove(get_active_drive(user.id, reaction.message.id))
+            active_drives.remove(active_drive)
             await reaction.message.clear_reactions()
             await reaction.message.channel.send("You stopped driving!, {}".format(user.name))
             cur.execute("UPDATE players SET position=? WHERE id=?",
@@ -106,6 +106,8 @@ def main():
                 await reaction.message.clear_reactions()
                 for symbol in symbols.get_drive_position_symbols(active_drive.player.position):
                     await reaction.message.add_reaction(symbol)
+            # add optional sleep to prevent rate limits
+            # await asyncio.sleep(1)
             active_drive.islocked = False
  
     async def check_drives():
@@ -214,6 +216,27 @@ def main():
             drive_embed.set_image(url=assets.get_default())
         return drive_embed
 
+    @bot.command()
+    @commands.bot_has_permissions(view_channel=True, send_messages=True, manage_messages=True, embed_links=True, attach_files=True, read_message_history=True, use_external_emojis=True, add_reactions=True)
+    async def stop(ctx):
+        if not user_registered(ctx.author.id):
+            await ctx.channel.send(
+                "{} you are not registered yet! Try `t.register` to get started".format(ctx.author.mention))
+            return
+        active_drive = get_active_drive(ctx.author.id)
+        if active_drive is None:
+            await ctx.channel.send("Your truck already stopped driving. But you checked the handbrake just to be sure.")
+            return
+        active_drives.remove(active_drive)
+        await active_drive.message.clear_reactions()
+        await ctx.channel.send("You stopped driving!, {}".format(ctx.author.name))
+        cur.execute("UPDATE players SET position=? WHERE id=?",
+                   (players.format_pos_to_db(active_drive.player.position), ctx.author.id))
+        cur.execute("UPDATE players SET miles=? WHERE id=?",
+                   (active_drive.player.miles, ctx.author.id))
+        con.commit()
+        
+
     @bot.command(aliases=["here"])
     async def position(ctx):
         if not user_registered(ctx.author.id):
@@ -267,7 +290,7 @@ def main():
     @commands.bot_has_permissions(view_channel=True, send_messages=True, manage_messages=True, embed_links=True, attach_files=True, read_message_history=True, use_external_emojis=True, add_reactions=True)
     async def bing(ctx):
         answer = await ctx.channel.send("Bong")
-        await ctx.channel.send(str(round((answer.created_at-ctx.message.created_at).total_seconds()*1000))+ "  ms")
+        await ctx.channel.send(str(round((answer.created_at-ctx.message.created_at).total_seconds()*1000))+ "ms")
 
     @bot.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True, manage_messages=True, embed_links=True, attach_files=True, read_message_history=True, use_external_emojis=True, add_reactions=True)
@@ -323,11 +346,18 @@ def main():
         cur.execute("SELECT * FROM players WHERE id=:id", {"id": user_id})
         return players.from_tuple(cur.fetchone())
 
-    def get_active_drive(player_id, message_id):
-        for active_drive in active_drives:
-            if active_drive.player.user_id == player_id and active_drive.message.id == message_id:
-                return active_drive
-        return None
+    def get_active_drive(player_id, message_id=None):
+        if message_id is not None:
+            for active_drive in active_drives:
+                if active_drive.player.user_id == player_id and active_drive.message.id == message_id:
+                    return active_drive
+            return None
+        else:
+            for active_drive in active_drives:
+                if active_drive.player.user_id == player_id:
+                    return active_drive
+            return None
+            
 
     loop = asyncio.get_event_loop()
     loop.create_task(check_drives())
