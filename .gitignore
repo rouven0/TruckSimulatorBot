@@ -2,3 +2,4 @@ __pycache__
 .env
 players.db
 .pylintrc
+venv/
