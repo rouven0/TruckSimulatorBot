@@ -14,7 +14,8 @@ def __generate_list(l):
         if p[2] is not None:
             commands = p[2].split(";")
         image_url = p[3]
-        l.append(Place(name, position, commands, image_url))
+        produced_item = p[5]
+        l.append(Place(name, position, commands, image_url, produced_item))
 
 @dataclass
 class Place():
@@ -22,6 +23,7 @@ class Place():
     position: list
     commands: list
     image_url: str
+    produced_item: str
 
 def get(position):
     for place in get_all():
@@ -38,6 +40,9 @@ def get_public():
 def get_hidden():
     return __hidden_places
 
+def get_quest_active():
+    return __quest_active_places
+
 con = sqlite3.connect('objects.db')
 cur = con.cursor()
 
@@ -52,5 +57,9 @@ __generate_list(__public_places)
 __hidden_places = []
 cur.execute('SELECT * FROM places WHERE visibility=1')
 __generate_list(__hidden_places)
+
+__quest_active_places = []
+cur.execute('SELECT * FROM places WHERE quest_active=1')
+__generate_list(__quest_active_places)
 
 con.close()

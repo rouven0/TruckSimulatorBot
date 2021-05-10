@@ -2,6 +2,7 @@ import os
 import sqlite3
 from time import time
 from datetime import datetime
+from random import randint
 from math import floor
 from importlib import reload
 import asyncio
@@ -12,6 +13,7 @@ from dotenv import load_dotenv
 import assets
 import config
 # import help
+import items
 import players
 import places
 import symbols
@@ -282,9 +284,18 @@ def main():
             return
         # TODO generate Job
         player = get_player(ctx.author.id)
-        job_emded = discord.Embed(title="{}'s Job".format(player.name), colour=discord.Colour.gold())
-        await ctx.channel.send(embed=job_emded)
+        job_embed = discord.Embed(title="{}'s Job".format(player.name), colour=discord.Colour.gold())
+        job_embed.add_field(name="You got a new Job", value=generate_job(player))
+        await ctx.channel.send(embed=job_embed)
 
+    def generate_job(player):
+        available_places = places.get_quest_active()
+        place_from = available_places[randint(0, len(available_places)-1)]
+        item = items.get(place_from.produced_item)
+        available_places.remove(place_from)
+        place_to = available_places[randint(0, len(available_places)-1)]
+        # TODO make money formula from miles
+        return "{} needs {} {} from {}. You get money for this transport".format(place_to.name, item.emoji, item.name, place_from.name)
 
     @bot.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True, manage_messages=True, embed_links=True, attach_files=True, read_message_history=True, use_external_emojis=True, add_reactions=True)
