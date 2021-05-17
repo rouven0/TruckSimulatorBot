@@ -1,12 +1,11 @@
 from dataclasses import dataclass
 import sqlite3
 
-def __generate_list(l):
-    for i in cur.fetchall():
+def __generate_list(lst):
+    for i in __cur__.fetchall():
         name = i[0]
-        emoji = i[1] 
-        l.append(Item(name, emoji))
-    
+        emoji = i[1]
+        lst.append(Item(name, emoji))
 
 @dataclass
 class Item:
@@ -14,14 +13,14 @@ class Item:
     emoji: str
 
 def get(name):
-    for item in __all_items:
+    for item in __all_items__:
         if item.name == name:
             return item
     return None
 
-con = sqlite3.connect('objects.db')
-cur = con.cursor()
+__con__ = sqlite3.connect('objects.db')
+__cur__ = __con__.cursor()
 
-cur.execute('SELECT * FROM items')
-__all_items = []
-__generate_list(__all_items)
+__cur__.execute('SELECT * FROM items')
+__all_items__ = []
+__generate_list(__all_items__)

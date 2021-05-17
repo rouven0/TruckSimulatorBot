@@ -6,16 +6,16 @@ def __get_position(db_pos):
     pos_y = db_pos[:db_pos.find("/")]
     return [int(pos_x), int(pos_y)]
 
-def __generate_list(l):
-    for p in cur.fetchall():
-        name = p[0]
-        position = __get_position(p[1])
+def __generate_list(lst):
+    for tup in __cur__.fetchall():
+        name = tup[0]
+        position = __get_position(tup[1])
         commands = []
-        if p[2] is not None:
-            commands = p[2].split(";")
-        image_url = p[3]
-        produced_item = p[5]
-        l.append(Place(name, position, commands, image_url, produced_item))
+        if tup[2] is not None:
+            commands = tup[2].split(";")
+        image_url = tup[3]
+        produced_item = tup[5]
+        lst.append(Place(name, position, commands, image_url, produced_item))
 
 @dataclass
 class Place():
@@ -32,34 +32,34 @@ def get(position):
     return None
 
 def get_all():
-    return __all_places
+    return __all_places__
 
 def get_public():
-    return __public_places
+    return __public_places__
 
 def get_hidden():
-    return __hidden_places
+    return __hidden_places__
 
 def get_quest_active():
-    return __quest_active_places
+    return __quest_active_places__
 
-con = sqlite3.connect('objects.db')
-cur = con.cursor()
+__con__ = sqlite3.connect('objects.db')
+__cur__ = __con__.cursor()
 
-__all_places = []
-cur.execute('SELECT * FROM places WHERE visibility=0')
-__generate_list(__all_places)
+__all_places__ = []
+__cur__.execute('SELECT * FROM places WHERE visibility=0')
+__generate_list(__all_places__)
 
-__public_places = []
-cur.execute('SELECT * FROM places WHERE visibility=0')
-__generate_list(__public_places)
+__public_places__ = []
+__cur__.execute('SELECT * FROM places WHERE visibility=0')
+__generate_list(__public_places__)
 
-__hidden_places = []
-cur.execute('SELECT * FROM places WHERE visibility=1')
-__generate_list(__hidden_places)
+__hidden_places__ = []
+__cur__.execute('SELECT * FROM places WHERE visibility=1')
+__generate_list(__hidden_places__)
 
-__quest_active_places = []
-cur.execute('SELECT * FROM places WHERE quest_active=1')
-__generate_list(__quest_active_places)
+__quest_active_places__ = []
+__cur__.execute('SELECT * FROM places WHERE quest_active=1')
+__generate_list(__quest_active_places__)
 
-con.close()
+__con__.close()

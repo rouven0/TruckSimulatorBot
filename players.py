@@ -1,3 +1,6 @@
+"""
+This file contains the important player dataclasses
+"""
 from dataclasses import dataclass
 
 def list_from_tuples(tups):
@@ -13,13 +16,14 @@ def from_tuple(tup):
     """
     Returns a Player object from a received database tuple
     """
-    return Player(tup[0], tup[1], tup[2], tup[3], get_position(tup[4]), tup[5].split(";"), get_position(tup[6]), get_position(tup[7]), tup[8])
+    return Player(tup[0], tup[1], tup[2], get_position(tup[3]), tup[4])
 
 def to_tuple(player):
     """
     Transforms the player object into a tuple that can be inserted in the db
     """
-    return (player.user_id, player.name, player.truck_id, player.money, format_pos_to_db(player.position), format_items_to_db(player.quest_items), format_pos_to_db(player.quest_from), format_pos_to_db(player.quest_to), player.miles)
+    return (player.user_id, player.name, player.money,
+            format_pos_to_db(player.position), player.miles)
 
 def get_position(db_pos):
     """
@@ -35,35 +39,26 @@ def format_pos_to_db(pos):
     """
     return "{}/{}".format(pos[0], pos[1])
 
-def format_items_to_db(items):
-    """
-    Returns a string in the form 'item0;item1;item2...' that is inserted into the database
-    """
-    res=""
-    for item in items():
-        if res == "":
-            res=item
-        else:
-            res= res+";"+item
-
 @dataclass
 class Player():
     user_id: int
     name: str
-    truck_id: int
     money: float
     position: list
-    quest_items: list
-    quest_from: list
-    quest_to: list
     miles: int
 
 class ActiveDrive():
-    """
-    The ActiveDrive object is used to identify and manage a set of user and message, that belong to a driving
-    """
     def __init__(self, player, message, last_action_time):
         self.player = player
         self.message = message
         self.last_action_time = last_action_time
-        self.islocked = False
+        self.__locked = False
+
+    def lock(self):
+        self.__locked = True
+
+    def unlock(self):
+        self.__locked = False
+
+    def islocked(self):
+        return self.__locked
