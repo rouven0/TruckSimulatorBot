@@ -26,6 +26,8 @@ class Place():
     produced_item: str
 
 def get(position):
+    if isinstance(position, str):
+        position = __get_position(position)
     for place in get_all():
         if place.position == position:
             return place

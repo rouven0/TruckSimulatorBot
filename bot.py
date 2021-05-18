@@ -1,6 +1,6 @@
-import os
 import sqlite3
 from time import time
+from os import getenv
 from datetime import datetime
 from random import randint
 from math import floor, sqrt
@@ -20,20 +20,20 @@ import places
 import symbols
 
 load_dotenv('./.env')
-BOT_TOKEN = os.getenv('BOT_TOKEN')
-BOT_PREFIX = os.getenv('BOT_PREFIX').split(";")
+# BOT_TOKEN = getenv('BOT_TOKEN')
+BOT_PREFIX = getenv('BOT_PREFIX').split(";")
 
 # Alternate token and prefix for testing. Uncomment if needed
 # remove this if the bot is transferred to a remote server, only the real token will be stored then
-# BOT_TOKEN = os.getenv('TEST_BOT_TOKEN')
-# BOT_PREFIX = os.getenv('TEST_BOT_PREFIX').split(";")
+BOT_TOKEN = getenv('TEST_BOT_TOKEN')
+# BOT_PREFIX = getenv('TEST_BOT_PREFIX').split(";")
 
 
 def main():
     con = sqlite3.connect('players.db')
     cur = con.cursor()
     bot = commands.Bot(command_prefix=["t.", "T."],
-                       help_command=discord.ext.commands.DefaultHelpCommand(),
+                       help_command=commands.DefaultHelpCommand(),
                        case_insensitive=True)
     active_drives = []
 
@@ -178,10 +178,15 @@ def main():
 
         if user_registered(requested_id):
             player = get_player(requested_id)
+            current_job = get_job(ctx.author.id)
             profile_embed = discord.Embed(title="{}'s Profile".format(player.name),
                                           colour=discord.Colour.gold())
-            profile_embed.add_field(name="Money", value=player.money, inline=False)
-            profile_embed.add_field(name="Miles driven", value=player.miles)
+            profile_embed.add_field(name="Money", value=player.money)
+            profile_embed.add_field(name="Miles driven", value=player.miles, inline=False)
+            if current_job is not None:
+                profile_embed.add_field(name="Current Job", value=show_job(current_job))
+            else:
+                profile
             await ctx.channel.send(embed=profile_embed)
         else:
             await ctx.channel.send("<@!{}> is not registered yet! "
@@ -328,9 +333,10 @@ def main():
         await ctx.channel.send(embed=job_embed)
 
     def show_job(job):
-        item = items.get(job.place_from.produced_item)
-        return "{} needs {} {} from {}. You get ${} for this transport".format(job.place_to.name,
-            item.emoji, item.name, job.place_from.name, job.reward)
+        place_from = places.get(job.place_from)
+        place_to = places.get(job.place_to)
+        item = items.get(place_from.produced_item)
+        return "Bring {}{} from {} to {}.".format(item.emoji, item.name, place_from.name, place_to.name)
 
     def generate_job(player):
         available_places = places.get_quest_active().copy()
@@ -340,7 +346,7 @@ def main():
         place_to = available_places[randint(0, len(available_places) - 1)]
         miles_x = abs(place_from.position[0] - place_to.position[0])
         miles_y = abs(place_from.position[1] - place_to.position[1])
-        reward = round(sqrt(miles_x**2 + miles_y**2)*23)
+        reward = round(sqrt(miles_x**2 + miles_y**2)*37)
         new_job = jobs.Job(player.user_id, place_from.position, place_to.position, 0, reward)
         cur.execute('INSERT INTO jobs VALUES (?,?,?,?,?)', jobs.to_tuple(new_job))
         con.commit()
@@ -394,7 +400,7 @@ def main():
 
     @bot.event
     async def on_command_error(ctx, error):
-        if isinstance(error, discord.ext.commands.errors.BotMissingPermissions):
+        if isinstance(error, commands.errors.BotMissingPermissions):
             missing_permissions = '`'
             for permission in error.missing_perms:
                 missing_permissions = missing_permissions + "\n" + permission
