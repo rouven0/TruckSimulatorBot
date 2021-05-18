@@ -3,7 +3,7 @@ import sqlite3
 from time import time
 from datetime import datetime
 from random import randint
-from math import floor
+from math import floor, sqrt
 from importlib import reload
 import asyncio
 import discord
@@ -321,11 +321,16 @@ def main():
         player = get_player(ctx.author.id)
         current_job = get_job(ctx.author.id)
         job_embed = discord.Embed(title=f"{player.name}'s Job", colour=discord.Colour.gold())
-        if current_job is not None:
+        if current_job is None:
             job_embed.add_field(name="You got a new Job", value=generate_job(player))
         else:
-            job_embed.add_field(name="Your current job", value="dfh")
+            job_embed.add_field(name="Your current job", value=show_job(current_job))
         await ctx.channel.send(embed=job_embed)
+
+    def show_job(job):
+        item = items.get(job.place_from.produced_item)
+        return "{} needs {} {} from {}. You get ${} for this transport".format(job.place_to.name,
+            item.emoji, item.name, job.place_from.name, job.reward)
 
     def generate_job(player):
         available_places = places.get_quest_active().copy()
@@ -333,12 +338,14 @@ def main():
         item = items.get(place_from.produced_item)
         available_places.remove(place_from)
         place_to = available_places[randint(0, len(available_places) - 1)]
-        reward = abs(place_from.position[0] - place_to.position[0]) + abs(place_from.position[1] - place_to.position[1])
+        miles_x = abs(place_from.position[0] - place_to.position[0])
+        miles_y = abs(place_from.position[1] - place_to.position[1])
+        reward = round(sqrt(miles_x**2 + miles_y**2)*23)
         new_job = jobs.Job(player.user_id, place_from.position, place_to.position, 0, reward)
         cur.execute('INSERT INTO jobs VALUES (?,?,?,?,?)', jobs.to_tuple(new_job))
         con.commit()
-        return "{} needs {} {} from {}. You get ${} for this transport".format(place_to.name, item.emoji, item.name,
-                                                                               place_from.name, reward)
+        return "{} needs {} {} from {}. You get ${} for this transport".format(place_to.name,
+            item.emoji, item.name, place_from.name, reward)
 
     @bot.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True, manage_messages=True,
