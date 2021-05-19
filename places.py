@@ -2,8 +2,8 @@ from dataclasses import dataclass
 import sqlite3
 
 def __get_position(db_pos):
-    pos_x = db_pos[db_pos.find("/")+1:]
-    pos_y = db_pos[:db_pos.find("/")]
+    pos_x = db_pos[:db_pos.find("/")]
+    pos_y = db_pos[db_pos.find("/")+1:]
     return [int(pos_x), int(pos_y)]
 
 def __generate_list(lst):
@@ -29,7 +29,9 @@ def get(position):
     if isinstance(position, str):
         position = __get_position(position)
     for place in get_all():
+        print(place.position)
         if place.position == position:
+            print("SUCCESS")
             return place
     return None
 

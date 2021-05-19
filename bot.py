@@ -32,7 +32,7 @@ BOT_TOKEN = getenv('TEST_BOT_TOKEN')
 def main():
     con = sqlite3.connect('players.db')
     cur = con.cursor()
-    bot = commands.Bot(command_prefix=["t.", "T."],
+    bot = commands.Bot(command_prefix=BOT_PREFIX,
                        help_command=commands.DefaultHelpCommand(),
                        case_insensitive=True)
     active_drives = []
@@ -135,9 +135,9 @@ def main():
 
     @bot.command()
     async def treasure(ctx):
-        if not user_registered(ctx.author.id):
-            return
         player = get_player(ctx.author.id)
+        if player is None:
+            return
         if player.position in [pl.position for pl in places.get_hidden()]:
             cur.execute('UPDATE players SET money=50000 WHERE id=?', ctx.author.id)
             cur.execute('UPDATE players SET position=? WHERE id=?', ("0/0", ctx.author.id))
@@ -176,21 +176,20 @@ def main():
         else:
             requested_id = ctx.author.id
 
-        if user_registered(requested_id):
-            player = get_player(requested_id)
-            current_job = get_job(ctx.author.id)
-            profile_embed = discord.Embed(title="{}'s Profile".format(player.name),
-                                          colour=discord.Colour.gold())
-            profile_embed.add_field(name="Money", value=player.money)
-            profile_embed.add_field(name="Miles driven", value=player.miles, inline=False)
-            if current_job is not None:
-                profile_embed.add_field(name="Current Job", value=show_job(current_job))
-            else:
-                profile
-            await ctx.channel.send(embed=profile_embed)
-        else:
+        player = get_player(requested_id)
+        if player is None:
             await ctx.channel.send("<@!{}> is not registered yet! "
                                    "Try `t.register` to get started".format(requested_id))
+            return
+
+        current_job = get_job(ctx.author.id)
+        profile_embed = discord.Embed(title="{}'s Profile".format(player.name),
+                                      colour=discord.Colour.gold())
+        profile_embed.add_field(name="Money", value=player.money)
+        profile_embed.add_field(name="Miles driven", value=player.miles, inline=False)
+        if current_job is not None:
+            profile_embed.add_field(name="Current Job", value=show_job(current_job))
+            await ctx.channel.send(embed=profile_embed)
 
     @bot.command()
     async def top(ctx, *args):
@@ -220,7 +219,8 @@ def main():
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True, add_reactions=True)
     async def drive(ctx):
-        if not user_registered(ctx.author.id):
+        player = get_player(ctx.author.id)
+        if player is None:
             await ctx.channel.send(
                 "{} you are not registered yet! "
                 "Try `t.register` to get started".format(ctx.author.mention))
@@ -230,7 +230,6 @@ def main():
             await ctx.channel.send("You can't drive on two roads at once!")
             return
 
-        player = get_player(ctx.author.id)
         message = await ctx.channel.send(embed=get_drive_embed(player))
         for symbol in symbols.get_drive_position_symbols(player.position):
             await message.add_reaction(symbol)
@@ -280,13 +279,13 @@ def main():
 
     @bot.command(aliases=["here"])
     async def position(ctx):
-        if not user_registered(ctx.author.id):
+        player = get_player(ctx.author.id)
+        if player is None:
             await ctx.channel.send(
                 "{} you are not registered yet! "
                 "Try `t.register` to get started".format(ctx.author.mention))
             return
 
-        player = get_player(ctx.author.id)
         place = places.get(player.position)
         position_embed = discord.Embed(title="{}'s Position".format(ctx.author.name),
                                        description="You are at {}".format(player.position),
@@ -318,27 +317,30 @@ def main():
 
     @bot.command()
     async def job(ctx):
-        if not user_registered(ctx.author.id):
+        player = get_player(ctx.author.id)
+        if player is None:
             await ctx.channel.send(
                 "{} you are not registered yet! "
                 "Try `t.register` to get started".format(ctx.author.mention))
             return
-        player = get_player(ctx.author.id)
         current_job = get_job(ctx.author.id)
         job_embed = discord.Embed(title=f"{player.name}'s Job", colour=discord.Colour.gold())
         if current_job is None:
-            job_embed.add_field(name="You got a new Job", value=generate_job(player))
+            job_tuple=generate_job(player)
+            job_embed.add_field(name="You got a new Job", value=job_tuple[1], inline=False)
+            job_embed.add_field(name="Current state", value=get_job_state(job_tuple[0]))
         else:
-            job_embed.add_field(name="Your current job", value=show_job(current_job))
+            job_embed.add_field(name="Your current job", value=show_job(current_job), inline=False)
+            job_embed.add_field(name="Current state", value=get_job_state(current_job))
         await ctx.channel.send(embed=job_embed)
 
-    def show_job(job):
-        place_from = places.get(job.place_from)
-        place_to = places.get(job.place_to)
+    def show_job(job: jobs.Job):
+        place_from = job.place_from
+        place_to = job.place_to
         item = items.get(place_from.produced_item)
-        return "Bring {}{} from {} to {}.".format(item.emoji, item.name, place_from.name, place_to.name)
+        return "Bring {} {} from {} to {}.".format(item.emoji, item.name, place_from.name, place_to.name)
 
-    def generate_job(player):
+    def generate_job(player: players.Player):
         available_places = places.get_quest_active().copy()
         place_from = available_places[randint(0, len(available_places) - 1)]
         item = items.get(place_from.produced_item)
@@ -347,11 +349,19 @@ def main():
         miles_x = abs(place_from.position[0] - place_to.position[0])
         miles_y = abs(place_from.position[1] - place_to.position[1])
         reward = round(sqrt(miles_x**2 + miles_y**2)*37)
-        new_job = jobs.Job(player.user_id, place_from.position, place_to.position, 0, reward)
+        new_job = jobs.Job(player.user_id, place_from, place_to, 0, reward)
         cur.execute('INSERT INTO jobs VALUES (?,?,?,?,?)', jobs.to_tuple(new_job))
         con.commit()
-        return "{} needs {} {} from {}. You get ${} for this transport".format(place_to.name,
-            item.emoji, item.name, place_from.name, reward)
+        return (new_job , "{} needs {} {} from {}. You get ${} for this transport".format(place_to.name,
+            item.emoji, item.name, place_from.name, reward))
+
+    def get_job_state(job: jobs.Job):
+        if job.state == 0:
+            return "You claimed this job. Drive to {} and load your truck".format(job.place_from.name)
+        if job.state == 1:
+            return "You loaded your truck with the needed items. Now drive to {} and unload them".format(job.place_to.name)
+        if job.state == 2:
+            return "Your job is done. If you can read this, something went wrong"
 
     @bot.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True, manage_messages=True,

@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import places
 
 def list_from_tuples(tups):
     """
@@ -13,14 +14,14 @@ def from_tuple(tup):
     """
     Returns a Job object from a received database tuple
     """
-    return Job(tup[0], get_position(tup[1]), get_position(tup[2]), tup[3], tup[4])
+    return Job(tup[0], places.get(tup[1]), places.get(tup[2]), tup[3], tup[4])
 
 def to_tuple(job):
     """
     Transforms the job object into a tuple that can be inserted in the db
     """
-    return (job.job_id, format_pos_to_db(job.place_from), format_pos_to_db(job.place_to),
-            job.state, job.reward)
+    return (job.player_id, format_pos_to_db(job.place_from.position),
+            format_pos_to_db(job.place_to.position), job.state, job.reward)
 
 def get_position(db_pos):
     """
@@ -38,8 +39,8 @@ def format_pos_to_db(pos):
 
 @dataclass
 class Job():
-    job_id: str
-    place_from: list
-    place_to: list
+    player_id: int
+    place_from: places.Place
+    place_to: places.Place
     state: int
     reward: int
