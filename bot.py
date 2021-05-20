@@ -134,24 +134,6 @@ def main():
             await asyncio.sleep(10)
 
     @bot.command()
-    async def treasure(ctx):
-        player = get_player(ctx.author.id)
-        if player is None:
-            return
-        if player.position in [pl.position for pl in places.get_hidden()]:
-            cur.execute('UPDATE players SET money=50000 WHERE id=?', ctx.author.id)
-            cur.execute('UPDATE players SET position=? WHERE id=?', ("0/0", ctx.author.id))
-            con.commit()
-            await ctx.channel.send("You found a strange chest with 50000 dollars inside. "
-                                   "Then you woke up at 0/0")
-            tempcon = sqlite3.connect('objects.db')
-            tempcur = tempcon.cursor()
-            tempcur.execute('DELETE FROM places WHERE position=?', '1000/1000')
-            tempcon.commit()
-            tempcon.close()
-            reload(places)
-
-    @bot.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True, manage_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True, add_reactions=True)
