@@ -29,9 +29,7 @@ def get(position):
     if isinstance(position, str):
         position = __get_position(position)
     for place in get_all():
-        print(place.position)
         if place.position == position:
-            print("SUCCESS")
             return place
     return None
 

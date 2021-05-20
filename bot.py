@@ -189,7 +189,7 @@ def main():
         profile_embed.add_field(name="Miles driven", value=player.miles, inline=False)
         if current_job is not None:
             profile_embed.add_field(name="Current Job", value=show_job(current_job))
-            await ctx.channel.send(embed=profile_embed)
+        await ctx.channel.send(embed=profile_embed)
 
     @bot.command()
     async def top(ctx, *args):
@@ -316,7 +316,7 @@ def main():
         await ctx.channel.send(embed=places_embed)
 
     @bot.command()
-    async def job(ctx):
+    async def job(ctx, *args):
         player = get_player(ctx.author.id)
         if player is None:
             await ctx.channel.send(
@@ -325,13 +325,17 @@ def main():
             return
         current_job = get_job(ctx.author.id)
         job_embed = discord.Embed(title=f"{player.name}'s Job", colour=discord.Colour.gold())
-        if current_job is None:
+        if args and args[0] == "new":
             job_tuple=generate_job(player)
             job_embed.add_field(name="You got a new Job", value=job_tuple[1], inline=False)
             job_embed.add_field(name="Current state", value=get_job_state(job_tuple[0]))
         else:
-            job_embed.add_field(name="Your current job", value=show_job(current_job), inline=False)
-            job_embed.add_field(name="Current state", value=get_job_state(current_job))
+            if current_job is None:
+                job_embed.add_field(name="You don't have a job at the moment", 
+                                    value="Type `t.job new` to get one")
+            else:
+                job_embed.add_field(name="Your current job", value=show_job(current_job), inline=False)
+                job_embed.add_field(name="Current state", value=get_job_state(current_job))
         await ctx.channel.send(embed=job_embed)
 
     def show_job(job: jobs.Job):
@@ -357,11 +361,52 @@ def main():
 
     def get_job_state(job: jobs.Job):
         if job.state == 0:
-            return "You claimed this job. Drive to {} and load your truck".format(job.place_from.name)
+            return "You claimed this job. Drive to {} and load your truck with `t.load`".format(job.place_from.name)
         if job.state == 1:
-            return "You loaded your truck with the needed items. Now drive to {} and unload them".format(job.place_to.name)
+            return "You loaded your truck with the needed items. Now drive to {} and unload them with `t.unload`".format(job.place_to.name)
         if job.state == 2:
-            return "Your job is done. If you can read this, something went wrong"
+            return "Your job is done and you got ${}.".format(job.reward)
+
+    @bot.command()
+    async def load(ctx):
+        player = get_player(ctx.author.id)
+        if player is None:
+            await ctx.channel.send(
+                "{} you are not registered yet! "
+                "Try `t.register` to get started".format(ctx.author.mention))
+            return
+        current_job = get_job(ctx.author.id)
+        if current_job is None:
+            await ctx.channel.send("Nothing to do here")
+            return
+        if player.position == current_job.place_from.position:
+            current_job.state = 1
+            await ctx.channel.send(get_job_state(current_job))
+            cur.execute('UPDATE jobs SET state=? WHERE player_id=?', (current_job.state, ctx.author.id))
+            con.commit()
+        else:
+            await ctx.channel.send("Nothing to do here")
+
+    @bot.command()
+    async def unload(ctx):
+        player = get_player(ctx.author.id)
+        if player is None:
+            await ctx.channel.send(
+                "{} you are not registered yet! "
+                "Try `t.register` to get started".format(ctx.author.mention))
+            return
+        current_job = get_job(ctx.author.id)
+        if current_job is None:
+            await ctx.channel.send("Nothing to do here")
+            return
+        if player.position == current_job.place_to.position:
+            current_job.state = 2
+            await ctx.channel.send(get_job_state(current_job))
+            cur.execute('DELETE FROM jobs WHERE player_id=:id', {"id": ctx.author.id})
+            cur.execute('UPDATE players SET money=? WHERE id=?', (player.money+current_job.reward, ctx.author.id))
+            con.commit()
+        else:
+            await ctx.channel.send("Nothing to do here")
 
     @bot.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True, manage_messages=True,
@@ -403,7 +448,18 @@ def main():
             await ctx.channel.send("Done")
 
         if args[0] == "shutdown":
-            # await ctx.channel.send("Are you sure to init the shutdown [y/N]")
+            processed_channels = []
+            for drv in active_drives:
+                active_drives.remove(drv)
+                await drv.message.clear_reactions()
+                if drv.message.channel.id not in processed_channels:
+                    await drv.message.channel.send("All trucks were stopped due to a bot shutdown!")
+                    processed_channels.append(drv.message.channel.id)
+                cur.execute("UPDATE players SET position=? WHERE id=?",
+                            (players.format_pos_to_db(drv.player.position), drv.player.user_id))
+                cur.execute("UPDATE players SET miles=? WHERE id=?",
+                            (drv.player.miles, drv.player.user_id))
+                con.commit()
             await bot.change_presence(status=discord.Status.idle)
             await ctx.channel.send("Shutting down")
             await bot.logout()
