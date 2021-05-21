@@ -307,17 +307,17 @@ def main():
             return
         current_job = get_job(ctx.author.id)
         job_embed = discord.Embed(title=f"{player.name}'s Job", colour=discord.Colour.gold())
-        if args and args[0] == "new":
-            job_tuple=generate_job(player)
-            job_embed.add_field(name="You got a new Job", value=job_tuple[1], inline=False)
-            job_embed.add_field(name="Current state", value=get_job_state(job_tuple[0]))
-        else:
-            if current_job is None:
+        if current_job is None:
+            if args and args[0] == "new":
+                job_tuple=generate_job(player)
+                job_embed.add_field(name="You got a new Job", value=job_tuple[1], inline=False)
+                job_embed.add_field(name="Current state", value=get_job_state(job_tuple[0]))
+            else:
                 job_embed.add_field(name="You don't have a job at the moment", 
                                     value="Type `t.job new` to get one")
-            else:
-                job_embed.add_field(name="Your current job", value=show_job(current_job), inline=False)
-                job_embed.add_field(name="Current state", value=get_job_state(current_job))
+        else:
+            job_embed.add_field(name="Your current job", value=show_job(current_job), inline=False)
+            job_embed.add_field(name="Current state", value=get_job_state(current_job))
         await ctx.channel.send(embed=job_embed)
 
     def show_job(job: jobs.Job):
