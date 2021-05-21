@@ -20,12 +20,12 @@ import places
 import symbols
 
 load_dotenv('./.env')
-# BOT_TOKEN = getenv('BOT_TOKEN')
+BOT_TOKEN = getenv('BOT_TOKEN')
 BOT_PREFIX = getenv('BOT_PREFIX').split(";")
 
 # Alternate token and prefix for testing. Uncomment if needed
 # remove this if the bot is transferred to a remote server, only the real token will be stored then
-BOT_TOKEN = getenv('TEST_BOT_TOKEN')
+# BOT_TOKEN = getenv('TEST_BOT_TOKEN')
 # BOT_PREFIX = getenv('TEST_BOT_PREFIX').split(";")
 
 
@@ -381,7 +381,7 @@ def main():
         if current_job is None:
             await ctx.channel.send("Nothing to do here")
             return
-        if player.position == current_job.place_to.position:
+        if player.position == current_job.place_to.position and current_job.state == 1:
             current_job.state = 2
             await ctx.channel.send(get_job_state(current_job))
             cur.execute('DELETE FROM jobs WHERE player_id=:id', {"id": ctx.author.id})
