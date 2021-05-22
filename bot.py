@@ -96,7 +96,7 @@ def main():
             active_drive.lock()
             active_drive.last_action_time = time()
             active_drive.player.miles += 1
-            await reaction.message.edit(embed=get_drive_embed(active_drive.player))
+            await reaction.message.edit(embed=get_drive_embed(active_drive.player, user.avatar_url))
             if (active_drive.player.position[0] >= config.MAP_BORDER or
                     active_drive.player.position[1] >= config.MAP_BORDER or
                     active_drive.player.position[0] < 1 or
@@ -165,8 +165,9 @@ def main():
             return
 
         current_job = get_job(ctx.author.id)
-        profile_embed = discord.Embed(title="{}'s Profile".format(player.name),
-                                      colour=discord.Colour.gold())
+        profile_embed = discord.Embed(colour=discord.Colour.gold())
+        profile_embed.set_author(name="{}'s Profile".format(player.name), icon_url=ctx.author.avatar_url)
+        profile_embed.set_thumbnail(url=ctx.author.avatar_url)
         profile_embed.add_field(name="Money", value=player.money)
         profile_embed.add_field(name="Miles driven", value=player.miles, inline=False)
         if current_job is not None:
@@ -212,16 +213,16 @@ def main():
             await ctx.channel.send("You can't drive on two roads at once!")
             return
 
-        message = await ctx.channel.send(embed=get_drive_embed(player))
+        message = await ctx.channel.send(embed=get_drive_embed(player, ctx.author.avatar_url))
         for symbol in symbols.get_drive_position_symbols(player.position):
             await message.add_reaction(symbol)
         active_drives.append(players.ActiveDrive(player, message, time()))
 
-    def get_drive_embed(player):
+    def get_drive_embed(player, avatar_url):
         place = places.get(player.position)
-        drive_embed = discord.Embed(title="{} is driving".format(player.name),
-                                    description="We hope he has fun",
+        drive_embed = discord.Embed(description="We hope he has fun",
                                     colour=discord.Colour.gold())
+        drive_embed.set_author(name="{} is driving".format(player.name), icon_url=avatar_url)
         drive_embed.add_field(name="Instructions",
                               value=open("./drive_instrucions.md", "r").read(),
                               inline=False)
@@ -269,9 +270,9 @@ def main():
             return
 
         place = places.get(player.position)
-        position_embed = discord.Embed(title="{}'s Position".format(ctx.author.name),
-                                       description="You are at {}".format(player.position),
+        position_embed = discord.Embed(description="You are at {}".format(player.position),
                                        colour=discord.Colour.gold())
+        position_embed.set_author(name="{}'s Position".format(ctx.author.name), icon_url=ctx.author.avatar_url)
         if place is not None:
             position_embed.add_field(name="What is here?",
                                      value=symbols.LIST_ITEM + place.name, inline=False)
@@ -306,7 +307,8 @@ def main():
                 "Try `t.register` to get started".format(ctx.author.mention))
             return
         current_job = get_job(ctx.author.id)
-        job_embed = discord.Embed(title=f"{player.name}'s Job", colour=discord.Colour.gold())
+        job_embed = discord.Embed(colour=discord.Colour.gold())
+        job_embed.set_author(name="{}'s Job".format(ctx.author.name), icon_url=ctx.author.avatar_url)
         if current_job is None:
             if args and args[0] == "new":
                 job_tuple=generate_job(player)
