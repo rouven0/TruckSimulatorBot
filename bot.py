@@ -23,12 +23,6 @@ load_dotenv('./.env')
 BOT_TOKEN = getenv('BOT_TOKEN')
 BOT_PREFIX = getenv('BOT_PREFIX').split(";")
 
-# Alternate token and prefix for testing. Uncomment if needed
-# remove this if the bot is transferred to a remote server, only the real token will be stored then
-# BOT_TOKEN = getenv('TEST_BOT_TOKEN')
-# BOT_PREFIX = getenv('TEST_BOT_PREFIX').split(";")
-
-
 def main():
     con = sqlite3.connect('players.db')
     cur = con.cursor()
@@ -138,7 +132,7 @@ def main():
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True, add_reactions=True)
     async def register(ctx):
-        # id, name, money, position, quest_id, miles
+        # id, name, money, position,  miles
         if not user_registered(ctx.author.id):
             cur.execute("INSERT INTO players VALUES (?,?,?,?,?)",
                         (ctx.author.id, ctx.author.name, 0, "0/0", 0))
