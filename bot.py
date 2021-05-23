@@ -177,22 +177,22 @@ def main():
     @bot.command()
     async def top(ctx, *args):
         if args and args[0] == "money":
-            request = "money"
+            request = "$"
             cur.execute('SELECT * FROM players ORDER BY money DESC')
         else:
-            request = "miles"
+            request = " miles"
             cur.execute('SELECT * FROM players ORDER BY miles DESC')
         top_embed = players.list_from_tuples(cur.fetchmany(10))
         top_body = ""
         count = 0
         for player in top_embed:
-            if request == "money":
+            if request == "$":
                 val = player.money
             else:
                 val = player.miles
 
             count += 1
-            top_body = "{}**{}**. {} - {} {}\n".format(top_body, count, player.name, val, request)
+            top_body = "{}**{}**. {} - {}{}\n".format(top_body, count, player.name, val, request)
         top_emded = discord.Embed(title="Truck Simulator top list", colour=discord.Colour.gold())
         top_emded.add_field(name="Top {}".format(request), value=top_body)
         await ctx.channel.send(embed=top_emded)
@@ -315,7 +315,7 @@ def main():
                 job_embed.add_field(name="You got a new Job", value=job_tuple[1], inline=False)
                 job_embed.add_field(name="Current state", value=get_job_state(job_tuple[0]))
             else:
-                job_embed.add_field(name="You don't have a job at the moment", 
+                job_embed.add_field(name="You don't have a job at the moment",
                                     value="Type `t.job new` to get one")
         else:
             job_embed.add_field(name="Your current job", value=show_job(current_job), inline=False)
@@ -334,9 +334,15 @@ def main():
         item = items.get(place_from.produced_item)
         available_places.remove(place_from)
         place_to = available_places[randint(0, len(available_places) - 1)]
-        miles_x = abs(place_from.position[0] - place_to.position[0])
-        miles_y = abs(place_from.position[1] - place_to.position[1])
-        reward = round(sqrt(miles_x**2 + miles_y**2)*37)
+        arrival_miles_x = abs(player.position[0] - place_from.position[0])
+        arrival_miles_y = abs(player.position[1] - place_from.position[1])
+        arrival_reward = round(sqrt(arrival_miles_x**2 + arrival_miles_y**2)*14)
+        job_miles_x = abs(place_from.position[0] - place_to.position[0])
+        job_miles_y = abs(place_from.position[1] - place_to.position[1])
+        job_reward = round(sqrt(job_miles_x**2 + job_miles_y**2)*37)
+        reward = job_reward + arrival_reward
+        if reward > 4329:
+            reward = 4329
         new_job = jobs.Job(player.user_id, place_from, place_to, 0, reward)
         cur.execute('INSERT INTO jobs VALUES (?,?,?,?,?)', jobs.to_tuple(new_job))
         con.commit()
@@ -350,6 +356,7 @@ def main():
             return "You loaded your truck with the needed items. Now drive to {} and unload them with `t.unload`".format(job.place_to.name)
         if job.state == 2:
             return "Your job is done and you got ${}.".format(job.reward)
+        return "Something went wrong"
 
     @bot.command()
     async def load(ctx):
