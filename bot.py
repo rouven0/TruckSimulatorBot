@@ -208,6 +208,13 @@ def main():
                               value="Your position is only applied if you stop driving",
                               inline=False)
         drive_embed.add_field(name="Position", value=player.position)
+        current_job = jobs.get(player.user_id)
+        if current_job is not None:
+            if current_job.state == 0:
+                navigation_place = current_job.place_from
+            else:
+                navigation_place = current_job.place_to
+            drive_embed.add_field(name="Navigation: Drive to {}".format(navigation_place.name), value=navigation_place.position)
         if place is not None:
             drive_embed.set_image(url=place.image_url)
         else:
@@ -296,7 +303,6 @@ def main():
             job_embed.add_field(name="Current state", value=jobs.get_state(current_job))
         await ctx.channel.send(embed=job_embed)
 
-
     @bot.command()
     async def load(ctx):
         player = players.get(ctx.author.id)
@@ -313,8 +319,6 @@ def main():
             current_job.state = 1
             await ctx.channel.send(jobs.get_state(current_job))
             jobs.update(current_job, state=current_job.state)
-            # cur.execute('UPDATE jobs SET state=? WHERE player_id=?', (current_job.state, ctx.author.id))
-            # con.commit()
         else:
             await ctx.channel.send("Nothing to do here")
 
