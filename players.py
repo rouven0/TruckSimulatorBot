@@ -70,13 +70,14 @@ def update(player: Player, name=None, money=None, position=None, miles=None):
     Updates a player in the database
     """
     if name is not None:
-       __cur__.execute('UPDATE players SET name=? WHERE id=?', (name, player.user_id))
+        __cur__.execute('UPDATE players SET name=? WHERE id=?', (name, player.user_id))
     if money is not None:
-       __cur__.execute('UPDATE players SET money=? WHERE id=?', (money, player.user_id))
+        __cur__.execute('UPDATE players SET money=? WHERE id=?', (money, player.user_id))
     if position is not None:
-       __cur__.execute('UPDATE players SET position=? WHERE id=?', (__format_pos_to_db(position), player.user_id))
+        __cur__.execute('UPDATE players SET position=? WHERE id=?',
+                        (__format_pos_to_db(position), player.user_id))
     if miles is not None:
-       __cur__.execute('UPDATE players SET miles=? WHERE id=?', (miles, player.user_id))
+        __cur__.execute('UPDATE players SET miles=? WHERE id=?', (miles, player.user_id))
     __con__.commit()
 
 def get(user_id):
@@ -93,7 +94,7 @@ def get_top(key):
     """
     Get the top 10 players from the database
     """
-    __cur__.execute('SELECT * FROM players ORDER BY ? DESC', (key,)) 
+    __cur__.execute("SELECT * FROM players ORDER BY key=:key DESC", {"key": key})
     return __list_from_tuples(__cur__.fetchmany(10))
 
 def registered(user_id):
