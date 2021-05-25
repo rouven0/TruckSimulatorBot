@@ -155,24 +155,22 @@ def main():
 
     @bot.command()
     async def top(ctx, *args):
-        if args and args[0] == "money":
-            request = "money"
-            suffix = "$"
+        if args:
+            top_players = players.get_top(args[0])
         else:
-            request = "miles"
-            suffix = " miles"
-        top_players = players.get_top(request)
+            top_players = players.get_top()
         top_body = ""
         count = 0
-        for player in top_players:
-            if request == "money":
+
+        for player in top_players[0]:
+            if top_players[1] == "money":
                 val = player.money
             else:
                 val = player.miles
             count += 1
-            top_body = "{}**{}**. {} - {}{}\n".format(top_body, count, player.name, val, suffix)
+            top_body = "{}**{}**. {} - {}{}\n".format(top_body, count, player.name, val, top_players[2])
         top_emded = discord.Embed(title="Truck Simulator top list", colour=discord.Colour.gold())
-        top_emded.add_field(name="Top {}".format(request), value=top_body)
+        top_emded.add_field(name="Top {}".format(top_players[1]), value=top_body)
         await ctx.channel.send(embed=top_emded)
 
     @bot.command()

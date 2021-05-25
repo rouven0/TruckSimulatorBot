@@ -90,12 +90,17 @@ def get(user_id):
     except TypeError:
         return None
 
-def get_top(key):
+def get_top(key="miles"):
     """
     Get the top 10 players from the database
     """
-    __cur__.execute("SELECT * FROM players ORDER BY key=:key DESC", {"key": key})
-    return __list_from_tuples(__cur__.fetchmany(10))
+    if key == "money":
+        __cur__.execute("SELECT * FROM players ORDER BY money DESC")
+        suffix = "$"
+    else:
+        __cur__.execute("SELECT * FROM players ORDER BY miles DESC")
+        suffix = " miles"
+    return (__list_from_tuples(__cur__.fetchmany(10)), key, suffix)
 
 def registered(user_id):
     """
