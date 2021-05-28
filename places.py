@@ -49,7 +49,7 @@ __con__ = sqlite3.connect('objects.db')
 __cur__ = __con__.cursor()
 
 __all_places__ = []
-__cur__.execute('SELECT * FROM places WHERE visibility=0')
+__cur__.execute('SELECT * FROM places')
 __generate_list(__all_places__)
 
 __public_places__ = []

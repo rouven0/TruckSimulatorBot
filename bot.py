@@ -4,6 +4,7 @@ from datetime import datetime
 from math import floor
 from importlib import reload
 import asyncio
+import logging
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -26,17 +27,19 @@ def main():
                        help_command=commands.DefaultHelpCommand(),
                        case_insensitive=True)
     active_drives = []
+    logging.basicConfig(level=config.LOGLEVEL,
+            format=config.LOG_FORMAT,
+            datefmt="%D %H:%M:%S",
+            filename='./{}.log'.format(datetime.now().strftime("%Y-%m-%d_%H:%M")))
 
     @bot.event
     async def on_ready():
-        print("Connected to Discord")
+        logging.info("Connected to Discord")
+        print("ready")
         await bot.change_presence(status=discord.Status.online,
                                   activity=discord.Activity(
                                       type=discord.ActivityType.watching,
                                       name=str(len(bot.guilds)) + " Servers"))
-        print("Bot servers:")
-        for guild in bot.guilds:
-            print(guild.name)
 
     @bot.event
     async def on_reaction_add(reaction, user):
