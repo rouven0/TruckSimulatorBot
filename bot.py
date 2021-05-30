@@ -30,7 +30,7 @@ def main():
     logging.basicConfig(level=config.LOGLEVEL,
             format=config.LOG_FORMAT,
             datefmt="%D %H:%M:%S",
-            filename='./{}.log'.format(datetime.now().strftime("%Y-%m-%d_%H:%M")))
+            filename='./logs/{}.log'.format(datetime.now().strftime("%Y-%m-%d_%H:%M")))
 
     @bot.event
     async def on_ready():
