@@ -27,10 +27,19 @@ def main():
                        help_command=commands.DefaultHelpCommand(),
                        case_insensitive=True)
     active_drives = []
-    logging.basicConfig(level=config.LOGLEVEL,
-            format=config.LOG_FORMAT,
-            datefmt="%D %H:%M:%S",
-            filename='./logs/{}.log'.format(datetime.now().strftime("%Y-%m-%d_%H:%M")))
+
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)
+
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.DEBUG)
+    console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
+    logger.addHandler(console_handler)
+
+    file_handler = console_handler = logging.FileHandler("./logs/{}.log".format(datetime.now().strftime("%Y-%m-%d_%H:%M")))
+    file_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
+    file_handler.setLevel(logging.INFO)
+    logger.addHandler(file_handler)
 
     @bot.event
     async def on_ready():
