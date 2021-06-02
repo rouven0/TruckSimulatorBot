@@ -29,16 +29,14 @@ def main():
     active_drives = []
 
     logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
 
     console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.DEBUG)
     console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
     logger.addHandler(console_handler)
 
     file_handler = console_handler = logging.FileHandler("./logs/{}.log".format(datetime.now().strftime("%Y-%m-%d_%H:%M")))
     file_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
-    file_handler.setLevel(logging.INFO)
     logger.addHandler(file_handler)
 
     @bot.event
