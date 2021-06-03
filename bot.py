@@ -41,12 +41,12 @@ def main():
 
     @bot.event
     async def on_ready():
-        logging.info("Connected to Discord")
-        print("ready")
         await bot.change_presence(status=discord.Status.online,
                                   activity=discord.Activity(
                                       type=discord.ActivityType.watching,
                                       name=str(len(bot.guilds)) + " Servers"))
+        logging.info("Connected to Discord")
+        logging.info(f'Loaded {len(places.get_all())} places')
 
     @bot.event
     async def on_reaction_add(reaction, user):

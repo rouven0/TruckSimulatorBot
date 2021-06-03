@@ -24,3 +24,5 @@ __cur__ = __con__.cursor()
 __cur__.execute('SELECT * FROM items')
 __all_items__ = []
 __generate_list(__all_items__)
+
+__con__.close()

@@ -2,7 +2,9 @@
 This file contains the important player dataclasses
 """
 from dataclasses import dataclass, field
+from math import log
 import sqlite3
+import logging
 
 __con__ = sqlite3.connect('players.db')
 __cur__ = __con__.cursor()
@@ -57,6 +59,7 @@ def insert(player: Player):
     """
     __cur__.execute('INSERT INTO players VALUES (?,?,?,?,?)', __to_tuple(player))
     __con__.commit()
+    logging.info(f'Inserted {player.name} into the database')
 
 def remove(player :Player):
     """
@@ -64,6 +67,7 @@ def remove(player :Player):
     """
     __cur__.execute('DELETE FROM players WHERE id=:id', {"id": player.user_id})
     __con__.commit()
+    logging.info(f'Removed {player.name} from the database')
 
 def update(player: Player, name=None, money=None, position=None, miles=None):
     """
@@ -79,6 +83,7 @@ def update(player: Player, name=None, money=None, position=None, miles=None):
     if miles is not None:
         __cur__.execute('UPDATE players SET miles=? WHERE id=?', (miles, player.user_id))
     __con__.commit()
+    logging.info(f'Updated player {player.name} to {__to_tuple(player)}')
 
 def get(user_id):
     """
