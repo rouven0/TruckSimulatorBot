@@ -34,7 +34,7 @@ def main():
     console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
     logger.addHandler(console_handler)
 
-    file_handler = console_handler = logging.FileHandler("./logs/{}.log".format(datetime.now().strftime("%Y-%m-%d_%H:%M")))
+    file_handler = logging.FileHandler("./logs/{}.log".format(datetime.now().strftime("%Y-%m-%d_%H:%M")))
     file_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
     logger.addHandler(file_handler)
 
@@ -45,11 +45,14 @@ def main():
                                       type=discord.ActivityType.watching,
                                       name=str(len(bot.guilds)) + " Servers"))
         logging.info("Connected to Discord")
-        logging.info(f'Loaded {len(places.get_all())} places')
 
-
-
-
+    @bot.event
+    async def on_guild_join(guild: discord.Guild):
+        await bot.change_presence(status=discord.Status.online,
+                                  activity=discord.Activity(
+                                      type=discord.ActivityType.watching,
+                                      name=str(len(bot.guilds)) + " Servers"))
+        logging.info("Joined {} [{}]".format(guild.name, guild.id))
 
     @bot.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True, manage_messages=True,
