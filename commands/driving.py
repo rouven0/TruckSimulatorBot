@@ -63,7 +63,7 @@ class Driving(commands.Cog):
                     active_drive.player.position[0] < 1 or
                     active_drive.player.position[1] < 1):
                 await reaction.message.clear_reactions()
-                # clear the local list to get the missing symbols done properly
+                # Clear the local list to get the missing symbols done properly
                 reaction.message.reactions = []
             else:
                 await reaction.remove(user)
@@ -76,8 +76,6 @@ class Driving(commands.Cog):
                 await reaction.message.clear_reactions()
                 for symbol in symbols.get_drive_position_symbols(active_drive.player.position):
                     await reaction.message.add_reaction(symbol)
-            # add optional sleep to prevent rate limits
-            # await asyncio.sleep(1)
             active_drive.unlock()
 
 

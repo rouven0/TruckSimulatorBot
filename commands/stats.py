@@ -3,6 +3,7 @@ from discord.ext import commands
 import jobs
 import players
 
+
 class Stats(commands.Cog):
     @commands.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True, manage_messages=True,

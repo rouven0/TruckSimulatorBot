@@ -6,8 +6,6 @@ import jobs
 class Economy(commands.Cog):
     @commands.command()
     async def job(self, ctx, *args):
-        hs = h()
-        hs.ee()
         player = players.get(ctx.author.id)
         if player is None:
             await ctx.channel.send(
