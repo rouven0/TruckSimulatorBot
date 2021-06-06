@@ -1,5 +1,6 @@
 """
-This file contains the important player dataclasses
+This module contains the Player class, several methods to operate with players in the database and
+the ActiveDrive, used to manage driving sessions
 """
 from dataclasses import dataclass, field
 import sqlite3
@@ -46,6 +47,14 @@ def __format_pos_to_db(pos):
 
 @dataclass
 class Player():
+    """
+    Attributes:
+        user_id: Unique discord user id to identify the player
+        name: Displayed name in discord, NOT the Nickname
+        money: Amount of ingame currency the player has
+        position: Position on the 2 dimensional array that I call map
+        miles: Amount of miles the Player has driven
+    """
     user_id: int
     name: str
     money: float = 0
@@ -123,6 +132,13 @@ def get_count():
     return __cur__.fetchall()[0][0]
 
 class ActiveDrive():
+    """
+    Object to manage current driving session and prevent duplicate driving
+    Attributes:
+        player: Player object of the driving player
+        message: Discord message where the drive is displayed and where the reacions are
+        last_action_time: Time used to keep the list clean and time out drives
+    """
     def __init__(self, player, message, last_action_time):
         self.player = player
         self.message = message
@@ -130,10 +146,19 @@ class ActiveDrive():
         self.__locked = False
 
     def lock(self):
+        """
+        Locks all reaction processing
+        """
         self.__locked = True
 
     def unlock(self):
+        """
+        Unlocks all reaction processing
+        """
         self.__locked = False
 
     def islocked(self):
+        """
+        Returns True when the drive is locked
+        """
         return self.__locked

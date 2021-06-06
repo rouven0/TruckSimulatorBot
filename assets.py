@@ -13,4 +13,7 @@ __DEFAULT_DRIVE_IMAGE_LIST = [
 ]
 
 def get_default():
+    """
+    Returns a randomly chosen image from the list
+    """
     return __DEFAULT_DRIVE_IMAGE_LIST[randint(0, len(__DEFAULT_DRIVE_IMAGE_LIST)-1)]

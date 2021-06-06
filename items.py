@@ -1,3 +1,6 @@
+"""
+This module provides the item class and a list of items, easy to access with get()
+"""
 from dataclasses import dataclass
 import sqlite3
 

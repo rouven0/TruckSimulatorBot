@@ -1,3 +1,6 @@
+"""
+This module provides the Job class and all the methods to operate with jobs in the database
+"""
 from dataclasses import dataclass
 import sqlite3
 from random import randint
@@ -8,6 +11,10 @@ import items
 
 __con__ = sqlite3.connect('players.db')
 __cur__ = __con__.cursor()
+
+STATE_CLAIMED = 0
+STATE_LOADED = 1
+STATE_DONE = 2
 
 def __from_tuple(tup):
     """
@@ -22,14 +29,6 @@ def __to_tuple(job):
     return (job.player_id, __format_pos_to_db(job.place_from.position),
             __format_pos_to_db(job.place_to.position), job.state, job.reward)
 
-def __get_position(db_pos):
-    """
-    Parses the position from the database as list [x][y]
-    """
-    pos_x = db_pos[:db_pos.find("/")]
-    pos_y = db_pos[db_pos.find("/")+1:]
-    return [int(pos_x), int(pos_y)]
-
 def __format_pos_to_db(pos):
     """
     Returns a database-ready string that contains the position in the form x/y
@@ -39,6 +38,17 @@ def __format_pos_to_db(pos):
 
 @dataclass
 class Job():
+
+    """
+    Attributes:
+        player_id: Player id that this jobs belongs to
+                   Used as primary key in the database
+        place_from: Place from which the player has to take the items
+        place_to: Place the player has to drive to when the truck is loaded
+        state: current state, see get_state() for more information about the states
+        reward: Amount of money the player gets for this job
+
+    """
     player_id: int
     place_from: places.Place
     place_to: places.Place
@@ -46,19 +56,31 @@ class Job():
     reward: int
 
 def insert(job: Job):
+    """
+    Inserts a Job object into the players database
+    """
     __cur__.execute('INSERT INTO jobs VALUES (?,?,?,?,?)', __to_tuple(job))
     __con__.commit()
 
-def remove(job :Job):
+def remove(job: Job):
+    """
+    Removes job from the player database
+    """
     __cur__.execute('DELETE FROM jobs WHERE player_id=:id', {"id": job.player_id})
     __con__.commit()
 
 def update(job: Job, state=None):
+    """
+    Updates a job's state
+    """
     if state is not None:
         __cur__.execute('UPDATE jobs SET state=? WHERE player_id=?', (state, job.player_id))
     __con__.commit()
 
 def get(user_id):
+    """
+    Get the Players current job as Job object
+    """
     __cur__.execute("SELECT * FROM jobs WHERE player_id=:id", {"id": user_id})
     try:
         return __from_tuple(__cur__.fetchone())
@@ -66,6 +88,10 @@ def get(user_id):
         return None
 
 def generate(player: Player):
+    """
+    This takes two random places from the list, calculates its reward based on the miles the player
+    has to drive and returns the Job object and the job as a sTring in human readable format.
+    """
     available_places = places.get_quest_active().copy()
     place_from = available_places[randint(0, len(available_places) - 1)]
     item = items.get(place_from.produced_item)
@@ -86,12 +112,18 @@ def generate(player: Player):
         item.emoji, item.name, place_from.name, reward))
 
 def show(job: Job):
+    """
+    Prints out the current job in a human readable format
+    """
     place_from = job.place_from
     place_to = job.place_to
     item = items.get(place_from.produced_item)
     return "Bring {} {} from {} to {}.".format(item.emoji, item.name, place_from.name, place_to.name)
 
 def get_state(job: Job):
+    """
+    Returns the next instructions based on the current jobs state
+    """
     if job.state == 0:
         return "You claimed this job. Drive to {} and load your truck with `t.load`".format(job.place_from.name)
     if job.state == 1:
