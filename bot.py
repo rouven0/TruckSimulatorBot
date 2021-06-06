@@ -27,7 +27,8 @@ def main():
     console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
     logger.addHandler(console_handler)
 
-    file_handler = logging.FileHandler("./logs/{}.log".format(datetime.now().strftime("%Y-%m-%d_%H:%M")))
+    file_handler = logging.FileHandler("./logs/{}.log"
+            .format(datetime.now().strftime("%Y-%m-%d_%H:%M")))
     file_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
     logger.addHandler(file_handler)
 

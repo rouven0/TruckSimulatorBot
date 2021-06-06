@@ -1,8 +1,8 @@
 from dataclasses import dataclass
-from players import Player
 import sqlite3
 from random import randint
 from math import sqrt
+from players import Player
 import places
 import items
 
@@ -55,7 +55,7 @@ def remove(job :Job):
 
 def update(job: Job, state=None):
     if state is not None:
-       __cur__.execute('UPDATE jobs SET state=? WHERE player_id=?', (state, job.player_id))
+        __cur__.execute('UPDATE jobs SET state=? WHERE player_id=?', (state, job.player_id))
     __con__.commit()
 
 def get(user_id):

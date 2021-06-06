@@ -15,9 +15,6 @@ class Driving(commands.Cog):
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
-        """
-        This method is only used to process the driving
-        """
         if reaction.message.id not in [p.message.id for p in self.active_drives]:
             return
         active_drive = self.get_active_drive(user.id, message_id=reaction.message.id)
@@ -63,7 +60,6 @@ class Driving(commands.Cog):
                     active_drive.player.position[0] < 1 or
                     active_drive.player.position[1] < 1):
                 await reaction.message.clear_reactions()
-                # Clear the local list to get the missing symbols done properly
                 reaction.message.reactions = []
             else:
                 await reaction.remove(user)
