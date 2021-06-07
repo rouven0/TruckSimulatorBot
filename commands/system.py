@@ -44,7 +44,6 @@ class System(commands.Cog):
     @commands.command()
     async def info(self, ctx):
         info_embed = discord.Embed(title="Truck Simulator info", colour=discord.Colour.gold())
-
         uptime = datetime.now() - self.start_time
         days = uptime.days
         hours = floor(uptime.seconds / 3600)
@@ -56,20 +55,12 @@ class System(commands.Cog):
         info_embed.add_field(name="Registered Players", value=players.get_count())
         info_embed.add_field(name="Servers", value=len(self.bot.guilds))
         await ctx.channel.send(embed=info_embed)
-
-    @commands.command()
-    @commands.is_owner()
-    async def reloadplaces(self, ctx):
-        reload(places)
-        reload(items)
-        await ctx.channel.send("Done")
-        logging.info("Reloaded the place and item databases")
  
     @commands.command()
     @commands.is_owner()
     async def shutdown(self, ctx):
         await self.driving_commands.on_shutdown()
-        await self.bot.change_presence(status=discord.Status.idle)
+        await self.bot.change_presence(status=discord.Status.invisible)
         await ctx.channel.send("Shutting down")
         logging.warning("Shutdown command is executed")
         await self.bot.logout()

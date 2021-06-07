@@ -90,7 +90,7 @@ def get(user_id):
 def generate(player: Player):
     """
     This takes two random places from the list, calculates its reward based on the miles the player
-    has to drive and returns the Job object and the job as a sTring in human readable format.
+    has to drive and returns the Job object and the job as a string in human readable format.
     """
     available_places = places.get_quest_active().copy()
     place_from = available_places[randint(0, len(available_places) - 1)]
