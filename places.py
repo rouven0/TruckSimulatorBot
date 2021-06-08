@@ -54,7 +54,7 @@ def get(position):
     for place in get_all():
         if place.position == position:
             return place
-    return None
+    return Place("Nothing", position, [], None, None)
 
 def get_all():
     """

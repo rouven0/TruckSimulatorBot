@@ -134,7 +134,7 @@ class Driving(commands.Cog):
                 navigation_place = current_job.place_to
             drive_embed.add_field(name="Navigation: Drive to {}".format(navigation_place.name),
                                   value=navigation_place.position)
-        if place is not None:
+        if place.image_url is not None:
             drive_embed.set_image(url=place.image_url)
         else:
             drive_embed.set_image(url=assets.get_default())
@@ -183,16 +183,14 @@ class Driving(commands.Cog):
                                        colour=discord.Colour.gold())
         position_embed.set_author(name="{}'s Position".format(ctx.author.name),
                                   icon_url=ctx.author.avatar_url)
-        if place is not None:
-            position_embed.add_field(name="What is here?",
-                                     value=symbols.LIST_ITEM + place.name, inline=False)
-            if len(place.commands[0]) != 0:
-                position_embed.add_field(name="Available Commands",
-                                         value=self.get_place_commands(place.commands))
-            position_embed.add_field(name="Note", value="The commands don't work yet :(")
+        position_embed.add_field(name="What is here?",
+                                 value=symbols.LIST_ITEM + place.name, inline=False)
+        if len(place.commands) != 0:
+            position_embed.add_field(name="Available Commands",
+                                     value=self.get_place_commands(place.commands))
+        position_embed.add_field(name="Note", value="The commands don't work yet :(")
+        if place.image_url is not None:
             position_embed.set_image(url=place.image_url)
-        else:
-            position_embed.add_field(name="What is here?", value="Nothing :frowning:", inline=False)
         await ctx.channel.send(embed=position_embed)
 
     def get_place_commands(self, command_list):

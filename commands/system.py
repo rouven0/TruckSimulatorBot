@@ -1,16 +1,13 @@
 from datetime import datetime
 from math import floor
-from importlib import reload
 import logging
 
 import discord
 from discord.ext import commands
 
-import places
 import players
-import items
 
-class System(commands.Cog):
+class System(commands.Cog, command_attrs=dict(hidden=True)):
     def __init__(self, bot, driving_commands):
         self.bot = bot
         self.driving_commands = driving_commands
@@ -55,7 +52,7 @@ class System(commands.Cog):
         info_embed.add_field(name="Registered Players", value=players.get_count())
         info_embed.add_field(name="Servers", value=len(self.bot.guilds))
         await ctx.channel.send(embed=info_embed)
- 
+
     @commands.command()
     @commands.is_owner()
     async def shutdown(self, ctx):

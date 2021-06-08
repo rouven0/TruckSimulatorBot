@@ -6,11 +6,13 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 import config
+from help import TruckSimulatorHelpCommand
 
 from commands.system import System
 from commands.driving import Driving
 from commands.stats import Stats
 from commands.economy import Economy
+from commands.gambling import Gambling
 
 load_dotenv('./.env')
 BOT_TOKEN = getenv('BOT_TOKEN')
@@ -18,6 +20,7 @@ BOT_PREFIX = getenv('BOT_PREFIX').split(";")
 
 def main():
     bot = commands.Bot(command_prefix=BOT_PREFIX,
+                       # help_command=TruckSimulatorHelpCommand(),
                        help_command=commands.DefaultHelpCommand(),
                        case_insensitive=True)
     logger = logging.getLogger()
@@ -37,6 +40,7 @@ def main():
     bot.add_cog(driving_commands)
     bot.add_cog(Stats())
     bot.add_cog(Economy())
+    bot.add_cog(Gambling())
     loop = asyncio.get_event_loop()
     loop.create_task(driving_commands.check_drives())
     bot.run(BOT_TOKEN)
