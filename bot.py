@@ -27,7 +27,7 @@ def main():
     logger.setLevel(logging.INFO)
 
     console_handler = logging.StreamHandler()
-    console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
+    console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT, datefmt="%Y-%M-%d %H:%m:%S"))
     logger.addHandler(console_handler)
 
     file_handler = logging.FileHandler("./logs/{}.log"

@@ -32,6 +32,7 @@ class Driving(commands.Cog):
             return
         if active_drive.islocked():
             return
+        active_drive.lock()
 
         if reaction.emoji == symbols.STOP:
             self.active_drives.remove(active_drive)
@@ -62,7 +63,6 @@ class Driving(commands.Cog):
             position_changed = True
 
         if position_changed:
-            active_drive.lock()
             active_drive.last_action_time = time()
             active_drive.player.miles += 1
             await reaction.message.edit(
@@ -71,6 +71,7 @@ class Driving(commands.Cog):
                     active_drive.player.position[1] >= config.MAP_BORDER or
                     active_drive.player.position[0] < 1 or
                     active_drive.player.position[1] < 1):
+                await asyncio.sleep(0.3)
                 await reaction.message.clear_reactions()
                 reaction.message.reactions = []
             else:
@@ -84,7 +85,7 @@ class Driving(commands.Cog):
                 await reaction.message.clear_reactions()
                 for symbol in symbols.get_drive_position_symbols(active_drive.player.position):
                     await reaction.message.add_reaction(symbol)
-            active_drive.unlock()
+        active_drive.unlock()
 
 
     @commands.command()
