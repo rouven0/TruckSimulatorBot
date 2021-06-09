@@ -6,7 +6,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 import config
-from help import TruckSimulatorHelpCommand
+# from help import TruckSimulatorHelpCommand
 
 from commands.system import System
 from commands.driving import Driving

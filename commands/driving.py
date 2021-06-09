@@ -188,7 +188,6 @@ class Driving(commands.Cog):
         if len(place.commands) != 0:
             position_embed.add_field(name="Available Commands",
                                      value=self.get_place_commands(place.commands))
-        position_embed.add_field(name="Note", value="The commands don't work yet :(")
         if place.image_url is not None:
             position_embed.set_image(url=place.image_url)
         await ctx.channel.send(embed=position_embed)
