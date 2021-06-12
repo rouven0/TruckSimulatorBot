@@ -60,7 +60,7 @@ class Stats(commands.Cog):
     @commands.command()
     async def top(self, ctx, *args):
         """
-        If you appear in one of these lists you are one of the top 10 Players. Congratulations!
+        If you appear in these lists you are one of the top 10 Players. Congratulations!
         """
         if args:
             top_players = players.get_top(args[0])

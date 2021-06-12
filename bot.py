@@ -2,6 +2,7 @@ from os import getenv
 from datetime import datetime
 import asyncio
 import logging
+from discord import shard
 from discord.ext import commands
 from dotenv import load_dotenv
 
@@ -19,7 +20,7 @@ BOT_TOKEN = getenv('BOT_TOKEN')
 BOT_PREFIX = getenv('BOT_PREFIX').split(";")
 
 def main():
-    bot = commands.Bot(command_prefix=BOT_PREFIX,
+    bot = commands.AutoShardedBot(shard_count=1, command_prefix=BOT_PREFIX,
                        # help_command=TruckSimulatorHelpCommand(),
                        help_command=commands.DefaultHelpCommand(),
                        case_insensitive=True)

@@ -83,13 +83,17 @@ def update(player: Player, name=None, money=None, position=None, miles=None):
     """
     if name is not None:
         __cur__.execute('UPDATE players SET name=? WHERE id=?', (name, player.user_id))
+        player.name = name
     if money is not None:
         __cur__.execute('UPDATE players SET money=? WHERE id=?', (money, player.user_id))
+        player.money = money
     if position is not None:
         __cur__.execute('UPDATE players SET position=? WHERE id=?',
                         (__format_pos_to_db(position), player.user_id))
+        player.position = position
     if miles is not None:
         __cur__.execute('UPDATE players SET miles=? WHERE id=?', (miles, player.user_id))
+        player.miles = miles
     __con__.commit()
     logging.info('Updated player %s to %s', player.name, __to_tuple(player))
 

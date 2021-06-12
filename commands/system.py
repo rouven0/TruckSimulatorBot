@@ -51,6 +51,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         info_embed.add_field(name="Latency", value=str(round(self.bot.latency, 2) * 1000) + " ms")
         info_embed.add_field(name="Registered Players", value=players.get_count())
         info_embed.add_field(name="Servers", value=len(self.bot.guilds))
+        info_embed.add_field(name="Driving Trucks", value=len(self.driving_commands.active_drives))
         await ctx.channel.send(embed=info_embed)
 
     @commands.command()
