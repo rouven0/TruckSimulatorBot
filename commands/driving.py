@@ -76,7 +76,7 @@ class Driving(commands.Cog):
             return
 
     @commands.command()
-    @commands.bot_has_permissions(view_channel=True, send_messages=True, manage_messages=True,
+    @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True, add_reactions=True)
     async def drive(self, ctx):
@@ -131,7 +131,7 @@ class Driving(commands.Cog):
         return drive_embed
 
     @commands.command()
-    @commands.bot_has_permissions(view_channel=True, send_messages=True, manage_messages=True,
+    @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True, add_reactions=True)
     async def stop(self, ctx):
