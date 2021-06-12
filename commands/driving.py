@@ -4,13 +4,12 @@ This module contains the Cog for all driving-related commands
 from time import time
 import asyncio
 import discord
-from discord import embeds
 from discord.ext import commands
 from discord_components import Button, Interaction
+from discord_components.component import Component
 import players
 import places
 import symbols
-import config
 import assets
 import jobs
 
@@ -207,14 +206,14 @@ class Driving(commands.Cog):
         Returns an ActiveDrive object for a specific player and message
         """
         if message_id is not None:
-            for drv in self.active_drives:
-                if drv.player.user_id == player_id and drv.message.id == message_id:
-                    return drv
+            for active_drive in self.active_drives:
+                if active_drive.player.user_id == player_id and active_drive.message.id == message_id:
+                    return active_drive
             return None
 
-        for drv in self.active_drives:
-            if drv.player.user_id == player_id:
-                return drv
+        for active_drive in self.active_drives:
+            if active_drive.player.user_id == player_id:
+                return active_drive
         return None
 
     async def check_drives(self):
@@ -222,12 +221,12 @@ class Driving(commands.Cog):
         Drives that are inactive for more than 10 minutes get stopped
         """
         while True:
-            for drv in self.active_drives:
-                if time() - drv.last_action_time > 600:
-                    self.active_drives.remove(drv)
-                    await drv.message.clear_reactions()
-                    await drv.message.channel.send("<@{}> Your driving timed out!".format(drv.player.user_id))
-                    players.update(drv.player, position=drv.player.position, miles=drv.player.miles)
+            for active_drive in self.active_drives:
+                if time() - active_drive.last_action_time > 600:
+                    self.active_drives.remove(active_drive)
+                    await active_drive.message.edit(embed=self.get_drive_embed(active_drive.player, self.bot.user.avatar_url), components=[])
+                    await active_drive.message.channel.send("<@{}> Your driving timed out!".format(active_drive.player.user_id))
+                    players.update(active_drive.player, position=active_drive.player.position, miles=active_drive.player.miles)
             await asyncio.sleep(10)
 
     async def on_shutdown(self):
@@ -235,10 +234,10 @@ class Driving(commands.Cog):
         Stop all drivings and save changes to the database when the bot is shut down
         """
         processed_channels = []
-        for drv in self.active_drives:
-            self.active_drives.remove(drv)
-            await drv.message.clear_reactions()
-            if drv.message.channel.id not in processed_channels:
-                await drv.message.channel.send("All trucks were stopped due to a bot shutdown!")
-                processed_channels.append(drv.message.channel.id)
-            players.update(drv.player, position=drv.player.position, miles=drv.player.miles)
+        for active_drive in self.active_drives:
+            self.active_drives.remove(active_drive)
+            await active_drive.message.edit(embed=self.get_drive_embed(active_drive.player, self.bot.user.avatar_url), components=[])
+            if active_drive.message.channel.id not in processed_channels:
+                await active_drive.message.channel.send("All trucks were stopped due to a bot shutdown!")
+                processed_channels.append(active_drive.message.channel.id)
+            players.update(active_drive.player, position=active_drive.player.position, miles=active_drive.player.miles)

@@ -5,6 +5,7 @@ the ActiveDrive, used to manage driving sessions
 from dataclasses import dataclass, field
 import sqlite3
 import logging
+import discord
 
 __con__ = sqlite3.connect('players.db')
 __cur__ = __con__.cursor()
@@ -135,6 +136,7 @@ def get_count():
     __cur__.execute("SELECT COUNT(*) FROM players")
     return __cur__.fetchall()[0][0]
 
+@dataclass
 class ActiveDrive():
     """
     Object to manage current driving session and prevent duplicate driving
@@ -143,26 +145,6 @@ class ActiveDrive():
         message: Discord message where the drive is displayed and where the reacions are
         last_action_time: Time used to keep the list clean and time out drives
     """
-    def __init__(self, player, message, last_action_time):
-        self.player = player
-        self.message = message
-        self.last_action_time = last_action_time
-        self.__locked = False
-
-    def lock(self):
-        """
-        Locks all reaction processing
-        """
-        self.__locked = True
-
-    def unlock(self):
-        """
-        Unlocks all reaction processing
-        """
-        self.__locked = False
-
-    def islocked(self):
-        """
-        Returns True when the drive is locked
-        """
-        return self.__locked
+    player: Player
+    message: discord.Message
+    last_action_time: float

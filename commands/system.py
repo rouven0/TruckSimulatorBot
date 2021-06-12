@@ -61,7 +61,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         await self.bot.change_presence(status=discord.Status.invisible)
         await ctx.channel.send("Shutting down")
         logging.warning("Shutdown command is executed")
-        await self.bot.logout()
+        await self.bot.close()
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
