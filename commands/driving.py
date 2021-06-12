@@ -28,6 +28,9 @@ class Driving(commands.Cog):
         Only when the stop sign is he reaction emoji, changes will be applied
         i
         """
+        if isinstance(interaction.component, list):
+            await interaction.respond(type=6)
+            return
         if interaction.message.id not in [p.message.id for p in self.active_drives]:
             return
         active_drive = self.get_active_drive(interaction.author.id, message_id=interaction.message.id)
@@ -63,7 +66,6 @@ class Driving(commands.Cog):
             position_changed = True
 
         if position_changed:
-            await interaction.respond(type=7)
             active_drive.last_action_time = time()
             active_drive.player.miles += 1
             buttons = []
@@ -72,6 +74,7 @@ class Driving(commands.Cog):
             buttons.append(Button(style=4, label=symbols.STOP))
             await interaction.message.edit(
                 embed=self.get_drive_embed(active_drive.player, interaction.author.avatar_url), components=[buttons])
+            await interaction.respond(type=7)
             return
 
     @commands.command()
