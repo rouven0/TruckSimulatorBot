@@ -26,6 +26,4 @@ def get_drive_position_symbols(position):
         symbols.append(UP)
     if pos_x < config.MAP_BORDER:
         symbols.append(RIGHT)
-
-    symbols.append(STOP)
     return symbols

@@ -2,8 +2,8 @@ from os import getenv
 from datetime import datetime
 import asyncio
 import logging
-from discord import shard
 from discord.ext import commands
+from discord_components import DiscordComponents
 from dotenv import load_dotenv
 
 import config
@@ -24,6 +24,7 @@ def main():
                        # help_command=TruckSimulatorHelpCommand(),
                        help_command=commands.DefaultHelpCommand(),
                        case_insensitive=True)
+    DiscordComponents(bot)
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
 
@@ -36,7 +37,7 @@ def main():
     file_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
     logger.addHandler(file_handler)
 
-    driving_commands = Driving()
+    driving_commands = Driving(bot)
     bot.add_cog(System(bot, driving_commands))
     bot.add_cog(driving_commands)
     bot.add_cog(Stats())

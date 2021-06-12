@@ -4,7 +4,9 @@ This module contains the Cog for all driving-related commands
 from time import time
 import asyncio
 import discord
+from discord import embeds
 from discord.ext import commands
+from discord_components import Button, Interaction
 import players
 import places
 import symbols
@@ -16,77 +18,62 @@ class Driving(commands.Cog):
     """
     The heart of the Truck simulator: Drive your Truck on a virtual map
     """
-    def __init__(self):
+    def __init__(self, bot):
+        self.bot = bot
         self.active_drives = []
 
     @commands.Cog.listener()
-    async def on_reaction_add(self, reaction, user):
+    async def on_button_click(self, interaction:Interaction):
         """
         All the driving reactions are processed here
         Only when the stop sign is he reaction emoji, changes will be applied
+        i
         """
-        if reaction.message.id not in [p.message.id for p in self.active_drives]:
+        if interaction.message.id not in [p.message.id for p in self.active_drives]:
             return
-        active_drive = self.get_active_drive(user.id, message_id=reaction.message.id)
+        active_drive = self.get_active_drive(interaction.author.id, message_id=interaction.message.id)
         if active_drive is None:
             return
-        if active_drive.islocked():
-            return
-        active_drive.lock()
 
-        if reaction.emoji == symbols.STOP:
+        if interaction.component.label == symbols.STOP:
             self.active_drives.remove(active_drive)
-            await reaction.message.clear_reactions()
-            await reaction.message.channel.send("You stopped driving!, {}".format(user.name))
+            await interaction.message.channel.send("You stopped driving!, {}".format(interaction.author.name))
+            await interaction.respond(type=7, components=[])
             players.update(active_drive.player, position=active_drive.player.position,
                            miles=active_drive.player.miles)
 
         position_changed = False
-        if reaction.emoji == symbols.LEFT:
+        if interaction.component.label == symbols.LEFT:
             active_drive.player.position = [active_drive.player.position[0] - 1,
                                             active_drive.player.position[1]]
             position_changed = True
 
-        if reaction.emoji == symbols.UP:
+        if interaction.component.label == symbols.UP:
             active_drive.player.position = [active_drive.player.position[0],
                                             active_drive.player.position[1] + 1]
             position_changed = True
 
-        if reaction.emoji == symbols.DOWN:
+        if interaction.component.label == symbols.DOWN:
             active_drive.player.position = [active_drive.player.position[0],
                                             active_drive.player.position[1] - 1]
             position_changed = True
 
-        if reaction.emoji == symbols.RIGHT:
+        if interaction.component.label == symbols.RIGHT:
             active_drive.player.position = [active_drive.player.position[0] + 1,
                                             active_drive.player.position[1]]
             position_changed = True
 
         if position_changed:
+            await interaction.respond(type=7)
             active_drive.last_action_time = time()
             active_drive.player.miles += 1
-            await reaction.message.edit(
-                embed=self.get_drive_embed(active_drive.player, user.avatar_url))
-            if (active_drive.player.position[0] >= config.MAP_BORDER or
-                    active_drive.player.position[1] >= config.MAP_BORDER or
-                    active_drive.player.position[0] < 1 or
-                    active_drive.player.position[1] < 1):
-                await asyncio.sleep(0.3)
-                await reaction.message.clear_reactions()
-                reaction.message.reactions = []
-            else:
-                await reaction.remove(user)
-
-            missing_symbols = False
+            buttons = []
             for symbol in symbols.get_drive_position_symbols(active_drive.player.position):
-                if symbol not in [r.emoji for r in reaction.message.reactions]:
-                    missing_symbols = True
-            if missing_symbols:
-                await reaction.message.clear_reactions()
-                for symbol in symbols.get_drive_position_symbols(active_drive.player.position):
-                    await reaction.message.add_reaction(symbol)
-        active_drive.unlock()
-
+                buttons.append(Button(style=1, label=symbol))
+            buttons.append(Button(style=4, label=symbols.STOP))
+            await interaction.message.edit(
+                embed=self.get_drive_embed(active_drive.player, interaction.author.avatar_url), components=[buttons])
+            return
 
     @commands.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True, manage_messages=True,
@@ -106,11 +93,19 @@ class Driving(commands.Cog):
         if ctx.author.id in [a.player.user_id for a in self.active_drives]:
             await ctx.channel.send("You can't drive on two roads at once!")
             return
-
-        message = await ctx.channel.send(embed=self.get_drive_embed(player, ctx.author.avatar_url))
+        buttons = []
         for symbol in symbols.get_drive_position_symbols(player.position):
-            await message.add_reaction(symbol)
+            buttons.append(Button(style=1, label=symbol))
+        buttons.append(Button(style=4, label=symbols.STOP))
+        message = await ctx.channel.send(embed=self.get_drive_embed(player, ctx.author.avatar_url),
+                                        components = [buttons])
         self.active_drives.append(players.ActiveDrive(player, message, time()))
+        #interact: interaction.Interaction = await self.bot.wait_for("button_click")
+        #await self.stop(ctx)
+        #await interact.respond(type=7)
+        
+        #for symbol in symbols.get_drive_position_symbols(player.position):
+        #    await message.add_reaction(symbol)
 
     def get_drive_embed(self, player, avatar_url):
         """
@@ -161,7 +156,7 @@ class Driving(commands.Cog):
                                    "But you checked the handbrake just to be sure.")
             return
         self.active_drives.remove(active_drive)
-        await active_drive.message.clear_reactions()
+        await active_drive.message.edit(embed=self.get_drive_embed(active_drive.player, ctx.author.avatar_url), components=[])
         await ctx.channel.send("You stopped driving!, {}".format(ctx.author.name))
         players.update(active_drive.player,
                        position=active_drive.player.position,
