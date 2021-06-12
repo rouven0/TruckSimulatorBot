@@ -100,12 +100,6 @@ class Driving(commands.Cog):
         message = await ctx.channel.send(embed=self.get_drive_embed(player, ctx.author.avatar_url),
                                         components = [buttons])
         self.active_drives.append(players.ActiveDrive(player, message, time()))
-        #interact: interaction.Interaction = await self.bot.wait_for("button_click")
-        #await self.stop(ctx)
-        #await interact.respond(type=7)
-        
-        #for symbol in symbols.get_drive_position_symbols(player.position):
-        #    await message.add_reaction(symbol)
 
     def get_drive_embed(self, player, avatar_url):
         """
