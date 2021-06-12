@@ -1,6 +1,7 @@
 """
 This module contains the Cog for all driving-related commands
 """
+import logging
 from time import time
 import asyncio
 import discord
@@ -37,7 +38,11 @@ class Driving(commands.Cog):
         if active_drive is None:
             return
 
-        if interaction.component.label == symbols.STOP:
+        try:
+            action = int(interaction.component.emoji.id)
+        except AttributeError:
+            action = interaction.component.label
+        if action == symbols.STOP:
             self.active_drives.remove(active_drive)
             await interaction.message.channel.send("You stopped driving!, {}".format(interaction.author.name))
             await interaction.respond(type=7, components=[])
@@ -45,22 +50,22 @@ class Driving(commands.Cog):
                            miles=active_drive.player.miles)
 
         position_changed = False
-        if interaction.component.label == symbols.LEFT:
+        if action == symbols.LEFT:
             active_drive.player.position = [active_drive.player.position[0] - 1,
                                             active_drive.player.position[1]]
             position_changed = True
 
-        if interaction.component.label == symbols.UP:
+        if action == symbols.UP:
             active_drive.player.position = [active_drive.player.position[0],
                                             active_drive.player.position[1] + 1]
             position_changed = True
 
-        if interaction.component.label == symbols.DOWN:
+        if action == symbols.DOWN:
             active_drive.player.position = [active_drive.player.position[0],
                                             active_drive.player.position[1] - 1]
             position_changed = True
 
-        if interaction.component.label == symbols.RIGHT:
+        if action == symbols.RIGHT:
             active_drive.player.position = [active_drive.player.position[0] + 1,
                                             active_drive.player.position[1]]
             position_changed = True
@@ -70,8 +75,8 @@ class Driving(commands.Cog):
             active_drive.player.miles += 1
             buttons = []
             for symbol in symbols.get_drive_position_symbols(active_drive.player.position):
-                buttons.append(Button(style=1, label=symbol))
-            buttons.append(Button(style=4, label=symbols.STOP))
+                buttons.append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbol)))
+            buttons.append(Button(style=4, label=" ", emoji=bot.get_emoji(symbols.STOP)))
             await interaction.message.edit(
                 embed=self.get_drive_embed(active_drive.player, interaction.author.avatar_url), components=[buttons])
             await interaction.respond(type=7)
@@ -97,8 +102,8 @@ class Driving(commands.Cog):
             return
         buttons = []
         for symbol in symbols.get_drive_position_symbols(player.position):
-            buttons.append(Button(style=1, label=symbol))
-        buttons.append(Button(style=4, label=symbols.STOP))
+            buttons.append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbol)))
+        buttons.append(Button(style=4, label=" ", emoji=self.bot.get_emoji(symbols.STOP)))
         message = await ctx.channel.send(embed=self.get_drive_embed(player, ctx.author.avatar_url),
                                         components = [buttons])
         self.active_drives.append(players.ActiveDrive(player, message, time()))
@@ -111,12 +116,6 @@ class Driving(commands.Cog):
         drive_embed = discord.Embed(description="We hope he has fun",
                                     colour=discord.Colour.gold())
         drive_embed.set_author(name="{} is driving".format(player.name), icon_url=avatar_url)
-        drive_embed.add_field(name="Instructions",
-                              value=open("./drive_instrucions.md", "r").read(),
-                              inline=False)
-        drive_embed.add_field(name="Note",
-                              value="Your position is only applied if you stop driving",
-                              inline=False)
         drive_embed.add_field(name="Position", value=player.position)
         current_job = jobs.get(player.user_id)
         if current_job is not None:
@@ -130,6 +129,7 @@ class Driving(commands.Cog):
             drive_embed.set_image(url=place.image_url)
         else:
             drive_embed.set_image(url=assets.get_default())
+        drive_embed.set_footer(text="Note: Your position is only applied if you stop driving")
         return drive_embed
 
     @commands.command()

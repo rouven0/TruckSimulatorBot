@@ -3,11 +3,11 @@ This module provides all symbols and emojis the bots operates with
 """
 import config
 
-LEFT="⬅️"
-DOWN="⬇️"
-UP="⬆️"
-RIGHT="➡️"
-STOP="\N{OCTAGONAL SIGN}"
+LEFT=853353650491752459
+DOWN=853353650905677884
+UP=853353627383889980
+RIGHT=853352377255854090
+STOP=853362422298968104
 LIST_ITEM=":small_orange_diamond:"
 
 def get_drive_position_symbols(position):
