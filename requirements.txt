@@ -8,3 +8,4 @@ multidict==5.1.0
 python-dotenv==0.17.1
 typing-extensions==3.10.0.0
 yarl==1.6.3
+discord-components==0.5.3
