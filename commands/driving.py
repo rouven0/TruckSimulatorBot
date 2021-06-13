@@ -76,7 +76,7 @@ class Driving(commands.Cog):
             buttons = []
             for symbol in symbols.get_drive_position_symbols(active_drive.player.position):
                 buttons.append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbol)))
-            buttons.append(Button(style=4, label=" ", emoji=bot.get_emoji(symbols.STOP)))
+            buttons.append(Button(style=4, label=" ", emoji=self.bot.get_emoji(symbols.STOP)))
             await interaction.message.edit(
                 embed=self.get_drive_embed(active_drive.player, interaction.author.avatar_url), components=[buttons])
             await interaction.respond(type=7)
