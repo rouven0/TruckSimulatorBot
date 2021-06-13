@@ -22,7 +22,6 @@ class Stats(commands.Cog):
         """
         if not players.registered(ctx.author.id):
             players.insert(players.Player(ctx.author.id, ctx.author.name))
-            print("{} got registered".format(ctx.author.name))
             await ctx.channel.send("Welcome to the Truckers, {}".format(ctx.author.mention))
         else:
             await ctx.channel.send("You are already registered")

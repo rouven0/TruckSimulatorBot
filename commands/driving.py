@@ -1,13 +1,11 @@
 """
 This module contains the Cog for all driving-related commands
 """
-import logging
 from time import time
 import asyncio
 import discord
 from discord.ext import commands
 from discord_components import Button, Interaction
-from discord_components.component import Component
 import players
 import places
 import symbols
@@ -30,12 +28,12 @@ class Driving(commands.Cog):
         i
         """
         if isinstance(interaction.component, list):
+            # Return if buttons are clicked too fast
             await interaction.respond(type=6)
-            return
-        if interaction.message.id not in [p.message.id for p in self.active_drives]:
             return
         active_drive = self.get_active_drive(interaction.author.id, message_id=interaction.message.id)
         if active_drive is None:
+            # Return if the wrong player clicked the button
             return
 
         try:
@@ -51,23 +49,19 @@ class Driving(commands.Cog):
 
         position_changed = False
         if action == symbols.LEFT:
-            active_drive.player.position = [active_drive.player.position[0] - 1,
-                                            active_drive.player.position[1]]
+            active_drive.player.position = [active_drive.player.position[0] - 1, active_drive.player.position[1]]
             position_changed = True
 
         if action == symbols.UP:
-            active_drive.player.position = [active_drive.player.position[0],
-                                            active_drive.player.position[1] + 1]
+            active_drive.player.position = [active_drive.player.position[0], active_drive.player.position[1] + 1]
             position_changed = True
 
         if action == symbols.DOWN:
-            active_drive.player.position = [active_drive.player.position[0],
-                                            active_drive.player.position[1] - 1]
+            active_drive.player.position = [active_drive.player.position[0], active_drive.player.position[1] - 1]
             position_changed = True
 
         if action == symbols.RIGHT:
-            active_drive.player.position = [active_drive.player.position[0] + 1,
-                                            active_drive.player.position[1]]
+            active_drive.player.position = [active_drive.player.position[0] + 1, active_drive.player.position[1]]
             position_changed = True
 
         if position_changed:
@@ -77,10 +71,11 @@ class Driving(commands.Cog):
             for symbol in symbols.get_drive_position_symbols(active_drive.player.position):
                 buttons.append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbol)))
             buttons.append(Button(style=4, label=" ", emoji=self.bot.get_emoji(symbols.STOP)))
-            await interaction.message.edit(
-                embed=self.get_drive_embed(active_drive.player, interaction.author.avatar_url), components=[buttons])
+
+            await interaction.message.edit(embed=self.get_drive_embed(active_drive.player,
+                                           interaction.author.avatar_url),
+                                           components=[buttons])
             await interaction.respond(type=7)
-            return
 
     @commands.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
@@ -108,7 +103,8 @@ class Driving(commands.Cog):
                                         components = [buttons])
         self.active_drives.append(players.ActiveDrive(player, message, time()))
 
-    def get_drive_embed(self, player, avatar_url):
+    @staticmethod
+    def get_drive_embed(player, avatar_url):
         """
         Returns a discord embed with all the information about the current drive
         """
@@ -152,7 +148,8 @@ class Driving(commands.Cog):
                                    "But you checked the handbrake just to be sure.")
             return
         self.active_drives.remove(active_drive)
-        await active_drive.message.edit(embed=self.get_drive_embed(active_drive.player, ctx.author.avatar_url), components=[])
+        await active_drive.message.edit(
+                embed=self.get_drive_embed(active_drive.player, ctx.author.avatar_url), components=[])
         await ctx.channel.send("You stopped driving!, {}".format(ctx.author.name))
         players.update(active_drive.player,
                        position=active_drive.player.position,
@@ -184,7 +181,8 @@ class Driving(commands.Cog):
             position_embed.set_image(url=place.image_url)
         await ctx.channel.send(embed=position_embed)
 
-    def get_place_commands(self, command_list):
+    @staticmethod
+    def get_place_commands(command_list):
         """
         Returns a string in which all available commands for this place are listed
         """
@@ -227,9 +225,12 @@ class Driving(commands.Cog):
             for active_drive in self.active_drives:
                 if time() - active_drive.last_action_time > 600:
                     self.active_drives.remove(active_drive)
-                    await active_drive.message.edit(embed=self.get_drive_embed(active_drive.player, self.bot.user.avatar_url), components=[])
-                    await active_drive.message.channel.send("<@{}> Your driving timed out!".format(active_drive.player.user_id))
-                    players.update(active_drive.player, position=active_drive.player.position, miles=active_drive.player.miles)
+                    await active_drive.message.edit(
+                            embed=self.get_drive_embed(active_drive.player, self.bot.user.avatar_url), components=[])
+                    await active_drive.message.channel.send(
+                            "<@{}> Your driving timed out!".format(active_drive.player.user_id))
+                    players.update(active_drive.player, position=active_drive.player.position,
+                                   miles=active_drive.player.miles)
             await asyncio.sleep(10)
 
     async def on_shutdown(self):
@@ -239,7 +240,8 @@ class Driving(commands.Cog):
         processed_channels = []
         for active_drive in self.active_drives:
             self.active_drives.remove(active_drive)
-            await active_drive.message.edit(embed=self.get_drive_embed(active_drive.player, self.bot.user.avatar_url), components=[])
+            await active_drive.message.edit(
+                    embed=self.get_drive_embed(active_drive.player, self.bot.user.avatar_url), components=[])
             if active_drive.message.channel.id not in processed_channels:
                 await active_drive.message.channel.send("All trucks were stopped due to a bot shutdown!")
                 processed_channels.append(active_drive.message.channel.id)

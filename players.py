@@ -68,7 +68,7 @@ def insert(player: Player):
     """
     __cur__.execute('INSERT INTO players VALUES (?,?,?,?,?)', __to_tuple(player))
     __con__.commit()
-    logging.info('Inserted %s the database', player.name)
+    logging.info('Inserted %s into the database as %s', player.name, __to_tuple(player))
 
 def remove(player :Player):
     """
