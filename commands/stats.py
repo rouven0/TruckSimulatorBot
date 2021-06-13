@@ -11,6 +11,9 @@ class Stats(commands.Cog):
     """
     A lot of numbers
     """
+    def __init__(self, bot):
+        self.bot = bot
+
     @commands.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
@@ -25,6 +28,30 @@ class Stats(commands.Cog):
             await ctx.channel.send("Welcome to the Truckers, {}".format(ctx.author.mention))
         else:
             await ctx.channel.send("You are already registered")
+
+    @commands.command()
+    async def delete(self, ctx):
+        if players.registered(ctx.author.id):
+            await ctx.channel.send("{}Are you sure you want to delete your profie? "
+                                   "**All your ingame stats will be lost!**".format(ctx.author.mention))
+            confirmation = "delete {}@trucksimulator".format(ctx.author.name)
+            await ctx.channel.send("Please type **`{}`** to confirm your deletion".format(confirmation))
+            
+            def check(message):
+                return message.author.id == ctx.author.id
+            
+            try:
+                answer_message: discord.Message = await self.bot.wait_for('message', check=check,  timeout=120)
+                answer = answer_message.content
+            except:
+                answer = ""
+            if answer == confirmation:
+                players.remove(players.get(ctx.author.id))
+                await ctx.channel.send("Your profile got deleted. We will miss you :(")
+            else:
+                await ctx.channel.send("Deletion aborted!")
+        else:
+            await ctx.channel.send("You have to be registerd to delete your account (Obviously...)")
 
     @commands.command(aliases=["p", "me"])
     async def profile(self, ctx, *args):

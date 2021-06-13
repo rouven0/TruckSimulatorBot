@@ -76,7 +76,7 @@ def remove(player :Player):
     """
     __cur__.execute('DELETE FROM players WHERE id=:id', {"id": player.user_id})
     __con__.commit()
-    logging.info('Removed %s from the database', player.name)
+    logging.info('Removed %s %s from the database', player.name, __to_tuple(player))
 
 def update(player: Player, name=None, money=None, position=None, miles=None):
     """

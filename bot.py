@@ -32,15 +32,15 @@ def main():
     console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT, datefmt="%Y-%M-%d %H:%m:%S"))
     logger.addHandler(console_handler)
 
-    file_handler = logging.FileHandler("./logs/{}.log"
-            .format(datetime.now().strftime("%Y-%m-%d_%H:%M")))
-    file_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
-    logger.addHandler(file_handler)
+    #file_handler = logging.FileHandler("./logs/{}.log"
+    #        .format(datetime.now().strftime("%Y-%m-%d_%H:%M")))
+    #file_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
+    #logger.addHandler(file_handler)
 
     driving_commands = Driving(bot)
     bot.add_cog(System(bot, driving_commands))
     bot.add_cog(driving_commands)
-    bot.add_cog(Stats())
+    bot.add_cog(Stats(bot))
     bot.add_cog(Economy())
     bot.add_cog(Gambling())
     loop = asyncio.get_event_loop()
