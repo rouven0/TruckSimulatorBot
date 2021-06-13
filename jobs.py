@@ -68,7 +68,7 @@ def insert(job: Job):
 
 def remove(job: Job):
     """
-    Removes job from the player database
+    Removes a job from the player database
     """
     __cur__.execute('DELETE FROM jobs WHERE player_id=:id', {"id": job.player_id})
     __con__.commit()
