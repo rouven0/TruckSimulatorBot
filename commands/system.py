@@ -7,6 +7,7 @@ from discord.ext import commands
 
 import players
 
+
 class System(commands.Cog, command_attrs=dict(hidden=True)):
     def __init__(self, bot, driving_commands):
         self.bot = bot
@@ -16,19 +17,18 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
     @commands.Cog.listener()
     async def on_ready(self):
         await self.bot.change_presence(status=discord.Status.online,
-                                  activity=discord.Activity(
-                                      type=discord.ActivityType.watching,
-                                      name=str(len(self.bot.guilds)) + " Servers"))
+                                       activity=discord.Activity(
+                                           type=discord.ActivityType.watching,
+                                           name=str(len(self.bot.guilds)) + " Servers"))
         logging.info("Connected to Discord")
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild):
         await self.bot.change_presence(status=discord.Status.online,
-                                  activity=discord.Activity(
-                                      type=discord.ActivityType.watching,
-                                      name=str(len(self.bot.guilds)) + " Servers"))
+                                       activity=discord.Activity(
+                                           type=discord.ActivityType.watching,
+                                           name=str(len(self.bot.guilds)) + " Servers"))
         logging.info("Joined {} [{}]".format(guild.name, guild.id))
-
 
     @commands.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True,

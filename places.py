@@ -4,13 +4,15 @@ This module provides the Place class and several lists of places easy to access
 from dataclasses import dataclass
 import sqlite3
 
+
 def __get_position(db_pos):
     """
     Formats the position string from the database into a list what we can operate with
     """
     pos_x = db_pos[:db_pos.find("/")]
-    pos_y = db_pos[db_pos.find("/")+1:]
+    pos_y = db_pos[db_pos.find("/") + 1:]
     return [int(pos_x), int(pos_y)]
+
 
 def __generate_list(lst):
     """
@@ -26,8 +28,9 @@ def __generate_list(lst):
         produced_item = tup[5]
         lst.append(Place(name, position, commands, image_url, produced_item))
 
+
 @dataclass
-class Place():
+class Place:
     """
     Attributes:
         name: The name of the place
@@ -44,6 +47,7 @@ class Place():
     image_url: str
     produced_item: str
 
+
 def get(position):
     """
     Returns a place object on a specific position
@@ -56,11 +60,13 @@ def get(position):
             return place
     return Place("Nothing", position, [], None, None)
 
+
 def get_all():
     """
     Returns all places that are currently loaded
     """
     return __all_places__
+
 
 def get_public():
     """
@@ -68,17 +74,20 @@ def get_public():
     """
     return __public_places__
 
+
 def get_hidden():
     """
     Returns places that should NOT be shown in the addressbook
     """
     return __hidden_places__
 
+
 def get_quest_active():
     """
     Returns all places that can appear in jobs
     """
     return __quest_active_places__
+
 
 __con__ = sqlite3.connect('objects.db')
 __cur__ = __con__.cursor()

@@ -1,5 +1,4 @@
 from os import getenv
-from datetime import datetime
 import asyncio
 import logging
 from discord.ext import commands
@@ -19,11 +18,12 @@ load_dotenv('./.env')
 BOT_TOKEN = getenv('BOT_TOKEN')
 BOT_PREFIX = getenv('BOT_PREFIX').split(";")
 
+
 def main():
     bot = commands.AutoShardedBot(shard_count=1, command_prefix=BOT_PREFIX,
-                       # help_command=TruckSimulatorHelpCommand(),
-                       help_command=commands.DefaultHelpCommand(),
-                       case_insensitive=True)
+                                  # help_command=TruckSimulatorHelpCommand(),
+                                  help_command=commands.DefaultHelpCommand(),
+                                  case_insensitive=True)
     DiscordComponents(bot)
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
@@ -32,10 +32,10 @@ def main():
     console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT, datefmt="%Y-%M-%d %H:%m:%S"))
     logger.addHandler(console_handler)
 
-    #file_handler = logging.FileHandler("./logs/{}.log"
+    # file_handler = logging.FileHandler("./logs/{}.log"
     #        .format(datetime.now().strftime("%Y-%m-%d_%H:%M")))
-    #file_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
-    #logger.addHandler(file_handler)
+    # file_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
+    # logger.addHandler(file_handler)
 
     driving_commands = Driving(bot)
     bot.add_cog(System(bot, driving_commands))
@@ -46,6 +46,7 @@ def main():
     loop = asyncio.get_event_loop()
     loop.create_task(driving_commands.check_drives())
     bot.run(BOT_TOKEN)
+
 
 if __name__ == '__main__':
     main()

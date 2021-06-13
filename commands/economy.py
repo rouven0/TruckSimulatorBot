@@ -6,14 +6,16 @@ from discord.ext import commands
 import players
 import jobs
 
+
 class Economy(commands.Cog):
     """
     Earn money, trade it and buy better Trucks (WIP)
     """
+
     @commands.command()
     async def job(self, ctx, *args):
         """
-        Get yourself some jobs adnd earn money
+        Get yourself some jobs and earn money
         """
         player = players.get(ctx.author.id)
         if player is None:
@@ -27,7 +29,7 @@ class Economy(commands.Cog):
                              icon_url=ctx.author.avatar_url)
         if current_job is None:
             if args and args[0] == "new":
-                job_tuple=jobs.generate(player)
+                job_tuple = jobs.generate(player)
                 job_embed.add_field(name="You got a new Job", value=job_tuple[1], inline=False)
                 job_embed.add_field(name="Current state", value=jobs.get_state(job_tuple[0]))
             else:
@@ -79,6 +81,6 @@ class Economy(commands.Cog):
             current_job.state = 2
             await ctx.channel.send(jobs.get_state(current_job))
             jobs.remove(current_job)
-            players.update(player, money=player.money+current_job.reward)
+            players.update(player, money=player.money + current_job.reward)
         else:
             await ctx.channel.send("Nothing to do here")

@@ -32,7 +32,7 @@ class Stats(commands.Cog):
     @commands.command()
     async def delete(self, ctx):
         if players.registered(ctx.author.id):
-            await ctx.channel.send("{}Are you sure you want to delete your profie? "
+            await ctx.channel.send("{}Are you sure you want to delete your profile? "
                                    "**All your ingame stats will be lost!**".format(ctx.author.mention))
             confirmation = "delete {}@trucksimulator".format(ctx.author.name)
             await ctx.channel.send("Please type **`{}`** to confirm your deletion".format(confirmation))
@@ -51,7 +51,7 @@ class Stats(commands.Cog):
             else:
                 await ctx.channel.send("Deletion aborted!")
         else:
-            await ctx.channel.send("You have to be registerd to delete your account (Obviously...)")
+            await ctx.channel.send("You have to be registered to delete your account (Obviously...)")
 
     @commands.command(aliases=["p", "me"])
     async def profile(self, ctx, *args):
@@ -103,6 +103,6 @@ class Stats(commands.Cog):
             count += 1
             top_body = "{}**{}**. {} - {}{}\n".format(top_body, count, player.name,
                                                       val, top_players[2])
-        top_emded = discord.Embed(title="Truck Simulator top list", colour=discord.Colour.gold())
-        top_emded.add_field(name="Top {}".format(top_players[1]), value=top_body)
-        await ctx.channel.send(embed=top_emded)
+        top_embed = discord.Embed(title="Truck Simulator top list", colour=discord.Colour.gold())
+        top_embed.add_field(name="Top {}".format(top_players[1]), value=top_body)
+        await ctx.channel.send(embed=top_embed)

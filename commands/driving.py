@@ -12,16 +12,18 @@ import symbols
 import assets
 import jobs
 
+
 class Driving(commands.Cog):
     """
     The heart of the Truck simulator: Drive your Truck on a virtual map
     """
+
     def __init__(self, bot):
         self.bot = bot
         self.active_drives = []
 
     @commands.Cog.listener()
-    async def on_button_click(self, interaction:Interaction):
+    async def on_button_click(self, interaction: Interaction):
         """
         All the driving reactions are processed here
         Only when the stop sign is he reaction emoji, changes will be applied
@@ -73,7 +75,7 @@ class Driving(commands.Cog):
             buttons.append(Button(style=4, label=" ", emoji=self.bot.get_emoji(symbols.STOP)))
 
             await interaction.message.edit(embed=self.get_drive_embed(active_drive.player,
-                                           interaction.author.avatar_url),
+                                                                      interaction.author.avatar_url),
                                            components=[buttons])
             await interaction.respond(type=7)
 
@@ -100,7 +102,7 @@ class Driving(commands.Cog):
             buttons.append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbol)))
         buttons.append(Button(style=4, label=" ", emoji=self.bot.get_emoji(symbols.STOP)))
         message = await ctx.channel.send(embed=self.get_drive_embed(player, ctx.author.avatar_url),
-                                        components = [buttons])
+                                         components=[buttons])
         self.active_drives.append(players.ActiveDrive(player, message, time()))
 
     @staticmethod
@@ -149,7 +151,7 @@ class Driving(commands.Cog):
             return
         self.active_drives.remove(active_drive)
         await active_drive.message.edit(
-                embed=self.get_drive_embed(active_drive.player, ctx.author.avatar_url), components=[])
+            embed=self.get_drive_embed(active_drive.player, ctx.author.avatar_url), components=[])
         await ctx.channel.send("You stopped driving!, {}".format(ctx.author.name))
         players.update(active_drive.player,
                        position=active_drive.player.position,
@@ -201,7 +203,6 @@ class Driving(commands.Cog):
             places_embed.add_field(name=place.name, value=place.position)
         await ctx.channel.send(embed=places_embed)
 
-
     def get_active_drive(self, player_id, message_id=None):
         """
         Returns an ActiveDrive object for a specific player and message
@@ -226,9 +227,9 @@ class Driving(commands.Cog):
                 if time() - active_drive.last_action_time > 600:
                     self.active_drives.remove(active_drive)
                     await active_drive.message.edit(
-                            embed=self.get_drive_embed(active_drive.player, self.bot.user.avatar_url), components=[])
+                        embed=self.get_drive_embed(active_drive.player, self.bot.user.avatar_url), components=[])
                     await active_drive.message.channel.send(
-                            "<@{}> Your driving timed out!".format(active_drive.player.user_id))
+                        "<@{}> Your driving timed out!".format(active_drive.player.user_id))
                     players.update(active_drive.player, position=active_drive.player.position,
                                    miles=active_drive.player.miles)
             await asyncio.sleep(10)
@@ -241,7 +242,7 @@ class Driving(commands.Cog):
         for active_drive in self.active_drives:
             self.active_drives.remove(active_drive)
             await active_drive.message.edit(
-                    embed=self.get_drive_embed(active_drive.player, self.bot.user.avatar_url), components=[])
+                embed=self.get_drive_embed(active_drive.player, self.bot.user.avatar_url), components=[])
             if active_drive.message.channel.id not in processed_channels:
                 await active_drive.message.channel.send("All trucks were stopped due to a bot shutdown!")
                 processed_channels.append(active_drive.message.channel.id)
