@@ -49,7 +49,7 @@ class Stats(commands.Cog):
                 players.remove(players.get(ctx.author.id))
                 job = jobs.get(ctx.author.id)
                 if job is not None:
-                    jobs.remove(job))
+                    jobs.remove(job)
                 await ctx.channel.send("Your profile got deleted. We will miss you :(")
             else:
                 await ctx.channel.send("Deletion aborted!")
