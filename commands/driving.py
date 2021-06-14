@@ -88,7 +88,7 @@ class Driving(commands.Cog):
         Start driving your Truck on the map and control it with reactions
         """
         player = players.get(ctx.author.id)
-        if player is None:
+        if player.user_id == 0:
             await ctx.channel.send(
                 "{} you are not registered yet! "
                 "Try `t.register` to get started".format(ctx.author.mention))
@@ -163,7 +163,7 @@ class Driving(commands.Cog):
         Provides some information about your current position and the things located there
         """
         player = players.get(ctx.author.id)
-        if player is None:
+        if player.user_id == 0:
             await ctx.channel.send(
                 "{} you are not registered yet! "
                 "Try `t.register` to get started".format(ctx.author.mention))

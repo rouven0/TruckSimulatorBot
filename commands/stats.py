@@ -14,6 +14,7 @@ class Stats(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+
     @commands.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
@@ -29,6 +30,7 @@ class Stats(commands.Cog):
         else:
             await ctx.channel.send("You are already registered")
 
+
     @commands.command()
     async def delete(self, ctx):
         if players.registered(ctx.author.id):
@@ -36,13 +38,11 @@ class Stats(commands.Cog):
                                    "**All your ingame stats will be lost!**".format(ctx.author.mention))
             confirmation = "delete {}@trucksimulator".format(ctx.author.name)
             await ctx.channel.send("Please type **`{}`** to confirm your deletion".format(confirmation))
-            
             def check(message):
                 return message.author.id == ctx.author.id
-            
             try:
                 answer_message: discord.Message = await self.bot.wait_for('message', check=check,  timeout=120)
-                answer = answer_message.content
+                answer = answer_message.content.lower()
             except:
                 answer = ""
             if answer == confirmation:
@@ -55,6 +55,7 @@ class Stats(commands.Cog):
                 await ctx.channel.send("Deletion aborted!")
         else:
             await ctx.channel.send("You have to be registered to delete your account (Obviously...)")
+
 
     @commands.command(aliases=["p", "me"])
     async def profile(self, ctx, *args):
@@ -70,7 +71,7 @@ class Stats(commands.Cog):
             requested_id = ctx.author.id
 
         player = players.get(requested_id)
-        if player is None:
+        if player.user_id == 0:
             await ctx.channel.send("<@!{}> is not registered yet! "
                                    "Try `t.register` to get started".format(requested_id))
             return
@@ -85,6 +86,7 @@ class Stats(commands.Cog):
         if current_job is not None:
             profile_embed.add_field(name="Current Job", value=jobs.show(current_job))
         await ctx.channel.send(embed=profile_embed)
+
 
     @commands.command()
     async def top(self, ctx, *args):

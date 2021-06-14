@@ -14,13 +14,14 @@ class Gambling(commands.Cog):
     Lose your money here
     """
 
+
     @commands.command(aliases=["cf"])
     async def coinflip(self, ctx, *args):
         """
         Test your luck while throwing a coin
         """
         player = players.get(ctx.author.id)
-        if player is None:
+        if player.user_id == 0:
             await ctx.channel.send(
                 "{} you are not registered yet! "
                 "Try `t.register` to get started".format(ctx.author.mention))

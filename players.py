@@ -116,7 +116,7 @@ def get(user_id):
     try:
         return __from_tuple(__cur__.fetchone())
     except TypeError:
-        return None
+        return Player(0, "Player not found")
 
 
 def get_top(key="miles"):

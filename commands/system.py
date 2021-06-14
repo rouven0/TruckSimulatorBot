@@ -17,6 +17,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         self.repo = git.Repo()
         self.commit=self.repo.head.commit.hexsha[:7]
 
+
     @commands.Cog.listener()
     async def on_ready(self):
         await self.bot.change_presence(status=discord.Status.online,
@@ -24,6 +25,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
                                            type=discord.ActivityType.watching,
                                            name=str(len(self.bot.guilds)) + " Servers"))
         logging.info("Connected to Discord")
+
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild):
@@ -33,6 +35,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
                                            name=str(len(self.bot.guilds)) + " Servers"))
         logging.info("Joined {} [{}]".format(guild.name, guild.id))
 
+
     @commands.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
@@ -40,6 +43,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
     async def bing(self, ctx):
         answer = await ctx.channel.send("Bong")
         await ctx.channel.send(str(round((answer.created_at - ctx.message.created_at).total_seconds() * 1000)) + "ms")
+
 
     @commands.command()
     async def info(self, ctx):
@@ -59,6 +63,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         info_embed.add_field(name="Commit", value=self.commit)
         await ctx.channel.send(embed=info_embed)
 
+
     @commands.command()
     @commands.is_owner()
     async def shutdown(self, ctx):
@@ -66,6 +71,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         await ctx.channel.send("Shutting down")
         logging.warning("Shutdown command is executed")
         await self.bot.close()
+
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
