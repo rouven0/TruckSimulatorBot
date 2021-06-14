@@ -1,6 +1,7 @@
 from os import getenv
 import asyncio
 import logging
+from datetime import datetime
 from discord.ext import commands
 from discord_components import DiscordComponents
 from dotenv import load_dotenv
@@ -32,10 +33,11 @@ def main():
     console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT, datefmt="%Y-%m-%d %H:%M:%S"))
     logger.addHandler(console_handler)
 
-    # file_handler = logging.FileHandler("./logs/{}.log"
-    #        .format(datetime.now().strftime("%Y-%m-%d_%H:%M")))
-    # file_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
-    # logger.addHandler(file_handler)
+    if config.LOG_FILE:
+        file_handler = logging.FileHandler("./logs/{}.log"
+               .format(datetime.now().strftime("%Y-%m-%d_%H:%M")))
+        file_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
+        logger.addHandler(file_handler)
 
     driving_commands = Driving(bot)
     bot.add_cog(System(bot, driving_commands))
