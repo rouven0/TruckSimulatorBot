@@ -109,7 +109,7 @@ def generate(player: Player):
     arrival_reward = round(sqrt(arrival_miles_x ** 2 + arrival_miles_y ** 2) * 14)
     job_miles_x = abs(place_from.position[0] - place_to.position[0])
     job_miles_y = abs(place_from.position[1] - place_to.position[1])
-    job_reward = round(sqrt(job_miles_x ** 2 + job_miles_y ** 2) * 37)
+    job_reward = round(sqrt(job_miles_x ** 2 + job_miles_y ** 2) * 79)
     reward = job_reward + arrival_reward
     if reward > 4329:
         reward = 4329
