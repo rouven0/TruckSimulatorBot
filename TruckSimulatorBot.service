@@ -3,8 +3,8 @@ Description=Truck Simulator Discord bot
 
 [Service]
 User=rouven
-WorkingDirectory=/home/rouven/PythonProjects/TruckSimulatorBot/development
-ExecStart=/usr/bin/python3 bot.py
+WorkingDirectory=/home/rouven/TruckSimulatorBot
+ExecStart=venv/bin/python3 bot.py
 
 [Install]
 WantedBy=multi-user.target
