@@ -5,6 +5,12 @@ from dataclasses import dataclass
 import sqlite3
 
 
+@dataclass
+class Item:
+    name: str
+    emoji: str
+
+
 def __generate_list(lst):
     for i in __cur__.fetchall():
         name = i[0]
@@ -12,13 +18,7 @@ def __generate_list(lst):
         lst.append(Item(name, emoji))
 
 
-@dataclass
-class Item:
-    name: str
-    emoji: str
-
-
-def get(name):
+def get(name) -> Item:
     for item in __all_items__:
         if item.name == name:
             return item

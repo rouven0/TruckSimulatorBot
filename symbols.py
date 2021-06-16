@@ -11,7 +11,7 @@ STOP = 853362422298968104
 LIST_ITEM = ":small_orange_diamond:"
 
 
-def get_drive_position_symbols(position):
+def get_drive_position_symbols(position) -> list[int]:
     """
     Returns a list of emojis that the bot will react with to the drive message
     Corresponding arrow symbols will be removed when the map border is reached

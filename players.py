@@ -11,47 +11,6 @@ __con__ = sqlite3.connect('players.db')
 __cur__ = __con__.cursor()
 
 
-def __list_from_tuples(tups):
-    """
-    Returns a list with all Players generated from a set of tuples from the database
-    """
-    players = []
-    for tup in tups:
-        players.append(__from_tuple(tup))
-    return players
-
-
-def __from_tuple(tup):
-    """
-    Returns a Player object from a received database tuple
-    """
-    return Player(tup[0], tup[1], tup[2], __get_position(tup[3]), tup[4])
-
-
-def __to_tuple(player):
-    """
-    Transforms the player object into a tuple that can be inserted in the db
-    """
-    return (player.user_id, player.name, player.money,
-            __format_pos_to_db(player.position), player.miles)
-
-
-def __get_position(db_pos):
-    """
-    Parses the position from the database as list [x][y]
-    """
-    pos_x = db_pos[:db_pos.find("/")]
-    pos_y = db_pos[db_pos.find("/") + 1:]
-    return [int(pos_x), int(pos_y)]
-
-
-def __format_pos_to_db(pos):
-    """
-    Returns a database-ready string that contains the position in the form x/y
-    """
-    return "{}/{}".format(pos[0], pos[1])
-
-
 @dataclass
 class Player:
     """
@@ -67,6 +26,47 @@ class Player:
     money: float = 0
     position: list = field(default_factory=lambda: [0, 0])
     miles: int = 0
+
+
+def __list_from_tuples(tups) -> list[Player]:
+    """
+    Returns a list with all Players generated from a set of tuples from the database
+    """
+    players = []
+    for tup in tups:
+        players.append(__from_tuple(tup))
+    return players
+
+
+def __from_tuple(tup) -> Player:
+    """
+    Returns a Player object from a received database tuple
+    """
+    return Player(tup[0], tup[1], tup[2], __get_position(tup[3]), tup[4])
+
+
+def __to_tuple(player) -> tuple:
+    """
+    Transforms the player object into a tuple that can be inserted in the db
+    """
+    return (player.user_id, player.name, player.money,
+            __format_pos_to_db(player.position), player.miles)
+
+
+def __get_position(db_pos) -> list[int]:
+    """
+    Parses the position from the database as list [x][y]
+    """
+    pos_x = db_pos[:db_pos.find("/")]
+    pos_y = db_pos[db_pos.find("/") + 1:]
+    return [int(pos_x), int(pos_y)]
+
+
+def __format_pos_to_db(pos) -> str:
+    """
+    Returns a database-ready string that contains the position in the form x/y
+    """
+    return "{}/{}".format(pos[0], pos[1])
 
 
 def add_money(player, amount):
@@ -123,7 +123,7 @@ def update(player: Player, name:str=None, money:float=None, position:list=None, 
     logging.info('Updated player %s to %s', player.name, __to_tuple(player))
 
 
-def get(user_id):
+def get(user_id) -> Player:
     """
     Get one player from the database
     """
@@ -134,7 +134,7 @@ def get(user_id):
         raise PlayerNotRegistered(user_id)
 
 
-def get_top(key="miles"):
+def get_top(key="miles") -> tuple[list[Player], str, str]:
     """
     Get the top 10 players from the database
     """
@@ -147,7 +147,7 @@ def get_top(key="miles"):
     return __list_from_tuples(__cur__.fetchmany(10)), key, suffix
 
 
-def registered(user_id):
+def registered(user_id) -> bool:
     """
     Checks whether a specific user is registered or not
     """
@@ -157,7 +157,7 @@ def registered(user_id):
     return False
 
 
-def get_count():
+def get_count() -> int:
     """
     Returns the player count
     """

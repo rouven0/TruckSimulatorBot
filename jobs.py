@@ -17,28 +17,6 @@ STATE_LOADED = 1
 STATE_DONE = 2
 
 
-def __from_tuple(tup):
-    """
-    Returns a Job object from a received database tuple
-    """
-    return Job(tup[0], places.get(tup[1]), places.get(tup[2]), tup[3], tup[4])
-
-
-def __to_tuple(job):
-    """
-    Transforms the job object into a tuple that can be inserted in the db
-    """
-    return (job.player_id, __format_pos_to_db(job.place_from.position),
-            __format_pos_to_db(job.place_to.position), job.state, job.reward)
-
-
-def __format_pos_to_db(pos):
-    """
-    Returns a database-ready string that contains the position in the form x/y
-    """
-    return "{}/{}".format(pos[0], pos[1])
-
-
 @dataclass
 class Job:
     """
@@ -56,6 +34,28 @@ class Job:
     place_to: places.Place
     state: int
     reward: int
+
+
+def __from_tuple(tup) -> Job:
+    """
+    Returns a Job object from a received database tuple
+    """
+    return Job(tup[0], places.get(tup[1]), places.get(tup[2]), tup[3], tup[4])
+
+
+def __to_tuple(job) -> tuple:
+    """
+    Transforms the job object into a tuple that can be inserted in the db
+    """
+    return (job.player_id, __format_pos_to_db(job.place_from.position),
+            __format_pos_to_db(job.place_to.position), job.state, job.reward)
+
+
+def __format_pos_to_db(pos) -> str:
+    """
+    Returns a database-ready string that contains the position in the form x/y
+    """
+    return "{}/{}".format(pos[0], pos[1])
 
 
 def insert(job: Job):
@@ -83,7 +83,7 @@ def update(job: Job, state=None):
     __con__.commit()
 
 
-def get(user_id):
+def get(user_id) -> Job:
     """
     Get the Players current job as Job object
     """
@@ -94,7 +94,7 @@ def get(user_id):
         return None
 
 
-def generate(player: Player):
+def generate(player: Player) -> tuple:
     """
     This takes two random places from the list, calculates its reward based on the miles the player
     has to drive and returns the Job object and the job as a string in human readable format.
@@ -115,12 +115,11 @@ def generate(player: Player):
         reward = 4329
     new_job = Job(player.user_id, place_from, place_to, 0, reward)
     insert(new_job)
-    return (new_job, "{} needs {} {} from {}. You get ${} for this transport".format(place_to.name,
-                                                                                     item.emoji, item.name,
-                                                                                     place_from.name, reward))
+    return (new_job,
+            "{} needs {} {} from {}. You get ${} for this transport".format(place_to.name, item.emoji, item.name, place_from.name, reward))
 
 
-def show(job: Job):
+def show(job: Job) -> str:
     """
     Prints out the current job in a human readable format
     """
@@ -130,7 +129,7 @@ def show(job: Job):
     return "Bring {} {} from {} to {}.".format(item.emoji, item.name, place_from.name, place_to.name)
 
 
-def get_state(job: Job):
+def get_state(job: Job) -> str:
     """
     Returns the next instructions based on the current jobs state
     """

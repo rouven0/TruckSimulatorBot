@@ -5,7 +5,25 @@ from dataclasses import dataclass
 import sqlite3
 
 
-def __get_position(db_pos):
+@dataclass
+class Place:
+    """
+    Attributes:
+        name: The name of the place
+        position: the Place's position in the 2 dimensional array that I call Map
+        commands: all local available commands stored as strings in a list
+        image_url: Every place has an image that is shown while driving
+                   Images are hosted on a ressource discord server and displayed in embeds via URL
+        produced_item: Items this place produces in jobs.
+                       This is None when the place is not quest_active
+    """
+    name: str
+    position: list
+    commands: list
+    image_url: str
+    produced_item: str
+
+def __get_position(db_pos) -> list[int]:
     """
     Formats the position string from the database into a list what we can operate with
     """
@@ -29,26 +47,8 @@ def __generate_list(lst):
         lst.append(Place(name, position, commands, image_url, produced_item))
 
 
-@dataclass
-class Place:
-    """
-    Attributes:
-        name: The name of the place
-        position: the Place's position in the 2 dimensional array that I call Map
-        commands: all local available commands stored as strings in a list
-        image_url: Every place has an image that is shown while driving
-                   Images are hosted on a ressource discord server and displayed in embeds via URL
-        produced_item: Items this place produces in jobs.
-                       This is None when the place is not quest_active
-    """
-    name: str
-    position: list
-    commands: list
-    image_url: str
-    produced_item: str
 
-
-def get(position):
+def get(position) -> Place:
     """
     Returns a place object on a specific position
     If no places is registered there, None is returned
@@ -61,28 +61,28 @@ def get(position):
     return Place("Nothing", position, [], None, None)
 
 
-def get_all():
+def get_all() -> list[Place]:
     """
     Returns all places that are currently loaded
     """
     return __all_places__
 
 
-def get_public():
+def get_public() -> list[Place]:
     """
     Returns places that should be shown in the addressbook
     """
     return __public_places__
 
 
-def get_hidden():
+def get_hidden() -> list[Place]:
     """
     Returns places that should NOT be shown in the addressbook
     """
     return __hidden_places__
 
 
-def get_quest_active():
+def get_quest_active() -> list[Place]:
     """
     Returns all places that can appear in jobs
     """

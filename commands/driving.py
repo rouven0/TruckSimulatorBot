@@ -14,7 +14,7 @@ import assets
 import jobs
 
 
-def generate_minimap(player):
+def generate_minimap(player) -> str:
     """
     This generate the minimap shown in t.drive
     """
@@ -38,7 +38,7 @@ def generate_minimap(player):
     return minimap
 
 
-def get_drive_embed(player, avatar_url):
+def get_drive_embed(player, avatar_url) -> discord.Embed:
     """
     Returns a discord embed with all the information about the current drive
     """
