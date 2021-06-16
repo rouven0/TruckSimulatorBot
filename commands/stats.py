@@ -33,28 +33,29 @@ class Stats(commands.Cog):
 
     @commands.command()
     async def delete(self, ctx):
-        if players.registered(ctx.author.id):
-            await ctx.channel.send("{}Are you sure you want to delete your profile? "
-                                   "**All your ingame stats will be lost!**".format(ctx.author.mention))
-            confirmation = "delete {}@trucksimulator".format(ctx.author.name)
-            await ctx.channel.send("Please type **`{}`** to confirm your deletion".format(confirmation))
-            def check(message):
-                return message.author.id == ctx.author.id
-            try:
-                answer_message: discord.Message = await self.bot.wait_for('message', check=check,  timeout=120)
-                answer = answer_message.content.lower()
-            except:
-                answer = ""
-            if answer == confirmation:
-                players.remove(players.get(ctx.author.id))
-                job = jobs.get(ctx.author.id)
-                if job is not None:
-                    jobs.remove(job)
-                await ctx.channel.send("Your profile got deleted. We will miss you :(")
-            else:
-                await ctx.channel.send("Deletion aborted!")
+        """
+        Delete your account
+        """
+        player = players.get(ctx.author.id)
+        await ctx.channel.send("{}Are you sure you want to delete your profile? "
+                               "**All your ingame stats will be lost!**".format(ctx.author.mention))
+        confirmation = "delete {}@trucksimulator".format(ctx.author.name)
+        await ctx.channel.send("Please type **`{}`** to confirm your deletion".format(confirmation))
+        def check(message):
+            return message.author.id == ctx.author.id
+        try:
+            answer_message: discord.Message = await self.bot.wait_for('message', check=check,  timeout=120)
+            answer = answer_message.content.lower()
+        except:
+            answer = ""
+        if answer == confirmation:
+            players.remove(player)
+            job = jobs.get(ctx.author.id)
+            if job is not None:
+                jobs.remove(job)
+            await ctx.channel.send("Your profile got deleted. We will miss you :(")
         else:
-            await ctx.channel.send("You have to be registered to delete your account (Obviously...)")
+            await ctx.channel.send("Deletion aborted!")
 
 
     @commands.command(aliases=["p", "me"])
@@ -71,10 +72,6 @@ class Stats(commands.Cog):
             requested_id = ctx.author.id
 
         player = players.get(requested_id)
-        if player.user_id == 0:
-            await ctx.channel.send("<@!{}> is not registered yet! "
-                                   "Try `t.register` to get started".format(requested_id))
-            return
 
         current_job = jobs.get(ctx.author.id)
         profile_embed = discord.Embed(colour=discord.Colour.gold())

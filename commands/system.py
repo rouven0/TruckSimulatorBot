@@ -74,11 +74,16 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
 
 
     @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
+    async def on_command_error(self, ctx, error: commands.CommandError):
         if isinstance(error, commands.errors.BotMissingPermissions):
             missing_permissions = '`'
             for permission in error.missing_perms:
                 missing_permissions = missing_permissions + "\n" + permission
             await ctx.channel.send("I'm missing the following permissions:" + missing_permissions + '`')
+        elif isinstance(error, commands.errors.CommandInvokeError):
+            if isinstance(error.original, players.PlayerNotRegistered):
+                await ctx.channel.send(
+                    "<@!{}> you are not registered yet! "
+                    "Try `t.register` to get started".format(error.original.requested_id))
         else:
             logging.error(error)

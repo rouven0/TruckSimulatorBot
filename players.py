@@ -69,6 +69,21 @@ class Player:
     miles: int = 0
 
 
+def add_money(player, amount):
+    """
+    Add money to the players account
+    """
+    update(player, money=player.money+amount)
+
+def debit_money(player, amount):
+    """
+    Debit money from the players account
+    """
+    if amount > player.money:
+        raise NotEnoughMoney()
+    else:
+        update(player, money=player.money-amount)
+
 def insert(player: Player):
     """
     Inserts a player into the database
@@ -87,7 +102,7 @@ def remove(player: Player):
     logging.info('Removed %s %s from the database', player.name, __to_tuple(player))
 
 
-def update(player: Player, name=None, money=None, position=None, miles=None):
+def update(player: Player, name:str=None, money:float=None, position:list=None, miles:int=None):
     """
     Updates a player in the database
     """
@@ -116,7 +131,7 @@ def get(user_id):
     try:
         return __from_tuple(__cur__.fetchone())
     except TypeError:
-        return Player(0, "Player not found")
+        raise PlayerNotRegistered(user_id)
 
 
 def get_top(key="miles"):
@@ -162,3 +177,23 @@ class ActiveDrive:
     player: Player
     message: discord.Message
     last_action_time: float
+
+
+class PlayerNotRegistered(Exception):
+    """
+    Exception raised when a player that is not registered is requested
+    """
+    def __init__(self, requested_id, *args: object) -> None:
+        self.requested_id = requested_id
+        super().__init__(*args)
+
+    def __str__(self) -> str:
+        return f"The requested player ({self.requested_id}) is not registered"
+
+
+class NotEnoughMoney(Exception):
+    """
+    Exception raised when more money is withdrawn than the player has
+    """
+    def __str__(self) -> str:
+        return "The requested player doesn't have enough money to perform this action"

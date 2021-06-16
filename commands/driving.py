@@ -140,12 +140,6 @@ class Driving(commands.Cog):
         Start driving your Truck on the map and control it with reactions
         """
         player = players.get(ctx.author.id)
-        if player.user_id == 0:
-            await ctx.channel.send(
-                "{} you are not registered yet! "
-                "Try `t.register` to get started".format(ctx.author.mention))
-            return
-
         if ctx.author.id in [a.player.user_id for a in self.active_drives]:
             await ctx.channel.send("You can't drive on two roads at once!")
             return
@@ -169,15 +163,9 @@ class Driving(commands.Cog):
         This is an alternate stop method to get your changes applied if there
         is a problem with the reactions
         """
-        if not players.registered(ctx.author.id):
-            await ctx.channel.send(
-                "{} you are not registered yet! "
-                "Try `t.register` to get started".format(ctx.author.mention))
-            return
         active_drive = self.get_active_drive(ctx.author.id)
         if active_drive is None:
-            await ctx.channel.send("Your truck already stopped driving. "
-                                   "But you checked the handbrake just to be sure.")
+            await ctx.channel.send("Nothing to do here")
             return
         self.active_drives.remove(active_drive)
         await active_drive.message.edit(
@@ -194,12 +182,6 @@ class Driving(commands.Cog):
         Provides some information about your current position and the things located there
         """
         player = players.get(ctx.author.id)
-        if player.user_id == 0:
-            await ctx.channel.send(
-                "{} you are not registered yet! "
-                "Try `t.register` to get started".format(ctx.author.mention))
-            return
-
         place = places.get(player.position)
         position_embed = discord.Embed(description="You are at {}".format(player.position),
                                        colour=discord.Colour.gold())

@@ -18,11 +18,6 @@ class Economy(commands.Cog):
         Get yourself some jobs and earn money
         """
         player = players.get(ctx.author.id)
-        if player.user_id == 0:
-            await ctx.channel.send(
-                "{} you are not registered yet! "
-                "Try `t.register` to get started".format(ctx.author.mention))
-            return
         current_job = jobs.get(ctx.author.id)
         job_embed = discord.Embed(colour=discord.Colour.gold())
         job_embed.set_author(name="{}'s Job".format(ctx.author.name),
@@ -47,11 +42,6 @@ class Economy(commands.Cog):
         If you have a job, you can load your Truck with items you have to transport
         """
         player = players.get(ctx.author.id)
-        if player.user_id == 0:
-            await ctx.channel.send(
-                "{} you are not registered yet! "
-                "Try `t.register` to get started".format(ctx.author.mention))
-            return
         current_job = jobs.get(ctx.author.id)
         if current_job is None:
             await ctx.channel.send("Nothing to do here")
@@ -70,11 +60,6 @@ class Economy(commands.Cog):
         Unload your Truck at the right place to get your job done
         """
         player = players.get(ctx.author.id)
-        if player.user_id == 0:
-            await ctx.channel.send(
-                "{} you are not registered yet! "
-                "Try `t.register` to get started".format(ctx.author.mention))
-            return
         current_job = jobs.get(ctx.author.id)
         if current_job is None:
             await ctx.channel.send("Nothing to do here")
