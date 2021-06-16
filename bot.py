@@ -1,4 +1,5 @@
 from os import getenv
+import sys
 import asyncio
 import logging
 from datetime import datetime
@@ -33,11 +34,12 @@ def main():
     console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT, datefmt="%Y-%m-%d %H:%M:%S"))
     logger.addHandler(console_handler)
 
-    if config.LOG_FILE:
+    if "--enable-log-file" in sys.argv:
         file_handler = logging.FileHandler("./logs/{}.log"
                .format(datetime.now().strftime("%Y-%m-%d_%H:%M")))
         file_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
         logger.addHandler(file_handler)
+        logging.info("Logging into file is enabled")
 
     driving_commands = Driving(bot)
     bot.add_cog(System(bot, driving_commands))
