@@ -72,7 +72,6 @@ class Driving(commands.Cog):
         self.bot = bot
         self.active_drives = []
 
-
     @commands.Cog.listener()
     async def on_button_click(self, interaction: Interaction):
         """
@@ -88,7 +87,6 @@ class Driving(commands.Cog):
         if active_drive is None:
             # Return if the wrong player clicked the button
             return
-
         try:
             action = int(interaction.component.emoji.id)
         except AttributeError:
@@ -130,7 +128,6 @@ class Driving(commands.Cog):
                                            components=[buttons])
             await interaction.respond(type=7)
 
-
     @commands.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
@@ -150,9 +147,6 @@ class Driving(commands.Cog):
         message = await ctx.channel.send(embed=get_drive_embed(player, ctx.author.avatar_url),
                                          components=[buttons])
         self.active_drives.append(players.ActiveDrive(player, message, time()))
-
-
-
 
     @commands.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
@@ -175,7 +169,6 @@ class Driving(commands.Cog):
                        position=active_drive.player.position,
                        miles=active_drive.player.miles)
 
-
     @commands.command(aliases=["here"])
     async def position(self, ctx):
         """
@@ -196,7 +189,6 @@ class Driving(commands.Cog):
             position_embed.set_image(url=place.image_url)
         await ctx.channel.send(embed=position_embed)
 
-
     @staticmethod
     def get_place_commands(command_list):
         """
@@ -207,7 +199,6 @@ class Driving(commands.Cog):
             readable = "{}{}`{}`\n".format(readable, symbols.LIST_ITEM, command)
         return readable
 
-
     @commands.command(aliases=["places"])
     async def addressbook(self, ctx):
         """
@@ -217,7 +208,6 @@ class Driving(commands.Cog):
         for place in places.get_public():
             places_embed.add_field(name=place.name, value=place.position)
         await ctx.channel.send(embed=places_embed)
-
 
     def get_active_drive(self, player_id, message_id=None):
         """
@@ -234,7 +224,6 @@ class Driving(commands.Cog):
                 return active_drive
         return None
 
-
     async def check_drives(self):
         """
         Drives that are inactive for more than 10 minutes get stopped
@@ -250,7 +239,6 @@ class Driving(commands.Cog):
                     players.update(active_drive.player, position=active_drive.player.position,
                                    miles=active_drive.player.miles)
             await asyncio.sleep(10)
-
 
     async def on_shutdown(self):
         """

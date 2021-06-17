@@ -30,7 +30,6 @@ class Stats(commands.Cog):
         else:
             await ctx.channel.send("You are already registered")
 
-
     @commands.command()
     async def delete(self, ctx):
         """
@@ -57,7 +56,6 @@ class Stats(commands.Cog):
         else:
             await ctx.channel.send("Deletion aborted!")
 
-
     @commands.command(aliases=["p", "me"])
     async def profile(self, ctx, *args):
         """
@@ -83,7 +81,6 @@ class Stats(commands.Cog):
         if current_job is not None:
             profile_embed.add_field(name="Current Job", value=jobs.show(current_job))
         await ctx.channel.send(embed=profile_embed)
-
 
     @commands.command()
     async def top(self, ctx, *args):

@@ -35,7 +35,6 @@ class Economy(commands.Cog):
             job_embed.add_field(name="Current state", value=jobs.get_state(current_job))
         await ctx.channel.send(embed=job_embed)
 
-
     @commands.command()
     async def load(self, ctx):
         """
@@ -52,7 +51,6 @@ class Economy(commands.Cog):
             jobs.update(current_job, state=current_job.state)
         else:
             await ctx.channel.send("Nothing to do here")
-
 
     @commands.command()
     async def unload(self, ctx):
