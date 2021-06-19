@@ -3,6 +3,7 @@ Small Truck Simulator bot using the discord py lib
 
 ## Install
 Simply install and set up this bot using `make`
+
 Superuser permissions are required to set up the bot's systemd service
 
 ## Remove the bot

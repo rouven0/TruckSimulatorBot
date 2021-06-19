@@ -12,7 +12,7 @@ ifeq (, $(wildcard ./.env))
 	@echo Setting up the environment file
 	@cp ./templates/template_env .env
 	@read -p "Enter bot token: " token; \
-	sed -i 's|TOKEN|'$$token'|g' .env
+	sed -i 's|<TOKEN>|'$$token'|g' .env
 	@echo Done.
 else
 	@echo Found existing environment, skipping this step.
