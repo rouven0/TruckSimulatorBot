@@ -79,5 +79,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
                 await ctx.channel.send(
                     "<@!{}> you are not registered yet! "
                     "Try `t.register` to get started".format(error.original.requested_id))
+            else:
+                logging.error(error)
         else:
             logging.error(error)
