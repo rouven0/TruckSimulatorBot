@@ -18,6 +18,7 @@ else
 	@echo Found existing environment, skipping this step.
 endif
 
+	@mkdir logs
 	@echo Setting up the virtual environment...
 	@python3 -m venv venv
 	@echo Installing requirements...
