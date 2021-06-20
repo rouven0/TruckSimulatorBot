@@ -10,6 +10,15 @@ class Misc(commands.Cog):
     All commands I can't find a category to
     """
     @commands.command()
+    async def support(self, ctx):
+        support_embed = discord.Embed(title="Click here to get to the support server",
+                                      description="Any problems with the TruckSimulator? \n"
+                                      "Report a bug or ask questions there :)",
+                                      url="https://discord.gg/CjBpA6ReFz",
+                                      colour=discord.Colour.gold())
+        await ctx.channel.send(embed=support_embed)
+
+    @commands.command()
     async def links(self, ctx):
         """
         Some useful links

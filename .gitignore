@@ -1,5 +1,13 @@
+# binaries
 __pycache__
+
+# sensitive files
 .env
 players.db
+
+# log and temp files
 *.log
 *.swp
+
+# virtual environment
+venv/
