@@ -13,7 +13,7 @@ __DEFAULT_DRIVE_IMAGE_LIST = [
 ]
 
 
-def get_default() -> str:
+def get_default():
     """
     Returns a randomly chosen image from the list
     """

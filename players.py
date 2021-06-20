@@ -28,7 +28,7 @@ class Player:
     miles: int = 0
 
 
-def __list_from_tuples(tups) -> list[Player]:
+def __list_from_tuples(tups):
     """
     Returns a list with all Players generated from a set of tuples from the database
     """
@@ -38,14 +38,14 @@ def __list_from_tuples(tups) -> list[Player]:
     return players
 
 
-def __from_tuple(tup) -> Player:
+def __from_tuple(tup):
     """
     Returns a Player object from a received database tuple
     """
     return Player(tup[0], tup[1], tup[2], __get_position(tup[3]), tup[4])
 
 
-def __to_tuple(player) -> tuple:
+def __to_tuple(player):
     """
     Transforms the player object into a tuple that can be inserted in the db
     """
@@ -53,7 +53,7 @@ def __to_tuple(player) -> tuple:
             __format_pos_to_db(player.position), player.miles)
 
 
-def __get_position(db_pos) -> list[int]:
+def __get_position(db_pos):
     """
     Parses the position from the database as list [x][y]
     """
@@ -62,7 +62,7 @@ def __get_position(db_pos) -> list[int]:
     return [int(pos_x), int(pos_y)]
 
 
-def __format_pos_to_db(pos) -> str:
+def __format_pos_to_db(pos):
     """
     Returns a database-ready string that contains the position in the form x/y
     """
@@ -123,7 +123,7 @@ def update(player: Player, name:str=None, money:float=None, position:list=None, 
     logging.info('Updated player %s to %s', player.name, __to_tuple(player))
 
 
-def get(user_id) -> Player:
+def get(user_id):
     """
     Get one player from the database
     """
@@ -134,7 +134,7 @@ def get(user_id) -> Player:
         raise PlayerNotRegistered(user_id)
 
 
-def get_top(key="miles") -> tuple[list[Player], str, str]:
+def get_top(key="miles"):
     """
     Get the top 10 players from the database
     """
@@ -147,7 +147,7 @@ def get_top(key="miles") -> tuple[list[Player], str, str]:
     return __list_from_tuples(__cur__.fetchmany(10)), key, suffix
 
 
-def registered(user_id) -> bool:
+def registered(user_id):
     """
     Checks whether a specific user is registered or not
     """
@@ -157,7 +157,7 @@ def registered(user_id) -> bool:
     return False
 
 
-def get_count() -> int:
+def get_count():
     """
     Returns the player count
     """
@@ -187,7 +187,7 @@ class PlayerNotRegistered(Exception):
         self.requested_id = requested_id
         super().__init__(*args)
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f"The requested player ({self.requested_id}) is not registered"
 
 
@@ -195,5 +195,5 @@ class NotEnoughMoney(Exception):
     """
     Exception raised when more money is withdrawn than the player has
     """
-    def __str__(self) -> str:
+    def __str__(self):
         return "The requested player doesn't have enough money to perform this action"

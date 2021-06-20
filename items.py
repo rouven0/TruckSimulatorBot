@@ -18,7 +18,7 @@ def __generate_list(lst):
         lst.append(Item(name, emoji))
 
 
-def get(name) -> Item:
+def get(name):
     for item in __all_items__:
         if item.name == name:
             return item
