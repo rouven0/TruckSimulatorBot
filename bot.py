@@ -41,7 +41,7 @@ def main():
             attribute = getattr(module, attribute_name)
             if isinstance(attribute, ModuleType) and attribute.__name__ in target_modules:
                 reloadcommands(attribute)
-                logging.info("Reloaded %s in %s", attribute.__name__, module.__name_, attribute.__name__, module.__name___)
+                logging.info("Reloaded %s in %s", attribute.__name__, module.__name__, attribute.__name__, module.__name__)
 
     @bot.command(hidden=True)
     @commands.is_owner()
