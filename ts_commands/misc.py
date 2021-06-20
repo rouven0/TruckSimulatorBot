@@ -14,7 +14,7 @@ class Misc(commands.Cog):
         support_embed = discord.Embed(title="Click here to get to the support server",
                                       description="Any problems with the TruckSimulator? \n"
                                       "Report a bug or ask questions there :)",
-                                      url="https://discord.gg/CjBpA6ReFz",
+                                      url="https://discord.gg/BKmtTFbvxv",
                                       colour=discord.Colour.gold())
         await ctx.channel.send(embed=support_embed)
 
@@ -25,7 +25,7 @@ class Misc(commands.Cog):
         """
         links_embed = discord.Embed(title="Some useful links", colour=discord.Colour.gold())
         links_embed.add_field(name="Github", value="https://www.github.com/therealr5/TruckSimulatorBot", inline=False)
-        links_embed.add_field(name="Support server", value="https://discord.gg/CjBpA6ReFz", inline=False)
+        links_embed.add_field(name="Support server", value="https://discord.gg/BKmtTFbvxv", inline=False)
         links_embed.add_field(name="Top.gg page", value="Coming soon", inline=False)
         await ctx.channel.send(embed=links_embed)
 
