@@ -26,6 +26,7 @@ endif
 	@echo Done.
 	@echo Setting up the systemd service...
 	@sed -i 's|WORKINGDIRECTORY|'$(PWD)'|g' TruckSimulatorBot.service
+	@sed -i 's|USER|'$(USER)'|g' TruckSimulatorBot.service
 	@sudo cp ./TruckSimulatorBot.service /etc/systemd/system
 	@sudo systemctl daemon-reload
 	@echo Done. The service is ready to be started
@@ -33,6 +34,7 @@ endif
 uninstall:
 	@echo Removing systemd service...
 	@sed -i 's|'$(PWD)'|WORKINGDIRECTORY|g' TruckSimulatorBot.service
+	@sed -i 's|'$(USER)'|USER|g' TruckSimulatorBot.service
 	@sudo rm /etc/systemd/system/TruckSimulatorBot.service
 	@sudo systemctl daemon-reload
 	@echo Done.

@@ -2,7 +2,7 @@
 Description=Truck Simulator Discord bot
 
 [Service]
-User=rouven
+User=USER
 WorkingDirectory=WORKINGDIRECTORY
 ExecStart=WORKINGDIRECTORY/venv/bin/python3 bot.py --enable-log-file
 
