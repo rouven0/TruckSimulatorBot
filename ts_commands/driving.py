@@ -246,7 +246,6 @@ class Driving(commands.Cog):
         """
         processed_channels = []
         for active_drive in self.active_drives:
-            self.active_drives.remove(active_drive)
             await active_drive.message.edit(
                 embed=get_drive_embed(active_drive.player, self.bot.user.avatar_url), components=[])
             if active_drive.message.channel.id not in processed_channels:
