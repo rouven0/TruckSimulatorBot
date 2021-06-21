@@ -67,13 +67,12 @@ class Driving(commands.Cog):
     """
     The heart of the Truck simulator: Drive your Truck on a virtual map
     """
-
     def __init__(self, bot):
         self.bot = bot
         self.active_drives = []
 
     @commands.Cog.listener()
-    async def on_button_click(self, interaction: Interaction):
+    async def on_button_click(self, interaction):
         """
         All the driving reactions are processed here
         Only when the stop sign is he reaction emoji, changes will be applied
@@ -85,6 +84,7 @@ class Driving(commands.Cog):
             return
         active_drive = self.get_active_drive(interaction.author.id, message_id=interaction.message.id)
         if active_drive is None:
+            await interaction.respond(type=6)
             # Return if the wrong player clicked the button
             return
         try:
@@ -124,9 +124,9 @@ class Driving(commands.Cog):
             buttons.append(Button(style=4, label=" ", emoji=self.bot.get_emoji(symbols.STOP)))
 
             await interaction.message.edit(embed=get_drive_embed(active_drive.player,
-                                                                      interaction.author.avatar_url),
+                                           interaction.author.avatar_url),
                                            components=[buttons])
-            await interaction.respond(type=7)
+            await interaction.respond(type=6)
 
     @commands.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
