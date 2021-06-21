@@ -72,7 +72,7 @@ class Driving(commands.Cog):
         self.active_drives = []
 
     @commands.Cog.listener()
-    async def on_button_click(self, interaction: Interaction):
+    async def on_button_click(self, interaction):
         """
         All the driving reactions are processed here
         Only when the stop sign is he reaction emoji, changes will be applied
@@ -92,9 +92,9 @@ class Driving(commands.Cog):
         except AttributeError:
             action = interaction.component.label
         if action == symbols.STOP:
-            await interaction.respond(type=7, components=[])
             self.active_drives.remove(active_drive)
             await interaction.message.channel.send("You stopped driving!, {}".format(interaction.author.name))
+            await interaction.respond(type=7, components=[])
             players.update(active_drive.player, position=active_drive.player.position,
                            miles=active_drive.player.miles)
 
@@ -116,7 +116,6 @@ class Driving(commands.Cog):
             position_changed = True
 
         if position_changed:
-            await interaction.respond(type=7)
             active_drive.last_action_time = time()
             active_drive.player.miles += 1
             buttons = []
@@ -127,6 +126,7 @@ class Driving(commands.Cog):
             await interaction.message.edit(embed=get_drive_embed(active_drive.player,
                                            interaction.author.avatar_url),
                                            components=[buttons])
+            await interaction.respond(type=6)
 
     @commands.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
