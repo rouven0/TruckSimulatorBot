@@ -71,6 +71,10 @@ class Stats(commands.Cog):
 
         player = players.get(requested_id)
 
+        # Detect, when the player is renamed
+        if player.name != ctx.author.name:
+            players.update(player, name=ctx.author.name)
+
         current_job = jobs.get(ctx.author.id)
         profile_embed = discord.Embed(colour=discord.Colour.gold())
         profile_embed.set_author(name="{}'s Profile".format(player.name),
