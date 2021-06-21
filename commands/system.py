@@ -81,5 +81,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
                     "Try `t.register` to get started".format(error.original.requested_id))
             else:
                 logging.error(error)
+        elif isinstance(error, commands.errors.CommandNotFound):
+            pass
         else:
             logging.error(error)

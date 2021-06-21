@@ -123,15 +123,14 @@ def update(player: Player, name:str=None, money:float=None, position:list=None, 
     logging.info('Updated player %s to %s', player.name, __to_tuple(player))
 
 
-def get(user_id):
+def get(user_id: int):
     """
     Get one player from the database
     """
-    __cur__.execute("SELECT * FROM players WHERE id=:id", {"id": user_id})
-    try:
-        return __from_tuple(__cur__.fetchone())
-    except TypeError:
+    if not registered(user_id):
         raise PlayerNotRegistered(user_id)
+    __cur__.execute("SELECT * FROM players WHERE id=:id", {"id": user_id})
+    return __from_tuple(__cur__.fetchone())
 
 
 def get_top(key="miles"):
@@ -147,7 +146,7 @@ def get_top(key="miles"):
     return __list_from_tuples(__cur__.fetchmany(10)), key, suffix
 
 
-def registered(user_id):
+def registered(user_id: int):
     """
     Checks whether a specific user is registered or not
     """
