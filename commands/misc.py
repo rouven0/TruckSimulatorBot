@@ -2,6 +2,7 @@
 This module contains a Cog for all the commands, that don't have a speciefied category
 """
 import discord
+from discord import colour
 from discord.ext import commands
 
 
@@ -17,6 +18,20 @@ class Misc(commands.Cog):
                                       url="https://discord.gg/BKmtTFbvxv",
                                       colour=discord.Colour.gold())
         await ctx.channel.send(embed=support_embed)
+
+    @commands.command()
+    async def rules(self, ctx):
+        rules_embed=discord.Embed(title="Truck Simulator Rules",
+                                  colour=discord.Colour.gold())
+        rules_embed.add_field(name="Trading ingame currency for real money",
+                              value="Not only that is is pretty stupid to trade real world's money in exchange of a number "
+                                    "somewhere in a random database it will also get you banned from this bot.",
+                                    inline=False)
+        rules_embed.add_field(name="Autotypers",
+                              value="Since it's quite hard to write them for the Truck Simulator and it's a good amount "
+                                    "of work, people who manage to write (working) automation software for this bot will "
+                                    "not get banned. But people who use them will be.")
+        await ctx.channel.send(embed=rules_embed)
 
     @commands.command()
     async def links(self, ctx):
