@@ -67,7 +67,6 @@ class Driving(commands.Cog):
     """
     The heart of the Truck simulator: Drive your Truck on a virtual map
     """
-
     def __init__(self, bot):
         self.bot = bot
         self.active_drives = []
@@ -85,6 +84,7 @@ class Driving(commands.Cog):
             return
         active_drive = self.get_active_drive(interaction.author.id, message_id=interaction.message.id)
         if active_drive is None:
+            await interaction.respond(type=6)
             # Return if the wrong player clicked the button
             return
         try:
@@ -92,9 +92,9 @@ class Driving(commands.Cog):
         except AttributeError:
             action = interaction.component.label
         if action == symbols.STOP:
+            await interaction.respond(type=7, components=[])
             self.active_drives.remove(active_drive)
             await interaction.message.channel.send("You stopped driving!, {}".format(interaction.author.name))
-            await interaction.respond(type=7, components=[])
             players.update(active_drive.player, position=active_drive.player.position,
                            miles=active_drive.player.miles)
 
@@ -116,6 +116,7 @@ class Driving(commands.Cog):
             position_changed = True
 
         if position_changed:
+            await interaction.respond(type=7)
             active_drive.last_action_time = time()
             active_drive.player.miles += 1
             buttons = []
@@ -124,9 +125,8 @@ class Driving(commands.Cog):
             buttons.append(Button(style=4, label=" ", emoji=self.bot.get_emoji(symbols.STOP)))
 
             await interaction.message.edit(embed=get_drive_embed(active_drive.player,
-                                                                      interaction.author.avatar_url),
+                                           interaction.author.avatar_url),
                                            components=[buttons])
-            await interaction.respond(type=7)
 
     @commands.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
