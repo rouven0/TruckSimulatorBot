@@ -22,8 +22,7 @@ def get(name) -> Item:
     for item in __all_items__:
         if item.name == name:
             return item
-    raise ItemNotFound()
-
+    return None
 __con__ = sqlite3.connect('objects.db')
 __cur__ = __con__.cursor()
 
@@ -34,7 +33,7 @@ __generate_list(__all_items__)
 __con__.close()
 
 
-class ItemNotFound(Exception):
-    "Exception raised when requested item is not found"
-    def __str__(self) -> str:
-        return "Requested item not found"
+#class ItemNotFound(Exception):
+#    "Exception raised when requested item is not found"
+#    def __str__(self) -> str:
+#        return "Requested item not found"
