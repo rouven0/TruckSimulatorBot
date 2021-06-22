@@ -91,16 +91,18 @@ class Stats(commands.Cog):
         else:
             top_players = players.get_top()
         top_body = ""
+        top_title = "miles"
         count = 0
 
         for player in top_players[0]:
             if top_players[1] == "money":
                 val = player.money
+                top_title = top_players[1]
             else:
                 val = player.miles
             count += 1
             top_body = "{}**{}**. {} - {}{}\n".format(top_body, count, player.name,
                                                       val, top_players[2])
         top_embed = discord.Embed(title="Truck Simulator top list", colour=discord.Colour.gold())
-        top_embed.add_field(name="Top {}".format(top_players[1]), value=top_body)
+        top_embed.add_field(name="Top {}".format(top_title), value=top_body)
         await ctx.channel.send(embed=top_embed)
