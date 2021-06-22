@@ -7,7 +7,7 @@ import sqlite3
 
 def __generate_list(lst) -> None:
     for i in __cur__.fetchall():
-        lst.append(Truck(i[0], i[1], i[2], i[3], i[4]))
+        lst.append(Truck(i[0], i[1], i[2], i[3], i[4], i[5], i[6]))
 
 
 @dataclass
@@ -17,14 +17,18 @@ class Truck:
         truck_id: Id of this Truck, in range of 0 ... best Truck
         name: Name of the Truck or the Trucks brand
         description: Description that is shown to the player
+        price: Price the player has to pay to use this Truck
         gas_consumptions: Amount of Gas used per mile
         gas_capacity: Amount of gas the player can fill in the Truck
+        image_url: Url of an image that is show to the user
     """
     truck_id: int
     name: str
     description: str
+    price: int
     gas_consumption: int
     gas_capacity: int
+    image_url: str
 
 
 def get(truck_id: int) -> Truck:
