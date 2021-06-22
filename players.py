@@ -28,7 +28,7 @@ class Player:
     miles: int = 0
 
 
-def __list_from_tuples(tups):
+def __list_from_tuples(tups) -> list:
     """
     Returns a list with all Players generated from a set of tuples from the database
     """
@@ -38,14 +38,14 @@ def __list_from_tuples(tups):
     return players
 
 
-def __from_tuple(tup):
+def __from_tuple(tup) -> Player:
     """
     Returns a Player object from a received database tuple
     """
     return Player(tup[0], tup[1], tup[2], __get_position(tup[3]), tup[4])
 
 
-def __to_tuple(player):
+def __to_tuple(player) -> tuple:
     """
     Transforms the player object into a tuple that can be inserted in the db
     """
@@ -53,7 +53,7 @@ def __to_tuple(player):
             __format_pos_to_db(player.position), player.miles)
 
 
-def __get_position(db_pos):
+def __get_position(db_pos) -> list:
     """
     Parses the position from the database as list [x][y]
     """
@@ -62,20 +62,20 @@ def __get_position(db_pos):
     return [int(pos_x), int(pos_y)]
 
 
-def __format_pos_to_db(pos):
+def __format_pos_to_db(pos) -> str:
     """
     Returns a database-ready string that contains the position in the form x/y
     """
     return "{}/{}".format(pos[0], pos[1])
 
 
-def add_money(player, amount):
+def add_money(player, amount) -> None:
     """
     Add money to the players account
     """
     update(player, money=player.money+amount)
 
-def debit_money(player, amount):
+def debit_money(player, amount) -> None:
     """
     Debit money from the players account
     """
@@ -84,7 +84,7 @@ def debit_money(player, amount):
     else:
         update(player, money=player.money-amount)
 
-def insert(player: Player):
+def insert(player: Player) -> None:
     """
     Inserts a player into the database
     """
@@ -93,7 +93,7 @@ def insert(player: Player):
     logging.info('Inserted %s into the database as %s', player.name, __to_tuple(player))
 
 
-def remove(player: Player):
+def remove(player: Player) -> None:
     """
     Removes a player from the database
     """
@@ -102,7 +102,7 @@ def remove(player: Player):
     logging.info('Removed %s %s from the database', player.name, __to_tuple(player))
 
 
-def update(player: Player, name:str=None, money:float=None, position:list=None, miles:int=None):
+def update(player: Player, name:str=None, money:float=None, position:list=None, miles:int=None) -> None:
     """
     Updates a player in the database
     """
@@ -123,7 +123,7 @@ def update(player: Player, name:str=None, money:float=None, position:list=None, 
     logging.info('Updated player %s to %s', player.name, __to_tuple(player))
 
 
-def get(user_id: int):
+def get(user_id: int) -> Player:
     """
     Get one player from the database
     """
@@ -133,7 +133,7 @@ def get(user_id: int):
     return __from_tuple(__cur__.fetchone())
 
 
-def get_top(key="miles"):
+def get_top(key="miles") -> tuple:
     """
     Get the top 10 players from the database
     """
@@ -146,7 +146,7 @@ def get_top(key="miles"):
     return __list_from_tuples(__cur__.fetchmany(10)), key, suffix
 
 
-def registered(user_id: int):
+def registered(user_id: int) -> bool:
     """
     Checks whether a specific user is registered or not
     """
@@ -156,7 +156,7 @@ def registered(user_id: int):
     return False
 
 
-def get_count():
+def get_count() -> int:
     """
     Returns the player count
     """
