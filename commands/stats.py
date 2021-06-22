@@ -11,9 +11,9 @@ class Stats(commands.Cog):
     """
     A lot of numbers
     """
+
     def __init__(self, bot):
         self.bot = bot
-
 
     @commands.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
@@ -40,6 +40,7 @@ class Stats(commands.Cog):
                                "**All your ingame stats will be lost!**".format(ctx.author.mention))
         confirmation = "delete {}@trucksimulator".format(ctx.author.name)
         await ctx.channel.send("Please type **`{}`** to confirm your deletion".format(confirmation))
+
         def check(message):
             return message.author.id == ctx.author.id
         try:
@@ -63,9 +64,11 @@ class Stats(commands.Cog):
         """
         if args and args[0].startswith("<@"):
             if args[0].find("!") != -1:
-                requested_id = int(args[0][args[0].find("!") + 1:args[0].find(">")])
+                requested_id = int(
+                    args[0][args[0].find("!") + 1:args[0].find(">")])
             else:
-                requested_id = int(args[0][args[0].find("@") + 1:args[0].find(">")])
+                requested_id = int(
+                    args[0][args[0].find("@") + 1:args[0].find(">")])
         else:
             requested_id = ctx.author.id
 
@@ -81,9 +84,11 @@ class Stats(commands.Cog):
                                  icon_url=ctx.author.avatar_url)
         profile_embed.set_thumbnail(url=ctx.author.avatar_url)
         profile_embed.add_field(name="Money", value=player.money)
-        profile_embed.add_field(name="Miles driven", value=player.miles, inline=False)
+        profile_embed.add_field(name="Miles driven",
+                                value=player.miles, inline=False)
         if current_job is not None:
-            profile_embed.add_field(name="Current Job", value=jobs.show(current_job))
+            profile_embed.add_field(
+                name="Current Job", value=jobs.show(current_job))
         await ctx.channel.send(embed=profile_embed)
 
     @commands.command()
@@ -96,16 +101,19 @@ class Stats(commands.Cog):
         else:
             top_players = players.get_top()
         top_body = ""
+        top_title = "miles"
         count = 0
 
         for player in top_players[0]:
             if top_players[1] == "money":
                 val = player.money
+                top_title = "money"
             else:
                 val = player.miles
             count += 1
             top_body = "{}**{}**. {} - {}{}\n".format(top_body, count, player.name,
                                                       val, top_players[2])
-        top_embed = discord.Embed(title="Truck Simulator top list", colour=discord.Colour.gold())
-        top_embed.add_field(name="Top {}".format(top_players[1]), value=top_body)
+        top_embed = discord.Embed(
+            title="Truck Simulator top list", colour=discord.Colour.gold())
+        top_embed.add_field(name="Top {}".format(top_title), value=top_body)
         await ctx.channel.send(embed=top_embed)
