@@ -57,29 +57,24 @@ class Stats(commands.Cog):
             await ctx.channel.send("Deletion aborted!")
 
     @commands.command(aliases=["p", "me"])
-    async def profile(self, ctx, *args):
+    async def profile(self, ctx, user: discord.Member=None):
         """
         Shows your in-game profile. That's it
         """
-        if args and args[0].startswith("<@"):
-            if args[0].find("!") != -1:
-                requested_id = int(args[0][args[0].find("!") + 1:args[0].find(">")])
-            else:
-                requested_id = int(args[0][args[0].find("@") + 1:args[0].find(">")])
+        if user is not None:
+            player = players.get(user.id)
         else:
-            requested_id = ctx.author.id
-
-        player = players.get(requested_id)
-
-        # Detect, when the player is renamed
-        if player.name != ctx.author.name:
-            players.update(player, name=ctx.author.name)
+            player = players.get(ctx.author.id)
+            # Detect, when the player is renamed
+            if player.name != ctx.author.name:
+                players.update(player, name=ctx.author.name)
 
         current_job = jobs.get(ctx.author.id)
         profile_embed = discord.Embed(colour=discord.Colour.gold())
         profile_embed.set_author(name="{}'s Profile".format(player.name),
                                  icon_url=ctx.author.avatar_url)
-        profile_embed.set_thumbnail(url=ctx.author.avatar_url)
+        if user is None:
+            profile_embed.set_thumbnail(url=ctx.author.avatar_url)
         profile_embed.add_field(name="Money", value=player.money)
         profile_embed.add_field(name="Miles driven", value=player.miles, inline=False)
         if current_job is not None:
