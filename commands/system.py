@@ -79,6 +79,8 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
                 await ctx.channel.send(
                     "<@!{}> you are not registered yet! "
                     "Try `t.register` to get started".format(error.original.requested_id))
+            elif isinstance(error.original, players.NotEnoughMoney):
+                await ctx.channel.send("{} you don't have enough money to do this".format(ctx.author.mention))
             else:
                 logging.error(error)
         elif isinstance(error, commands.errors.CommandNotFound):

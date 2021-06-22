@@ -46,8 +46,6 @@ class Gambling(commands.Cog):
                     players.add_money(player, amount*2)
                 else:
                     await ctx.channel.send("Nope, it was {}. You lost ${}".format(result, amount))
-            except players.NotEnoughMoney:
-                await ctx.channel.send("{} you don't have enough money to do this".format(ctx.author.mention))
             except (IndexError, ValueError):
                 await ctx.channel.send("**Syntax:** `t.coinflip [h/t] <amount>`")
         else:
