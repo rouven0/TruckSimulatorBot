@@ -2,6 +2,8 @@
 This module contains the Cog for all economy-related commands
 """
 import discord
+from discord import embeds
+from discord import colour
 from discord.ext import commands
 import players
 import jobs
@@ -69,3 +71,22 @@ class Economy(commands.Cog):
             players.update(player, money=player.money + current_job.reward)
         else:
             await ctx.channel.send("Nothing to do here")
+
+    @commands.command()
+    async def give(self, ctx, user: discord.Member=None, amount=None):
+        if user is None:
+            await ctx.channel.send("No user specified")
+            return
+        if amount is None:
+            await ctx.channel.send("No amount specified")
+        try:
+            amount = abs(int(amount))
+        except ValueError:
+            await ctx.channel.send("Wtf")
+        donator = players.get(ctx.author.id)
+        acceptor = players.get(user.id)
+        players.debit_money(donator, amount)
+        players.add_money(acceptor, amount)
+        give_embed = discord.Embed(description=f"{donator.name} gave ${amount} to {acceptor.name}",
+                                   colour=discord.Colour.gold())
+        await ctx.channel.send(embed=give_embed)
