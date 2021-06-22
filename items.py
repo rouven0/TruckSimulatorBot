@@ -33,6 +33,7 @@ __generate_list(__all_items__)
 
 __con__.close()
 
+
 class ItemNotFound(Exception):
     "Exception raised when requested item is not found"
     def __str__(self) -> str:
