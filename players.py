@@ -89,7 +89,7 @@ def insert(player: Player) -> None:
     """
     Inserts a player into the database
     """
-    __cur__.execute('INSERT INTO players VALUES (?,?,?,?,?)', __to_tuple(player))
+    __cur__.execute('INSERT INTO players VALUES (?,?,?,?,?,?)', __to_tuple(player))
     __con__.commit()
     logging.info('Inserted %s into the database as %s', player.name, __to_tuple(player))
 
