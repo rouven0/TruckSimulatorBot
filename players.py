@@ -26,6 +26,7 @@ class Player:
     money: float = 0
     position: list = field(default_factory=lambda: [0, 0])
     miles: int = 0
+    gas: int = 0
 
 
 def __list_from_tuples(tups) -> list:
@@ -42,7 +43,7 @@ def __from_tuple(tup) -> Player:
     """
     Returns a Player object from a received database tuple
     """
-    return Player(tup[0], tup[1], tup[2], __get_position(tup[3]), tup[4])
+    return Player(tup[0], tup[1], tup[2], __get_position(tup[3]), tup[4], tup[5])
 
 
 def __to_tuple(player) -> tuple:
@@ -50,7 +51,7 @@ def __to_tuple(player) -> tuple:
     Transforms the player object into a tuple that can be inserted in the db
     """
     return (player.user_id, player.name, player.money,
-            __format_pos_to_db(player.position), player.miles)
+            __format_pos_to_db(player.position), player.miles, player.gas)
 
 
 def __get_position(db_pos) -> list:
@@ -102,7 +103,7 @@ def remove(player: Player) -> None:
     logging.info('Removed %s %s from the database', player.name, __to_tuple(player))
 
 
-def update(player: Player, name:str=None, money:float=None, position:list=None, miles:int=None) -> None:
+def update(player: Player, name:str=None, money:float=None, position:list=None, miles:int=None, gas:int=None) -> None:
     """
     Updates a player in the database
     """
@@ -119,6 +120,9 @@ def update(player: Player, name:str=None, money:float=None, position:list=None, 
     if miles is not None:
         __cur__.execute('UPDATE players SET miles=? WHERE id=?', (miles, player.user_id))
         player.miles = miles
+    if gas is not None:
+        __cur__.execute('UPDATE players SET gas=? WHERE id=?', (gas, player.user_id))
+        player.gas = gas
     __con__.commit()
     logging.info('Updated player %s to %s', player.name, __to_tuple(player))
 
