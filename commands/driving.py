@@ -137,6 +137,9 @@ class Driving(commands.Cog):
         Start driving your Truck on the map and control it with reactions
         """
         player = players.get(ctx.author.id)
+        # Detect, when the player is renamed
+        if player.name != ctx.author.name:
+            players.update(player, name=ctx.author.name)
         if ctx.author.id in [a.player.user_id for a in self.active_drives]:
             await ctx.channel.send("You can't drive on two roads at once!")
             return
