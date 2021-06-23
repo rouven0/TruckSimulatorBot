@@ -2,6 +2,8 @@
 This module contains the Cog for all economy-related commands
 """
 import discord
+from discord import embeds
+from discord import colour
 from discord.ext import commands
 import players
 import jobs
@@ -9,11 +11,11 @@ import jobs
 
 class Economy(commands.Cog):
     """
-    Earn money, trade it and buy better Trucks (WIP)
+    Earn money, trade it and buy better Trucks
     """
 
     @commands.command()
-    async def job(self, ctx, *args):
+    async def job(self, ctx, *args) -> None:
         """
         Get yourself some jobs and earn money
         """
@@ -36,7 +38,7 @@ class Economy(commands.Cog):
         await ctx.channel.send(embed=job_embed)
 
     @commands.command()
-    async def load(self, ctx):
+    async def load(self, ctx) -> None:
         """
         If you have a job, you can load your Truck with items you have to transport
         """
@@ -53,7 +55,7 @@ class Economy(commands.Cog):
             await ctx.channel.send("Nothing to do here")
 
     @commands.command()
-    async def unload(self, ctx):
+    async def unload(self, ctx) -> None:
         """
         Unload your Truck at the right place to get your job done
         """
@@ -69,3 +71,22 @@ class Economy(commands.Cog):
             players.update(player, money=player.money + current_job.reward)
         else:
             await ctx.channel.send("Nothing to do here")
+
+    @commands.command()
+    async def give(self, ctx, user: discord.Member=None, amount=None) -> None:
+        if user is None:
+            await ctx.channel.send("No user specified")
+            return
+        if amount is None:
+            await ctx.channel.send("No amount specified")
+        try:
+            amount = abs(int(amount))
+        except ValueError:
+            await ctx.channel.send("Wtf")
+        donator = players.get(ctx.author.id)
+        acceptor = players.get(user.id)
+        players.debit_money(donator, amount)
+        players.add_money(acceptor, amount)
+        give_embed = discord.Embed(description=f"{donator.name} gave ${amount} to {acceptor.name}",
+                                   colour=discord.Colour.gold())
+        await ctx.channel.send(embed=give_embed)

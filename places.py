@@ -23,7 +23,7 @@ class Place:
     image_url: str
     produced_item: str
 
-def __get_position(db_pos):
+def __get_position(db_pos) -> list:
     """
     Formats the position string from the database into a list what we can operate with
     """
@@ -32,7 +32,7 @@ def __get_position(db_pos):
     return [int(pos_x), int(pos_y)]
 
 
-def __generate_list(lst):
+def __generate_list(lst) -> None:
     """
     Populates a list with Place objects created from database tuples
     """
@@ -48,7 +48,7 @@ def __generate_list(lst):
 
 
 
-def get(position):
+def get(position) -> Place:
     """
     Returns a place object on a specific position
     If no places is registered there, None is returned
@@ -61,28 +61,28 @@ def get(position):
     return Place("Nothing", position, [], None, None)
 
 
-def get_all():
+def get_all() -> list:
     """
     Returns all places that are currently loaded
     """
     return __all_places__
 
 
-def get_public():
+def get_public() -> list:
     """
     Returns places that should be shown in the addressbook
     """
     return __public_places__
 
 
-def get_hidden():
+def get_hidden() -> list:
     """
     Returns places that should NOT be shown in the addressbook
     """
     return __hidden_places__
 
 
-def get_quest_active():
+def get_quest_active() -> list:
     """
     Returns all places that can appear in jobs
     """

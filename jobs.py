@@ -36,14 +36,14 @@ class Job:
     reward: int
 
 
-def __from_tuple(tup):
+def __from_tuple(tup) -> Job:
     """
     Returns a Job object from a received database tuple
     """
     return Job(tup[0], places.get(tup[1]), places.get(tup[2]), tup[3], tup[4])
 
 
-def __to_tuple(job):
+def __to_tuple(job) -> tuple:
     """
     Transforms the job object into a tuple that can be inserted in the db
     """
@@ -51,14 +51,14 @@ def __to_tuple(job):
             __format_pos_to_db(job.place_to.position), job.state, job.reward)
 
 
-def __format_pos_to_db(pos):
+def __format_pos_to_db(pos) -> str:
     """
     Returns a database-ready string that contains the position in the form x/y
     """
     return "{}/{}".format(pos[0], pos[1])
 
 
-def insert(job: Job):
+def insert(job: Job) -> None:
     """
     Inserts a Job object into the players database
     """
@@ -66,7 +66,7 @@ def insert(job: Job):
     __con__.commit()
 
 
-def remove(job: Job):
+def remove(job: Job) -> None:
     """
     Removes a job from the player database
     """
@@ -74,7 +74,7 @@ def remove(job: Job):
     __con__.commit()
 
 
-def update(job: Job, state=None):
+def update(job: Job, state=None) -> None:
     """
     Updates a job's state
     """
@@ -83,7 +83,8 @@ def update(job: Job, state=None):
     __con__.commit()
 
 
-def get(user_id):
+def get(user_id) -> Job:
+    # TODO better up job getting using exceptions and has_job(): -> boolean
     """
     Get the Players current job as Job object
     """
@@ -94,7 +95,7 @@ def get(user_id):
         return None
 
 
-def generate(player: Player):
+def generate(player: Player) -> tuple:
     """
     This takes two random places from the list, calculates its reward based on the miles the player
     has to drive and returns the Job object and the job as a string in human readable format.
@@ -119,7 +120,7 @@ def generate(player: Player):
             "{} needs {} {} from {}. You get ${} for this transport".format(place_to.name, item.emoji, item.name, place_from.name, reward))
 
 
-def show(job: Job):
+def show(job: Job) -> str:
     """
     Prints out the current job in a human readable format
     """
@@ -129,7 +130,7 @@ def show(job: Job):
     return "Bring {} {} from {} to {}.".format(item.emoji, item.name, place_from.name, place_to.name)
 
 
-def get_state(job: Job):
+def get_state(job: Job) -> str:
     """
     Returns the next instructions based on the current jobs state
     """

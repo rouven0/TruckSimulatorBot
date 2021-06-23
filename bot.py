@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 
 import config
-# from help import TruckSimulatorHelpCommand
+from help import TruckSimulatorHelpCommand
 
 from commands.system import System
 from commands.driving import Driving
@@ -24,10 +24,9 @@ BOT_PREFIX = getenv('BOT_PREFIX').split(";")
 
 
 def main():
-    bot = commands.AutoShardedBot(shard_count=1, command_prefix=BOT_PREFIX,
-                                  # help_command=TruckSimulatorHelpCommand(),
-                                  help_command=commands.DefaultHelpCommand(),
-                                  case_insensitive=True)
+    bot = commands.Bot(command_prefix=BOT_PREFIX,
+                       help_command=TruckSimulatorHelpCommand(),
+                       case_insensitive=True)
 
     DiscordComponents(bot)
     logger = logging.getLogger()

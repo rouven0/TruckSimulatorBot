@@ -11,7 +11,7 @@ class Stats(commands.Cog):
     """
     A lot of numbers
     """
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
 
@@ -19,7 +19,7 @@ class Stats(commands.Cog):
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True, add_reactions=True)
-    async def register(self, ctx):
+    async def register(self, ctx) -> None:
         """
         Register yourself in a stunningly beautiful database that will definitely not
         deleted by accident anymore
@@ -31,7 +31,7 @@ class Stats(commands.Cog):
             await ctx.channel.send("You are already registered")
 
     @commands.command()
-    async def delete(self, ctx):
+    async def delete(self, ctx) -> None:
         """
         Delete your account
         """
@@ -57,37 +57,34 @@ class Stats(commands.Cog):
             await ctx.channel.send("Deletion aborted!")
 
     @commands.command(aliases=["p", "me"])
-    async def profile(self, ctx, *args):
+    async def profile(self, ctx, user: discord.Member=None) -> None:
         """
         Shows your in-game profile. That's it
         """
-        if args and args[0].startswith("<@"):
-            if args[0].find("!") != -1:
-                requested_id = int(args[0][args[0].find("!") + 1:args[0].find(">")])
-            else:
-                requested_id = int(args[0][args[0].find("@") + 1:args[0].find(">")])
-        else:
-            requested_id = ctx.author.id
-
-        player = players.get(requested_id)
-
-        # Detect, when the player is renamed
-        if player.name != ctx.author.name:
-            players.update(player, name=ctx.author.name)
-
-        current_job = jobs.get(ctx.author.id)
         profile_embed = discord.Embed(colour=discord.Colour.gold())
-        profile_embed.set_author(name="{}'s Profile".format(player.name),
-                                 icon_url=ctx.author.avatar_url)
-        profile_embed.set_thumbnail(url=ctx.author.avatar_url)
+        if user is not None:
+            player = players.get(user.id)
+            profile_embed.set_thumbnail(url=user.avatar_url)
+            profile_embed.set_author(name="{}'s Profile".format(player.name),
+                                     icon_url=user.avatar_url)
+        else:
+            player = players.get(ctx.author.id)
+            profile_embed.set_thumbnail(url=ctx.author.avatar_url)
+            profile_embed.set_author(name="{}'s Profile".format(player.name),
+                                     icon_url=ctx.author.avatar_url)
+            # Detect, when the player is renamed
+            if player.name != ctx.author.name:
+                players.update(player, name=ctx.author.name)
+
         profile_embed.add_field(name="Money", value=player.money)
         profile_embed.add_field(name="Miles driven", value=player.miles, inline=False)
+        current_job = jobs.get(ctx.author.id)
         if current_job is not None:
             profile_embed.add_field(name="Current Job", value=jobs.show(current_job))
         await ctx.channel.send(embed=profile_embed)
 
     @commands.command()
-    async def top(self, ctx, *args):
+    async def top(self, ctx, *args) -> None:
         """
         If you appear in these lists you are one of the top 10 Players. Congratulations!
         """
@@ -96,16 +93,18 @@ class Stats(commands.Cog):
         else:
             top_players = players.get_top()
         top_body = ""
+        top_title = "miles"
         count = 0
 
         for player in top_players[0]:
             if top_players[1] == "money":
                 val = player.money
+                top_title = top_players[1]
             else:
                 val = player.miles
             count += 1
             top_body = "{}**{}**. {} - {}{}\n".format(top_body, count, player.name,
                                                       val, top_players[2])
         top_embed = discord.Embed(title="Truck Simulator top list", colour=discord.Colour.gold())
-        top_embed.add_field(name="Top {}".format(top_players[1]), value=top_body)
+        top_embed.add_field(name="Top {}".format(top_title), value=top_body)
         await ctx.channel.send(embed=top_embed)
