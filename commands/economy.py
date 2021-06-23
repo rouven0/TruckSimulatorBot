@@ -11,7 +11,7 @@ import jobs
 
 class Economy(commands.Cog):
     """
-    Earn money, trade it and buy better Trucks (WIP -> None)
+    Earn money, trade it and buy better Trucks
     """
 
     @commands.command()

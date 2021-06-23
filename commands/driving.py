@@ -134,7 +134,7 @@ class Driving(commands.Cog):
                                   use_external_emojis=True, add_reactions=True)
     async def drive(self, ctx) -> None:
         """
-        Start driving your Truck on the map and control it with reactions
+        Start driving your Truck on the map and control it with buttons
         """
         player = players.get(ctx.author.id)
         # Detect, when the player is renamed
