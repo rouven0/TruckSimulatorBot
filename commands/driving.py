@@ -14,7 +14,7 @@ import assets
 import jobs
 
 
-def generate_minimap(player):
+def generate_minimap(player) -> str:
     """
     This generate the minimap shown in t.drive
     """
@@ -38,7 +38,7 @@ def generate_minimap(player):
     return minimap
 
 
-def get_drive_embed(player, avatar_url):
+def get_drive_embed(player, avatar_url) -> discord.Embed:
     """
     Returns a discord embed with all the information about the current drive
     """
@@ -72,7 +72,7 @@ class Driving(commands.Cog):
         self.active_drives = []
 
     @commands.Cog.listener()
-    async def on_button_click(self, interaction):
+    async def on_button_click(self, interaction) -> None:
         """
         All the driving reactions are processed here
         Only when the stop sign is he reaction emoji, changes will be applied
@@ -132,7 +132,7 @@ class Driving(commands.Cog):
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True, add_reactions=True)
-    async def drive(self, ctx):
+    async def drive(self, ctx) -> None:
         """
         Start driving your Truck on the map and control it with reactions
         """
@@ -155,7 +155,7 @@ class Driving(commands.Cog):
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True, add_reactions=True)
-    async def stop(self, ctx):
+    async def stop(self, ctx) -> None:
         """
         This is an alternate stop method to get your changes applied if there
         is a problem with the reactions
@@ -173,7 +173,7 @@ class Driving(commands.Cog):
                        miles=active_drive.player.miles)
 
     @commands.command(aliases=["here"])
-    async def position(self, ctx):
+    async def position(self, ctx) -> None:
         """
         Provides some information about your current position and the things located there
         """
@@ -193,7 +193,7 @@ class Driving(commands.Cog):
         await ctx.channel.send(embed=position_embed)
 
     @staticmethod
-    def get_place_commands(command_list):
+    def get_place_commands(command_list) -> str:
         """
         Returns a string in which all available commands for this place are listed
         """
@@ -203,7 +203,7 @@ class Driving(commands.Cog):
         return readable
 
     @commands.command(aliases=["places"])
-    async def addressbook(self, ctx):
+    async def addressbook(self, ctx) -> None:
         """
         Lists all public places. Hidden ones are excluded
         """
@@ -227,7 +227,7 @@ class Driving(commands.Cog):
                 return active_drive
         return None
 
-    async def check_drives(self):
+    async def check_drives(self) -> None:
         """
         Drives that are inactive for more than 10 minutes get stopped
         """
@@ -243,7 +243,7 @@ class Driving(commands.Cog):
                                    miles=active_drive.player.miles)
             await asyncio.sleep(10)
 
-    async def on_shutdown(self):
+    async def on_shutdown(self) -> None:
         """
         Stop all drivings and save changes to the database when the bot is shut down
         """

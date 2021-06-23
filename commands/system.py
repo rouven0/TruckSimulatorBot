@@ -1,3 +1,4 @@
+from commands.driving import Driving
 from datetime import datetime
 from math import floor
 import logging
@@ -10,7 +11,7 @@ import players
 
 
 class System(commands.Cog, command_attrs=dict(hidden=True)):
-    def __init__(self, bot, driving_commands):
+    def __init__(self, bot: commands.Bot, driving_commands: Driving) -> None:
         self.bot = bot
         self.driving_commands = driving_commands
         self.start_time = datetime.now()
@@ -18,7 +19,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         self.commit=self.repo.head.commit.hexsha[:7]
 
     @commands.Cog.listener()
-    async def on_ready(self):
+    async def on_ready(self) -> None:
         await self.bot.change_presence(status=discord.Status.online,
                                        activity=discord.Activity(
                                            type=discord.ActivityType.watching,
@@ -26,7 +27,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         logging.info("Connected to Discord")
 
     @commands.Cog.listener()
-    async def on_guild_join(self, guild: discord.Guild):
+    async def on_guild_join(self, guild: discord.Guild) -> None:
         await self.bot.change_presence(status=discord.Status.online,
                                        activity=discord.Activity(
                                            type=discord.ActivityType.watching,
@@ -37,12 +38,12 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True, add_reactions=True)
-    async def bing(self, ctx):
+    async def bing(self, ctx) -> None:
         answer = await ctx.channel.send("Bong")
         await ctx.channel.send(str(round((answer.created_at - ctx.message.created_at).total_seconds() * 1000)) + "ms")
 
     @commands.command()
-    async def info(self, ctx):
+    async def info(self, ctx) -> None:
         info_embed = discord.Embed(title="Truck Simulator info", colour=discord.Colour.gold())
         uptime = datetime.now() - self.start_time
         days = uptime.days
@@ -61,14 +62,14 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.command()
     @commands.is_owner()
-    async def shutdown(self, ctx):
+    async def shutdown(self, ctx) -> None:
         await self.driving_commands.on_shutdown()
         await ctx.channel.send("Shutting down")
         logging.warning("Shutdown command is executed")
         await self.bot.close()
 
     @commands.Cog.listener()
-    async def on_command_error(self, ctx, error: commands.CommandError):
+    async def on_command_error(self, ctx, error: commands.CommandError) -> None:
         if isinstance(error, commands.errors.BotMissingPermissions):
             missing_permissions = '`'
             for permission in error.missing_perms:

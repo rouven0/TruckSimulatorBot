@@ -11,7 +11,7 @@ class Stats(commands.Cog):
     """
     A lot of numbers
     """
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
 
@@ -19,7 +19,7 @@ class Stats(commands.Cog):
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True, add_reactions=True)
-    async def register(self, ctx):
+    async def register(self, ctx) -> None:
         """
         Register yourself in a stunningly beautiful database that will definitely not
         deleted by accident anymore
@@ -31,7 +31,7 @@ class Stats(commands.Cog):
             await ctx.channel.send("You are already registered")
 
     @commands.command()
-    async def delete(self, ctx):
+    async def delete(self, ctx) -> None:
         """
         Delete your account
         """
@@ -57,7 +57,7 @@ class Stats(commands.Cog):
             await ctx.channel.send("Deletion aborted!")
 
     @commands.command(aliases=["p", "me"])
-    async def profile(self, ctx, user: discord.Member=None):
+    async def profile(self, ctx, user: discord.Member=None) -> None:
         """
         Shows your in-game profile. That's it
         """
@@ -84,7 +84,7 @@ class Stats(commands.Cog):
         await ctx.channel.send(embed=profile_embed)
 
     @commands.command()
-    async def top(self, ctx, *args):
+    async def top(self, ctx, *args) -> None:
         """
         If you appear in these lists you are one of the top 10 Players. Congratulations!
         """

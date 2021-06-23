@@ -14,7 +14,7 @@ class Gambling(commands.Cog):
     Lose your money here
     """
     @commands.command(aliases=["cf"])
-    async def coinflip(self, ctx, *args):
+    async def coinflip(self, ctx, *args) -> None:
         """
         Test your luck while throwing a coin
         """

@@ -11,11 +11,11 @@ import jobs
 
 class Economy(commands.Cog):
     """
-    Earn money, trade it and buy better Trucks (WIP)
+    Earn money, trade it and buy better Trucks (WIP -> None)
     """
 
     @commands.command()
-    async def job(self, ctx, *args):
+    async def job(self, ctx, *args) -> None:
         """
         Get yourself some jobs and earn money
         """
@@ -38,7 +38,7 @@ class Economy(commands.Cog):
         await ctx.channel.send(embed=job_embed)
 
     @commands.command()
-    async def load(self, ctx):
+    async def load(self, ctx) -> None:
         """
         If you have a job, you can load your Truck with items you have to transport
         """
@@ -55,7 +55,7 @@ class Economy(commands.Cog):
             await ctx.channel.send("Nothing to do here")
 
     @commands.command()
-    async def unload(self, ctx):
+    async def unload(self, ctx) -> None:
         """
         Unload your Truck at the right place to get your job done
         """
@@ -73,7 +73,7 @@ class Economy(commands.Cog):
             await ctx.channel.send("Nothing to do here")
 
     @commands.command()
-    async def give(self, ctx, user: discord.Member=None, amount=None):
+    async def give(self, ctx, user: discord.Member=None, amount=None) -> None:
         if user is None:
             await ctx.channel.send("No user specified")
             return
