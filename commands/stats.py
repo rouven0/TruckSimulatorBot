@@ -61,22 +61,24 @@ class Stats(commands.Cog):
         """
         Shows your in-game profile. That's it
         """
+        profile_embed = discord.Embed(colour=discord.Colour.gold())
         if user is not None:
             player = players.get(user.id)
+            profile_embed.set_thumbnail(url=user.avatar_url)
+            profile_embed.set_author(name="{}'s Profile".format(player.name),
+                                     icon_url=user.avatar_url)
         else:
             player = players.get(ctx.author.id)
+            profile_embed.set_thumbnail(url=ctx.author.avatar_url)
+            profile_embed.set_author(name="{}'s Profile".format(player.name),
+                                     icon_url=ctx.author.avatar_url)
             # Detect, when the player is renamed
             if player.name != ctx.author.name:
                 players.update(player, name=ctx.author.name)
 
-        current_job = jobs.get(ctx.author.id)
-        profile_embed = discord.Embed(colour=discord.Colour.gold())
-        profile_embed.set_author(name="{}'s Profile".format(player.name),
-                                 icon_url=ctx.author.avatar_url)
-        if user is None:
-            profile_embed.set_thumbnail(url=ctx.author.avatar_url)
         profile_embed.add_field(name="Money", value=player.money)
         profile_embed.add_field(name="Miles driven", value=player.miles, inline=False)
+        current_job = jobs.get(ctx.author.id)
         if current_job is not None:
             profile_embed.add_field(name="Current Job", value=jobs.show(current_job))
         await ctx.channel.send(embed=profile_embed)
