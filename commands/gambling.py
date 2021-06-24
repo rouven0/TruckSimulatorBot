@@ -14,27 +14,28 @@ class Gambling(commands.Cog):
     Lose your money here
     """
     @commands.command(aliases=["cf"])
-    async def coinflip(self, ctx, *args) -> None:
+    async def coinflip(self, ctx, side=None, amount=None) -> None:
         """
         Test your luck while throwing a coin
         """
         player = players.get(ctx.author.id)
         if "coinflip" in places.get(player.position).commands:
             try:
-                if args[1] == "all":
+                if amount == "all":
                     amount = player.money
-                elif args[1] == "half":
+                elif amount == "half":
                     amount = round(player.money / 2)
                 else:
-                    amount = int(args[1])
+                    amount = int(amount)
 
-                if args[0] == "h":
-                    side = "heads"
-                elif args[0] == "t":
-                    side = "tails"
-                else:
+                if str.lower(side) not in ["h", "head", "t", "tails"]:
                     await ctx.channel.send("**Syntax:** `t.coinflip [h/t] <amount>`")
                     return
+
+                if side == "h":
+                    side = "heads"
+                elif side == "t":
+                    side = "tails"
                 players.debit_money(player, amount)
                 if randint(0, 1) == 0:
                     result = "heads"

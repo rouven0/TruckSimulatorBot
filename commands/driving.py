@@ -157,8 +157,7 @@ class Driving(commands.Cog):
                                   use_external_emojis=True, add_reactions=True)
     async def stop(self, ctx) -> None:
         """
-        This is an alternate stop method to get your changes applied if there
-        is a problem with the reactions
+        This is an alternate stop method to get your changes applied if there is a problem with the reactions
         """
         active_drive = self.get_active_drive(ctx.author.id)
         if active_drive is None:
