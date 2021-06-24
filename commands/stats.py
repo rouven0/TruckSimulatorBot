@@ -21,8 +21,7 @@ class Stats(commands.Cog):
                                   use_external_emojis=True, add_reactions=True)
     async def register(self, ctx) -> None:
         """
-        Register yourself in a stunningly beautiful database that will definitely not
-        deleted by accident anymore
+        Register yourself in a stunningly beautiful database that will definitely not deleted by accident anymore
         """
         if not players.registered(ctx.author.id):
             players.insert(players.Player(ctx.author.id, ctx.author.name))
@@ -84,14 +83,11 @@ class Stats(commands.Cog):
         await ctx.channel.send(embed=profile_embed)
 
     @commands.command()
-    async def top(self, ctx, *args) -> None:
+    async def top(self, ctx, key="miles") -> None:
         """
         If you appear in these lists you are one of the top 10 Players. Congratulations!
         """
-        if args:
-            top_players = players.get_top(args[0])
-        else:
-            top_players = players.get_top()
+        top_players = players.get_top(key)
         top_body = ""
         top_title = "miles"
         count = 0
