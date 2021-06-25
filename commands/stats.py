@@ -35,7 +35,7 @@ class Stats(commands.Cog):
         Delete your account
         """
         player = players.get(ctx.author.id)
-        await ctx.channel.send("{}Are you sure you want to delete your profile? "
+        await ctx.channel.send("{} Are you sure you want to delete your profile? "
                                "**All your ingame stats will be lost!**".format(ctx.author.mention))
         confirmation = "delete {}@trucksimulator".format(ctx.author.name)
         await ctx.channel.send("Please type **`{}`** to confirm your deletion".format(confirmation))
