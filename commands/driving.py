@@ -5,7 +5,7 @@ from time import time
 import asyncio
 import discord
 from discord.ext import commands
-from discord_components import Button, Interaction
+from discord_components import Button
 import players
 import items
 import places
@@ -201,7 +201,7 @@ class Driving(commands.Cog):
             readable = "{}{}`{}`\n".format(readable, symbols.LIST_ITEM, command)
         return readable
 
-    @commands.command(aliases=["places"])
+    @commands.command(aliases=["places", "ab"])
     async def addressbook(self, ctx) -> None:
         """
         Lists all public places. Hidden ones are excluded
