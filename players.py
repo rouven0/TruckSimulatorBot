@@ -148,7 +148,7 @@ def update(player: Player, name:str=None, level:int=None, xp:int=None,  money:fl
         __cur__.execute('UPDATE players SET gas=? WHERE id=?', (gas, player.user_id))
         player.gas = gas
     __con__.commit()
-    logging.info('Updated player %s to %s', player.name, __to_tuple(player))
+    logging.debug('Updated player %s to %s', player.name, __to_tuple(player))
 
 
 def get(user_id: int) -> Player:
