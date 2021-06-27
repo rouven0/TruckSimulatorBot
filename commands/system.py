@@ -66,6 +66,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
     @commands.is_owner()
     async def shutdown(self, ctx) -> None:
         await self.driving_commands.on_shutdown()
+        await self.bot.change_presence(status=discord.Status.idle)
         await ctx.channel.send("Shutting down")
         logging.warning("Shutdown command is executed")
         await self.bot.close()
