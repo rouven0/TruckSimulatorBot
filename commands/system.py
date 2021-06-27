@@ -16,7 +16,9 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         self.driving_commands = driving_commands
         self.start_time = datetime.now()
         self.repo = git.Repo()
+        self.branch = self.repo.active_branch.name
         self.commit=self.repo.head.commit.hexsha[:7]
+        self.repo.close()
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
@@ -56,7 +58,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         info_embed.add_field(name="Registered Players", value=players.get_count())
         info_embed.add_field(name="Servers", value=len(self.bot.guilds))
         info_embed.add_field(name="Driving Trucks", value=len(self.driving_commands.active_drives))
-        info_embed.add_field(name="Branch", value=self.repo.active_branch.name)
+        info_embed.add_field(name="Branch", value=self.branch)
         info_embed.add_field(name="Commit", value=self.commit)
         await ctx.channel.send(embed=info_embed)
 

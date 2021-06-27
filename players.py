@@ -17,12 +17,16 @@ class Player:
     Attributes:
         user_id: Unique discord user id to identify the player
         name: Displayed name in discord, NOT the Nickname
+        level: players level
+        xp: xp for current level
         money: Amount of ingame currency the player has
         position: Position on the 2 dimensional array that I call map
         miles: Amount of miles the Player has driven
     """
     user_id: int
     name: str
+    level: int = 0
+    xp:int = 0
     money: float = 0
     position: list = field(default_factory=lambda: [0, 0])
     miles: int = 0
@@ -43,14 +47,14 @@ def __from_tuple(tup) -> Player:
     """
     Returns a Player object from a received database tuple
     """
-    return Player(tup[0], tup[1], tup[2], __get_position(tup[3]), tup[4], tup[5])
+    return Player(tup[0], tup[1], tup[2], tup[3], tup[4], __get_position(tup[5]), tup[6], tup[7])
 
 
 def __to_tuple(player) -> tuple:
     """
     Transforms the player object into a tuple that can be inserted in the db
     """
-    return (player.user_id, player.name, player.money,
+    return (player.user_id, player.name, player.level, player.xp, player.money,
             __format_pos_to_db(player.position), player.miles, player.gas)
 
 
@@ -89,7 +93,7 @@ def insert(player: Player) -> None:
     """
     Inserts a player into the database
     """
-    __cur__.execute('INSERT INTO players VALUES (?,?,?,?,?,?)', __to_tuple(player))
+    __cur__.execute('INSERT INTO players VALUES (?,?,?,?,?,?,?,?)', __to_tuple(player))
     __con__.commit()
     logging.info('Inserted %s into the database as %s', player.name, __to_tuple(player))
 
@@ -103,19 +107,24 @@ def remove(player: Player) -> None:
     logging.info('Removed %s %s from the database', player.name, __to_tuple(player))
 
 
-def update(player: Player, name:str=None, money:float=None, position:list=None, miles:int=None, gas:int=None) -> None:
+def update(player: Player, name:str=None, level:int=None, xp:int=None,  money:float=None, position:list=None, miles:int=None, gas:int=None) -> None:
     """
     Updates a player in the database
     """
     if name is not None:
         __cur__.execute('UPDATE players SET name=? WHERE id=?', (name, player.user_id))
         player.name = name
+    if level is not None:
+        __cur__.execute('UPDATE players SET level=? WHERE id=?', (level, player.user_id))
+        player.level = level
+    if xp is not None:
+        __cur__.execute('UPDATE players SET xp=? WHERE id=?', (xp, player.user_id))
+        player.xp = xp
     if money is not None:
         __cur__.execute('UPDATE players SET money=? WHERE id=?', (money, player.user_id))
         player.money = money
     if position is not None:
-        __cur__.execute('UPDATE players SET position=? WHERE id=?',
-                        (__format_pos_to_db(position), player.user_id))
+        __cur__.execute('UPDATE players SET position=? WHERE id=?', (__format_pos_to_db(position), player.user_id))
         player.position = position
     if miles is not None:
         __cur__.execute('UPDATE players SET miles=? WHERE id=?', (miles, player.user_id))
@@ -137,16 +146,19 @@ def get(user_id: int) -> Player:
     return __from_tuple(__cur__.fetchone())
 
 
-def get_top(key="miles") -> tuple:
+def get_top(key="level") -> tuple:
     """
     Get the top 10 players from the database
     """
     if key == "money":
         __cur__.execute("SELECT * FROM players ORDER BY money DESC")
         suffix = "$"
-    else:
+    elif key == "miles":
         __cur__.execute("SELECT * FROM players ORDER BY miles DESC")
         suffix = " miles"
+    else:
+        __cur__.execute("SELECT * FROM players ORDER BY level DESC")
+        suffix = ""
     return __list_from_tuples(__cur__.fetchmany(10)), key, suffix
 
 
