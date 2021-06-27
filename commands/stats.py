@@ -5,6 +5,7 @@ import discord
 from discord.ext import commands
 import jobs
 import players
+import levels
 
 
 class Stats(commands.Cog):
@@ -56,7 +57,7 @@ class Stats(commands.Cog):
             await ctx.channel.send("Deletion aborted!")
 
     @commands.command(aliases=["p", "me"])
-    async def profile(self, ctx, user: discord.Member=None) -> None:
+    async def profile(self, ctx, user: discord.User=None) -> None:
         """
         Shows your in-game profile. That's it
         """
@@ -75,8 +76,13 @@ class Stats(commands.Cog):
             if player.name != ctx.author.name:
                 players.update(player, name=ctx.author.name)
 
-        profile_embed.add_field(name="Money", value=player.money)
-        profile_embed.add_field(name="Miles driven", value=player.miles, inline=False)
+        xp = "{:,}".format(player.xp)
+        next_xp= "{:,}".format(levels.get_next_xp(player.level))
+        money = "{:,}".format(player.money)
+        miles = "{:,}".format(player.miles)
+        profile_embed.add_field(name="Level", value=f"{player.level} ({xp}/{next_xp} xp)", inline=False)
+        profile_embed.add_field(name="Money", value=f"{money}$")
+        profile_embed.add_field(name="Miles driven", value=miles, inline=False)
         current_job = jobs.get(ctx.author.id)
         if current_job is not None:
             profile_embed.add_field(name="Current Job", value=jobs.show(current_job))
@@ -94,13 +100,13 @@ class Stats(commands.Cog):
 
         for player in top_players[0]:
             if top_players[1] == "money":
-                val = player.money
+                val = "{:,}".format(player.money)
                 top_title = top_players[1]
             elif top_players[1] == "miles":
-                val = player.miles
+                val = "{:,}".format(player.miles)
                 top_title = top_players[1]
             else:
-                val = player.level
+                val = "{:,}".format(player.level)
             count += 1
             top_body = "{}**{}**. {} - {}{}\n".format(top_body, count, player.name,
                                                       val, top_players[2])

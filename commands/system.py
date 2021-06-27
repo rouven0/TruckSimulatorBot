@@ -54,7 +54,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         seconds = uptime.seconds - hours * 3600 - minutes * 60
         info_embed.add_field(name="Uptime",
                              value="{}d {}h {}m {}s".format(days, hours, minutes, seconds))
-        info_embed.add_field(name="Latency", value=str(round(self.bot.latency, 2) * 1000) + " ms")
+        info_embed.add_field(name="Latency", value=str(round(self.bot.latency *1000)) + " ms")
         info_embed.add_field(name="Registered Players", value=players.get_count())
         info_embed.add_field(name="Servers", value=len(self.bot.guilds))
         info_embed.add_field(name="Driving Trucks", value=len(self.driving_commands.active_drives))
@@ -66,6 +66,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
     @commands.is_owner()
     async def shutdown(self, ctx) -> None:
         await self.driving_commands.on_shutdown()
+        await self.bot.change_presence(status=discord.Status.idle)
         await ctx.channel.send("Shutting down")
         logging.warning("Shutdown command is executed")
         await self.bot.close()

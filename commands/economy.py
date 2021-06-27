@@ -1,9 +1,8 @@
 """
 This module contains the Cog for all economy-related commands
 """
+from random import randint
 import discord
-from discord import embeds
-from discord import colour
 from discord.ext import commands
 import players
 import jobs
@@ -66,14 +65,14 @@ class Economy(commands.Cog):
             return
         if player.position == current_job.place_to.position and current_job.state == 1:
             current_job.state = 2
-            await ctx.channel.send(jobs.get_state(current_job))
+            await ctx.channel.send(jobs.get_state(current_job)+players.add_xp(player, randint(1, (player.level**2)+7)))
             jobs.remove(current_job)
             players.update(player, money=player.money + current_job.reward)
         else:
             await ctx.channel.send("Nothing to do here")
 
     @commands.command()
-    async def give(self, ctx, user: discord.Member=None, amount=None) -> None:
+    async def give(self, ctx, user: discord.User=None, amount=None) -> None:
         if user is None:
             await ctx.channel.send("No user specified")
             return
