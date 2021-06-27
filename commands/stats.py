@@ -75,8 +75,9 @@ class Stats(commands.Cog):
             if player.name != ctx.author.name:
                 players.update(player, name=ctx.author.name)
 
-        profile_embed.add_field(name="Money", value=player.money)
-        profile_embed.add_field(name="Miles driven", value=player.miles, inline=False)
+        profile_embed.add_field(name="Level", value=f"{player.level} ({player.xp}/coming soon xp)", inline=False)
+        profile_embed.add_field(name="Money", value=f"{player.money}$")
+        profile_embed.add_field(name="Miles driven", value=player.miles)
         current_job = jobs.get(ctx.author.id)
         if current_job is not None:
             profile_embed.add_field(name="Current Job", value=jobs.show(current_job))
