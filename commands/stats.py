@@ -82,7 +82,7 @@ class Stats(commands.Cog):
         miles = "{:,}".format(player.miles)
         profile_embed.add_field(name="Level", value=f"{player.level} ({xp}/{next_xp} xp)", inline=False)
         profile_embed.add_field(name="Money", value=f"{money}$")
-        profile_embed.add_field(name="Miles driven", value=miles)
+        profile_embed.add_field(name="Miles driven", value=miles, inline=False)
         current_job = jobs.get(ctx.author.id)
         if current_job is not None:
             profile_embed.add_field(name="Current Job", value=jobs.show(current_job))
