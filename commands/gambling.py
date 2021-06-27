@@ -43,10 +43,10 @@ class Gambling(commands.Cog):
                     result = "tails"
 
                 if result == side:
-                    await ctx.channel.send("Congratulations, it was {}. You won ${}".format(result, amount))
+                    await ctx.channel.send("Congratulations, it was {}. You won ${}".format(result, "{:,}".format(amount)))
                     players.add_money(player, amount*2)
                 else:
-                    await ctx.channel.send("Nope, it was {}. You lost ${}".format(result, amount))
+                    await ctx.channel.send("Nope, it was {}. You lost ${}".format(result, "{:,}".format(amount)))
             except (IndexError, ValueError):
                 await ctx.channel.send("**Syntax:** `t.coinflip [h/t] <amount>`")
         else:
