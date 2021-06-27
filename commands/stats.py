@@ -83,21 +83,24 @@ class Stats(commands.Cog):
         await ctx.channel.send(embed=profile_embed)
 
     @commands.command()
-    async def top(self, ctx, key="miles") -> None:
+    async def top(self, ctx, key="level") -> None:
         """
         If you appear in these lists you are one of the top 10 Players. Congratulations!
         """
         top_players = players.get_top(key)
         top_body = ""
-        top_title = "miles"
+        top_title = "level"
         count = 0
 
         for player in top_players[0]:
             if top_players[1] == "money":
                 val = player.money
                 top_title = top_players[1]
-            else:
+            elif top_players[1] == "miles":
                 val = player.miles
+                top_title = top_players[1]
+            else:
+                val = player.level
             count += 1
             top_body = "{}**{}**. {} - {}{}\n".format(top_body, count, player.name,
                                                       val, top_players[2])
