@@ -57,7 +57,7 @@ class Stats(commands.Cog):
             await ctx.channel.send("Deletion aborted!")
 
     @commands.command(aliases=["p", "me"])
-    async def profile(self, ctx, user: discord.Member=None) -> None:
+    async def profile(self, ctx, user: discord.User=None) -> None:
         """
         Shows your in-game profile. That's it
         """

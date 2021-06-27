@@ -73,7 +73,7 @@ class Economy(commands.Cog):
             await ctx.channel.send("Nothing to do here")
 
     @commands.command()
-    async def give(self, ctx, user: discord.Member=None, amount=None) -> None:
+    async def give(self, ctx, user: discord.User=None, amount=None) -> None:
         if user is None:
             await ctx.channel.send("No user specified")
             return
