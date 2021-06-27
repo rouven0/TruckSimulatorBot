@@ -5,6 +5,7 @@ import discord
 from discord.ext import commands
 import jobs
 import players
+import levels
 
 
 class Stats(commands.Cog):
@@ -75,7 +76,7 @@ class Stats(commands.Cog):
             if player.name != ctx.author.name:
                 players.update(player, name=ctx.author.name)
 
-        profile_embed.add_field(name="Level", value=f"{player.level} ({player.xp}/coming soon xp)", inline=False)
+        profile_embed.add_field(name="Level", value=f"{player.level} ({player.xp}/{levels.get_next_xp(player.level)} xp)", inline=False)
         profile_embed.add_field(name="Money", value=f"{player.money}$")
         profile_embed.add_field(name="Miles driven", value=player.miles)
         current_job = jobs.get(ctx.author.id)

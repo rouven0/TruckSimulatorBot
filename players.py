@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 import sqlite3
 import logging
 import discord
+import levels
 
 __con__ = sqlite3.connect('players.db')
 __cur__ = __con__.cursor()
@@ -74,11 +75,24 @@ def __format_pos_to_db(pos) -> str:
     return "{}/{}".format(pos[0], pos[1])
 
 
+def add_xp(player: Player, amount: int) -> str:
+    """
+    Adds xp to the player and performs a level up if neede
+    """
+    answer = f"You got {amount} xp"
+    update(player, xp=int(player.xp)+amount)
+    while int(player.xp) >  levels.get_next_xp(player.level):
+        update(player, level=player.level+1, xp=player.xp-levels.get_next_xp(player.level))
+        answer+=f"\n:tada: You leveled up to level {player.level} :tada:"
+    return answer
+
+
 def add_money(player, amount) -> None:
     """
     Add money to the players account
     """
     update(player, money=player.money+amount)
+
 
 def debit_money(player, amount) -> None:
     """
@@ -88,6 +102,7 @@ def debit_money(player, amount) -> None:
         raise NotEnoughMoney()
     else:
         update(player, money=player.money-amount)
+
 
 def insert(player: Player) -> None:
     """
