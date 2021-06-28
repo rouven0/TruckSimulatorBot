@@ -8,6 +8,7 @@ import discord
 from discord.ext import commands
 
 import players
+import places
 
 
 class System(commands.Cog, command_attrs=dict(hidden=True)):
@@ -78,16 +79,24 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
             for permission in error.missing_perms:
                 missing_permissions = missing_permissions + "\n" + permission
             await ctx.channel.send("I'm missing the following permissions:" + missing_permissions + '`')
+
         elif isinstance(error, commands.errors.CommandInvokeError):
             if isinstance(error.original, players.PlayerNotRegistered):
                 await ctx.channel.send(
                     "<@!{}> you are not registered yet! "
                     "Try `t.register` to get started".format(error.original.requested_id))
+
             elif isinstance(error.original, players.NotEnoughMoney):
                 await ctx.channel.send("{} you don't have enough money to do this".format(ctx.author.mention))
+
+            elif isinstance(error.original, places.WrongPlaceError):
+                await ctx.channel.send(error.original.message)
+
             else:
                 logging.error(error)
+
         elif isinstance(error, commands.errors.CommandNotFound):
             pass
+
         else:
             logging.error(error)

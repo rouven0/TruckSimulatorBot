@@ -28,7 +28,7 @@ class Player:
     name: str
     level: int = 0
     xp:int = 0
-    money: float = 0
+    money: int = 0
     position: list = field(default_factory=lambda: [0, 0])
     miles: int = 0
     gas: int = 0
@@ -217,7 +217,7 @@ class PlayerNotRegistered(Exception):
         self.requested_id = requested_id
         super().__init__(*args)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"The requested player ({self.requested_id}) is not registered"
 
 
@@ -225,5 +225,5 @@ class NotEnoughMoney(Exception):
     """
     Exception raised when more money is withdrawn than the player has
     """
-    def __str__(self):
+    def __str__(self) -> str:
         return "The requested player doesn't have enough money to perform this action"
