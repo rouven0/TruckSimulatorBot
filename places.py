@@ -4,6 +4,8 @@ This module provides the Place class and several lists of places easy to access
 from dataclasses import dataclass
 import sqlite3
 
+from discord import message
+
 
 @dataclass
 class Place:
@@ -109,3 +111,14 @@ __cur__.execute('SELECT * FROM places WHERE quest_active=1')
 __generate_list(__quest_active_places__)
 
 __con__.close()
+
+class WrongPlaceError(Exception):
+    """
+    Exception raised when the player is at the wrong place
+    """
+    def __init__(self, message, *args: object) -> None:
+        super().__init__(*args)
+        self.message=message
+
+    def __str__(self) -> str:
+        return self.message

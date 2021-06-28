@@ -24,6 +24,9 @@ def get(name) -> Item:
             return item
     return None
 
+def get_all() -> list:
+    return __all_items__
+
 
 __con__ = sqlite3.connect('objects.db')
 __cur__ = __con__.cursor()
