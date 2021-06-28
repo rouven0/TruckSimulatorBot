@@ -141,7 +141,12 @@ class Driving(commands.Cog):
         if player.name != ctx.author.name:
             players.update(player, name=ctx.author.name)
         if ctx.author.id in [a.player.user_id for a in self.active_drives]:
-            await ctx.channel.send("You can't drive on two roads at once!")
+            active_drive = self.get_active_drive(ctx.author.id)
+            await ctx.channel.send(embed=discord.Embed(title=f"Hey {ctx.author.name}",
+                                   description="You can't drive on two roads at once!\n"
+                                   "Click [here]({}) to jump right back into your Truck".format(active_drive.message.jump_url),
+                                   colour=discord.Colour.gold())
+)
             return
         buttons = []
         for symbol in symbols.get_drive_position_symbols(player.position):
@@ -211,7 +216,7 @@ class Driving(commands.Cog):
             places_embed.add_field(name=place.name, value=place.position)
         await ctx.channel.send(embed=places_embed)
 
-    def get_active_drive(self, player_id, message_id=None):
+    def get_active_drive(self, player_id, message_id=None) -> players.ActiveDrive:
         """
         Returns an ActiveDrive object for a specific player and message
         """
