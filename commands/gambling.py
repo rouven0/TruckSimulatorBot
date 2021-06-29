@@ -92,6 +92,5 @@ class Gambling(commands.Cog):
 
             await ctx.channel.send(embed=slots_embed)
 
-        #except (TypeError, ValueError):
-        except (ValueError):
+        except (TypeError, ValueError):
             await ctx.channel.send("**Syntax:** `t.slots <amount>`")
