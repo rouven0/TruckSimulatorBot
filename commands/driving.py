@@ -38,16 +38,17 @@ def generate_minimap(player) -> str:
     return minimap
 
 
-def get_drive_embed(player, avatar_url) -> discord.Embed:
+def get_drive_embed(player: players.Player, avatar_url: str) -> discord.Embed:
     """
     Returns a discord embed with all the information about the current drive
     """
     place = places.get(player.position)
-    drive_embed = discord.Embed(description="We hope he has fun",
+    drive_embed = discord.Embed(description="Keep an eye on your gas!",
                                 colour=discord.Colour.gold())
     drive_embed.set_author(name="{} is driving".format(player.name), icon_url=avatar_url)
     drive_embed.add_field(name="Minimap", value=generate_minimap(player), inline=False)
     drive_embed.add_field(name="Position", value=player.position)
+    drive_embed.add_field(name="Gas left", value=f"{player.gas} l")
     current_job = jobs.get(player.user_id)
     if current_job is not None:
         if current_job.state == 0:
@@ -96,7 +97,7 @@ class Driving(commands.Cog):
             await interaction.message.channel.send("You stopped driving!, {}".format(interaction.author.name))
             await interaction.respond(type=7, components=[])
             players.update(active_drive.player, position=active_drive.player.position,
-                           miles=active_drive.player.miles)
+                           miles=active_drive.player.miles, gas=active_drive.player.gas)
 
         position_changed = False
         if action == symbols.LEFT:
@@ -118,6 +119,25 @@ class Driving(commands.Cog):
         if position_changed:
             active_drive.last_action_time = time()
             active_drive.player.miles += 1
+            active_drive.player.gas -= 1
+            if active_drive.player.gas == 30:
+                await active_drive.message.channel.send(f"<@{active_drive.player.user_id}> you are running out of gas. "
+                                                        "Please drive to the nearest gas station")
+
+            if active_drive.player.gas == 0:
+                active_drive.player.gas = 1
+                players.update(active_drive.player, position=active_drive.player.position,
+                               miles=active_drive.player.miles, gas=active_drive.player.gas)
+                await active_drive.message.channel.send(f"<@{active_drive.player.user_id}> You messed up and ran out of gas. "
+                                                        "The company had to have your truck towed away. You will pay $3000 for this incident!")
+                try:
+                    players.debit_money(active_drive.player, 3000)
+                except players.NotEnoughMoney:
+                    await active_drive.message.channel.send("You are lucky that you don't have enough money. I'll let you go, for now...")
+                await interaction.respond(type=7, components=[])
+                self.active_drives.remove(active_drive)
+                return
+
             buttons = []
             for symbol in symbols.get_drive_position_symbols(active_drive.player.position):
                 buttons.append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbol)))
@@ -145,8 +165,7 @@ class Driving(commands.Cog):
             await ctx.channel.send(embed=discord.Embed(title=f"Hey {ctx.author.name}",
                                    description="You can't drive on two roads at once!\n"
                                    "Click [here]({}) to jump right back into your Truck".format(active_drive.message.jump_url),
-                                   colour=discord.Colour.gold())
-)
+                                   colour=discord.Colour.gold()))
             return
         buttons = []
         for symbol in symbols.get_drive_position_symbols(player.position):
@@ -174,7 +193,8 @@ class Driving(commands.Cog):
         await ctx.channel.send("You stopped driving!, {}".format(ctx.author.name))
         players.update(active_drive.player,
                        position=active_drive.player.position,
-                       miles=active_drive.player.miles)
+                       miles=active_drive.player.miles,
+                       gas=active_drive.player.gas)
 
     @commands.command(aliases=["here"])
     async def position(self, ctx) -> None:
@@ -244,7 +264,8 @@ class Driving(commands.Cog):
                     await active_drive.message.channel.send(
                         "<@{}> Your driving timed out!".format(active_drive.player.user_id))
                     players.update(active_drive.player, position=active_drive.player.position,
-                                   miles=active_drive.player.miles)
+                                   miles=active_drive.player.miles,
+                                   gas=active_drive.player.gas)
             await asyncio.sleep(10)
 
     async def on_shutdown(self) -> None:
@@ -258,4 +279,4 @@ class Driving(commands.Cog):
             if active_drive.message.channel.id not in processed_channels:
                 await active_drive.message.channel.send("All trucks were stopped due to a bot shutdown!")
                 processed_channels.append(active_drive.message.channel.id)
-            players.update(active_drive.player, position=active_drive.player.position, miles=active_drive.player.miles)
+            players.update(active_drive.player, position=active_drive.player.position, miles=active_drive.player.miles, gas=active_drive.player.gas)

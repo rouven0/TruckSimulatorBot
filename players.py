@@ -31,7 +31,7 @@ class Player:
     money: int = 0
     position: list = field(default_factory=lambda: [0, 0])
     miles: int = 0
-    gas: int = 0
+    gas: int = 600
 
 
 def __list_from_tuples(tups) -> list:

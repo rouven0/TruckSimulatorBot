@@ -72,11 +72,11 @@ class Gambling(commands.Cog):
             players.debit_money(player, amount)
 
             chosen_items = choices(sample(items.get_all(), 8), k=3)
-            machine = "< "
+            machine = "<|"
             for item in chosen_items:
                 machine += item.emoji
-                machine += " | "
-            machine += " >"
+                machine += "|"
+            machine += ">"
 
             slots_embed = discord.Embed(description=machine, colour=discord.Colour.gold())
             slots_embed.set_author(name=f"{ctx.author.name}'s slots", icon_url=ctx.author.avatar_url)
@@ -92,6 +92,5 @@ class Gambling(commands.Cog):
 
             await ctx.channel.send(embed=slots_embed)
 
-        #except (TypeError, ValueError):
-        except (ValueError):
+        except (TypeError, ValueError):
             await ctx.channel.send("**Syntax:** `t.slots <amount>`")

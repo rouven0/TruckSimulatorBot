@@ -21,6 +21,7 @@ from commands.misc import Misc
 load_dotenv('./.env')
 BOT_TOKEN = getenv('BOT_TOKEN')
 BOT_PREFIX = getenv('BOT_PREFIX').split(";")
+INGAME_NEWS_CHANNEL_ID = int(getenv('INGAME_NEWS_CHANNEL_ID'))
 
 
 def main():
@@ -44,14 +45,16 @@ def main():
         logging.info("Logging into file is enabled")
 
     driving_commands = Driving(bot)
+    economy_commands = Economy(bot, (INGAME_NEWS_CHANNEL_ID), driving_commands)
     bot.add_cog(System(bot, driving_commands))
     bot.add_cog(driving_commands)
     bot.add_cog(Stats(bot))
-    bot.add_cog(Economy())
+    bot.add_cog(economy_commands)
     bot.add_cog(Gambling())
     bot.add_cog(Misc())
     loop = asyncio.get_event_loop()
     loop.create_task(driving_commands.check_drives())
+    loop.create_task(economy_commands.daily_gas_prices())
     bot.run(BOT_TOKEN)
 
 
