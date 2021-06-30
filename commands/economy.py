@@ -1,9 +1,12 @@
 """
 This module contains the Cog for all economy-related commands
 """
+from datetime import datetime
 from random import randint
+
 import discord
 from discord.ext import commands
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import players
 import jobs
 
@@ -12,6 +15,31 @@ class Economy(commands.Cog):
     """
     Earn money, trade it and buy better Trucks
     """
+    def __init__(self, bot: commands.Bot, news_channel_id: int) -> None:
+        self.bot = bot
+        self.news_channel_id = news_channel_id
+        self.scheduler = AsyncIOScheduler()
+        self.gas_price = 1
+        super().__init__()
+
+    @commands.Cog.listener()
+    async def on_ready(self) -> None:
+        self.news_channel: discord.TextChannel = self.bot.get_channel(self.news_channel_id)
+
+        self.scheduler.add_job(self.daily_gas_prices, trigger="cron", day_of_week="mon-sun", hour=0)
+
+        # use this for development and testing
+        # self.scheduler.add_job(self.daily_gas_prices, trigger="interval", seconds=9)
+        self.scheduler.start()
+
+    async def daily_gas_prices(self) -> None:
+        self.gas_price = randint(50, 200)/100
+        gas_embed = discord.Embed(title="Daily Gas Prices", description="Gas prices for {}".format(datetime.utcnow().strftime("%A, %B %d %y")), colour=discord.Colour.gold())
+        gas_embed.add_field(name="Main gas station", value=f"${self.gas_price} per liter")
+        try:
+            await self.news_channel.send(embed=gas_embed)
+        except AttributeError:
+            pass
 
     @commands.command()
     async def job(self, ctx, *args) -> None:
