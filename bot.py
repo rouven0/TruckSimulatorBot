@@ -45,7 +45,7 @@ def main():
         logging.info("Logging into file is enabled")
 
     driving_commands = Driving(bot)
-    economy_commands = Economy(bot, (INGAME_NEWS_CHANNEL_ID))
+    economy_commands = Economy(bot, (INGAME_NEWS_CHANNEL_ID), driving_commands)
     bot.add_cog(System(bot, driving_commands))
     bot.add_cog(driving_commands)
     bot.add_cog(Stats(bot))

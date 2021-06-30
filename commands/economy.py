@@ -3,11 +3,13 @@ This module contains the Cog for all economy-related commands
 """
 from datetime import datetime
 from random import randint
+import re
 
 import discord
 from discord.ext import commands
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import players
+import places
 import jobs
 
 
@@ -15,11 +17,12 @@ class Economy(commands.Cog):
     """
     Earn money, trade it and buy better Trucks
     """
-    def __init__(self, bot: commands.Bot, news_channel_id: int) -> None:
+    def __init__(self, bot: commands.Bot, news_channel_id: int, driving_commands) -> None:
         self.bot = bot
         self.news_channel_id = news_channel_id
         self.scheduler = AsyncIOScheduler()
         self.gas_price = 1
+        self.driving_commands = driving_commands
         super().__init__()
 
     @commands.Cog.listener()
@@ -28,14 +31,15 @@ class Economy(commands.Cog):
 
         self.scheduler.add_job(self.daily_gas_prices, trigger="cron", day_of_week="mon-sun", hour=0)
 
-        # use this for development and testing
-        # self.scheduler.add_job(self.daily_gas_prices, trigger="interval", seconds=9)
         self.scheduler.start()
+
+        # set the daily prices on startup
+        await self.daily_gas_prices()
 
     async def daily_gas_prices(self) -> None:
         self.gas_price = randint(50, 200)/100
         gas_embed = discord.Embed(title="Daily Gas Prices", description="Gas prices for {}".format(datetime.utcnow().strftime("%A, %B %d %y")), colour=discord.Colour.gold())
-        gas_embed.add_field(name="Main gas station", value=f"${self.gas_price} per liter")
+        gas_embed.add_field(name="Main gas station", value=f"${self.gas_price} per litre")
         try:
             await self.news_channel.send(embed=gas_embed)
         except AttributeError:
@@ -98,6 +102,40 @@ class Economy(commands.Cog):
             players.update(player, money=player.money + current_job.reward)
         else:
             await ctx.channel.send("Nothing to do here")
+
+    @commands.command()
+    async def refill(self, ctx):
+        player = players.get(ctx.author.id)
+
+        if ctx.author.id in [a.player.user_id for a in self.driving_commands.active_drives]:
+            active_drive = self.driving_commands.get_active_drive(ctx.author.id)
+            await ctx.channel.send(embed=discord.Embed(title=f"Hey {ctx.author.name}",
+                                   description="You can't refill a driving vehicle\n"
+                                   "Click [here]({}) to jump right back into your Truck".format(active_drive.message.jump_url),
+                                   colour=discord.Colour.gold()))
+            return
+        if "refill" not in places.get(player.position).commands:
+            raise places.WrongPlaceError("Do you see a gas pump here?")
+        # TODO replace the 600 with the trucks gas max
+        gas_amount = 600 - player.gas
+        price = round(gas_amount * self.gas_price)
+
+        try:
+            players.debit_money(player, price)
+        except players.NotEnoughMoney:
+            await ctx.channel.send("Guess we have a problem. Lets make a deal, I will give you 100 litres of gas, and you lose 2 levels")
+            if player.level > 2:
+                players.update(player, gas=100, level=player.level-2, xp=0)
+            else:
+                players.update(player, gas=100, xp=0)
+            return
+
+        refill_embed = discord.Embed(title="Thank you for visiting our gas station",
+                                    description=f"You filled {gas_amount} litres into your truck and payed ${price}",
+                                    colour=discord.Colour.gold())
+        refill_embed.set_footer(text="Wonder how these prices are calculated? Check out the daily gas prices in the official server")
+        players.update(player, gas=600)
+        await ctx.channel.send(embed=refill_embed)
 
     @commands.command()
     async def give(self, ctx, user: discord.User=None, amount=None) -> None:
