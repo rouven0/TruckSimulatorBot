@@ -38,7 +38,7 @@ class Economy(commands.Cog):
 
     async def daily_gas_prices(self) -> None:
         self.gas_price = randint(50, 200)/100
-        gas_embed = discord.Embed(title="Daily Gas Prices", description="Gas prices for {}".format(datetime.utcnow().strftime("%A, %B %d %y")), colour=discord.Colour.gold())
+        gas_embed = discord.Embed(title="Daily Gas Prices", description="Gas prices for {}".format(datetime.utcnow().strftime("%A, %B %d %Y")), colour=discord.Colour.gold())
         gas_embed.add_field(name="Main gas station", value=f"${self.gas_price} per litre")
         try:
             await self.news_channel.send(embed=gas_embed)
