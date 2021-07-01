@@ -40,6 +40,9 @@ def get(truck_id: int) -> Truck:
             return truck
     raise TruckNotFound
 
+def get_all() -> list:
+    return __all_trucks__
+
 __con__ = sqlite3.connect('objects.db')
 __cur__ = __con__.cursor()
 
