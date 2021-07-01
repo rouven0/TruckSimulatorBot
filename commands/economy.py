@@ -29,7 +29,7 @@ class Economy(commands.Cog):
     async def on_ready(self) -> None:
         self.news_channel: discord.TextChannel = self.bot.get_channel(self.news_channel_id)
 
-        self.scheduler.add_job(self.daily_gas_prices, trigger="cron", day_of_week="mon-sun", hour=0)
+        self.scheduler.add_job(self.daily_gas_prices, trigger="cron", day_of_week="mon-sun", hour=1)
 
         self.scheduler.start()
 
