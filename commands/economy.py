@@ -123,7 +123,7 @@ class Economy(commands.Cog):
         try:
             players.debit_money(player, price)
         except players.NotEnoughMoney:
-            await ctx.channel.send("Guess we have a problem. Lets make a deal, I will give you 100 litres of gas, and you lose 2 levels")
+            await ctx.channel.send("Guess we have a problem: You don't have enough money. Lets make a deal, I will give you 100 litres of gas, and you lose 2 levels")
             if player.level > 2:
                 players.update(player, gas=100, level=player.level-2, xp=0)
             else:
