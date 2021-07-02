@@ -3,7 +3,7 @@ This module contains the Cog for all economy-related commands
 """
 from datetime import datetime
 from random import randint
-import re
+import sys
 
 import discord
 from discord.ext import commands
@@ -33,8 +33,8 @@ class Economy(commands.Cog):
 
         self.scheduler.start()
 
-        # set the daily prices on startup
-        await self.daily_gas_prices()
+        if "--set-gas-price" in sys.argv:
+            await self.daily_gas_prices()
 
     async def daily_gas_prices(self) -> None:
         self.gas_price = randint(50, 200)/100
