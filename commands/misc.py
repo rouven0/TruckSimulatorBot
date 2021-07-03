@@ -19,6 +19,22 @@ class Misc(commands.Cog):
         await ctx.channel.send(embed=support_embed)
 
     @commands.command()
+    async def github(self, ctx) -> None:
+        support_embed = discord.Embed(title="Truck Simulator github repo",
+                                      description="Check out the beautiful code behind the TruckSimulator or use the issue tracker to report bugs and problems",
+                                      url="https://github.com/therealr5/TruckSimulator",
+                                      colour=discord.Colour.gold())
+        await ctx.channel.send(embed=support_embed)
+
+    @commands.command()
+    async def invite(self, ctx) -> None:
+        support_embed = discord.Embed(title="Click here to add the bot to your servers",
+                                      description="Go spread the word of the Truck Simulator",
+                                      url="https://discord.com/api/oauth2/authorize?client_id=831052837353816066&permissions=379904&scope=bot",
+                                      colour=discord.Colour.gold())
+        await ctx.channel.send(embed=support_embed)
+
+    @commands.command()
     async def rules(self, ctx) -> None:
         rules_embed=discord.Embed(title="Truck Simulator Rules",
                                   colour=discord.Colour.gold())
@@ -38,6 +54,7 @@ class Misc(commands.Cog):
         Some useful links
         """
         links_embed = discord.Embed(title="Some useful links", colour=discord.Colour.gold())
+        links_embed.add_field(name="Invite Link", value="https://discord.com/api/oauth2/authorize?client_id=831052837353816066&permissions=379904&scope=bot", inline=False)
         links_embed.add_field(name="Github", value="https://www.github.com/therealr5/TruckSimulatorBot", inline=False)
         links_embed.add_field(name="Support server", value="https://discord.gg/BKmtTFbvxv", inline=False)
         links_embed.add_field(name="Top.gg page", value="Coming soon", inline=False)
