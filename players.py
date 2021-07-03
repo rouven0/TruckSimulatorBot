@@ -101,8 +101,7 @@ def debit_money(player, amount) -> None:
     """
     if amount > player.money:
         raise NotEnoughMoney()
-    else:
-        update(player, money=player.money-amount)
+    update(player, money=player.money-amount)
 
 
 def insert(player: Player) -> None:
@@ -123,7 +122,7 @@ def remove(player: Player) -> None:
     logging.info('Removed %s %s from the database', player.name, __to_tuple(player))
 
 
-def update(player: Player, name:str=None, level:int=None, xp:int=None,  money:float=None, position:list=None, miles:int=None, gas:int=None, truck_id:int=None) -> None:
+def update(player: Player, name:str=None, level:int=None, xp:int=None,  money:int=None, position:list=None, miles:int=None, gas:int=None, truck_id:int=None) -> None:
     """
     Updates a player in the database
     """
