@@ -6,12 +6,14 @@ import asyncio
 import discord
 from discord.ext import commands
 from discord_components import Button
+from discord_components.component import Select, SelectOption
 import players
 import items
 import places
 import symbols
 import assets
 import jobs
+import trucks
 
 
 def generate_minimap(player) -> str:
@@ -196,6 +198,21 @@ class Driving(commands.Cog):
                        miles=active_drive.player.miles,
                        gas=active_drive.player.gas)
 
+    @commands.command()
+    async def truck(self, ctx, *args):
+        await ctx.channel.send("Coming soon")
+
+        #if args and args[0] == "buy":
+        #    options = []
+
+        #   for truck in trucks.get_all():
+        #        options.append(SelectOption(label=truck.name, description=truck.description, value=truck.truck_id))
+
+        #   await ctx.channel.send("Which truck do you wanna buy?", components=[
+        #        Select(placeholder="Select your Truck",
+        #            options=options)
+        #        ])
+    
     @commands.command(aliases=["here"])
     async def position(self, ctx) -> None:
         """
