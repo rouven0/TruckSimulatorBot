@@ -99,7 +99,7 @@ class Economy(commands.Cog):
             current_job.state = 2
             await ctx.channel.send(jobs.get_state(current_job)+players.add_xp(player, randint(1, (player.level**2)+7)))
             jobs.remove(current_job)
-            players.update(player, money=player.money + current_job.reward)
+            players.add_money(player, current_job.reward)
         else:
             await ctx.channel.send("Nothing to do here")
 
