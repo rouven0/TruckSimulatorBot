@@ -111,9 +111,9 @@ def generate(player: Player) -> tuple:
     job_miles_x = abs(place_from.position[0] - place_to.position[0])
     job_miles_y = abs(place_from.position[1] - place_to.position[1])
     job_reward = round(sqrt(job_miles_x ** 2 + job_miles_y ** 2) * 79)
-    reward = round((job_reward + arrival_reward) * sqrt(player.level))
-    if reward > 4329*player.level:
-        reward = 4329*player.level
+    reward = round((job_reward + arrival_reward) * sqrt(player.level+1))
+    if reward > 4329*(player.level+1):
+        reward = 4329*(player.level+1)
     new_job = Job(player.user_id, place_from, place_to, 0, reward)
     insert(new_job)
     return (new_job,
