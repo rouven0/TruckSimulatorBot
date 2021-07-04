@@ -2,16 +2,19 @@
 This module contains the Cog for all driving-related commands
 """
 from time import time
+from random import randint
 import asyncio
 import discord
 from discord.ext import commands
 from discord_components import Button
+from discord_components.component import Select, SelectOption
 import players
 import items
 import places
 import symbols
 import assets
 import jobs
+import trucks
 
 
 def generate_minimap(player) -> str:
@@ -72,6 +75,21 @@ class Driving(commands.Cog):
         self.bot = bot
         self.active_drives = []
 
+    def get_buttons(self, player: players.Player) -> list:
+        """
+        Returns buttons based on the players position
+        """
+        buttons = [[]]
+        for symbol in symbols.get_drive_position_symbols(player.position):
+            buttons[0].append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbol)))
+        buttons[0].append(Button(style=4, label=" ", emoji=self.bot.get_emoji(symbols.STOP)))
+        current_job = jobs.get(player.user_id)
+        if current_job is not None and player.position == current_job.place_from.position and current_job.state == 0:
+            buttons.append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbols.LOAD)))
+        if current_job is not None and player.position == current_job.place_to.position and current_job.state == 1:
+            buttons.append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbols.UNLOAD)))
+        return buttons
+
     @commands.Cog.listener()
     async def on_button_click(self, interaction) -> None:
         """
@@ -92,12 +110,32 @@ class Driving(commands.Cog):
             action = int(interaction.component.emoji.id)
         except AttributeError:
             action = interaction.component.label
+
         if action == symbols.STOP:
             self.active_drives.remove(active_drive)
             await interaction.message.channel.send("You stopped driving!, {}".format(interaction.author.name))
             await interaction.respond(type=7, components=[])
             players.update(active_drive.player, position=active_drive.player.position,
                            miles=active_drive.player.miles, gas=active_drive.player.gas)
+
+        if action == symbols.LOAD:
+            current_job = jobs.get(interaction.author.id)
+            current_job.state = 1
+            await interaction.channel.send(jobs.get_state(current_job))
+            jobs.update(current_job, state=current_job.state)
+            await interaction.respond(type=7, components=self.get_buttons(active_drive.player))
+
+        if action == symbols.UNLOAD:
+            current_job = jobs.get(interaction.author.id)
+            current_job.state = 2
+            await interaction.channel.send(jobs.get_state(current_job)+
+                                           players.add_xp(active_drive.player, randint(1, (active_drive.player.level**2)+7))+
+                                           "\nYour position got applied")
+            players.add_money(active_drive.player, current_job.reward)
+            jobs.remove(current_job)
+            players.update(active_drive.player, position=active_drive.player.position,
+                           miles=active_drive.player.miles, gas=active_drive.player.gas)
+            await interaction.respond(type=7, components=self.get_buttons(active_drive.player))
 
         position_changed = False
         if action == symbols.LEFT:
@@ -138,14 +176,10 @@ class Driving(commands.Cog):
                 self.active_drives.remove(active_drive)
                 return
 
-            buttons = []
-            for symbol in symbols.get_drive_position_symbols(active_drive.player.position):
-                buttons.append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbol)))
-            buttons.append(Button(style=4, label=" ", emoji=self.bot.get_emoji(symbols.STOP)))
 
             await interaction.message.edit(embed=get_drive_embed(active_drive.player,
                                            interaction.author.avatar_url),
-                                           components=[buttons])
+                                           components=self.get_buttons(active_drive.player))
             await interaction.respond(type=6)
 
     @commands.command()
@@ -167,12 +201,8 @@ class Driving(commands.Cog):
                                    "Click [here]({}) to jump right back into your Truck".format(active_drive.message.jump_url),
                                    colour=discord.Colour.gold()))
             return
-        buttons = []
-        for symbol in symbols.get_drive_position_symbols(player.position):
-            buttons.append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbol)))
-        buttons.append(Button(style=4, label=" ", emoji=self.bot.get_emoji(symbols.STOP)))
         message = await ctx.channel.send(embed=get_drive_embed(player, ctx.author.avatar_url),
-                                         components=[buttons])
+                                         components=self.get_buttons(player))
         self.active_drives.append(players.ActiveDrive(player, message, time()))
 
     @commands.command()
@@ -196,6 +226,21 @@ class Driving(commands.Cog):
                        miles=active_drive.player.miles,
                        gas=active_drive.player.gas)
 
+    @commands.command()
+    async def truck(self, ctx, *args):
+        await ctx.channel.send("Coming soon")
+
+        #if args and args[0] == "buy":
+        #    options = []
+
+        #   for truck in trucks.get_all():
+        #        options.append(SelectOption(label=truck.name, description=truck.description, value=truck.truck_id))
+
+        #   await ctx.channel.send("Which truck do you wanna buy?", components=[
+        #        Select(placeholder="Select your Truck",
+        #            options=options)
+        #        ])
+    
     @commands.command(aliases=["here"])
     async def position(self, ctx) -> None:
         """
