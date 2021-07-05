@@ -11,6 +11,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import players
 import places
 import jobs
+import trucks
 
 
 class Economy(commands.Cog):
@@ -116,8 +117,7 @@ class Economy(commands.Cog):
             return
         if "refill" not in places.get(player.position).commands:
             raise places.WrongPlaceError("Do you see a gas pump here?")
-        # TODO replace the 600 with the trucks gas max
-        gas_amount = 600 - player.gas
+        gas_amount = trucks.get(player.truck_id).gas_capacity - player.gas
         price = round(gas_amount * self.gas_price)
 
         try:
