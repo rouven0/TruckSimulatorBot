@@ -4,8 +4,6 @@ This module provides the Place class and several lists of places easy to access
 from dataclasses import dataclass
 import sqlite3
 
-from discord import message
-
 
 @dataclass
 class Place:
@@ -16,6 +14,9 @@ class Place:
         commands: all local available commands stored as strings in a list
         image_url: Every place has an image that is shown while driving
                    Images are hosted on a ressource discord server and displayed in embeds via URL
+        image_url_better: image with the better truck
+        image_url_tropical: image with the tropical truck
+        image_url_ultimate: image with the ultimate truck
         produced_item: Items this place produces in jobs.
                        This is None when the place is not quest_active
     """
@@ -23,6 +24,9 @@ class Place:
     position: list
     commands: list
     image_url: str
+    image_url_better: str
+    image_url_tropical: str
+    image_url_ultimate: str
     produced_item: str
 
 def __get_position(db_pos) -> list:
@@ -45,8 +49,11 @@ def __generate_list(lst) -> None:
         if tup[2] is not None:
             commands = tup[2].split(";")
         image_url = tup[3]
-        produced_item = tup[5]
-        lst.append(Place(name, position, commands, image_url, produced_item))
+        image_url_better = tup[4]
+        image_url_tropical = tup[5]
+        image_url_ultimate = tup[6]
+        produced_item = tup[8]
+        lst.append(Place(name, position, commands, image_url, image_url_better, image_url_tropical, image_url_ultimate, produced_item))
 
 
 
@@ -60,7 +67,7 @@ def get(position) -> Place:
     for place in get_all():
         if place.position == position:
             return place
-    return Place("Nothing", position, [], None, None)
+    return Place("Nothing", position, [], None, None, None, None, None)
 
 
 def get_all() -> list:
