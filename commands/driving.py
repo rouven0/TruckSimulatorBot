@@ -157,11 +157,11 @@ class Driving(commands.Cog):
             active_drive.last_action_time = time()
             active_drive.player.miles += 1
             active_drive.player.gas -= trucks.get(active_drive.player.truck_id).gas_consumption
-            if active_drive.player.gas == 30:
+            if 25 < active_drive.player.gas < 30:
                 await active_drive.message.channel.send(f"<@{active_drive.player.user_id}> you are running out of gas. "
                                                         "Please drive to the nearest gas station")
 
-            if active_drive.player.gas == 0:
+            if active_drive.player.gas <= 0:
                 active_drive.player.gas = 1
                 players.update(active_drive.player, position=active_drive.player.position,
                                miles=active_drive.player.miles, gas=active_drive.player.gas)
