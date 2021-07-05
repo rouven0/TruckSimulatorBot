@@ -95,7 +95,6 @@ class Driving(commands.Cog):
         """
         All the driving reactions are processed here
         Only when the stop sign is he reaction emoji, changes will be applied
-        i
         """
         if isinstance(interaction.component, list):
             # Return if buttons are clicked too fast
@@ -226,21 +225,58 @@ class Driving(commands.Cog):
                        miles=active_drive.player.miles,
                        gas=active_drive.player.gas)
 
-    @commands.command()
+    @commands.command(aliases=["t", "trucks"])
     async def truck(self, ctx, *args):
-        await ctx.channel.send("Coming soon")
+        player = players.get(ctx.author.id)
 
-        #if args and args[0] == "buy":
-        #    options = []
+        if args and args[0] == "buy":
+            options = []
+            for truck in trucks.get_all():
+                options.append(SelectOption(label=truck.name, description=truck.description, value=truck.truck_id))
 
-        #   for truck in trucks.get_all():
-        #        options.append(SelectOption(label=truck.name, description=truck.description, value=truck.truck_id))
+            await ctx.channel.send("Which truck do you wanna buy?", components=[
+                Select(placeholder="Select your Truck",
+                       options=options) ])
+            return
 
-        #   await ctx.channel.send("Which truck do you wanna buy?", components=[
-        #        Select(placeholder="Select your Truck",
-        #            options=options)
-        #        ])
-    
+        if args and args[0] == "list":
+            list_embed = discord.Embed(title="All available trucks", colour=discord.Colour.gold())
+            for truck in trucks.get_all():
+                list_embed.add_field(name=truck.name, value=f"Id: {truck.truck_id} \n Price: ${truck.price}", inline=False)
+            list_embed.set_footer(icon_url=self.bot.user.avatar_url, text="Get more information about a truck with `t.truck show <id>`")
+            await ctx.channel.send(embed=list_embed)
+            return
+
+        if args and args[0] == "show":
+            try:
+                truck = trucks.get(int(args[1]))
+                is_own_truck=False
+            except trucks.TruckNotFound:
+                await ctx.channel.send("Truck not found")
+            except (ValueError, IndexError):
+                await ctx.channel.send("**Syntax** `t.truck show <id>`")
+        else:
+            truck = trucks.get(player.truck_id)
+            is_own_truck=True
+
+
+        truck_embed = self.get_truck_embed(truck)
+        if is_own_truck:
+            truck_embed.set_author(name=f"{ctx.author.name}'s truck", icon_url=ctx.author.avatar_url)
+            truck_embed.set_footer(icon_url=self.bot.user.avatar_url, text="This is your Truck, see all trucks with `t.truck list` and change your truck with `t.truck buy`")
+        else:
+            truck_embed.set_footer(icon_url=self.bot.user.avatar_url, text="See all trucks with `t.truck list` and change your truck with `t.truck buy`")
+
+        await ctx.channel.send(embed=truck_embed)
+
+    def get_truck_embed(self, truck: trucks.Truck) -> discord.Embed:
+        truck_embed = discord.Embed(title=truck.name, description=truck.description, colour=discord.Colour.gold())
+        truck_embed.add_field(name="Gas consumption", value=f"{truck.gas_consumption} litres per mile")
+        truck_embed.add_field(name="Gas capacity", value = str(truck.gas_capacity)+" l")
+        truck_embed.add_field(name="Price", value = "$"+str(truck.price))
+        truck_embed.set_image(url=truck.image_url)
+        return truck_embed
+
     @commands.command(aliases=["here"])
     async def position(self, ctx) -> None:
         """
