@@ -184,7 +184,7 @@ class Driving(commands.Cog):
     @commands.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True, add_reactions=True)
+                                  use_external_emojis=True)
     async def drive(self, ctx) -> None:
         """
         Start driving your Truck on the map and control it with buttons
@@ -207,7 +207,7 @@ class Driving(commands.Cog):
     @commands.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True, add_reactions=True)
+                                  use_external_emojis=True)
     async def stop(self, ctx) -> None:
         """
         This is an alternate stop method to get your changes applied if there is a problem with the reactions
@@ -240,7 +240,6 @@ class Driving(commands.Cog):
 
         **Buy:**
         -> Select a new Truck to buy, your old one will be sold
-            
         """
         player = players.get(ctx.author.id)
 
@@ -274,7 +273,7 @@ class Driving(commands.Cog):
             # this also adds money if the end price is negative
             players.debit_money(player, end_price)
             players.update(player, miles=0, gas=new_truck.gas_capacity, truck_id=new_truck.truck_id)
-            answer_embed=discord.Embed(description=f"You sold your old {old_truck.name} for ${selling_price} and bought a brand new {new_truck.name} for ${new_truck.price}", 
+            answer_embed=discord.Embed(description=f"You sold your old {old_truck.name} for ${selling_price} and bought a brand new {new_truck.name} for ${new_truck.price}",
                                        colour=discord.Colour.gold())
             answer_embed.set_author(name="You got a new truck", icon_url=self.bot.user.avatar_url)
             answer_embed.set_footer(text="Check out your new baby with `t.truck`")

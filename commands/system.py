@@ -40,7 +40,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
     @commands.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True, add_reactions=True)
+                                  use_external_emojis=True)
     async def bing(self, ctx) -> None:
         answer = await ctx.channel.send("Bong")
         await ctx.channel.send(str(round((answer.created_at - ctx.message.created_at).total_seconds() * 1000)) + "ms")

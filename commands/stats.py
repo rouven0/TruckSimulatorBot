@@ -19,7 +19,7 @@ class Stats(commands.Cog):
     @commands.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True, add_reactions=True)
+                                  use_external_emojis=True)
     async def register(self, ctx) -> None:
         """
         Register yourself in a stunningly beautiful database that will definitely not deleted by accident anymore
