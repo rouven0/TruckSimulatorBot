@@ -38,6 +38,9 @@ class Economy(commands.Cog):
             await self.daily_gas_prices()
 
     async def daily_gas_prices(self) -> None:
+        """
+        Set the daily gas price and show it in the support server
+        """
         self.gas_price = randint(50, 200)/100
         gas_embed = discord.Embed(title="Daily Gas Prices", description="Gas prices for {}".format(datetime.utcnow().strftime("%A, %B %d %Y")), colour=discord.Colour.gold())
         gas_embed.add_field(name="Main gas station", value=f"${self.gas_price} per litre")
@@ -106,6 +109,9 @@ class Economy(commands.Cog):
 
     @commands.command()
     async def refill(self, ctx):
+        """
+        If you're at the gas station, you can refill your truck's gas
+        """
         player = players.get(ctx.author.id)
 
         if ctx.author.id in [a.player.user_id for a in self.driving_commands.active_drives]:
@@ -139,6 +145,9 @@ class Economy(commands.Cog):
 
     @commands.command()
     async def give(self, ctx, user: discord.User=None, amount=None) -> None:
+        """
+        Do I really have to explain this?
+        """
         if user is None:
             await ctx.channel.send("No user specified")
             return

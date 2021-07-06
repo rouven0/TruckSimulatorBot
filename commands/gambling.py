@@ -57,7 +57,12 @@ class Gambling(commands.Cog):
     @commands.command()
     async def slots(self, ctx, amount=None) -> None:
         """
-        SLOTS SLOTS SLOTS
+        Simple slot machine
+
+        **__Payouts:__**
+        **No identical items:** You lose your money
+        **2 identical items:** You win the amount you bet
+        **3 identical items:** You win 10x the amount you bet
         """
         player = players.get(ctx.author.id)
         if "slots" not in places.get(player.position).commands:
