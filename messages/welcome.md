@@ -1,5 +1,3 @@
-**Hey there, fellow Trucker,**
-
 My name is Mr Thomas Ruck and I am the founder of this Trucking company.
 We get jobs from all around the country and distribute them among all registered drivers that use `t.job`
 

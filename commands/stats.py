@@ -25,9 +25,10 @@ class Stats(commands.Cog):
         Register yourself in a stunningly beautiful database that will definitely not deleted by accident anymore
         """
         welcome_file = open("./messages/welcome.md", "r")
-        welcome_embed = discord.Embed(title="Welcome to the Truck Simulator", description=welcome_file.read(),
+        welcome_embed = discord.Embed(title="Hey there, fellow Trucker,", description=welcome_file.read(),
                                        colour=discord.Colour.gold())
         welcome_file.close()
+        welcome_embed.set_author(name="Welcome to the Truck Simulator", icon_url=self.bot.user.avatar_url)
         await ctx.channel.send(embed=welcome_embed)
         if not players.registered(ctx.author.id):
             players.insert(players.Player(ctx.author.id, ctx.author.name))
