@@ -41,8 +41,10 @@ def get(truck_id: int) -> Truck:
             return truck
     raise TruckNotFound
 
+
 def get_all() -> list:
     return __all_trucks__
+
 
 __con__ = sqlite3.connect('objects.db')
 __cur__ = __con__.cursor()
@@ -55,6 +57,7 @@ __con__.close()
 
 
 class TruckNotFound(Exception):
-    "Exception raised when requested truck is not found"
+    """Exception raised when requested truck is not found"""
+
     def __str__(self) -> str:
         return "Requested truck not found"

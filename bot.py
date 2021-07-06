@@ -7,7 +7,6 @@ from discord.ext import commands
 from discord_components import DiscordComponents
 from dotenv import load_dotenv
 
-
 import config
 from help import TruckSimulatorHelpCommand
 
@@ -39,13 +38,13 @@ def main():
 
     if "--enable-log-file" in sys.argv:
         file_handler = logging.FileHandler("./logs/{}.log"
-               .format(datetime.now().strftime("%Y-%m-%d_%H:%M")))
+                                           .format(datetime.now().strftime("%Y-%m-%d_%H:%M")))
         file_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
         logger.addHandler(file_handler)
         logging.info("Logging into file is enabled")
 
     driving_commands = Driving(bot)
-    economy_commands = Economy(bot, (INGAME_NEWS_CHANNEL_ID), driving_commands)
+    economy_commands = Economy(bot, INGAME_NEWS_CHANNEL_ID, driving_commands)
     bot.add_cog(System(bot, driving_commands))
     bot.add_cog(driving_commands)
     bot.add_cog(Stats(bot))

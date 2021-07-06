@@ -23,19 +23,19 @@ def generate_minimap(player: players.Player) -> str:
     This generate the minimap shown in t.drive
     """
     minimap_array = []
-    for i in range(0,7):
+    for i in range(0, 7):
         minimap_array.append([])
-        for j in range(0,7):
+        for j in range(0, 7):
             minimap_array[i].append("")
-            map_place = places.get([player.position[0]-3+j, player.position[1]+3-i])
+            map_place = places.get([player.position[0] - 3 + j, player.position[1] + 3 - i])
             try:
-                minimap_array[i][j]=items.get(map_place.produced_item).emoji
+                minimap_array[i][j] = items.get(map_place.produced_item).emoji
             except AttributeError:
                 minimap_array[i][j] = ":black_large_square:"
 
     minimap_array[3][3] = trucks.get(player.truck_id).emoji
     minimap = ""
-    for i in range(0,7):
+    for i in range(0, 7):
         for j in range(0, 7):
             minimap = minimap + minimap_array[i][j]
         minimap = minimap + "\n"
@@ -50,7 +50,7 @@ def get_drive_embed(player: players.Player, avatar_url: str) -> discord.Embed:
                                 colour=discord.Colour.gold())
     drive_embed.set_author(name="{} is driving".format(player.name), icon_url=avatar_url)
     drive_embed.add_field(name="Minimap", value=generate_minimap(player), inline=False)
-    drive_embed.add_field(name="Position", value=player.position)
+    drive_embed.add_field(name="Position", value=str(player.position))
     drive_embed.add_field(name="Gas left", value=f"{player.gas} l")
     current_job = jobs.get(player.user_id)
     if current_job is not None:
@@ -59,7 +59,7 @@ def get_drive_embed(player: players.Player, avatar_url: str) -> discord.Embed:
         else:
             navigation_place = current_job.place_to
         drive_embed.add_field(name="Navigation: Drive to {}".format(navigation_place.name),
-                              value=navigation_place.position)
+                              value=str(navigation_place.position))
     if place.image_url is not None:
         drive_embed.set_image(url=assets.get_place_image(player, place))
     else:
@@ -67,10 +67,24 @@ def get_drive_embed(player: players.Player, avatar_url: str) -> discord.Embed:
     drive_embed.set_footer(text="Note: Your position is only applied if you stop driving")
     return drive_embed
 
+
+def get_truck_embed(truck: trucks.Truck) -> discord.Embed:
+    """
+    Returns an embed with details about the given Truck
+    """
+    truck_embed = discord.Embed(title=truck.name, description=truck.description, colour=discord.Colour.gold())
+    truck_embed.add_field(name="Gas consumption", value=f"{truck.gas_consumption} litres per mile")
+    truck_embed.add_field(name="Gas capacity", value=str(truck.gas_capacity) + " l")
+    truck_embed.add_field(name="Price", value="$" + str(truck.price))
+    truck_embed.set_image(url=truck.image_url)
+    return truck_embed
+
+
 class Driving(commands.Cog):
     """
     The heart of the Truck simulator: Drive your Truck on a virtual map
     """
+
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.active_drives = []
@@ -127,8 +141,9 @@ class Driving(commands.Cog):
         if action == symbols.UNLOAD:
             current_job = jobs.get(interaction.author.id)
             current_job.state = 2
-            await interaction.channel.send(jobs.get_state(current_job)+
-                                           players.add_xp(active_drive.player, randint(1, (active_drive.player.level**2)+7))+
+            await interaction.channel.send(jobs.get_state(current_job) +
+                                           players.add_xp(active_drive.player,
+                                                          randint(1, (active_drive.player.level ** 2) + 7)) +
                                            "\nYour position got applied")
             players.add_money(active_drive.player, current_job.reward)
             jobs.remove(current_job)
@@ -165,19 +180,20 @@ class Driving(commands.Cog):
                 active_drive.player.gas = 1
                 players.update(active_drive.player, position=active_drive.player.position,
                                miles=active_drive.player.miles, gas=active_drive.player.gas)
-                await active_drive.message.channel.send(f"<@{active_drive.player.user_id}> You messed up and ran out of gas. "
-                                                        "The company had to have your truck towed away. You will pay $3000 for this incident!")
+                await active_drive.message.channel.send(
+                    f"<@{active_drive.player.user_id}> You messed up and ran out of gas. "
+                    "The company had to have your truck towed away. You will pay $3000 for this incident!")
                 try:
                     players.debit_money(active_drive.player, 3000)
                 except players.NotEnoughMoney:
-                    await active_drive.message.channel.send("You are lucky that you don't have enough money. I'll let you go, for now...")
+                    await active_drive.message.channel.send(
+                        "You are lucky that you don't have enough money. I'll let you go, for now...")
                 await interaction.respond(type=7, components=[])
                 self.active_drives.remove(active_drive)
                 return
 
-
             await interaction.message.edit(embed=get_drive_embed(active_drive.player,
-                                           interaction.author.avatar_url),
+                                                                 interaction.author.avatar_url),
                                            components=self.get_buttons(active_drive.player))
             await interaction.respond(type=6)
 
@@ -248,12 +264,12 @@ class Driving(commands.Cog):
             for truck in trucks.get_all():
                 options.append(SelectOption(label=truck.name, description=truck.description, value=truck.truck_id))
 
-            buy_instrucions = discord.Embed(title="Time for a new Truck?", colour=discord.Colour.gold(),
-                                            description="Choose one of the Trucks in the list. \n"
-                                            "Your old Truck will be sold and your miles and gas will be reset. \n")
-            message = await ctx.channel.send(embed=buy_instrucions, components=[
+            buy_instructions = discord.Embed(title="Time for a new Truck?", colour=discord.Colour.gold(),
+                                             description="Choose one of the Trucks in the list. \n"
+                                                         "Your old Truck will be sold and your miles and gas will be reset. \n")
+            message = await ctx.channel.send(embed=buy_instructions, components=[
                 Select(placeholder="Select your Truck",
-                       options=options) ])
+                       options=options)])
 
             def check(select_option):
                 return select_option.author.id == ctx.author.id
@@ -268,13 +284,14 @@ class Driving(commands.Cog):
 
             old_truck = trucks.get(player.truck_id)
             new_truck = trucks.get(selected_truck_id)
-            selling_price = round(old_truck.price-(old_truck.price/10)*log(player.miles+1))
+            selling_price = round(old_truck.price - (old_truck.price / 10) * log(player.miles + 1))
             end_price = new_truck.price - selling_price
             # this also adds money if the end price is negative
             players.debit_money(player, end_price)
             players.update(player, miles=0, gas=new_truck.gas_capacity, truck_id=new_truck.truck_id)
-            answer_embed=discord.Embed(description=f"You sold your old {old_truck.name} for ${selling_price} and bought a brand new {new_truck.name} for ${new_truck.price}",
-                                       colour=discord.Colour.gold())
+            answer_embed = discord.Embed(
+                description=f"You sold your old {old_truck.name} for ${selling_price} and bought a brand new {new_truck.name} for ${new_truck.price}",
+                colour=discord.Colour.gold())
             answer_embed.set_author(name="You got a new truck", icon_url=self.bot.user.avatar_url)
             answer_embed.set_footer(text="Check out your new baby with `t.truck`")
             await ctx.channel.send(embed=answer_embed)
@@ -284,15 +301,17 @@ class Driving(commands.Cog):
         if args and args[0] == "list":
             list_embed = discord.Embed(title="All available trucks", colour=discord.Colour.gold())
             for truck in trucks.get_all():
-                list_embed.add_field(name=truck.name, value="Id: {} \n Price: ${:,}".format(truck.truck_id, truck.price), inline=False)
-            list_embed.set_footer(icon_url=self.bot.user.avatar_url, text="Get more information about a truck with `t.truck show <id>`")
+                list_embed.add_field(name=truck.name,
+                                     value="Id: {} \n Price: ${:,}".format(truck.truck_id, truck.price), inline=False)
+            list_embed.set_footer(icon_url=self.bot.user.avatar_url,
+                                  text="Get more information about a truck with `t.truck show <id>`")
             await ctx.channel.send(embed=list_embed)
             return
 
         if args and args[0] == "show":
             try:
                 truck = trucks.get(int(args[1]))
-                is_own_truck=False
+                is_own_truck = False
             except trucks.TruckNotFound:
                 await ctx.channel.send("Truck not found")
                 return
@@ -301,28 +320,18 @@ class Driving(commands.Cog):
                 return
         else:
             truck = trucks.get(player.truck_id)
-            is_own_truck=True
+            is_own_truck = True
 
-
-        truck_embed = self.get_truck_embed(truck)
+        truck_embed = get_truck_embed(truck)
         if is_own_truck:
             truck_embed.set_author(name=f"{ctx.author.name}'s truck", icon_url=ctx.author.avatar_url)
-            truck_embed.set_footer(icon_url=self.bot.user.avatar_url, text="This is your Truck, see all trucks with `t.truck list` and change your truck with `t.truck buy`")
+            truck_embed.set_footer(icon_url=self.bot.user.avatar_url,
+                                   text="This is your Truck, see all trucks with `t.truck list` and change your truck with `t.truck buy`")
         else:
-            truck_embed.set_footer(icon_url=self.bot.user.avatar_url, text="See all trucks with `t.truck list` and change your truck with `t.truck buy`")
+            truck_embed.set_footer(icon_url=self.bot.user.avatar_url,
+                                   text="See all trucks with `t.truck list` and change your truck with `t.truck buy`")
 
         await ctx.channel.send(embed=truck_embed)
-
-    def get_truck_embed(self, truck: trucks.Truck) -> discord.Embed:
-        """
-        Returns an embed with details about the given Truck
-        """
-        truck_embed = discord.Embed(title=truck.name, description=truck.description, colour=discord.Colour.gold())
-        truck_embed.add_field(name="Gas consumption", value=f"{truck.gas_consumption} litres per mile")
-        truck_embed.add_field(name="Gas capacity", value = str(truck.gas_capacity)+" l")
-        truck_embed.add_field(name="Price", value = "$"+str(truck.price))
-        truck_embed.set_image(url=truck.image_url)
-        return truck_embed
 
     @commands.command(aliases=["here"])
     async def position(self, ctx) -> None:
@@ -407,4 +416,5 @@ class Driving(commands.Cog):
             if active_drive.message.channel.id not in processed_channels:
                 await active_drive.message.channel.send("All trucks were stopped due to a bot shutdown!")
                 processed_channels.append(active_drive.message.channel.id)
-            players.update(active_drive.player, position=active_drive.player.position, miles=active_drive.player.miles, gas=active_drive.player.gas)
+            players.update(active_drive.player, position=active_drive.player.position, miles=active_drive.player.miles,
+                           gas=active_drive.player.gas)

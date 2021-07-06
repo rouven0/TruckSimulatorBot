@@ -18,7 +18,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         self.start_time = datetime.now()
         self.repo = git.Repo()
         self.branch = self.repo.active_branch.name
-        self.commit=self.repo.head.commit.hexsha[:7]
+        self.commit = self.repo.head.commit.hexsha[:7]
         self.repo.close()
 
     @commands.Cog.listener()
@@ -55,10 +55,10 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         seconds = uptime.seconds - hours * 3600 - minutes * 60
         info_embed.add_field(name="Uptime",
                              value="{}d {}h {}m {}s".format(days, hours, minutes, seconds))
-        info_embed.add_field(name="Latency", value=str(round(self.bot.latency *1000)) + " ms")
-        info_embed.add_field(name="Registered Players", value=players.get_count())
-        info_embed.add_field(name="Servers", value=len(self.bot.guilds))
-        info_embed.add_field(name="Driving Trucks", value=len(self.driving_commands.active_drives))
+        info_embed.add_field(name="Latency", value=str(round(self.bot.latency * 1000)) + " ms")
+        info_embed.add_field(name="Registered Players", value=str(players.get_count()))
+        info_embed.add_field(name="Servers", value=str(len(self.bot.guilds)))
+        info_embed.add_field(name="Driving Trucks", value=str(len(self.driving_commands.active_drives)))
         info_embed.add_field(name="Branch", value=self.branch)
         info_embed.add_field(name="Commit", value=self.commit)
         await ctx.channel.send(embed=info_embed)
