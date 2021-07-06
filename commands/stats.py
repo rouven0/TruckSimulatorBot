@@ -12,22 +12,23 @@ class Stats(commands.Cog):
     """
     A lot of numbers
     """
+
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
-
 
     @commands.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True, add_reactions=True)
+                                  use_external_emojis=True)
     async def register(self, ctx) -> None:
         """
         Register yourself in a stunningly beautiful database that will definitely not deleted by accident anymore
         """
         welcome_file = open("./messages/welcome.md", "r")
-        welcome_embed = discord.Embed(title="Welcome to the Truck Simulator", description=welcome_file.read(),
-                                       colour=discord.Colour.gold())
+        welcome_embed = discord.Embed(title="Hey there, fellow Trucker,", description=welcome_file.read(),
+                                      colour=discord.Colour.gold())
         welcome_file.close()
+        welcome_embed.set_author(name="Welcome to the Truck Simulator", icon_url=self.bot.user.avatar_url)
         await ctx.channel.send(embed=welcome_embed)
         if not players.registered(ctx.author.id):
             players.insert(players.Player(ctx.author.id, ctx.author.name))
@@ -45,10 +46,12 @@ class Stats(commands.Cog):
                                "**All your ingame stats will be lost!**".format(ctx.author.mention))
         confirmation = "delete {}@trucksimulator".format(ctx.author.name)
         await ctx.channel.send("Please type **`{}`** to confirm your deletion".format(confirmation))
+
         def check(message):
             return message.author.id == ctx.author.id
+
         try:
-            answer_message: discord.Message = await self.bot.wait_for('message', check=check,  timeout=120)
+            answer_message: discord.Message = await self.bot.wait_for('message', check=check, timeout=120)
             answer = answer_message.content.lower()
         except:
             answer = ""
@@ -62,7 +65,7 @@ class Stats(commands.Cog):
             await ctx.channel.send("Deletion aborted!")
 
     @commands.command(aliases=["p", "me"])
-    async def profile(self, ctx, user: discord.User=None) -> None:
+    async def profile(self, ctx, user: discord.User = None) -> None:
         """
         Shows your in-game profile. That's it
         """
@@ -82,7 +85,7 @@ class Stats(commands.Cog):
                 players.update(player, name=ctx.author.name)
 
         xp = "{:,}".format(player.xp)
-        next_xp= "{:,}".format(levels.get_next_xp(player.level))
+        next_xp = "{:,}".format(levels.get_next_xp(player.level))
         money = "{:,}".format(player.money)
         miles = "{:,}".format(player.miles)
         profile_embed.add_field(name="Level", value=f"{player.level} ({xp}/{next_xp} xp)", inline=False)

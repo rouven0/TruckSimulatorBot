@@ -34,7 +34,7 @@ __ULTIMATE_DRIVE_IMAGE_LIST = [
     "https://cdn.discordapp.com/attachments/861619966137860118/861634997403779092/default_ultimatre.png",
     "https://cdn.discordapp.com/attachments/861619966137860118/861634981683003411/default_2_ultimate.png",
     "https://cdn.discordapp.com/attachments/861619966137860118/861634986011394068/default_3_ultimate.png",
-    "https://cdn.discordapp.com/attachments/861619966137860118/861634990025211934/default_4_ultimate.png", 
+    "https://cdn.discordapp.com/attachments/861619966137860118/861634990025211934/default_4_ultimate.png",
     "https://cdn.discordapp.com/attachments/861619966137860118/861634993738350612/default_5_ultimate.png"
 
 ]
@@ -54,6 +54,7 @@ def get_default(player: Player) -> str:
         lst = __DEFAULT_DRIVE_IMAGE_LIST
 
     return lst[randint(0, len(lst) - 1)]
+
 
 def get_place_image(player: Player, place: Place) -> str:
     """

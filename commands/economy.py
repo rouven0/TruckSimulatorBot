@@ -18,6 +18,7 @@ class Economy(commands.Cog):
     """
     Earn money, trade it and buy better Trucks
     """
+
     def __init__(self, bot: commands.Bot, news_channel_id: int, driving_commands) -> None:
         self.bot = bot
         self.news_channel_id = news_channel_id
@@ -28,6 +29,7 @@ class Economy(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
+        # noinspection PyAttributeOutsideInit
         self.news_channel: discord.TextChannel = self.bot.get_channel(self.news_channel_id)
 
         self.scheduler.add_job(self.daily_gas_prices, trigger="cron", day_of_week="mon-sun", hour=2)
@@ -41,8 +43,10 @@ class Economy(commands.Cog):
         """
         Set the daily gas price and show it in the support server
         """
-        self.gas_price = randint(50, 200)/100
-        gas_embed = discord.Embed(title="Daily Gas Prices", description="Gas prices for {}".format(datetime.utcnow().strftime("%A, %B %d %Y")), colour=discord.Colour.gold())
+        self.gas_price = randint(50, 200) / 100
+        gas_embed = discord.Embed(title="Daily Gas Prices",
+                                  description="Gas prices for {}".format(datetime.utcnow().strftime("%A, %B %d %Y")),
+                                  colour=discord.Colour.gold())
         gas_embed.add_field(name="Main gas station", value=f"${self.gas_price} per litre")
         try:
             await self.news_channel.send(embed=gas_embed)
@@ -101,7 +105,8 @@ class Economy(commands.Cog):
             return
         if player.position == current_job.place_to.position and current_job.state == 1:
             current_job.state = 2
-            await ctx.channel.send(jobs.get_state(current_job)+players.add_xp(player, randint(1, (player.level**2)+7)))
+            await ctx.channel.send(
+                jobs.get_state(current_job) + players.add_xp(player, randint(1, (player.level ** 2) + 7)))
             jobs.remove(current_job)
             players.add_money(player, current_job.reward)
         else:
@@ -117,9 +122,10 @@ class Economy(commands.Cog):
         if ctx.author.id in [a.player.user_id for a in self.driving_commands.active_drives]:
             active_drive = self.driving_commands.get_active_drive(ctx.author.id)
             await ctx.channel.send(embed=discord.Embed(title=f"Hey {ctx.author.name}",
-                                   description="You can't refill a driving vehicle\n"
-                                   "Click [here]({}) to jump right back into your Truck".format(active_drive.message.jump_url),
-                                   colour=discord.Colour.gold()))
+                                                       description="You can't refill a driving vehicle\n"
+                                                                   "Click [here]({}) to jump right back into your Truck".format(
+                                                           active_drive.message.jump_url),
+                                                       colour=discord.Colour.gold()))
             return
         if "refill" not in places.get(player.position).commands:
             raise places.WrongPlaceError("Do you see a gas pump here?")
@@ -129,22 +135,24 @@ class Economy(commands.Cog):
         try:
             players.debit_money(player, price)
         except players.NotEnoughMoney:
-            await ctx.channel.send("Guess we have a problem: You don't have enough money. Lets make a deal, I will give you 100 litres of gas, and you lose 2 levels")
+            await ctx.channel.send(
+                "Guess we have a problem: You don't have enough money. Lets make a deal, I will give you 100 litres of gas, and you lose 2 levels")
             if player.level > 2:
-                players.update(player, gas=100, level=player.level-2, xp=0)
+                players.update(player, gas=100, level=player.level - 2, xp=0)
             else:
                 players.update(player, gas=100, xp=0)
             return
 
         refill_embed = discord.Embed(title="Thank you for visiting our gas station",
-                                    description=f"You filled {gas_amount} litres into your truck and payed ${price}",
-                                    colour=discord.Colour.gold())
-        refill_embed.set_footer(text="Wonder how these prices are calculated? Check out the daily gas prices in the official server")
+                                     description=f"You filled {gas_amount} litres into your truck and payed ${price}",
+                                     colour=discord.Colour.gold())
+        refill_embed.set_footer(
+            text="Wonder how these prices are calculated? Check out the daily gas prices in the official server")
         players.update(player, gas=600)
         await ctx.channel.send(embed=refill_embed)
 
     @commands.command()
-    async def give(self, ctx, user: discord.User=None, amount=None) -> None:
+    async def give(self, ctx, user: discord.User = None, amount=None) -> None:
         """
         Do I really have to explain this?
         """
