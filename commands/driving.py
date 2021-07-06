@@ -188,6 +188,7 @@ class Driving(commands.Cog):
                 except players.NotEnoughMoney:
                     await active_drive.message.channel.send(
                         "You are lucky that you don't have enough money. I'll let you go, for now...")
+                players.update(active_drive.player, gas=50, position=[7, 7])
                 await interaction.respond(type=7, components=[])
                 self.active_drives.remove(active_drive)
                 return
