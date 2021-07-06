@@ -50,9 +50,6 @@ class Misc(commands.Cog):
 
     @commands.command()
     async def links(self, ctx) -> None:
-        """
-        Some useful links
-        """
         links_embed = discord.Embed(title="Some useful links", colour=discord.Colour.gold())
         links_embed.add_field(name="Invite Link", value="https://discord.com/api/oauth2/authorize?client_id=831052837353816066&permissions=379904&scope=bot", inline=False)
         links_embed.add_field(name="Github", value="https://www.github.com/therealr5/TruckSimulatorBot", inline=False)

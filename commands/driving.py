@@ -227,6 +227,21 @@ class Driving(commands.Cog):
 
     @commands.command(aliases=["t", "trucks"])
     async def truck(self, ctx, *args):
+        """
+        Shows your Truck
+
+        **__Optional arguments:__**
+
+        **List:**
+        -> Lists all available Trucks
+
+        **Show <id>:**
+        -> Shows details about the requested Truck
+
+        **Buy:**
+        -> Select a new Truck to buy, your old one will be sold
+            
+        """
         player = players.get(ctx.author.id)
 
         if args and args[0] == "buy":
@@ -300,6 +315,9 @@ class Driving(commands.Cog):
         await ctx.channel.send(embed=truck_embed)
 
     def get_truck_embed(self, truck: trucks.Truck) -> discord.Embed:
+        """
+        Returns an embed with details about the given Truck
+        """
         truck_embed = discord.Embed(title=truck.name, description=truck.description, colour=discord.Colour.gold())
         truck_embed.add_field(name="Gas consumption", value=f"{truck.gas_consumption} litres per mile")
         truck_embed.add_field(name="Gas capacity", value = str(truck.gas_capacity)+" l")
