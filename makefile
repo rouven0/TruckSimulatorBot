@@ -3,7 +3,6 @@ install:
 ifeq (, $(wildcard ./players.db))
 	@echo Setting up player database...
 	@cp ./templates/template_players.db players.db
-	@cp ./templates/template_gas.txt gas.txt
 	@echo Done.
 else
 	@echo Found existing player database, skipping this step.
@@ -21,6 +20,10 @@ endif
 
 ifeq (, $(wildcard ./logs/))
 	@mkdir logs
+endif
+
+ifeq (, $(wildcard ./gas.txt))
+	@cp ./templates/template_gas.txt gas.txt
 endif
 
 	@echo Setting up the virtual environment...
