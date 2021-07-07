@@ -54,6 +54,9 @@ class Economy(commands.Cog):
             pass
 
     @commands.command()
+    @commands.bot_has_permissions(view_channel=True, send_messages=True,
+                                  embed_links=True, attach_files=True, read_message_history=True,
+                                  use_external_emojis=True)
     async def job(self, ctx, *args) -> None:
         """
         Get yourself some jobs and earn money
@@ -77,6 +80,9 @@ class Economy(commands.Cog):
         await ctx.channel.send(embed=job_embed)
 
     @commands.command()
+    @commands.bot_has_permissions(view_channel=True, send_messages=True,
+                                  embed_links=True, attach_files=True, read_message_history=True,
+                                  use_external_emojis=True)
     async def load(self, ctx) -> None:
         """
         If you have a job, you can load your Truck with items you have to transport
@@ -94,6 +100,9 @@ class Economy(commands.Cog):
             await ctx.channel.send("Nothing to do here")
 
     @commands.command()
+    @commands.bot_has_permissions(view_channel=True, send_messages=True,
+                                  embed_links=True, attach_files=True, read_message_history=True,
+                                  use_external_emojis=True)
     async def unload(self, ctx) -> None:
         """
         Unload your Truck at the right place to get your job done
@@ -113,6 +122,9 @@ class Economy(commands.Cog):
             await ctx.channel.send("Nothing to do here")
 
     @commands.command()
+    @commands.bot_has_permissions(view_channel=True, send_messages=True,
+                                  embed_links=True, attach_files=True, read_message_history=True,
+                                  use_external_emojis=True)
     async def refill(self, ctx):
         """
         If you're at the gas station, you can refill your truck's gas
@@ -152,6 +164,9 @@ class Economy(commands.Cog):
         await ctx.channel.send(embed=refill_embed)
 
     @commands.command()
+    @commands.bot_has_permissions(view_channel=True, send_messages=True,
+                                  embed_links=True, attach_files=True, read_message_history=True,
+                                  use_external_emojis=True)
     async def give(self, ctx, user: discord.User = None, amount=None) -> None:
         """
         Do I really have to explain this?

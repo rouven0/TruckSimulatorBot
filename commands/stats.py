@@ -65,6 +65,9 @@ class Stats(commands.Cog):
             await ctx.channel.send("Deletion aborted!")
 
     @commands.command(aliases=["p", "me"])
+    @commands.bot_has_permissions(view_channel=True, send_messages=True,
+                                  embed_links=True, attach_files=True, read_message_history=True,
+                                  use_external_emojis=True)
     async def profile(self, ctx, user: discord.User = None) -> None:
         """
         Shows your in-game profile. That's it
@@ -97,6 +100,9 @@ class Stats(commands.Cog):
         await ctx.channel.send(embed=profile_embed)
 
     @commands.command()
+    @commands.bot_has_permissions(view_channel=True, send_messages=True,
+                                  embed_links=True, attach_files=True, read_message_history=True,
+                                  use_external_emojis=True)
     async def top(self, ctx, key="level") -> None:
         """
         If you appear in these lists you are one of the top 10 Players. Congratulations!

@@ -10,6 +10,9 @@ class Misc(commands.Cog):
     All commands I can't find a category to
     """
     @commands.command()
+    @commands.bot_has_permissions(view_channel=True, send_messages=True,
+                                  embed_links=True, attach_files=True, read_message_history=True,
+                                  use_external_emojis=True)
     async def support(self, ctx) -> None:
         support_embed = discord.Embed(title="Click here to get to the support server",
                                       description="Any problems with the TruckSimulator? \n"
@@ -19,6 +22,9 @@ class Misc(commands.Cog):
         await ctx.channel.send(embed=support_embed)
 
     @commands.command()
+    @commands.bot_has_permissions(view_channel=True, send_messages=True,
+                                  embed_links=True, attach_files=True, read_message_history=True,
+                                  use_external_emojis=True)
     async def github(self, ctx) -> None:
         support_embed = discord.Embed(title="Truck Simulator github repo",
                                       description="Check out the beautiful code behind the TruckSimulator or use the issue tracker to report bugs and problems",
@@ -27,6 +33,9 @@ class Misc(commands.Cog):
         await ctx.channel.send(embed=support_embed)
 
     @commands.command()
+    @commands.bot_has_permissions(view_channel=True, send_messages=True,
+                                  embed_links=True, attach_files=True, read_message_history=True,
+                                  use_external_emojis=True)
     async def invite(self, ctx) -> None:
         support_embed = discord.Embed(title="Click here to add the bot to your servers",
                                       description="Go spread the word of the Truck Simulator",
@@ -35,6 +44,9 @@ class Misc(commands.Cog):
         await ctx.channel.send(embed=support_embed)
 
     @commands.command()
+    @commands.bot_has_permissions(view_channel=True, send_messages=True,
+                                  embed_links=True, attach_files=True, read_message_history=True,
+                                  use_external_emojis=True)
     async def rules(self, ctx) -> None:
         rules_embed=discord.Embed(title="Truck Simulator Rules",
                                   colour=discord.Colour.gold())
@@ -49,6 +61,9 @@ class Misc(commands.Cog):
         await ctx.channel.send(embed=rules_embed)
 
     @commands.command()
+    @commands.bot_has_permissions(view_channel=True, send_messages=True,
+                                  embed_links=True, attach_files=True, read_message_history=True,
+                                  use_external_emojis=True)
     async def links(self, ctx) -> None:
         links_embed = discord.Embed(title="Some useful links", colour=discord.Colour.gold())
         links_embed.add_field(name="Invite Link", value="https://discord.com/api/oauth2/authorize?client_id=831052837353816066&permissions=379904&scope=bot", inline=False)
@@ -58,6 +73,9 @@ class Misc(commands.Cog):
         await ctx.channel.send(embed=links_embed)
 
     @commands.command(hidden=True)
+    @commands.bot_has_permissions(view_channel=True, send_messages=True,
+                                  embed_links=True, attach_files=True, read_message_history=True,
+                                  use_external_emojis=True)
     async def rechts(self, ctx) -> None:
         await ctx.channel.send("<:ts_actor:845028860361965598>")
 
