@@ -62,9 +62,9 @@ def get_drive_embed(player: players.Player, avatar_url: str) -> discord.Embed:
                               value=str(navigation_place.position))
     if place.image_url is not None:
         drive_embed.add_field(name="What is here?", value=place.name)
-    #    drive_embed.set_image(url=assets.get_place_image(player, place))
-    #else:
-    #    drive_embed.set_image(url=assets.get_default(player))
+        drive_embed.set_image(url=assets.get_place_image(player, place))
+    else:
+        drive_embed.set_image(url=assets.get_default(player))
     drive_embed.set_footer(text="Note: Your position is only applied if you stop driving")
     return drive_embed
 
