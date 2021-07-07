@@ -11,6 +11,7 @@ STOP = 853362422298968104
 LOAD = 861353140476706877
 UNLOAD = 861353156902256680
 LIST_ITEM = ":small_orange_diamond:"
+MAP_BACKGROUND="⬛"
 
 
 def get_drive_position_symbols(position) -> list:

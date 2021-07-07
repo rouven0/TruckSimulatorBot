@@ -31,7 +31,7 @@ def generate_minimap(player: players.Player) -> str:
             try:
                 minimap_array[i][j] = items.get(map_place.produced_item).emoji
             except AttributeError:
-                minimap_array[i][j] = ":black_large_square:"
+                minimap_array[i][j] = symbols.MAP_BACKGROUND
 
     minimap_array[3][3] = trucks.get(player.truck_id).emoji
     minimap = ""
@@ -371,7 +371,7 @@ class Driving(commands.Cog):
             readable = "{}{}`{}`\n".format(readable, symbols.LIST_ITEM, command)
         return readable
 
-    @commands.command(aliases=["places", "ab"])
+    @commands.command(aliases=["places", "ab", "map"])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
