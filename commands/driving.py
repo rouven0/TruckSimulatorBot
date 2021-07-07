@@ -89,6 +89,7 @@ class Driving(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.active_drives = []
+        self.gas_price = 0
 
     def get_buttons(self, player: players.Player) -> list:
         """
@@ -103,6 +104,9 @@ class Driving(commands.Cog):
             buttons.append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbols.LOAD)))
         if current_job is not None and player.position == current_job.place_to.position and current_job.state == 1:
             buttons.append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbols.UNLOAD)))
+        # refill button
+        if player.position == [7, 7]:
+            buttons.append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbols.REFILL)))
         return buttons
 
     @commands.Cog.listener()
@@ -135,14 +139,17 @@ class Driving(commands.Cog):
         if action == symbols.LOAD:
             current_job = jobs.get(interaction.author.id)
             current_job.state = 1
-            await interaction.channel.send(jobs.get_state(current_job))
+            await interaction.channel.send(interaction.author.mention+" "+jobs.get_state(current_job))
             jobs.update(current_job, state=current_job.state)
             await interaction.respond(type=7, components=self.get_buttons(active_drive.player))
+            await interaction.message.edit(embed=get_drive_embed(active_drive.player,
+                                                                 interaction.author.avatar_url),
+                                           components=self.get_buttons(active_drive.player))
 
         if action == symbols.UNLOAD:
             current_job = jobs.get(interaction.author.id)
             current_job.state = 2
-            await interaction.channel.send(jobs.get_state(current_job) +
+            await interaction.channel.send(interaction.author.mention+" "+jobs.get_state(current_job) +
                                            players.add_xp(active_drive.player,
                                                           randint(1, (active_drive.player.level ** 2) + 7)) +
                                            "\nYour position got applied")
@@ -151,6 +158,36 @@ class Driving(commands.Cog):
             players.update(active_drive.player, position=active_drive.player.position,
                            miles=active_drive.player.miles, gas=active_drive.player.gas)
             await interaction.respond(type=7, components=self.get_buttons(active_drive.player))
+            await interaction.message.edit(embed=get_drive_embed(active_drive.player,
+                                                                 interaction.author.avatar_url),
+                                           components=self.get_buttons(active_drive.player))
+
+        if action == symbols.REFILL:
+            gas_amount = trucks.get(active_drive.player.truck_id).gas_capacity - active_drive.player.gas
+            price = round(gas_amount * self.gas_price)
+
+            try:
+                players.debit_money(active_drive.player, price)
+            except players.NotEnoughMoney:
+                await interaction.channel.send(
+                    "Guess we have a problem: You don't have enough money. Lets make a deal, I will give you 100 litres of gas, and you lose 2 levels")
+                if active_drive.player.level > 2:
+                    players.update(active_drive.player, gas=100, level=active_drive.player.level - 2, xp=0)
+                else:
+                    players.update(active_drive.player, gas=100, xp=0)
+                return
+
+            refill_embed = discord.Embed(title="Thank you for visiting our gas station",
+                                         description=f"You filled {gas_amount} litres into your truck and payed ${price}",
+                                         colour=discord.Colour.gold())
+            refill_embed.set_footer(
+                text="Wonder how these prices are calculated? Check out the daily gas prices in the official server")
+            players.update(active_drive.player, gas=600)
+            await interaction.channel.send(embed=refill_embed)
+            await interaction.respond(type=7, components=self.get_buttons(active_drive.player))
+            await interaction.message.edit(embed=get_drive_embed(active_drive.player,
+                                                                 interaction.author.avatar_url),
+                                           components=self.get_buttons(active_drive.player))
 
         position_changed = False
         if action == symbols.LEFT:

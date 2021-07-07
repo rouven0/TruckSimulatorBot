@@ -135,9 +135,9 @@ def get_state(job: Job) -> str:
     Returns the next instructions based on the current jobs state
     """
     if job.state == 0:
-        return "You claimed this job. Drive to {} and load your truck with `t.load`".format(job.place_from.name)
+        return "You claimed this job. Drive to {} and load your truck".format(job.place_from.name)
     if job.state == 1:
-        return "You loaded your truck with the needed items. Now drive to {} and unload them with `t.unload`".format(
+        return "You loaded your truck with the needed items. Now drive to {} and unload them".format(
             job.place_to.name)
     if job.state == 2:
         return "Your job is done and you got ${}.".format(job.reward)
