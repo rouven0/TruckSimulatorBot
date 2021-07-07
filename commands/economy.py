@@ -32,6 +32,7 @@ class Economy(commands.Cog):
         self.scheduler.start()
         gas_file = open("gas.txt", "r")
         self.gas_price = float(gas_file.readline())
+        self.driving_commands.gas_price = self.gas_price
         logging.info(f"Starting with gas price {self.gas_price}")
         gas_file.close()
 
@@ -47,6 +48,7 @@ class Economy(commands.Cog):
         try:
             await self.news_channel.send(embed=gas_embed)
             # I am doing this afterwards to prevent the gas setting on startup
+            self.driving_commands.gas_price = self.gas_price
             logging.info(f"The new gas price is {self.gas_price}")
             gas_file = open("gas.txt", "w")
             gas_file.write(str(self.gas_price))
