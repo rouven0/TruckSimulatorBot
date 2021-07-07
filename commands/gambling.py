@@ -17,6 +17,9 @@ class Gambling(commands.Cog):
     """
 
     @commands.command(aliases=["cf"])
+    @commands.bot_has_permissions(view_channel=True, send_messages=True,
+                                  embed_links=True, attach_files=True, read_message_history=True,
+                                  use_external_emojis=True)
     async def coinflip(self, ctx, side=None, amount=None) -> None:
         """
         Test your luck while throwing a coin
@@ -55,6 +58,9 @@ class Gambling(commands.Cog):
             await ctx.channel.send("**Syntax:** `t.coinflip [h/t] <amount>`")
 
     @commands.command()
+    @commands.bot_has_permissions(view_channel=True, send_messages=True,
+                                  embed_links=True, attach_files=True, read_message_history=True,
+                                  use_external_emojis=True)
     async def slots(self, ctx, amount=None) -> None:
         """
         Simple slot machine

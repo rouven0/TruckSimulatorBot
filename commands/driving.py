@@ -61,9 +61,10 @@ def get_drive_embed(player: players.Player, avatar_url: str) -> discord.Embed:
         drive_embed.add_field(name="Navigation: Drive to {}".format(navigation_place.name),
                               value=str(navigation_place.position))
     if place.image_url is not None:
-        drive_embed.set_image(url=assets.get_place_image(player, place))
-    else:
-        drive_embed.set_image(url=assets.get_default(player))
+        drive_embed.add_field(name="What is here?", value=place.name)
+    #    drive_embed.set_image(url=assets.get_place_image(player, place))
+    #else:
+    #    drive_embed.set_image(url=assets.get_default(player))
     drive_embed.set_footer(text="Note: Your position is only applied if you stop driving")
     return drive_embed
 
@@ -243,6 +244,9 @@ class Driving(commands.Cog):
                        gas=active_drive.player.gas)
 
     @commands.command(aliases=["t", "trucks"])
+    @commands.bot_has_permissions(view_channel=True, send_messages=True,
+                                  embed_links=True, attach_files=True, read_message_history=True,
+                                  use_external_emojis=True)
     async def truck(self, ctx, *args):
         """
         Shows your Truck
@@ -335,6 +339,9 @@ class Driving(commands.Cog):
         await ctx.channel.send(embed=truck_embed)
 
     @commands.command(aliases=["here"])
+    @commands.bot_has_permissions(view_channel=True, send_messages=True,
+                                  embed_links=True, attach_files=True, read_message_history=True,
+                                  use_external_emojis=True)
     async def position(self, ctx) -> None:
         """
         Provides some information about your current position and the things located there
@@ -365,6 +372,9 @@ class Driving(commands.Cog):
         return readable
 
     @commands.command(aliases=["places", "ab"])
+    @commands.bot_has_permissions(view_channel=True, send_messages=True,
+                                  embed_links=True, attach_files=True, read_message_history=True,
+                                  use_external_emojis=True)
     async def addressbook(self, ctx) -> None:
         """
         Lists all public places. Hidden ones are excluded
