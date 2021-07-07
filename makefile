@@ -3,6 +3,7 @@ install:
 ifeq (, $(wildcard ./players.db))
 	@echo Setting up player database...
 	@cp ./templates/template_players.db players.db
+	@cp ./templates/template_gas.txt gas.txt
 	@echo Done.
 else
 	@echo Found existing player database, skipping this step.
@@ -18,7 +19,10 @@ else
 	@echo Found existing environment, skipping this step.
 endif
 
+ifeq (, $(wildcard ./logs/))
 	@mkdir logs
+endif
+
 	@echo Setting up the virtual environment...
 	@python3 -m venv venv
 	@echo Installing requirements...

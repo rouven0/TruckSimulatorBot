@@ -2,9 +2,8 @@
 This module contains the Cog for all economy-related commands
 """
 from datetime import datetime
+import logging
 from random import randint
-import sys
-
 import discord
 from discord.ext import commands
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -23,21 +22,22 @@ class Economy(commands.Cog):
         self.bot = bot
         self.news_channel_id = news_channel_id
         self.scheduler = AsyncIOScheduler()
-        self.gas_price = 1
         self.driving_commands = driving_commands
         super().__init__()
 
+    @commands.command()
+    async def gas(self, ctx):
+        await ctx.channel.send(str(self.gas_price))
+
     @commands.Cog.listener()
     async def on_ready(self) -> None:
-        # noinspection PyAttributeOutsideInit
         self.news_channel: discord.TextChannel = self.bot.get_channel(self.news_channel_id)
-
         self.scheduler.add_job(self.daily_gas_prices, trigger="cron", day_of_week="mon-sun", hour=2)
-
         self.scheduler.start()
-
-        if "--set-gas-price" in sys.argv:
-            await self.daily_gas_prices()
+        gas_file = open("gas.txt", "r")
+        self.gas_price = float(gas_file.readline())
+        logging.info(f"Starting with gas price {self.gas_price}")
+        gas_file.close()
 
     async def daily_gas_prices(self) -> None:
         """
@@ -50,6 +50,11 @@ class Economy(commands.Cog):
         gas_embed.add_field(name="Main gas station", value=f"${self.gas_price} per litre")
         try:
             await self.news_channel.send(embed=gas_embed)
+            # I am doing this afterwards to prevent the gas setting on startup
+            logging.info(f"The new gas price is {self.gas_price}")
+            gas_file = open("gas.txt", "w")
+            gas_file.write(str(self.gas_price))
+            gas_file.close()
         except AttributeError:
             pass
 

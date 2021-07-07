@@ -11,3 +11,6 @@ players.db
 
 # virtual environment
 venv/
+
+#bot generated files
+gas.txt
