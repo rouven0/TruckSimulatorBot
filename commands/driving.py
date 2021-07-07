@@ -135,14 +135,17 @@ class Driving(commands.Cog):
         if action == symbols.LOAD:
             current_job = jobs.get(interaction.author.id)
             current_job.state = 1
-            await interaction.channel.send(jobs.get_state(current_job))
+            await interaction.channel.send(interaction.author.mention+" "+jobs.get_state(current_job))
             jobs.update(current_job, state=current_job.state)
             await interaction.respond(type=7, components=self.get_buttons(active_drive.player))
+            await interaction.message.edit(embed=get_drive_embed(active_drive.player,
+                                                                 interaction.author.avatar_url),
+                                           components=self.get_buttons(active_drive.player))
 
         if action == symbols.UNLOAD:
             current_job = jobs.get(interaction.author.id)
             current_job.state = 2
-            await interaction.channel.send(jobs.get_state(current_job) +
+            await interaction.channel.send(interaction.author.mention+" "+jobs.get_state(current_job) +
                                            players.add_xp(active_drive.player,
                                                           randint(1, (active_drive.player.level ** 2) + 7)) +
                                            "\nYour position got applied")
@@ -151,6 +154,9 @@ class Driving(commands.Cog):
             players.update(active_drive.player, position=active_drive.player.position,
                            miles=active_drive.player.miles, gas=active_drive.player.gas)
             await interaction.respond(type=7, components=self.get_buttons(active_drive.player))
+            await interaction.message.edit(embed=get_drive_embed(active_drive.player,
+                                                                 interaction.author.avatar_url),
+                                           components=self.get_buttons(active_drive.player))
 
         position_changed = False
         if action == symbols.LEFT:
