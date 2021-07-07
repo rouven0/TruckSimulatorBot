@@ -25,11 +25,7 @@ class Economy(commands.Cog):
         self.driving_commands = driving_commands
         super().__init__()
 
-    @commands.command()
-    async def gas(self, ctx):
-        await ctx.channel.send(str(self.gas_price))
-
-    @commands.Cog.listener()
+   @commands.Cog.listener()
     async def on_ready(self) -> None:
         self.news_channel: discord.TextChannel = self.bot.get_channel(self.news_channel_id)
         self.scheduler.add_job(self.daily_gas_prices, trigger="cron", day_of_week="mon-sun", hour=2)
