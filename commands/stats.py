@@ -120,9 +120,9 @@ class Stats(commands.Cog):
                 val = "{:,}".format(player.miles)
                 top_title = top_players[1]
             else:
-                val = "{:,}".format(player.level)
+                val = "{:,} ({}/{} xp)".format(player.level, player.xp, levels.get_next_xp(player.level))
             count += 1
-            top_body = "{}**{}**. {} - {}{}\n".format(top_body, count, player.name,
+            top_body += "**{}**. {} - {}{}\n".format(count, player.name,
                                                       val, top_players[2])
         top_embed = discord.Embed(title="Truck Simulator top list", colour=discord.Colour.gold())
         top_embed.add_field(name="Top {}".format(top_title), value=top_body)
