@@ -175,7 +175,7 @@ def get_top(key="level") -> tuple:
         __cur__.execute("SELECT * FROM players ORDER BY miles DESC")
         suffix = " miles"
     else:
-        __cur__.execute("SELECT * FROM players ORDER BY level DESC")
+        __cur__.execute("SELECT * FROM players ORDER BY level DESC, xp DESC")
         suffix = ""
     return __list_from_tuples(__cur__.fetchmany(10)), key, suffix
 
