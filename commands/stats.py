@@ -111,6 +111,7 @@ class Stats(commands.Cog):
         top_body = ""
         top_title = "level"
         count = 0
+        top_embed = discord.Embed(title="Truck Simulator top list", colour=discord.Colour.gold())
 
         for player in top_players[0]:
             if top_players[1] == "money":
@@ -121,9 +122,9 @@ class Stats(commands.Cog):
                 top_title = top_players[1]
             else:
                 val = "{:,} ({}/{} xp)".format(player.level, player.xp, levels.get_next_xp(player.level))
+                top_embed.set_footer(text="You can also sort by money and miles", icon_url=self.bot.user.avatar_url)
             count += 1
-            top_body += "**{}**. {} - {}{}\n".format(count, player.name,
+            top_body += "**{}**. {} ~ {}{}\n".format(count, player.name,
                                                       val, top_players[2])
-        top_embed = discord.Embed(title="Truck Simulator top list", colour=discord.Colour.gold())
         top_embed.add_field(name="Top {}".format(top_title), value=top_body)
         await ctx.channel.send(embed=top_embed)
