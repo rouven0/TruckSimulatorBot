@@ -134,7 +134,7 @@ class Driving(commands.Cog):
             await interaction.message.channel.send("You stopped driving!, {}".format(interaction.author.name))
             await interaction.respond(type=7, components=[])
             players.update(active_drive.player, position=active_drive.player.position,
-                           miles=active_drive.player.miles, gas=active_drive.player.gas)
+                           miles=active_drive.player.miles, truck_miles=active_drive.player.truck_miles, gas=active_drive.player.gas)
 
         if action == symbols.LOAD:
             current_job = jobs.get(interaction.author.id)
@@ -210,6 +210,7 @@ class Driving(commands.Cog):
         if position_changed:
             active_drive.last_action_time = time()
             active_drive.player.miles += 1
+            active_drive.player.truck_miles += 1
             active_drive.player.gas -= trucks.get(active_drive.player.truck_id).gas_consumption
             if 25 < active_drive.player.gas < 30:
                 await active_drive.message.channel.send(f"<@{active_drive.player.user_id}> you are running out of gas. "
@@ -279,6 +280,7 @@ class Driving(commands.Cog):
         players.update(active_drive.player,
                        position=active_drive.player.position,
                        miles=active_drive.player.miles,
+                       truck_miles=active_drive.player.truck_miles,
                        gas=active_drive.player.gas)
 
     @commands.group(pass_context=True)
@@ -313,11 +315,11 @@ class Driving(commands.Cog):
         player = players.get(ctx.author.id)
         old_truck = trucks.get(player.truck_id)
         new_truck = trucks.get(id)
-        selling_price = round(old_truck.price - (old_truck.price / 10) * log(player.miles + 1))
+        selling_price = round(old_truck.price - (old_truck.price / 10) * log(player.truck_miles + 1))
         end_price = new_truck.price - selling_price
         # this also adds money if the end price is negative
         players.debit_money(player, end_price)
-        players.update(player, miles=0, gas=new_truck.gas_capacity, truck_id=new_truck.truck_id)
+        players.update(player, truck_miles=0, gas=new_truck.gas_capacity, truck_id=new_truck.truck_id)
         answer_embed = discord.Embed(
             description=f"You sold your old {old_truck.name} for ${selling_price} and bought a brand new {new_truck.name} for ${new_truck.price}",
             colour=discord.Colour.gold())
@@ -426,10 +428,9 @@ class Driving(commands.Cog):
                     self.active_drives.remove(active_drive)
                     await active_drive.message.edit(
                         embed=get_drive_embed(active_drive.player, self.bot.user.avatar_url), components=[])
-                    await active_drive.message.channel.send(
-                        "<@{}> Your driving timed out!".format(active_drive.player.user_id))
                     players.update(active_drive.player, position=active_drive.player.position,
                                    miles=active_drive.player.miles,
+                                   truck_miles=active_drive.player.truck_miles,
                                    gas=active_drive.player.gas)
             await asyncio.sleep(10)
 
@@ -444,5 +445,7 @@ class Driving(commands.Cog):
             if active_drive.message.channel.id not in processed_channels:
                 await active_drive.message.channel.send("All trucks were stopped due to a bot shutdown!")
                 processed_channels.append(active_drive.message.channel.id)
-            players.update(active_drive.player, position=active_drive.player.position, miles=active_drive.player.miles,
+            players.update(active_drive.player, position=active_drive.player.position,
+                           miles=active_drive.player.miles,
+                           truck_miles=active_drive.player.truck_miles,
                            gas=active_drive.player.gas)
