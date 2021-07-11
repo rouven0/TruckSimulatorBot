@@ -2,14 +2,12 @@
 This module contains the Cog for all driving-related commands
 """
 from math import log
-from sqlite3.dbapi2 import Error
 from time import time
 from random import randint
 import asyncio
 import discord
 from discord.ext import commands
 from discord_components import Button
-from discord_components.component import Select, SelectOption
 import players
 import items
 import places
@@ -299,36 +297,23 @@ class Driving(commands.Cog):
         **Show <id>:**
         -> Shows details about the requested Truck
 
-        **Buy:**
+        **Buy <id>:**
         -> Select a new Truck to buy, your old one will be sold
         """
         player = players.get(ctx.author.id)
 
         if args and args[0] == "buy":
-            options = []
-            for truck in trucks.get_all():
-                options.append(SelectOption(label=truck.name, description=truck.description, value=truck.truck_id))
-
-            buy_instructions = discord.Embed(title="Time for a new Truck?", colour=discord.Colour.gold(),
-                                             description="Choose one of the Trucks in the list. \n"
-                                                         "Your old Truck will be sold and your miles and gas will be reset. \n")
-            message = await ctx.channel.send(embed=buy_instructions, components=[
-                Select(placeholder="Select your Truck",
-                       options=options)])
-
-            def check(select_option):
-                return select_option.author.id == ctx.author.id
-
             try:
-                selection = await self.bot.wait_for("select_option", check=check, timeout=6)
-            except Error:
-                await message.edit("Truck selection timed out", components=[])
+                selected_truck_id = int(args[1])
+                old_truck = trucks.get(player.truck_id)
+                new_truck = trucks.get(selected_truck_id)
+            except IndexError:
+                await ctx.channel.send("Which truck do you want to buy? Please specify the id.")
                 return
-            await selection.respond(type=7, components=[])
-            selected_truck_id = int(selection.component[0].value)
+            except (ValueError, trucks.TruckNotFound):
+                await ctx.channel.send("There is no truck with this id.")
+                return
 
-            old_truck = trucks.get(player.truck_id)
-            new_truck = trucks.get(selected_truck_id)
             selling_price = round(old_truck.price - (old_truck.price / 10) * log(player.miles + 1))
             end_price = new_truck.price - selling_price
             # this also adds money if the end price is negative
