@@ -31,6 +31,7 @@ class Player:
     money: int = 0
     position: list = field(default_factory=lambda: [0, 0])
     miles: int = 0
+    truck_miles: int = 0
     gas: int = 600
     truck_id: int = 0
 
@@ -49,7 +50,7 @@ def __from_tuple(tup) -> Player:
     """
     Returns a Player object from a received database tuple
     """
-    return Player(tup[0], tup[1], tup[2], tup[3], tup[4], __get_position(tup[5]), tup[6], tup[7], tup[8])
+    return Player(tup[0], tup[1], tup[2], tup[3], tup[4], __get_position(tup[5]), tup[6], tup[7], tup[8], tup[9])
 
 
 def __to_tuple(player) -> tuple:
@@ -57,7 +58,7 @@ def __to_tuple(player) -> tuple:
     Transforms the player object into a tuple that can be inserted in the db
     """
     return (player.user_id, player.name, player.level, player.xp, player.money,
-            __format_pos_to_db(player.position), player.miles, player.gas, player.truck_id)
+            __format_pos_to_db(player.position), player.miles, player.truck_miles, player.gas, player.truck_id)
 
 
 def __get_position(db_pos) -> list:
@@ -108,7 +109,7 @@ def insert(player: Player) -> None:
     """
     Inserts a player into the database
     """
-    __cur__.execute('INSERT INTO players VALUES (?,?,?,?,?,?,?,?,?)', __to_tuple(player))
+    __cur__.execute('INSERT INTO players VALUES (?,?,?,?,?,?,?,?,?,?)', __to_tuple(player))
     __con__.commit()
     logging.info('Inserted %s into the database as %s', player.name, __to_tuple(player))
 
@@ -122,7 +123,7 @@ def remove(player: Player) -> None:
     logging.info('Removed %s %s from the database', player.name, __to_tuple(player))
 
 
-def update(player: Player, name:str=None, level:int=None, xp:int=None,  money:int=None, position:list=None, miles:int=None, gas:int=None, truck_id:int=None) -> None:
+def update(player: Player, name:str=None, level:int=None, xp:int=None,  money:int=None, position:list=None, miles:int=None, truck_miles:int=None,  gas:int=None, truck_id:int=None) -> None:
     """
     Updates a player in the database
     """
@@ -144,6 +145,9 @@ def update(player: Player, name:str=None, level:int=None, xp:int=None,  money:in
     if miles is not None:
         __cur__.execute('UPDATE players SET miles=? WHERE id=?', (miles, player.user_id))
         player.miles = miles
+    if truck_miles is not None:
+        __cur__.execute('UPDATE players SET truck_miles=? WHERE id=?', (truck_miles, player.user_id))
+        player.truck_miles = truck_miles
     if gas is not None:
         __cur__.execute('UPDATE players SET gas=? WHERE id=?', (gas, player.user_id))
         player.gas = gas
