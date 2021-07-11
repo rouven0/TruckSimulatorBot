@@ -281,87 +281,79 @@ class Driving(commands.Cog):
                        miles=active_drive.player.miles,
                        gas=active_drive.player.gas)
 
-    @commands.command(aliases=["t", "trucks"])
+    @commands.group(pass_context=True)
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
-    async def truck(self, ctx, *args):
+    async def truck(self, ctx):
         """
-        Shows your Truck
-
-        **__Optional arguments:__**
-
-        **List:**
-        -> Lists all available Trucks
-
-        **Show <id>:**
-        -> Shows details about the requested Truck
-
-        **Buy <id>:**
-        -> Select a new Truck to buy, your old one will be sold
+        Get details about your truck and change it
         """
-        player = players.get(ctx.author.id)
-
-        if args and args[0] == "buy":
-            try:
-                selected_truck_id = int(args[1])
-                old_truck = trucks.get(player.truck_id)
-                new_truck = trucks.get(selected_truck_id)
-            except IndexError:
-                await ctx.channel.send("Which truck do you want to buy? Please specify the id.")
-                return
-            except (ValueError, trucks.TruckNotFound):
-                await ctx.channel.send("There is no truck with this id.")
-                return
-
-            selling_price = round(old_truck.price - (old_truck.price / 10) * log(player.miles + 1))
-            end_price = new_truck.price - selling_price
-            # this also adds money if the end price is negative
-            players.debit_money(player, end_price)
-            players.update(player, miles=0, gas=new_truck.gas_capacity, truck_id=new_truck.truck_id)
-            answer_embed = discord.Embed(
-                description=f"You sold your old {old_truck.name} for ${selling_price} and bought a brand new {new_truck.name} for ${new_truck.price}",
-                colour=discord.Colour.gold())
-            answer_embed.set_author(name="You got a new truck", icon_url=self.bot.user.avatar_url)
-            answer_embed.set_footer(text="Check out your new baby with `t.truck`")
-            await ctx.channel.send(embed=answer_embed)
-
-            return
-
-        if args and args[0] == "list":
-            list_embed = discord.Embed(title="All available trucks", colour=discord.Colour.gold())
-            for truck in trucks.get_all():
-                list_embed.add_field(name=truck.name,
-                                     value="Id: {} \n Price: ${:,}".format(truck.truck_id, truck.price), inline=False)
-            list_embed.set_footer(icon_url=self.bot.user.avatar_url,
-                                  text="Get more information about a truck with `t.truck show <id>`")
-            await ctx.channel.send(embed=list_embed)
-            return
-
-        if args and args[0] == "show":
-            try:
-                truck = trucks.get(int(args[1]))
-                is_own_truck = False
-            except trucks.TruckNotFound:
-                await ctx.channel.send("Truck not found")
-                return
-            except (ValueError, IndexError):
-                await ctx.channel.send("**Syntax** `t.truck show <id>`")
-                return
-        else:
+        if ctx.invoked_subcommand == None:
+            player = players.get(ctx.author.id)
             truck = trucks.get(player.truck_id)
-            is_own_truck = True
 
-        truck_embed = get_truck_embed(truck)
-        if is_own_truck:
+            truck_embed = get_truck_embed(truck)
             truck_embed.set_author(name=f"{ctx.author.name}'s truck", icon_url=ctx.author.avatar_url)
             truck_embed.set_footer(icon_url=self.bot.user.avatar_url,
-                                   text="This is your Truck, see all trucks with `t.truck list` and change your truck with `t.truck buy`")
-        else:
+                                       text="This is your Truck, see all trucks with `t.truck list` and change your truck with `t.truck buy`")
+
+            await ctx.channel.send(embed=truck_embed)
+
+    @truck.command()
+    async def buy(self, ctx, id) -> None:
+        """
+        Buy a new truck, your old one will be sold and your miles will be reset
+        """
+        try:
+            id  = int(id)
+        except ValueError:
+            await ctx.channel.send("Wtf do you want to buy?")
+            return
+        player = players.get(ctx.author.id)
+        old_truck = trucks.get(player.truck_id)
+        new_truck = trucks.get(id)
+        selling_price = round(old_truck.price - (old_truck.price / 10) * log(player.miles + 1))
+        end_price = new_truck.price - selling_price
+        # this also adds money if the end price is negative
+        players.debit_money(player, end_price)
+        players.update(player, miles=0, gas=new_truck.gas_capacity, truck_id=new_truck.truck_id)
+        answer_embed = discord.Embed(
+            description=f"You sold your old {old_truck.name} for ${selling_price} and bought a brand new {new_truck.name} for ${new_truck.price}",
+            colour=discord.Colour.gold())
+        answer_embed.set_author(name="You got a new truck", icon_url=self.bot.user.avatar_url)
+        answer_embed.set_footer(text="Check out your new baby with `t.truck`")
+        await ctx.channel.send(embed=answer_embed)
+
+    @truck.command()
+    async def show(self, ctx, id) -> None:
+        """
+        Shows details about a specific truck
+        """
+        try:
+            id  = int(id)
+            truck = trucks.get(id)
+            truck_embed = get_truck_embed(truck)
             truck_embed.set_footer(icon_url=self.bot.user.avatar_url,
                                    text="See all trucks with `t.truck list` and change your truck with `t.truck buy`")
+            await ctx.channel.send(embed=truck_embed)
+        except trucks.TruckNotFound:
+            await ctx.channel.send("Truck not found")
+        except ValueError:
+            await ctx.channel.send("Wtf do you want to show?")
 
-        await ctx.channel.send(embed=truck_embed)
+    @truck.command()
+    async def list(self, ctx) -> None:
+        """
+        Lists all available Trucks
+        """
+        list_embed = discord.Embed(title="All available trucks", colour=discord.Colour.gold())
+        for truck in trucks.get_all():
+            list_embed.add_field(name=truck.name,
+                                 value="Id: {} \n Price: ${:,}".format(truck.truck_id, truck.price), inline=False)
+        list_embed.set_footer(icon_url=self.bot.user.avatar_url,
+                              text="Get more information about a truck with `t.truck show <id>`")
+        await ctx.channel.send(embed=list_embed)
 
     @commands.command(aliases=["here"])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,

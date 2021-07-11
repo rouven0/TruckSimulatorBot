@@ -9,6 +9,7 @@ from discord.ext import commands
 
 import players
 import places
+from trucks import TruckNotFound
 
 
 class System(commands.Cog, command_attrs=dict(hidden=True)):
@@ -80,6 +81,12 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
                 missing_permissions = missing_permissions + "\n" + permission
             await ctx.channel.send("I'm missing the following permissions:" + missing_permissions + '`')
 
+        elif isinstance(error, commands.errors.MissingRequiredArgument):
+            if len(ctx.invoked_parents) > 0:
+                await ctx.channel.send(f"Command usage: `t.{ctx.invoked_parents[0]} {ctx.command.name} {ctx.command.signature}`")
+            else:
+                await ctx.channel.send(f"Command usage: `t.{ctx.command.name} {ctx.command.signature}`")
+
         elif isinstance(error, commands.errors.CommandInvokeError):
             if isinstance(error.original, players.PlayerNotRegistered):
                 await ctx.channel.send(
@@ -91,6 +98,9 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
 
             elif isinstance(error.original, places.WrongPlaceError):
                 await ctx.channel.send(error.original.message)
+
+            elif isinstance(error.original, TruckNotFound):
+                await ctx.channel.send("Truck not found")
 
             else:
                 logging.error(error)
