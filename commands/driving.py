@@ -2,6 +2,7 @@
 This module contains the Cog for all driving-related commands
 """
 from math import log
+from sqlite3.dbapi2 import Error
 from time import time
 from random import randint
 import asyncio
@@ -44,6 +45,7 @@ def generate_minimap(player: players.Player) -> str:
 
 def get_drive_embed(player: players.Player, avatar_url: str) -> discord.Embed:
     """
+    Returns the drive embed that includes all the information about the current position and gas
     """
     place = places.get(player.position)
     drive_embed = discord.Embed(description="Keep an eye on your gas!",
@@ -170,7 +172,8 @@ class Driving(commands.Cog):
                 players.debit_money(active_drive.player, price)
             except players.NotEnoughMoney:
                 await interaction.channel.send(
-                    "Guess we have a problem: You don't have enough money. Lets make a deal, I will give you 100 litres of gas, and you lose 2 levels")
+                    "Guess we have a problem: You don't have enough money. Lets make a deal. "
+                    "I will give you 100 litres of gas, and you lose 2 levels")
                 if active_drive.player.level > 2:
                     players.update(active_drive.player, gas=100, level=active_drive.player.level - 2, xp=0)
                 else:
@@ -252,8 +255,8 @@ class Driving(commands.Cog):
             active_drive = self.get_active_drive(ctx.author.id)
             await ctx.channel.send(embed=discord.Embed(title=f"Hey {ctx.author.name}",
                                    description="You can't drive on two roads at once!\n"
-                                   "Click [here]({}) to jump right back into your Truck".format(active_drive.message.jump_url),
-                                   colour=discord.Colour.gold()))
+                                   f"Click [here]({active_drive.message.jump_url}) to jump right back into your Truck"),
+                                   colour=discord.Colour.gold())
             return
         message = await ctx.channel.send(embed=get_drive_embed(player, ctx.author.avatar_url),
                                          components=self.get_buttons(player))
@@ -318,7 +321,7 @@ class Driving(commands.Cog):
 
             try:
                 selection = await self.bot.wait_for("select_option", check=check, timeout=6)
-            except:
+            except Error:
                 await message.edit("Truck selection timed out", components=[])
                 return
             await selection.respond(type=7, components=[])
