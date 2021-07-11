@@ -8,7 +8,6 @@ import asyncio
 import discord
 from discord.ext import commands
 from discord_components import Button
-from discord_components.component import Select, SelectOption
 import players
 import items
 import places
@@ -44,6 +43,7 @@ def generate_minimap(player: players.Player) -> str:
 
 def get_drive_embed(player: players.Player, avatar_url: str) -> discord.Embed:
     """
+    Returns the drive embed that includes all the information about the current position and gas
     """
     place = places.get(player.position)
     drive_embed = discord.Embed(description="Keep an eye on your gas!",
@@ -170,7 +170,8 @@ class Driving(commands.Cog):
                 players.debit_money(active_drive.player, price)
             except players.NotEnoughMoney:
                 await interaction.channel.send(
-                    "Guess we have a problem: You don't have enough money. Lets make a deal, I will give you 100 litres of gas, and you lose 2 levels")
+                    "Guess we have a problem: You don't have enough money. Lets make a deal. "
+                    "I will give you 100 litres of gas, and you lose 2 levels")
                 if active_drive.player.level > 2:
                     players.update(active_drive.player, gas=100, level=active_drive.player.level - 2, xp=0)
                 else:
@@ -252,8 +253,8 @@ class Driving(commands.Cog):
             active_drive = self.get_active_drive(ctx.author.id)
             await ctx.channel.send(embed=discord.Embed(title=f"Hey {ctx.author.name}",
                                    description="You can't drive on two roads at once!\n"
-                                   "Click [here]({}) to jump right back into your Truck".format(active_drive.message.jump_url),
-                                   colour=discord.Colour.gold()))
+                                   f"Click [here]({active_drive.message.jump_url}) to jump right back into your Truck"),
+                                   colour=discord.Colour.gold())
             return
         message = await ctx.channel.send(embed=get_drive_embed(player, ctx.author.avatar_url),
                                          components=self.get_buttons(player))
@@ -296,36 +297,23 @@ class Driving(commands.Cog):
         **Show <id>:**
         -> Shows details about the requested Truck
 
-        **Buy:**
+        **Buy <id>:**
         -> Select a new Truck to buy, your old one will be sold
         """
         player = players.get(ctx.author.id)
 
         if args and args[0] == "buy":
-            options = []
-            for truck in trucks.get_all():
-                options.append(SelectOption(label=truck.name, description=truck.description, value=truck.truck_id))
-
-            buy_instructions = discord.Embed(title="Time for a new Truck?", colour=discord.Colour.gold(),
-                                             description="Choose one of the Trucks in the list. \n"
-                                                         "Your old Truck will be sold and your miles and gas will be reset. \n")
-            message = await ctx.channel.send(embed=buy_instructions, components=[
-                Select(placeholder="Select your Truck",
-                       options=options)])
-
-            def check(select_option):
-                return select_option.author.id == ctx.author.id
-
             try:
-                selection = await self.bot.wait_for("select_option", check=check, timeout=6)
-            except:
-                await message.edit("Truck selection timed out", components=[])
+                selected_truck_id = int(args[1])
+                old_truck = trucks.get(player.truck_id)
+                new_truck = trucks.get(selected_truck_id)
+            except IndexError:
+                await ctx.channel.send("Which truck do you want to buy? Please specify the id.")
                 return
-            await selection.respond(type=7, components=[])
-            selected_truck_id = int(selection.component[0].value)
+            except (ValueError, trucks.TruckNotFound):
+                await ctx.channel.send("There is no truck with this id.")
+                return
 
-            old_truck = trucks.get(player.truck_id)
-            new_truck = trucks.get(selected_truck_id)
             selling_price = round(old_truck.price - (old_truck.price / 10) * log(player.miles + 1))
             end_price = new_truck.price - selling_price
             # this also adds money if the end price is negative
