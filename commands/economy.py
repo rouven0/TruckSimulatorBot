@@ -11,6 +11,7 @@ import players
 import places
 import jobs
 import trucks
+from commands.driving import get_drive_embed
 
 
 class Economy(commands.Cog):
@@ -74,6 +75,10 @@ class Economy(commands.Cog):
                 job_tuple = jobs.generate(player)
                 job_embed.add_field(name="You got a new Job", value=job_tuple[1], inline=False)
                 job_embed.add_field(name="Current state", value=jobs.get_state(job_tuple[0]))
+                if ctx.author.id in [a.player.user_id for a in self.driving_commands.active_drives]:
+                    active_drive = self.driving_commands.get_active_drive(ctx.author.id)
+                    await active_drive.message.edit(embed=get_drive_embed(active_drive.player, ctx.author.avatar_url),
+                                                   components=self.driving_commands.get_buttons(active_drive.player))
             else:
                 job_embed.add_field(name="You don't have a job at the moment",
                                     value="Type `t.job new` to get one")
@@ -138,32 +143,37 @@ class Economy(commands.Cog):
             active_drive = self.driving_commands.get_active_drive(ctx.author.id)
             await ctx.channel.send(embed=discord.Embed(title=f"Hey {ctx.author.name}",
                                                        description="You can't refill a driving vehicle\n"
-                                                                   "Click [here]({}) to jump right back into your Truck".format(
-                                                           active_drive.message.jump_url),
+                                                                   "Click [here]({}) to jump right back into your Truck".format(active_drive.message.jump_url),
                                                        colour=discord.Colour.gold()))
             return
+
         if "refill" not in places.get(player.position).commands:
             raise places.WrongPlaceError("Do you see a gas pump here?")
+
         gas_amount = trucks.get(player.truck_id).gas_capacity - player.gas
         price = round(gas_amount * self.gas_price)
 
         try:
             players.debit_money(player, price)
         except players.NotEnoughMoney:
-            await ctx.channel.send(
-                "Guess we have a problem: You don't have enough money. Lets make a deal, I will give you 100 litres of gas, and you lose 2 levels")
-            if player.level > 2:
-                players.update(player, gas=100, level=player.level - 2, xp=0)
+            if player.gas < 100:
+                await ctx.channel.send(
+                    f"{ctx.author.mention} We have a problem: You don't have enough money. Lets make a deal. "
+                "I will give you 100 litres of gas, and you lose 2 levels")
+                if player.level > 2:
+                    players.update(player, gas=player.gas+100, level=active_drive.player.level - 2, xp=0)
+                else:
+                    players.update(player, gas=player.gas+100, xp=0)
             else:
-                players.update(player, gas=100, xp=0)
-            return
+                await ctx.channel.send(f"{ctx.author.mention} you don't have enough money to do this. "
+                                            "Do some jobs and come back if you have enough")
 
         refill_embed = discord.Embed(title="Thank you for visiting our gas station",
                                      description=f"You filled {gas_amount} litres into your truck and payed ${price}",
                                      colour=discord.Colour.gold())
         refill_embed.set_footer(
             text="Wonder how these prices are calculated? Check out the daily gas prices in the official server")
-        players.update(player, gas=600)
+        players.update(player, gas=trucks.get(player.truck_id).gas_capacity)
         await ctx.channel.send(embed=refill_embed)
 
     @commands.command()

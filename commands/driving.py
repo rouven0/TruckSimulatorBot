@@ -49,9 +49,11 @@ def get_drive_embed(player: players.Player, avatar_url: str) -> discord.Embed:
     drive_embed = discord.Embed(description="Keep an eye on your gas!",
                                 colour=discord.Colour.gold())
     drive_embed.set_author(name="{} is driving".format(player.name), icon_url=avatar_url)
+
     drive_embed.add_field(name="Minimap", value=generate_minimap(player), inline=False)
     drive_embed.add_field(name="Position", value=str(player.position))
     drive_embed.add_field(name="Gas left", value=f"{player.gas} l")
+
     current_job = jobs.get(player.user_id)
     if current_job is not None:
         if current_job.state == 0:
@@ -60,8 +62,9 @@ def get_drive_embed(player: players.Player, avatar_url: str) -> discord.Embed:
             navigation_place = current_job.place_to
         drive_embed.add_field(name="Navigation: Drive to {}".format(navigation_place.name),
                               value=str(navigation_place.position))
+
     if place.image_url is not None:
-        drive_embed.add_field(name="What is here?", value=place.name)
+        drive_embed.add_field(name="What is here?", value=items.get(place.produced_item).emoji+" "+place.name, inline=False)
         drive_embed.set_image(url=assets.get_place_image(player, place))
     else:
         drive_embed.set_image(url=assets.get_default(player))
@@ -95,7 +98,8 @@ class Driving(commands.Cog):
         """
         Returns buttons based on the players position
         """
-        buttons = [[]]
+        buttons = []
+        buttons.append([])
         for symbol in symbols.get_drive_position_symbols(player.position):
             buttons[0].append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbol)))
         buttons[0].append(Button(style=4, label=" ", emoji=self.bot.get_emoji(symbols.STOP)))
@@ -124,6 +128,7 @@ class Driving(commands.Cog):
             await interaction.respond(type=6)
             # Return if the wrong player clicked the button
             return
+
         try:
             action = int(interaction.component.emoji.id)
         except AttributeError:
@@ -139,27 +144,22 @@ class Driving(commands.Cog):
         if action == symbols.LOAD:
             current_job = jobs.get(interaction.author.id)
             current_job.state = 1
-            await interaction.channel.send(interaction.author.mention+" "+jobs.get_state(current_job))
             jobs.update(current_job, state=current_job.state)
-            await interaction.respond(type=7, components=self.get_buttons(active_drive.player))
-            await interaction.message.edit(embed=get_drive_embed(active_drive.player,
-                                                                 interaction.author.avatar_url),
-                                           components=self.get_buttons(active_drive.player))
+            drive_embed = get_drive_embed(active_drive.player, interaction.author.avatar_url)
+            drive_embed.add_field(name="Job notification", value=jobs.get_state(current_job))
+            await interaction.respond(type=7, embed=drive_embed, components=self.get_buttons(active_drive.player))
 
         if action == symbols.UNLOAD:
             current_job = jobs.get(interaction.author.id)
             current_job.state = 2
-            await interaction.channel.send(interaction.author.mention+" "+jobs.get_state(current_job) +
-                                           players.add_xp(active_drive.player,
-                                                          randint(1, (active_drive.player.level ** 2) + 7)) +
-                                           "\nYour position got applied")
             players.add_money(active_drive.player, current_job.reward)
             jobs.remove(current_job)
             players.update(active_drive.player, position=active_drive.player.position,
-                           miles=active_drive.player.miles, gas=active_drive.player.gas)
-            await interaction.respond(type=7, components=self.get_buttons(active_drive.player))
-            await interaction.message.edit(embed=get_drive_embed(active_drive.player,
-                                                                 interaction.author.avatar_url),
+                           miles=active_drive.player.miles, truck_miles=active_drive.player.truck_miles, gas=active_drive.player.gas)
+            job_message = jobs.get_state(current_job) + players.add_xp(active_drive.player, randint(1, (active_drive.player.level ** 2) + 7))
+            drive_embed=get_drive_embed(active_drive.player, interaction.author.avatar_url)
+            drive_embed.add_field(name="Job Notification", value=job_message)
+            await interaction.respond(type=7, embed=drive_embed,
                                            components=self.get_buttons(active_drive.player))
 
         if action == symbols.REFILL:
@@ -169,26 +169,33 @@ class Driving(commands.Cog):
             try:
                 players.debit_money(active_drive.player, price)
             except players.NotEnoughMoney:
-                await interaction.channel.send(
-                    "Guess we have a problem: You don't have enough money. Lets make a deal. "
-                    "I will give you 100 litres of gas, and you lose 2 levels")
-                if active_drive.player.level > 2:
-                    players.update(active_drive.player, gas=100, level=active_drive.player.level - 2, xp=0)
+                if active_drive.player.gas < 100:
+                    await interaction.channel.send(
+                        f"{interaction.author.mention} We have a problem: You don't have enough money. Lets make a deal. "
+                        "I will give you 100 litres of gas, and you lose 2 levels")
+                    if active_drive.player.level > 2:
+                        players.update(active_drive.player, gas=active_drive.player.gas+100, level=active_drive.player.level - 2, xp=0)
+                    else:
+                        players.update(active_drive.player, gas=active_drive.player.gas+100, xp=0)
                 else:
-                    players.update(active_drive.player, gas=100, xp=0)
+                    await interaction.channel.send(f"{interaction.author.mention} you don't have enough money to do this. "
+                                            "Do some jobs and come back if you have enough")
+                players.update(active_drive.player, position=active_drive.player.position,
+                               miles=active_drive.player.miles, truck_miles=active_drive.player.truck_miles)
+                drive_embed = get_drive_embed(active_drive.player, interaction.author.avatar_url)
+                await interaction.respond(type=7, embed=drive_embed, components=self.get_buttons(active_drive.player))
                 return
 
-            refill_embed = discord.Embed(title="Thank you for visiting our gas station",
-                                         description=f"You filled {gas_amount} litres into your truck and payed ${price}",
-                                         colour=discord.Colour.gold())
-            refill_embed.set_footer(
-                text="Wonder how these prices are calculated? Check out the daily gas prices in the official server")
-            players.update(active_drive.player, gas=600)
-            await interaction.channel.send(embed=refill_embed)
-            await interaction.respond(type=7, components=self.get_buttons(active_drive.player))
-            await interaction.message.edit(embed=get_drive_embed(active_drive.player,
-                                                                 interaction.author.avatar_url),
-                                           components=self.get_buttons(active_drive.player))
+            players.update(active_drive.player, position=active_drive.player.position,
+                           miles=active_drive.player.miles, truck_miles=active_drive.player.truck_miles,
+                           gas=trucks.get(active_drive.player.truck_id).gas_capacity)
+            drive_embed = get_drive_embed(active_drive.player, interaction.author.avatar_url)
+            drive_embed.add_field(name="Thank you for visiting our gas station",
+                                  value=f"You filled {gas_amount} litres into your truck and payed ${price}")
+            drive_embed.set_footer(
+                text="Wonder how the gas prices are calculated? Check out the daily gas prices in the official server",
+                icon_url=self.bot.user.avatar_url)
+            await interaction.respond(type=7, embed=drive_embed, components=self.get_buttons(active_drive.player))
 
         position_changed = False
         if action == symbols.LEFT:
@@ -233,8 +240,7 @@ class Driving(commands.Cog):
                 self.active_drives.remove(active_drive)
                 return
 
-            await interaction.message.edit(embed=get_drive_embed(active_drive.player,
-                                                                 interaction.author.avatar_url),
+            await interaction.message.edit(embed=get_drive_embed(active_drive.player, interaction.author.avatar_url),
                                            components=self.get_buttons(active_drive.player))
             await interaction.respond(type=6)
 
@@ -307,6 +313,9 @@ class Driving(commands.Cog):
         """
         Buy a new truck, your old one will be sold and your miles will be reset
         """
+        if ctx.author.id in [a.player.user_id for a in self.active_drives]:
+            await ctx.channel.send(f"{ctx.author.mention} You can't buy a new truck while you are driving in the old one")
+            return
         try:
             id  = int(id)
         except ValueError:
