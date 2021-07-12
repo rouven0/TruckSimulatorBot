@@ -169,7 +169,7 @@ class Driving(commands.Cog):
             try:
                 players.debit_money(active_drive.player, price)
             except players.NotEnoughMoney:
-                if active_drive.player.gas < 100:
+                if active_drive.player.gas < 170:
                     await interaction.channel.send(
                         f"{interaction.author.mention} We have a problem: You don't have enough money. Lets make a deal. "
                         "I will give you 100 litres of gas, and you lose 2 levels")

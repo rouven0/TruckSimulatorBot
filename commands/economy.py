@@ -141,10 +141,11 @@ class Economy(commands.Cog):
 
         if ctx.author.id in [a.player.user_id for a in self.driving_commands.active_drives]:
             active_drive = self.driving_commands.get_active_drive(ctx.author.id)
-            await ctx.channel.send(embed=discord.Embed(title=f"Hey {ctx.author.name}",
-                                                       description="You can't refill a driving vehicle\n"
-                                                                   "Click [here]({}) to jump right back into your Truck".format(active_drive.message.jump_url),
-                                                       colour=discord.Colour.gold()))
+            await ctx.channel.send(
+                    embed=discord.Embed(title=f"Hey {ctx.author.name}",
+                                       description="You can't refill a driving vehicle\n"
+                                                   "Click [here]({}) to jump right back into your Truck".format(active_drive.message.jump_url),
+                                       colour=discord.Colour.gold()))
             return
 
         if "refill" not in places.get(player.position).commands:
@@ -156,17 +157,18 @@ class Economy(commands.Cog):
         try:
             players.debit_money(player, price)
         except players.NotEnoughMoney:
-            if player.gas < 100:
+            if player.gas < 170:
                 await ctx.channel.send(
                     f"{ctx.author.mention} We have a problem: You don't have enough money. Lets make a deal. "
                 "I will give you 100 litres of gas, and you lose 2 levels")
                 if player.level > 2:
-                    players.update(player, gas=player.gas+100, level=active_drive.player.level - 2, xp=0)
+                    players.update(player, gas=player.gas+100, level=player.level - 2, xp=0)
                 else:
                     players.update(player, gas=player.gas+100, xp=0)
             else:
                 await ctx.channel.send(f"{ctx.author.mention} you don't have enough money to do this. "
                                             "Do some jobs and come back if you have enough")
+            return
 
         refill_embed = discord.Embed(title="Thank you for visiting our gas station",
                                      description=f"You filled {gas_amount} litres into your truck and payed ${price}",
