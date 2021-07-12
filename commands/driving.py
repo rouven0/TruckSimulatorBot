@@ -226,7 +226,8 @@ class Driving(commands.Cog):
             if active_drive.player.gas <= 0:
                 active_drive.player.gas = 1
                 players.update(active_drive.player, position=active_drive.player.position,
-                               miles=active_drive.player.miles, gas=active_drive.player.gas)
+                               miles=active_drive.player.miles, truck_miles=active_drive.player.truck_miles,
+                               gas=active_drive.player.gas)
                 await active_drive.message.channel.send(
                     f"<@{active_drive.player.user_id}> You messed up and ran out of gas. "
                     "The company had to have your truck towed away. You will pay $3000 for this incident!")
