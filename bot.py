@@ -54,7 +54,6 @@ def main():
     bot.add_cog(Misc())
     loop = asyncio.get_event_loop()
     loop.create_task(driving_commands.check_drives())
-    loop.create_task(economy_commands.daily_gas_prices())
     bot.run(BOT_TOKEN)
 
 
