@@ -91,9 +91,10 @@ class Stats(commands.Cog):
         next_xp = "{:,}".format(levels.get_next_xp(player.level))
         money = "{:,}".format(player.money)
         miles = "{:,}".format(player.miles)
+        truck_miles = "{:,}".format(player.truck_miles)
         profile_embed.add_field(name="Level", value=f"{player.level} ({xp}/{next_xp} xp)", inline=False)
         profile_embed.add_field(name="Money", value=f"${money}")
-        profile_embed.add_field(name="Miles driven", value=f"{miles}\n({player.truck_miles} with current truck)",
+        profile_embed.add_field(name="Miles driven", value=f"{miles}\n({truck_miles} with current truck)",
                                 inline=False)
         profile_embed.add_field(name="Gas left", value=f"{player.gas} l", inline=False)
         current_job = jobs.get(ctx.author.id)
