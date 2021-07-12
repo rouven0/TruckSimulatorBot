@@ -28,7 +28,7 @@ class Misc(commands.Cog):
     async def github(self, ctx) -> None:
         support_embed = discord.Embed(title="Truck Simulator github repo",
                                       description="Check out the beautiful code behind the TruckSimulator or use the issue tracker to report bugs and problems",
-                                      url="https://github.com/therealr5/TruckSimulator",
+                                      url="https://github.com/therealr5/TruckSimulatorBot",
                                       colour=discord.Colour.gold())
         await ctx.channel.send(embed=support_embed)
 

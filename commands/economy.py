@@ -45,9 +45,9 @@ class Economy(commands.Cog):
                                   description="Gas prices for {}".format(datetime.utcnow().strftime("%A, %B %d %Y")),
                                   colour=discord.Colour.gold())
         gas_embed.add_field(name="Main gas station", value=f"${self.gas_price} per litre")
+        print(1)
         try:
             await self.news_channel.send(embed=gas_embed)
-            # I am doing this afterwards to prevent the gas setting on startup
             self.driving_commands.gas_price = self.gas_price
             logging.info(f"The new gas price is {self.gas_price}")
             gas_file = open("gas.txt", "w")

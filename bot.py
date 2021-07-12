@@ -4,7 +4,6 @@ import asyncio
 import logging
 from datetime import datetime
 from discord.ext import commands
-from discord.ext.commands.core import bot_has_permissions, has_permissions
 from discord_components import DiscordComponents
 from dotenv import load_dotenv
 
@@ -54,7 +53,6 @@ def main():
     bot.add_cog(Misc())
     loop = asyncio.get_event_loop()
     loop.create_task(driving_commands.check_drives())
-    loop.create_task(economy_commands.daily_gas_prices())
     bot.run(BOT_TOKEN)
 
 
