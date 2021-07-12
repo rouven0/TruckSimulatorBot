@@ -4,7 +4,6 @@ import asyncio
 import logging
 from datetime import datetime
 from discord.ext import commands
-from discord.ext.commands.core import bot_has_permissions, has_permissions
 from discord_components import DiscordComponents
 from dotenv import load_dotenv
 
