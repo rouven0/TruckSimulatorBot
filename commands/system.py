@@ -103,10 +103,10 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
                 await ctx.channel.send("Truck not found")
 
             else:
-                logging.error(f"Error in Server {ctx.guild.name} in channel {ctx.channel.name} from {ctx.author.name}: " + str(error))
+                logging.error(f"Error at t.{ctx.command} in Server {ctx.guild.name} in channel {ctx.channel.name} from {ctx.author.name}: " + str(error))
 
         elif isinstance(error, commands.errors.CommandNotFound):
             pass
 
         else:
-            logging.error(f"Error in Server {ctx.guild.name} in channel {ctx.channel.name} from {ctx.author.name}: " + str(error))
+            logging.error(f"Error at t.{ctx.command} in Server {ctx.guild.name} in channel {ctx.channel.name} from {ctx.author.name}: " + str(error))
