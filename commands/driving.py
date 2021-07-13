@@ -108,9 +108,11 @@ class Driving(commands.Cog):
             buttons.append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbols.LOAD)))
         if current_job is not None and player.position == current_job.place_to.position and current_job.state == 1:
             buttons.append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbols.UNLOAD)))
+        if current_job is None:
+            buttons.append(Button(style=3, label="New Job", id="new_job"))
         # refill button
         if player.position == [7, 7]:
-            buttons.append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbols.REFILL)))
+            buttons.append(Button(style=2, label=" ", emoji=self.bot.get_emoji(symbols.REFILL)))
         return buttons
 
     @commands.Cog.listener()
@@ -132,7 +134,13 @@ class Driving(commands.Cog):
         try:
             action = int(interaction.component.emoji.id)
         except AttributeError:
-            action = interaction.component.label
+            action = interaction.component.id
+
+        if action == "new_job":
+            job_tuple = jobs.generate(active_drive.player)
+            drive_embed = get_drive_embed(active_drive.player, interaction.author.avatar_url)
+            drive_embed.add_field(name="You got a new Job", value=job_tuple[1], inline=False)
+            await interaction.respond(type=7, embed=drive_embed, components=self.get_buttons(active_drive.player))
 
         if action == symbols.STOP:
             self.active_drives.remove(active_drive)
