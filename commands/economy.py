@@ -7,6 +7,7 @@ from random import randint
 import discord
 from discord.ext import commands
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+import levels
 import players
 import places
 import jobs
@@ -123,7 +124,7 @@ class Economy(commands.Cog):
         if player.position == current_job.place_to.position and current_job.state == 1:
             current_job.state = 2
             await ctx.channel.send(
-                jobs.get_state(current_job) + players.add_xp(player, randint(1, (player.level ** 2) + 7)))
+                jobs.get_state(current_job) + players.add_xp(player, levels.get_job_reward_xp(player.level)))
             jobs.remove(current_job)
             players.add_money(player, current_job.reward)
         else:

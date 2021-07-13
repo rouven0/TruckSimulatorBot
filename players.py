@@ -81,7 +81,7 @@ def add_xp(player: Player, amount: int) -> str:
     """
     Adds xp to the player and performs a level up if neede
     """
-    answer = f"\nYou got {amount} xp"
+    answer = "\nYou got {:,} xp".format(amount)
     update(player, xp=int(player.xp)+amount)
     while int(player.xp) >=  levels.get_next_xp(player.level):
         update(player, level=player.level+1, xp=player.xp-levels.get_next_xp(player.level))
