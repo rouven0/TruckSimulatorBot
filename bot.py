@@ -39,7 +39,7 @@ def main():
     if "--enable-log-file" in sys.argv:
         file_handler = logging.FileHandler("./logs/{}.log"
                                            .format(datetime.now().strftime("%Y-%m-%d_%H:%M")))
-        file_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
+        file_handler.setFormatter(logging.Formatter(config.LOG_FORMAT, datefmt="%Y-%m-%d %H:%M:%S"))
         logger.addHandler(file_handler)
         logging.info("Logging into file is enabled")
 
