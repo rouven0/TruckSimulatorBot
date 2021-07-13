@@ -10,6 +10,7 @@ from discord.ext import commands
 from discord_components import Button
 import players
 import items
+import levels
 import places
 import symbols
 import assets
@@ -164,7 +165,7 @@ class Driving(commands.Cog):
             jobs.remove(current_job)
             players.update(active_drive.player, position=active_drive.player.position,
                            miles=active_drive.player.miles, truck_miles=active_drive.player.truck_miles, gas=active_drive.player.gas)
-            job_message = jobs.get_state(current_job) + players.add_xp(active_drive.player, randint(1, (active_drive.player.level ** 2) + 7))
+            job_message = jobs.get_state(current_job) + players.add_xp(active_drive.player, levels.get_job_reward_xp(active_drive.player.level))
             drive_embed=get_drive_embed(active_drive.player, interaction.author.avatar_url)
             drive_embed.add_field(name="Job Notification", value=job_message)
             await interaction.respond(type=7, embed=drive_embed,

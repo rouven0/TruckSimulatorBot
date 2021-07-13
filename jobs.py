@@ -117,7 +117,7 @@ def generate(player: Player) -> tuple:
     new_job = Job(player.user_id, place_from, place_to, 0, reward)
     insert(new_job)
     return (new_job,
-            "{} needs {} {} from {}. You get ${} for this transport".format(place_to.name, item.emoji, item.name, place_from.name, reward))
+            "{} needs {} {} from {}. You get ${:,} for this transport".format(place_to.name, item.emoji, item.name, place_from.name, reward))
 
 
 def show(job: Job) -> str:
@@ -140,5 +140,5 @@ def get_state(job: Job) -> str:
         return "You loaded your truck with the needed items. Now drive to {} and unload them".format(
             job.place_to.name)
     if job.state == 2:
-        return "Your job is done and you got ${}.".format(job.reward)
+        return "Your job is done and you got ${:,}.".format(job.reward)
     return "Something went wrong"
