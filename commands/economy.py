@@ -12,7 +12,6 @@ import players
 import places
 import jobs
 import trucks
-from commands.driving import get_drive_embed
 
 
 class Economy(commands.Cog):
@@ -78,8 +77,8 @@ class Economy(commands.Cog):
                 job_embed.add_field(name="Current state", value=jobs.get_state(job_tuple[0]))
                 if ctx.author.id in [a.player.user_id for a in self.driving_commands.active_drives]:
                     active_drive = self.driving_commands.get_active_drive(ctx.author.id)
-                    await active_drive.message.edit(embed=get_drive_embed(active_drive.player, ctx.author.avatar_url),
-                                                   components=self.driving_commands.get_buttons(active_drive.player))
+                    await active_drive.message.edit(embed=self.driving_commands.get_drive_embed(active_drive.player, ctx.author.avatar_url),
+                                                    components=self.driving_commands.get_buttons(active_drive.player))
             else:
                 job_embed.add_field(name="You don't have a job at the moment",
                                     value="Type `t.job new` to get one")
