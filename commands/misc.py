@@ -72,6 +72,17 @@ class Misc(commands.Cog):
         links_embed.add_field(name="Top.gg page", value="Coming soon", inline=False)
         await ctx.channel.send(embed=links_embed)
 
+    @commands.command()
+    @commands.bot_has_permissions(view_channel=True, send_messages=True,
+                                  embed_links=True, attach_files=True, read_message_history=True,
+                                  use_external_emojis=True)
+    async def credits(self, ctx) -> None:
+        await ctx.channel.send(embed=discord.Embed(title="All the wonderful persons that helped the Truck Simulator evolve",
+                                                   description="**LeBogo** - _Testing helper_ - Contributed 2 lines of code\n"
+                                                   "**FlyingPanda** - _EPIC Artist_ - Drew almost all of the images you see (and had the idea of this bot)\n"
+                                                   "**Miriel** - _The brain_ - Gave a lot of great tips and constructive feedback",
+                                                   colour=discord.Colour.gold()))
+
     @commands.command(hidden=True)
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
