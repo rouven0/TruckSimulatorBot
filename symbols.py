@@ -32,3 +32,6 @@ def get_drive_position_symbols(position) -> list:
     if pos_x < config.MAP_BORDER:
         symbols.append(RIGHT)
     return symbols
+
+def get_all_drive_symbols() -> list:
+    return [LEFT, DOWN, UP, RIGHT]

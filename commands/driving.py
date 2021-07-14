@@ -48,8 +48,11 @@ class Driving(commands.Cog):
         """
         buttons = []
         buttons.append([])
-        for symbol in symbols.get_drive_position_symbols(player.position):
-            buttons[0].append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbol)))
+        for symbol in symbols.get_all_drive_symbols():
+            if symbol in symbols.get_drive_position_symbols(player.position):
+                buttons[0].append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbol)))
+            else:
+                buttons[0].append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbol), disabled=True))
         buttons[0].append(Button(style=4, label=" ", emoji=self.bot.get_emoji(symbols.STOP)))
         current_job = jobs.get(player.user_id)
         if current_job is not None and player.position == current_job.place_from.position and current_job.state == 0:
