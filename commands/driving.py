@@ -1,9 +1,9 @@
 """
 This module contains the Cog for all driving-related commands
 """
+from datetime import datetime
 from math import log
 from time import time
-from random import randint
 import asyncio
 import discord
 from discord.ext import commands
@@ -18,59 +18,6 @@ import jobs
 import trucks
 
 
-def generate_minimap(player: players.Player) -> str:
-    """
-    This generate the minimap shown in t.drive
-    """
-    minimap_array = []
-    for i in range(0, 7):
-        minimap_array.append([])
-        for j in range(0, 7):
-            minimap_array[i].append("")
-            map_place = places.get([player.position[0] - 3 + j, player.position[1] + 3 - i])
-            try:
-                minimap_array[i][j] = items.get(map_place.produced_item).emoji
-            except AttributeError:
-                minimap_array[i][j] = symbols.MAP_BACKGROUND
-
-    minimap_array[3][3] = trucks.get(player.truck_id).emoji
-    minimap = ""
-    for i in range(0, 7):
-        for j in range(0, 7):
-            minimap = minimap + minimap_array[i][j]
-        minimap = minimap + "\n"
-    return minimap
-
-
-def get_drive_embed(player: players.Player, avatar_url: str) -> discord.Embed:
-    """
-    Returns the drive embed that includes all the information about the current position and gas
-    """
-    place = places.get(player.position)
-    drive_embed = discord.Embed(description="Keep an eye on your gas!",
-                                colour=discord.Colour.gold())
-    drive_embed.set_author(name="{} is driving".format(player.name), icon_url=avatar_url)
-
-    drive_embed.add_field(name="Minimap", value=generate_minimap(player), inline=False)
-    drive_embed.add_field(name="Position", value=str(player.position))
-    drive_embed.add_field(name="Gas left", value=f"{player.gas} l")
-
-    current_job = jobs.get(player.user_id)
-    if current_job is not None:
-        if current_job.state == 0:
-            navigation_place = current_job.place_from
-        else:
-            navigation_place = current_job.place_to
-        drive_embed.add_field(name="Navigation: Drive to {}".format(navigation_place.name),
-                              value=str(navigation_place.position))
-
-    if place.image_url is not None:
-        drive_embed.add_field(name="What is here?", value=items.get(place.produced_item).emoji+" "+place.name, inline=False)
-        drive_embed.set_image(url=assets.get_place_image(player, place))
-    else:
-        drive_embed.set_image(url=assets.get_default(player))
-    drive_embed.set_footer(text="Note: Your position is only applied if you stop driving")
-    return drive_embed
 
 
 def get_truck_embed(truck: trucks.Truck) -> discord.Embed:
@@ -101,8 +48,11 @@ class Driving(commands.Cog):
         """
         buttons = []
         buttons.append([])
-        for symbol in symbols.get_drive_position_symbols(player.position):
-            buttons[0].append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbol)))
+        for symbol in symbols.get_all_drive_symbols():
+            if symbol in symbols.get_drive_position_symbols(player.position):
+                buttons[0].append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbol)))
+            else:
+                buttons[0].append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbol), disabled=True))
         buttons[0].append(Button(style=4, label=" ", emoji=self.bot.get_emoji(symbols.STOP)))
         current_job = jobs.get(player.user_id)
         if current_job is not None and player.position == current_job.place_from.position and current_job.state == 0:
@@ -139,7 +89,7 @@ class Driving(commands.Cog):
 
         if action == "new_job":
             job_tuple = jobs.generate(active_drive.player)
-            drive_embed = get_drive_embed(active_drive.player, interaction.author.avatar_url)
+            drive_embed = self.get_drive_embed(active_drive.player, interaction.author.avatar_url)
             drive_embed.add_field(name="You got a new Job", value=job_tuple[1], inline=False)
             await interaction.respond(type=7, embed=drive_embed, components=self.get_buttons(active_drive.player))
 
@@ -154,7 +104,7 @@ class Driving(commands.Cog):
             current_job = jobs.get(interaction.author.id)
             current_job.state = 1
             jobs.update(current_job, state=current_job.state)
-            drive_embed = get_drive_embed(active_drive.player, interaction.author.avatar_url)
+            drive_embed = self.get_drive_embed(active_drive.player, interaction.author.avatar_url)
             drive_embed.add_field(name="Job notification", value=jobs.get_state(current_job))
             await interaction.respond(type=7, embed=drive_embed, components=self.get_buttons(active_drive.player))
 
@@ -166,7 +116,7 @@ class Driving(commands.Cog):
             players.update(active_drive.player, position=active_drive.player.position,
                            miles=active_drive.player.miles, truck_miles=active_drive.player.truck_miles, gas=active_drive.player.gas)
             job_message = jobs.get_state(current_job) + players.add_xp(active_drive.player, levels.get_job_reward_xp(active_drive.player.level))
-            drive_embed=get_drive_embed(active_drive.player, interaction.author.avatar_url)
+            drive_embed=self.get_drive_embed(active_drive.player, interaction.author.avatar_url)
             drive_embed.add_field(name="Job Notification", value=job_message)
             await interaction.respond(type=7, embed=drive_embed,
                                            components=self.get_buttons(active_drive.player))
@@ -191,14 +141,14 @@ class Driving(commands.Cog):
                                             "Do some jobs and come back if you have enough")
                 players.update(active_drive.player, position=active_drive.player.position,
                                miles=active_drive.player.miles, truck_miles=active_drive.player.truck_miles)
-                drive_embed = get_drive_embed(active_drive.player, interaction.author.avatar_url)
+                drive_embed = self.get_drive_embed(active_drive.player, interaction.author.avatar_url)
                 await interaction.respond(type=7, embed=drive_embed, components=self.get_buttons(active_drive.player))
                 return
 
             players.update(active_drive.player, position=active_drive.player.position,
                            miles=active_drive.player.miles, truck_miles=active_drive.player.truck_miles,
                            gas=trucks.get(active_drive.player.truck_id).gas_capacity)
-            drive_embed = get_drive_embed(active_drive.player, interaction.author.avatar_url)
+            drive_embed = self.get_drive_embed(active_drive.player, interaction.author.avatar_url)
             drive_embed.add_field(name="Thank you for visiting our gas station",
                                   value=f"You filled {gas_amount} litres into your truck and payed ${price}")
             drive_embed.set_footer(
@@ -250,7 +200,7 @@ class Driving(commands.Cog):
                 self.active_drives.remove(active_drive)
                 return
 
-            await interaction.message.edit(embed=get_drive_embed(active_drive.player, interaction.author.avatar_url),
+            await interaction.message.edit(embed=self.get_drive_embed(active_drive.player, interaction.author.avatar_url),
                                            components=self.get_buttons(active_drive.player))
             await interaction.respond(type=6)
 
@@ -273,7 +223,7 @@ class Driving(commands.Cog):
                                    f"Click [here]({active_drive.message.jump_url}) to jump right back into your Truck"),
                                    colour=discord.Colour.gold())
             return
-        message = await ctx.channel.send(embed=get_drive_embed(player, ctx.author.avatar_url),
+        message = await ctx.channel.send(embed=self.get_drive_embed(player, ctx.author.avatar_url),
                                          components=self.get_buttons(player))
         self.active_drives.append(players.ActiveDrive(player, message, time()))
 
@@ -291,7 +241,7 @@ class Driving(commands.Cog):
             return
         self.active_drives.remove(active_drive)
         await active_drive.message.edit(
-            embed=get_drive_embed(active_drive.player, ctx.author.avatar_url), components=[])
+            embed=self.get_drive_embed(active_drive.player, ctx.author.avatar_url), components=[])
         await ctx.channel.send("You stopped driving!, {}".format(ctx.author.name))
         players.update(active_drive.player,
                        position=active_drive.player.position,
@@ -422,6 +372,66 @@ class Driving(commands.Cog):
             places_embed.add_field(name=place.name, value=place.position)
         await ctx.channel.send(embed=places_embed)
 
+    def get_drive_embed(self, player: players.Player, avatar_url: str) -> discord.Embed:
+        """
+        Returns the drive embed that includes all the information about the current position and gas
+        """
+        place = places.get(player.position)
+        drive_embed = discord.Embed(description="Keep an eye on your gas!",
+                                    colour=discord.Colour.gold(),
+                                    timestamp=datetime.utcnow())
+        drive_embed.set_author(name="{} is driving".format(player.name), icon_url=avatar_url)
+
+        drive_embed.add_field(name="Minimap", value=self.generate_minimap(player), inline=False)
+        drive_embed.add_field(name="Position", value=str(player.position))
+        drive_embed.add_field(name="Gas left", value=f"{player.gas} l")
+
+        current_job = jobs.get(player.user_id)
+        if current_job is not None:
+            if current_job.state == 0:
+                navigation_place = current_job.place_from
+            else:
+                navigation_place = current_job.place_to
+            drive_embed.add_field(name="Navigation: Drive to {}".format(navigation_place.name),
+                                  value=str(navigation_place.position))
+
+        if place.image_url is not None:
+            drive_embed.add_field(name="What is here?", value=items.get(place.produced_item).emoji+" "+place.name, inline=False)
+            drive_embed.set_image(url=assets.get_place_image(player, place))
+        else:
+            drive_embed.set_image(url=assets.get_default(player))
+        drive_embed.set_footer(text="Note: Your position is only applied if you stop driving")
+        return drive_embed
+
+    def generate_minimap(self, player: players.Player) -> str:
+        """
+        This generate the minimap shown in t.drive
+        """
+        minimap_array = []
+        for i in range(0, 7):
+            minimap_array.append([])
+            for j in range(0, 7):
+                minimap_array[i].append("")
+                position = [player.position[0] - 3 + j, player.position[1] + 3 - i]
+                map_place = places.get(position)
+                item = items.get(map_place.produced_item)
+                if item is not None:
+                    minimap_array[i][j] = items.get(map_place.produced_item).emoji
+                elif position in (a.player.position for a in self.active_drives):
+                    for active_drive in self.active_drives:
+                        if active_drive.player.position == position:
+                            minimap_array[i][j] = trucks.get(active_drive.player.truck_id).emoji
+                else:
+                    minimap_array[i][j] = symbols.MAP_BACKGROUND
+
+        minimap_array[3][3] = trucks.get(player.truck_id).emoji
+        minimap = ""
+        for i in range(0, 7):
+            for j in range(0, 7):
+                minimap = minimap + minimap_array[i][j]
+            minimap = minimap + "\n"
+        return minimap
+
     def get_active_drive(self, player_id, message_id=None) -> players.ActiveDrive:
         """
         Returns an ActiveDrive object for a specific player and message
@@ -446,7 +456,7 @@ class Driving(commands.Cog):
                 if time() - active_drive.last_action_time > 600:
                     self.active_drives.remove(active_drive)
                     await active_drive.message.edit(
-                        embed=get_drive_embed(active_drive.player, self.bot.user.avatar_url), components=[])
+                        embed=self.get_drive_embed(active_drive.player, self.bot.user.avatar_url), components=[])
                     players.update(active_drive.player, position=active_drive.player.position,
                                    miles=active_drive.player.miles,
                                    truck_miles=active_drive.player.truck_miles,
@@ -460,7 +470,7 @@ class Driving(commands.Cog):
         processed_channels = []
         for active_drive in self.active_drives:
             await active_drive.message.edit(
-                embed=get_drive_embed(active_drive.player, self.bot.user.avatar_url), components=[])
+                embed=self.get_drive_embed(active_drive.player, self.bot.user.avatar_url), components=[])
             if active_drive.message.channel.id not in processed_channels:
                 await active_drive.message.channel.send("All trucks were stopped due to a bot shutdown!")
                 processed_channels.append(active_drive.message.channel.id)
