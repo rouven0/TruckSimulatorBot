@@ -1,9 +1,9 @@
 """
 This module contains the Cog for all driving-related commands
 """
+from datetime import datetime
 from math import log
 from time import time
-from random import randint
 import asyncio
 import discord
 from discord.ext import commands
@@ -48,7 +48,8 @@ def get_drive_embed(player: players.Player, avatar_url: str) -> discord.Embed:
     """
     place = places.get(player.position)
     drive_embed = discord.Embed(description="Keep an eye on your gas!",
-                                colour=discord.Colour.gold())
+                                colour=discord.Colour.gold(),
+                                timestamp=datetime.utcnow())
     drive_embed.set_author(name="{} is driving".format(player.name), icon_url=avatar_url)
 
     drive_embed.add_field(name="Minimap", value=generate_minimap(player), inline=False)
