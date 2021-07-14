@@ -72,7 +72,7 @@ class Misc(commands.Cog):
         links_embed.add_field(name="Top.gg page", value="Coming soon", inline=False)
         await ctx.channel.send(embed=links_embed)
 
-    @commands.command()
+    @commands.command(hidden=True)
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
@@ -90,3 +90,14 @@ class Misc(commands.Cog):
     async def rechts(self, ctx) -> None:
         await ctx.channel.send("<:ts_actor:845028860361965598>")
 
+    @commands.command(hidden=True)
+    @commands.bot_has_permissions(view_channel=True, send_messages=True,
+                                  embed_links=True, attach_files=True, read_message_history=True,
+                                  use_external_emojis=True)
+    async def complain(self, ctx) -> None:
+        await ctx.channel.send("What a crap bot this is! :rage: "
+                "Hours of time wasted on this useless procuct of a terrible coder and a <paste fitting adjective here> artist "
+                ":rage: :rage: Is this bot even TESTED before the updates are published... "
+                "Horrible, just HORRIBLE this spawn of incopetence. Who tf made this? A 12 year old child? "
+                "This child would probably have made it better than THAT :rage: "
+                "The core system is buggy the economy is unbalanced and there is no goal in this _\"game bot\"_ :rage:")
