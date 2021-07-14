@@ -110,7 +110,7 @@ class Stats(commands.Cog):
         """
         If you appear in these lists you are one of the top 10 Players. Congratulations!
         """
-        top_players = players.get_top(key)
+        top_players = players.get_top(key.lower())
         top_body = ""
         top_title = "level"
         count = 0
