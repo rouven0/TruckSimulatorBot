@@ -18,8 +18,6 @@ import jobs
 import trucks
 
 
-
-
 def get_truck_embed(truck: trucks.Truck) -> discord.Embed:
     """
     Returns an embed with details about the given Truck
@@ -97,7 +95,7 @@ class Driving(commands.Cog):
             self.active_drives.remove(active_drive)
             await interaction.message.channel.send("You stopped driving!, {}".format(interaction.author.name))
             await interaction.respond(type=7, components=[])
-            players.update(active_drive.player, position=active_drive.player.position,
+            await players.update(active_drive.player, position=active_drive.player.position,
                            miles=active_drive.player.miles, truck_miles=active_drive.player.truck_miles, gas=active_drive.player.gas)
 
         if action == symbols.LOAD:
@@ -111,11 +109,11 @@ class Driving(commands.Cog):
         if action == symbols.UNLOAD:
             current_job = jobs.get(interaction.author.id)
             current_job.state = 2
-            players.add_money(active_drive.player, current_job.reward)
+            await players.add_money(active_drive.player, current_job.reward)
             jobs.remove(current_job)
-            players.update(active_drive.player, position=active_drive.player.position,
+            await players.update(active_drive.player, position=active_drive.player.position,
                            miles=active_drive.player.miles, truck_miles=active_drive.player.truck_miles, gas=active_drive.player.gas)
-            job_message = jobs.get_state(current_job) + players.add_xp(active_drive.player, levels.get_job_reward_xp(active_drive.player.level))
+            job_message = jobs.get_state(current_job) + await players.add_xp(active_drive.player, levels.get_job_reward_xp(active_drive.player.level))
             drive_embed=self.get_drive_embed(active_drive.player, interaction.author.avatar_url)
             drive_embed.add_field(name="Job Notification", value=job_message)
             await interaction.respond(type=7, embed=drive_embed,
@@ -126,26 +124,26 @@ class Driving(commands.Cog):
             price = round(gas_amount * self.gas_price)
 
             try:
-                players.debit_money(active_drive.player, price)
+                await players.debit_money(active_drive.player, price)
             except players.NotEnoughMoney:
                 if active_drive.player.gas < 170:
                     await interaction.channel.send(
                         f"{interaction.author.mention} We have a problem: You don't have enough money. Lets make a deal. "
                         "I will give you 100 litres of gas, and you lose 2 levels")
                     if active_drive.player.level > 2:
-                        players.update(active_drive.player, gas=active_drive.player.gas+100, level=active_drive.player.level - 2, xp=0)
+                        await players.update(active_drive.player, gas=active_drive.player.gas+100, level=active_drive.player.level - 2, xp=0)
                     else:
-                        players.update(active_drive.player, gas=active_drive.player.gas+100, xp=0)
+                        await players.update(active_drive.player, gas=active_drive.player.gas+100, xp=0)
                 else:
                     await interaction.channel.send(f"{interaction.author.mention} you don't have enough money to do this. "
                                             "Do some jobs and come back if you have enough")
-                players.update(active_drive.player, position=active_drive.player.position,
+                await players.update(active_drive.player, position=active_drive.player.position,
                                miles=active_drive.player.miles, truck_miles=active_drive.player.truck_miles)
                 drive_embed = self.get_drive_embed(active_drive.player, interaction.author.avatar_url)
                 await interaction.respond(type=7, embed=drive_embed, components=self.get_buttons(active_drive.player))
                 return
 
-            players.update(active_drive.player, position=active_drive.player.position,
+            await players.update(active_drive.player, position=active_drive.player.position,
                            miles=active_drive.player.miles, truck_miles=active_drive.player.truck_miles,
                            gas=trucks.get(active_drive.player.truck_id).gas_capacity)
             drive_embed = self.get_drive_embed(active_drive.player, interaction.author.avatar_url)
@@ -184,18 +182,18 @@ class Driving(commands.Cog):
 
             if active_drive.player.gas <= 0:
                 active_drive.player.gas = 1
-                players.update(active_drive.player, position=active_drive.player.position,
+                await players.update(active_drive.player, position=active_drive.player.position,
                                miles=active_drive.player.miles, truck_miles=active_drive.player.truck_miles,
                                gas=active_drive.player.gas)
                 await active_drive.message.channel.send(
                     f"<@{active_drive.player.user_id}> You messed up and ran out of gas. "
                     "The company had to have your truck towed away. You will pay $3000 for this incident!")
                 try:
-                    players.debit_money(active_drive.player, 3000)
+                    await players.debit_money(active_drive.player, 3000)
                 except players.NotEnoughMoney:
                     await active_drive.message.channel.send(
                         "You are lucky that you don't have enough money. I'll let you go, for now...")
-                players.update(active_drive.player, gas=50, position=[7, 7])
+                await players.update(active_drive.player, gas=50, position=[7, 7])
                 await interaction.respond(type=7, components=[])
                 self.active_drives.remove(active_drive)
                 return
@@ -212,10 +210,10 @@ class Driving(commands.Cog):
         """
         Start driving your Truck on the map and control it with buttons
         """
-        player = players.get(ctx.author.id)
+        player = await players.get(ctx.author.id)
         # Detect, when the player is renamed
         if player.name != ctx.author.name:
-            players.update(player, name=ctx.author.name)
+            await players.update(player, name=ctx.author.name)
         if ctx.author.id in [a.player.user_id for a in self.active_drives]:
             active_drive = self.get_active_drive(ctx.author.id)
             await ctx.channel.send(embed=discord.Embed(title=f"Hey {ctx.author.name}",
@@ -243,7 +241,7 @@ class Driving(commands.Cog):
         await active_drive.message.edit(
             embed=self.get_drive_embed(active_drive.player, ctx.author.avatar_url), components=[])
         await ctx.channel.send("You stopped driving!, {}".format(ctx.author.name))
-        players.update(active_drive.player,
+        await players.update(active_drive.player,
                        position=active_drive.player.position,
                        miles=active_drive.player.miles,
                        truck_miles=active_drive.player.truck_miles,
@@ -258,7 +256,7 @@ class Driving(commands.Cog):
         Get details about your truck and change it
         """
         if ctx.invoked_subcommand == None:
-            player = players.get(ctx.author.id)
+            player = await players.get(ctx.author.id)
             truck = trucks.get(player.truck_id)
 
             truck_embed = get_truck_embed(truck)
@@ -281,14 +279,14 @@ class Driving(commands.Cog):
         except ValueError:
             await ctx.channel.send("Wtf do you want to buy?")
             return
-        player = players.get(ctx.author.id)
+        player = await players.get(ctx.author.id)
         old_truck = trucks.get(player.truck_id)
         new_truck = trucks.get(id)
         selling_price = round(old_truck.price - (old_truck.price / 10) * log(player.truck_miles + 1))
         end_price = new_truck.price - selling_price
         # this also adds money if the end price is negative
-        players.debit_money(player, end_price)
-        players.update(player, truck_miles=0, gas=new_truck.gas_capacity, truck_id=new_truck.truck_id)
+        await players.debit_money(player, end_price)
+        await players.update(player, truck_miles=0, gas=new_truck.gas_capacity, truck_id=new_truck.truck_id)
         answer_embed = discord.Embed(
             description=f"You sold your old {old_truck.name} for ${selling_price} and bought a brand new {new_truck.name} for ${new_truck.price}",
             colour=discord.Colour.gold())
@@ -334,7 +332,7 @@ class Driving(commands.Cog):
         """
         Provides some information about your current position and the things located there
         """
-        player = players.get(ctx.author.id)
+        player = await players.get(ctx.author.id)
         place = places.get(player.position)
         position_embed = discord.Embed(description="You are at {}".format(player.position),
                                        colour=discord.Colour.gold())
@@ -457,7 +455,7 @@ class Driving(commands.Cog):
                     self.active_drives.remove(active_drive)
                     await active_drive.message.edit(
                         embed=self.get_drive_embed(active_drive.player, self.bot.user.avatar_url), components=[])
-                    players.update(active_drive.player, position=active_drive.player.position,
+                    await players.update(active_drive.player, position=active_drive.player.position,
                                    miles=active_drive.player.miles,
                                    truck_miles=active_drive.player.truck_miles,
                                    gas=active_drive.player.gas)
@@ -474,7 +472,7 @@ class Driving(commands.Cog):
             if active_drive.message.channel.id not in processed_channels:
                 await active_drive.message.channel.send("All trucks were stopped due to a bot shutdown!")
                 processed_channels.append(active_drive.message.channel.id)
-            players.update(active_drive.player, position=active_drive.player.position,
+            await players.update(active_drive.player, position=active_drive.player.position,
                            miles=active_drive.player.miles,
                            truck_miles=active_drive.player.truck_miles,
                            gas=active_drive.player.gas)
