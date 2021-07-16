@@ -30,8 +30,8 @@ class Stats(commands.Cog):
         welcome_file.close()
         welcome_embed.set_author(name="Welcome to the Truck Simulator", icon_url=self.bot.user.avatar_url)
         await ctx.channel.send(embed=welcome_embed)
-        if not players.registered(ctx.author.id):
-            players.insert(players.Player(ctx.author.id, ctx.author.name))
+        if not await players.registered(ctx.author.id):
+            await players.insert(players.Player(ctx.author.id, ctx.author.name))
             await ctx.channel.send("Welcome to the Truckers, {}".format(ctx.author.mention))
         else:
             await ctx.channel.send("You are already registered")
@@ -41,7 +41,7 @@ class Stats(commands.Cog):
         """
         Delete your account
         """
-        player = players.get(ctx.author.id)
+        player = await players.get(ctx.author.id)
         await ctx.channel.send("{} Are you sure you want to delete your profile? "
                                "**All your ingame stats will be lost!**".format(ctx.author.mention))
         confirmation = "delete {}@trucksimulator".format(ctx.author.name)
@@ -56,7 +56,7 @@ class Stats(commands.Cog):
         except:
             answer = ""
         if answer == confirmation:
-            players.remove(player)
+            await players.remove(player)
             job = jobs.get(ctx.author.id)
             if job is not None:
                 jobs.remove(job)
@@ -74,18 +74,18 @@ class Stats(commands.Cog):
         """
         profile_embed = discord.Embed(colour=discord.Colour.gold())
         if user is not None:
-            player = players.get(user.id)
+            player = await players.get(user.id)
             profile_embed.set_thumbnail(url=user.avatar_url)
             profile_embed.set_author(name="{}'s Profile".format(player.name),
                                      icon_url=user.avatar_url)
         else:
-            player = players.get(ctx.author.id)
+            player = await players.get(ctx.author.id)
             profile_embed.set_thumbnail(url=ctx.author.avatar_url)
             profile_embed.set_author(name="{}'s Profile".format(player.name),
                                      icon_url=ctx.author.avatar_url)
             # Detect, when the player is renamed
             if player.name != ctx.author.name:
-                players.update(player, name=ctx.author.name)
+                await players.update(player, name=ctx.author.name)
 
         xp = "{:,}".format(player.xp)
         next_xp = "{:,}".format(levels.get_next_xp(player.level))
@@ -110,7 +110,7 @@ class Stats(commands.Cog):
         """
         If you appear in these lists you are one of the top 10 Players. Congratulations!
         """
-        top_players = players.get_top(key.lower())
+        top_players = await players.get_top(key.lower())
         top_body = ""
         top_title = "level"
         count = 0

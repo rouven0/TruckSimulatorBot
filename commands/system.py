@@ -24,6 +24,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
+        await players.init()
         await self.bot.change_presence(status=discord.Status.online,
                                        activity=discord.Activity(
                                            type=discord.ActivityType.watching,
@@ -57,7 +58,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         info_embed.add_field(name="Uptime",
                              value="{}d {}h {}m {}s".format(days, hours, minutes, seconds))
         info_embed.add_field(name="Latency", value=str(round(self.bot.latency * 1000)) + " ms")
-        info_embed.add_field(name="Registered Players", value=str(players.get_count()))
+        info_embed.add_field(name="Registered Players", value=str(await players.get_count()))
         info_embed.add_field(name="Servers", value=str(len(self.bot.guilds)))
         info_embed.add_field(name="Driving Trucks", value=str(len(self.driving_commands.active_drives)))
         info_embed.add_field(name="Branch", value=self.branch)

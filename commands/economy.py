@@ -65,7 +65,7 @@ class Economy(commands.Cog):
         """
         Get yourself some jobs and earn money
         """
-        player = players.get(ctx.author.id)
+        player = await players.get(ctx.author.id)
         current_job = jobs.get(ctx.author.id)
         job_embed = discord.Embed(colour=discord.Colour.gold())
         job_embed.set_author(name="{}'s Job".format(ctx.author.name),
@@ -95,7 +95,7 @@ class Economy(commands.Cog):
         """
         If you have a job, you can load your Truck with items you have to transport
         """
-        player = players.get(ctx.author.id)
+        player = await players.get(ctx.author.id)
         current_job = jobs.get(ctx.author.id)
         if current_job is None:
             await ctx.channel.send("Nothing to do here")
@@ -115,7 +115,7 @@ class Economy(commands.Cog):
         """
         Unload your Truck at the right place to get your job done
         """
-        player = players.get(ctx.author.id)
+        player = await players.get(ctx.author.id)
         current_job = jobs.get(ctx.author.id)
         if current_job is None:
             await ctx.channel.send("Nothing to do here")
@@ -123,9 +123,9 @@ class Economy(commands.Cog):
         if player.position == current_job.place_to.position and current_job.state == 1:
             current_job.state = 2
             await ctx.channel.send(
-                jobs.get_state(current_job) + players.add_xp(player, levels.get_job_reward_xp(player.level)))
+                jobs.get_state(current_job) + await players.add_xp(player, levels.get_job_reward_xp(player.level)))
             jobs.remove(current_job)
-            players.add_money(player, current_job.reward)
+            await players.add_money(player, current_job.reward)
         else:
             await ctx.channel.send("Nothing to do here")
 
@@ -137,7 +137,7 @@ class Economy(commands.Cog):
         """
         If you're at the gas station, you can refill your truck's gas
         """
-        player = players.get(ctx.author.id)
+        player = await players.get(ctx.author.id)
 
         if ctx.author.id in [a.player.user_id for a in self.driving_commands.active_drives]:
             active_drive = self.driving_commands.get_active_drive(ctx.author.id)
@@ -155,16 +155,16 @@ class Economy(commands.Cog):
         price = round(gas_amount * self.gas_price)
 
         try:
-            players.debit_money(player, price)
+            await players.debit_money(player, price)
         except players.NotEnoughMoney:
             if player.gas < 170:
                 await ctx.channel.send(
                     f"{ctx.author.mention} We have a problem: You don't have enough money. Lets make a deal. "
                 "I will give you 100 litres of gas, and you lose 2 levels")
                 if player.level > 2:
-                    players.update(player, gas=player.gas+100, level=player.level - 2, xp=0)
+                    await players.update(player, gas=player.gas+100, level=player.level - 2, xp=0)
                 else:
-                    players.update(player, gas=player.gas+100, xp=0)
+                    await players.update(player, gas=player.gas+100, xp=0)
             else:
                 await ctx.channel.send(f"{ctx.author.mention} you don't have enough money to do this. "
                                             "Do some jobs and come back if you have enough")
@@ -175,7 +175,7 @@ class Economy(commands.Cog):
                                      colour=discord.Colour.gold())
         refill_embed.set_footer(
             text="Wonder how these prices are calculated? Check out the daily gas prices in the official server")
-        players.update(player, gas=trucks.get(player.truck_id).gas_capacity)
+        await players.update(player, gas=trucks.get(player.truck_id).gas_capacity)
         await ctx.channel.send(embed=refill_embed)
 
     @commands.command()
@@ -195,10 +195,10 @@ class Economy(commands.Cog):
             amount = abs(int(amount))
         except ValueError:
             await ctx.channel.send("Wtf")
-        donator = players.get(ctx.author.id)
-        acceptor = players.get(user.id)
-        players.debit_money(donator, amount)
-        players.add_money(acceptor, amount)
+        donator = await players.get(ctx.author.id)
+        acceptor = await players.get(user.id)
+        await players.debit_money(donator, amount)
+        await players.add_money(acceptor, amount)
         give_embed = discord.Embed(description=f"{donator.name} gave ${amount} to {acceptor.name}",
                                    colour=discord.Colour.gold())
         await ctx.channel.send(embed=give_embed)

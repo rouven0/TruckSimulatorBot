@@ -3,14 +3,16 @@ This module contains the Player class, several methods to operate with players i
 the ActiveDrive, used to manage driving sessions
 """
 from dataclasses import dataclass, field
-import sqlite3
+import aiosqlite
 import logging
 import discord
 import levels
 
-__con__ = sqlite3.connect('players.db')
-__cur__ = __con__.cursor()
 
+async def init():
+    global __con__
+    __con__ = await aiosqlite.connect('players.db')
+    logging.info("Initialized player database")
 
 @dataclass
 class Player:
@@ -77,129 +79,137 @@ def __format_pos_to_db(pos) -> str:
     return "{}/{}".format(pos[0], pos[1])
 
 
-def add_xp(player: Player, amount: int) -> str:
+async def add_xp(player: Player, amount: int) -> str:
     """
     Adds xp to the player and performs a level up if neede
     """
     answer = "\nYou got {:,} xp".format(amount)
-    update(player, xp=int(player.xp)+amount)
+    await update(player, xp=int(player.xp)+amount)
     while int(player.xp) >=  levels.get_next_xp(player.level):
-        update(player, level=player.level+1, xp=player.xp-levels.get_next_xp(player.level))
+        await update(player, level=player.level+1, xp=player.xp-levels.get_next_xp(player.level))
         answer+=f"\n:tada: You leveled up to level {player.level} :tada:"
     return answer
 
 
-def add_money(player, amount) -> None:
+async def add_money(player, amount) -> None:
     """
     Add money to the players account
     """
-    update(player, money=player.money+amount)
+    await update(player, money=player.money+amount)
 
 
-def debit_money(player, amount) -> None:
+async def debit_money(player, amount) -> None:
     """
     Debit money from the players account
     """
     if amount > player.money:
         raise NotEnoughMoney()
-    update(player, money=player.money-amount)
+    await update(player, money=player.money-amount)
 
 
-def insert(player: Player) -> None:
+async def insert(player: Player) -> None:
     """
     Inserts a player into the database
     """
-    __cur__.execute('INSERT INTO players VALUES (?,?,?,?,?,?,?,?,?,?)', __to_tuple(player))
-    __con__.commit()
+    await __con__.execute('INSERT INTO players VALUES (?,?,?,?,?,?,?,?,?,?)', __to_tuple(player))
+    await __con__.commit()
     logging.info('Inserted %s into the database as %s', player.name, __to_tuple(player))
 
 
-def remove(player: Player) -> None:
+async def remove(player: Player) -> None:
     """
     Removes a player from the database
     """
-    __cur__.execute('DELETE FROM players WHERE id=:id', {"id": player.user_id})
-    __con__.commit()
+    await __con__.execute('DELETE FROM players WHERE id=:id', {"id": player.user_id})
+    await __con__.commit()
     logging.info('Removed %s %s from the database', player.name, __to_tuple(player))
 
 
-def update(player: Player, name:str=None, level:int=None, xp:int=None,  money:int=None, position:list=None, miles:int=None, truck_miles:int=None,  gas:int=None, truck_id:int=None) -> None:
+async def update(player: Player, name:str=None, level:int=None, xp:int=None,  money:int=None, position:list=None, miles:int=None, truck_miles:int=None,  gas:int=None, truck_id:int=None) -> None:
     """
     Updates a player in the database
     """
     if name is not None:
-        __cur__.execute('UPDATE players SET name=? WHERE id=?', (name, player.user_id))
+        await __con__.execute('UPDATE players SET name=? WHERE id=?', (name, player.user_id))
         player.name = name
     if level is not None:
-        __cur__.execute('UPDATE players SET level=? WHERE id=?', (level, player.user_id))
+        await __con__.execute('UPDATE players SET level=? WHERE id=?', (level, player.user_id))
         player.level = level
     if xp is not None:
-        __cur__.execute('UPDATE players SET xp=? WHERE id=?', (xp, player.user_id))
+        await __con__.execute('UPDATE players SET xp=? WHERE id=?', (xp, player.user_id))
         player.xp = xp
     if money is not None:
-        __cur__.execute('UPDATE players SET money=? WHERE id=?', (money, player.user_id))
+        await __con__.execute('UPDATE players SET money=? WHERE id=?', (money, player.user_id))
         player.money = money
     if position is not None:
-        __cur__.execute('UPDATE players SET position=? WHERE id=?', (__format_pos_to_db(position), player.user_id))
+        await __con__.execute('UPDATE players SET position=? WHERE id=?', (__format_pos_to_db(position), player.user_id))
         player.position = position
     if miles is not None:
-        __cur__.execute('UPDATE players SET miles=? WHERE id=?', (miles, player.user_id))
+        await __con__.execute('UPDATE players SET miles=? WHERE id=?', (miles, player.user_id))
         player.miles = miles
     if truck_miles is not None:
-        __cur__.execute('UPDATE players SET truck_miles=? WHERE id=?', (truck_miles, player.user_id))
+        await __con__.execute('UPDATE players SET truck_miles=? WHERE id=?', (truck_miles, player.user_id))
         player.truck_miles = truck_miles
     if gas is not None:
-        __cur__.execute('UPDATE players SET gas=? WHERE id=?', (gas, player.user_id))
+        await __con__.execute('UPDATE players SET gas=? WHERE id=?', (gas, player.user_id))
         player.gas = gas
     if truck_id is not None:
-        __cur__.execute('UPDATE players SET truck_id=? WHERE id=?', (truck_id, player.user_id))
+        await __con__.execute('UPDATE players SET truck_id=? WHERE id=?', (truck_id, player.user_id))
         player.truck_id = truck_id
-    __con__.commit()
+    await __con__.commit()
     logging.debug('Updated player %s to %s', player.name, __to_tuple(player))
 
 
-def get(user_id: int) -> Player:
+async def get(user_id: int) -> Player:
     """
     Get one player from the database
     """
-    if not registered(user_id):
+    if not await registered(user_id):
         raise PlayerNotRegistered(user_id)
-    __cur__.execute("SELECT * FROM players WHERE id=:id", {"id": user_id})
-    return __from_tuple(__cur__.fetchone())
+    cur = await __con__.execute("SELECT * FROM players WHERE id=:id", {"id": user_id})
+    player_tuple =  await cur.fetchone()
+    await cur.close()
+    return __from_tuple(player_tuple)
 
 
-def get_top(key="level") -> tuple:
+async def get_top(key="level") -> tuple:
     """
     Get the top 10 players from the database
     """
     if key == "money":
-        __cur__.execute("SELECT * FROM players ORDER BY money DESC")
+        cur = await __con__.execute("SELECT * FROM players ORDER BY money DESC")
         suffix = "$"
     elif key == "miles":
-        __cur__.execute("SELECT * FROM players ORDER BY miles DESC")
+        cur = await __con__.execute("SELECT * FROM players ORDER BY miles DESC")
         suffix = " miles"
     else:
-        __cur__.execute("SELECT * FROM players ORDER BY level DESC, xp DESC")
+        cur = await __con__.execute("SELECT * FROM players ORDER BY level DESC, xp DESC")
         suffix = ""
-    return __list_from_tuples(__cur__.fetchmany(10)), key, suffix
+    top_tuples = await cur.fetchmany(10)
+    await cur.close()
+    return __list_from_tuples(top_tuples), key, suffix
 
 
-def registered(user_id: int) -> bool:
+async def registered(user_id: int) -> bool:
     """
     Checks whether a specific user is registered or not
     """
-    __cur__.execute("SELECT * FROM players WHERE id=:id", {"id": user_id})
-    if len(__cur__.fetchall()) == 1:
+    cur = await __con__.execute("SELECT * FROM players WHERE id=:id", {"id": user_id})
+    if len(await cur.fetchall()) == 1:
+        await cur.close()
         return True
+    await cur.close()
     return False
 
 
-def get_count() -> int:
+async def get_count() -> int:
     """
     Returns the player count
     """
-    __cur__.execute("SELECT COUNT(*) FROM players")
-    return __cur__.fetchall()[0][0]
+    cur = await __con__.execute("SELECT COUNT(*) FROM players")
+    number_tuple = await cur.fetchall()
+    await cur.close()
+    return number_tuple[0][0]
 
 
 @dataclass
