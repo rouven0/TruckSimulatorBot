@@ -6,6 +6,7 @@ from datetime import datetime
 from discord.ext import commands
 from discord_components import DiscordComponents
 from dotenv import load_dotenv
+import players
 
 import config
 from help import TruckSimulatorHelpCommand
@@ -53,7 +54,9 @@ def main():
     bot.add_cog(Misc())
     loop = asyncio.get_event_loop()
     loop.create_task(driving_commands.check_drives())
+    asyncio.run(players.init())
     bot.run(BOT_TOKEN)
+    asyncio.run(players.close())
 
 
 if __name__ == '__main__':

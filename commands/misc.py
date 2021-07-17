@@ -69,8 +69,20 @@ class Misc(commands.Cog):
         links_embed.add_field(name="Invite Link", value="https://discord.com/api/oauth2/authorize?client_id=831052837353816066&permissions=379904&scope=bot", inline=False)
         links_embed.add_field(name="Github", value="https://www.github.com/therealr5/TruckSimulatorBot", inline=False)
         links_embed.add_field(name="Support server", value="https://discord.gg/BKmtTFbvxv", inline=False)
-        links_embed.add_field(name="Top.gg page", value="Coming soon", inline=False)
+        links_embed.add_field(name="Top.gg page", value="https://top.gg/bot/831052837353816066", inline=False)
         await ctx.channel.send(embed=links_embed)
+
+
+    @commands.command()
+    @commands.bot_has_permissions(view_channel=True, send_messages=True,
+                                  embed_links=True, attach_files=True, read_message_history=True,
+                                  use_external_emojis=True)
+    async def vote(self, ctx) -> None:
+        vote_embed=discord.Embed(title="Click here to vote for the Truck Simulator",
+                                 description="There are no rewards yet :frowning: , do it if you want to support this bot.",
+                                 url="https://top.gg/bot/831052837353816066/vote",
+                                 colour=discord.Colour.gold())
+        await ctx.channel.send(embed=vote_embed)
 
     @commands.command(hidden=True)
     @commands.bot_has_permissions(view_channel=True, send_messages=True,

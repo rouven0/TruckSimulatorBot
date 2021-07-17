@@ -1,3 +1,4 @@
+from discord import player
 from commands.driving import Driving
 from datetime import datetime
 from math import floor
@@ -24,7 +25,6 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
-        await players.init()
         await self.bot.change_presence(status=discord.Status.online,
                                        activity=discord.Activity(
                                            type=discord.ActivityType.watching,
@@ -72,7 +72,6 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         await self.bot.change_presence(status=discord.Status.idle)
         await ctx.channel.send("Shutting down")
         logging.warning("Shutdown command is executed")
-        await players.__con__.close()
         await self.bot.close()
 
     @commands.Cog.listener()
