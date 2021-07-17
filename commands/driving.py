@@ -453,12 +453,12 @@ class Driving(commands.Cog):
             for active_drive in self.active_drives:
                 if time() - active_drive.last_action_time > 600:
                     self.active_drives.remove(active_drive)
-                    await active_drive.message.edit(
-                        embed=self.get_drive_embed(active_drive.player, self.bot.user.avatar_url), components=[])
                     await players.update(active_drive.player, position=active_drive.player.position,
                                    miles=active_drive.player.miles,
                                    truck_miles=active_drive.player.truck_miles,
                                    gas=active_drive.player.gas)
+                    await active_drive.message.edit(
+                        embed=self.get_drive_embed(active_drive.player, self.bot.user.avatar_url), components=[])
             await asyncio.sleep(10)
 
     async def on_shutdown(self) -> None:
