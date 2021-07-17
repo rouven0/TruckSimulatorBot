@@ -14,6 +14,10 @@ async def init():
     __con__ = await aiosqlite.connect('players.db')
     logging.info("Initialized player database")
 
+async def close():
+    await __con__.close()
+    logging.info("Closed player database connection")
+
 @dataclass
 class Player:
     """
