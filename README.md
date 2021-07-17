@@ -1,3 +1,6 @@
+[![Discord Bots](https://top.gg/api/widget/status/831052837353816066.svg)](https://top.gg/bot/831052837353816066)
+[![Discord Bots](https://top.gg/api/widget/servers/831052837353816066.svg)](https://top.gg/bot/831052837353816066)
+
 # TruckSimulatorBot
 Small Truck Simulator bot using the discord py lib
 
