@@ -68,7 +68,9 @@ def main():
             logging.info(f"Posted server count ({bot.topggpy.guild_count})")
         except Exception as e:
             logging.error(f"Failed to post server count\n{e.__class__.__name__}: {e}")
-    update_stats.start()
+
+    if "--post-server-count" in sys.argv:
+        update_stats.start()
 
     loop = asyncio.get_event_loop()
     loop.create_task(driving_commands.check_drives())
