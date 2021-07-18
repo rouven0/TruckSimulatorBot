@@ -60,7 +60,7 @@ def main():
     bot.add_cog(Gambling())
     bot.add_cog(Misc())
 
-    @tasks.loop(minutes=30)
+    @tasks.loop(minutes=120)
     async def update_stats():
         """This function runs every 30 minutes to automatically update your server count."""
         try:
