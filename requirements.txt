@@ -4,7 +4,7 @@ APScheduler==3.7.0
 async-timeout==3.0.1
 attrs==21.2.0
 chardet==4.0.0
-discord-components==1.0.1
+discord-components==1.1.4
 discord.py==1.7.2
 gitdb==4.0.7
 GitPython==3.1.18

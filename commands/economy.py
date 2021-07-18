@@ -23,13 +23,13 @@ class Economy(commands.Cog):
         self.bot = bot
         self.news_channel_id = news_channel_id
         self.scheduler = AsyncIOScheduler()
+        self.scheduler.add_job(self.daily_gas_prices, trigger="cron", day_of_week="mon-sun", hour=14)
         self.driving_commands = driving_commands
         super().__init__()
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
         self.news_channel: discord.TextChannel = self.bot.get_channel(self.news_channel_id)
-        self.scheduler.add_job(self.daily_gas_prices, trigger="cron", day_of_week="mon-sun", hour=2)
         self.scheduler.start()
         gas_file = open("gas.txt", "r")
         self.gas_price = float(gas_file.readline())
