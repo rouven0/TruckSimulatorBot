@@ -88,6 +88,9 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
             else:
                 await ctx.channel.send(f"Command usage: `t.{ctx.command.name} {ctx.command.signature}`")
 
+        elif isinstance(error, commands.errors.UserNotFound):
+            await ctx.channel.send(f"User **`{error.argument}`** not found")
+
         elif isinstance(error, commands.errors.CommandInvokeError):
             if isinstance(error.original, players.PlayerNotRegistered):
                 await ctx.channel.send(
