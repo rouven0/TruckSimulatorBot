@@ -23,10 +23,10 @@ from commands.gambling import Gambling
 from commands.misc import Misc
 
 load_dotenv('./.env')
-BOT_TOKEN = getenv('BOT_TOKEN')
-BOT_PREFIX = getenv('BOT_PREFIX').split(";")
-DBL_TOKEN = getenv('DBL_TOKEN')
-INGAME_NEWS_CHANNEL_ID = int(getenv('INGAME_NEWS_CHANNEL_ID'))
+BOT_TOKEN = getenv('BOT_TOKEN', default="")
+BOT_PREFIX = getenv('BOT_PREFIX', default="").split(";")
+DBL_TOKEN = getenv('DBL_TOKEN', default="")
+INGAME_NEWS_CHANNEL_ID = int(getenv('INGAME_NEWS_CHANNEL_ID', default=0))
 
 
 def main():
