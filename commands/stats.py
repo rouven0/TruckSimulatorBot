@@ -98,9 +98,6 @@ class Stats(commands.Cog):
         profile_embed.add_field(name="Miles driven", value=f"{miles}\n({truck_miles} with current truck)",
                                 inline=False)
         profile_embed.add_field(name="Gas left", value=f"{player.gas} l", inline=False)
-        current_job = jobs.get(ctx.author.id)
-        if current_job is not None:
-            profile_embed.add_field(name="Current Job", value=jobs.show(current_job))
         await ctx.channel.send(embed=profile_embed)
 
     @commands.command()
