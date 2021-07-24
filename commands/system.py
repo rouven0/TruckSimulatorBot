@@ -22,6 +22,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         self.branch = self.repo.active_branch.name
         self.commit = self.repo.head.commit.hexsha[:7]
         self.repo.close()
+        super().__init__()
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:

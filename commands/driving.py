@@ -2,12 +2,11 @@
 This module contains the Cog for all driving-related commands
 """
 from datetime import datetime
-from math import log
 from time import time
-import asyncio
 import discord
 from discord.ext import commands
-from discord_components import Button
+from discord.ext import tasks
+from discord_components import Button, Select, SelectOption
 import players
 import items
 import levels
@@ -18,27 +17,16 @@ import jobs
 import trucks
 
 
-def get_truck_embed(truck: trucks.Truck) -> discord.Embed:
-    """
-    Returns an embed with details about the given Truck
-    """
-    truck_embed = discord.Embed(title=truck.name, description=truck.description, colour=discord.Colour.gold())
-    truck_embed.add_field(name="Gas consumption", value=f"{truck.gas_consumption} litres per mile")
-    truck_embed.add_field(name="Gas capacity", value=str(truck.gas_capacity) + " l")
-    truck_embed.add_field(name="Price", value="$" + str(truck.price))
-    truck_embed.set_image(url=truck.image_url)
-    return truck_embed
-
-
 class Driving(commands.Cog):
     """
     The heart of the Truck simulator: Drive your Truck on a virtual map
     """
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.active_drives = []
         self.gas_price = 0
+        super().__init__()
 
     def get_buttons(self, player: players.Player) -> list:
         """
@@ -46,6 +34,7 @@ class Driving(commands.Cog):
         """
         buttons = []
         buttons.append([])
+        place = places.get(player.position)
         for symbol in symbols.get_all_drive_symbols():
             if symbol in symbols.get_drive_position_symbols(player.position):
                 buttons[0].append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbol)))
@@ -53,16 +42,19 @@ class Driving(commands.Cog):
                 buttons[0].append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbol), disabled=True))
         buttons[0].append(Button(style=4, label=" ", emoji=self.bot.get_emoji(symbols.STOP)))
         current_job = jobs.get(player.user_id)
-        if current_job is not None and player.position == current_job.place_from.position and current_job.state == 0:
-            buttons.append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbols.LOAD)))
-        if current_job is not None and player.position == current_job.place_to.position and current_job.state == 1:
-            buttons.append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbols.UNLOAD)))
+        action_buttons = []
+        if len(player.loaded_items) < trucks.get(player.truck_id).loading_capacity:
+            action_buttons.append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbols.LOAD)))
+        if len(player.loaded_items) > 0:
+            action_buttons.append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbols.UNLOAD)))
+        if player.position == [7, 7]:
+            action_buttons.append(Button(style=2, label=" ", emoji=self.bot.get_emoji(symbols.REFILL)))
+        if place.name != "Nothing":
+            buttons.append(action_buttons)
         if current_job is None:
             buttons.append(Button(style=3, label="New Job", id="new_job"))
-        # refill button
-        if player.position == [7, 7]:
-            buttons.append(Button(style=2, label=" ", emoji=self.bot.get_emoji(symbols.REFILL)))
         return buttons
+
 
     @commands.Cog.listener()
     async def on_button_click(self, interaction) -> None:
@@ -86,9 +78,12 @@ class Driving(commands.Cog):
             action = interaction.component.id
 
         if action == "new_job":
-            job_tuple = jobs.generate(active_drive.player)
             drive_embed = self.get_drive_embed(active_drive.player, interaction.author.avatar_url)
-            drive_embed.add_field(name="You got a new Job", value=job_tuple[1], inline=False)
+            job = jobs.generate(active_drive.player)
+            item = items.get(job.place_from.produced_item)
+            job_message =  "{} needs {} {} from {}. You get ${:,} for this transport".format(
+                    job.place_to.name, self.bot.get_emoji(item.emoji), item.name, job.place_from.name, job.reward)
+            drive_embed.add_field(name="You got a new Job", value=job_message, inline=False)
             await interaction.respond(type=7, embed=drive_embed, components=self.get_buttons(active_drive.player))
 
         if action == symbols.STOP:
@@ -99,25 +94,51 @@ class Driving(commands.Cog):
                            miles=active_drive.player.miles, truck_miles=active_drive.player.truck_miles, gas=active_drive.player.gas)
 
         if action == symbols.LOAD:
+            item = items.get(places.get(active_drive.player.position).produced_item)
+            await players.load_item(active_drive.player, item)
+            job_message = None
+
             current_job = jobs.get(interaction.author.id)
-            current_job.state = 1
-            jobs.update(current_job, state=current_job.state)
+            if item.name == current_job.place_from.produced_item:
+                current_job.state = jobs.STATE_LOADED
+                job_message = jobs.get_state(current_job)
+                jobs.update(current_job, state=current_job.state)
+
             drive_embed = self.get_drive_embed(active_drive.player, interaction.author.avatar_url)
-            drive_embed.add_field(name="Job notification", value=jobs.get_state(current_job))
+            drive_embed.add_field(name="Loading successful", value=f"You loaded {self.bot.get_emoji(item.emoji)} {item.name} into your truck", inline=False)
+            #This order is required to fit the navigation to the right place
+            if job_message is not None:
+                drive_embed.add_field(name="Job Notification", value=job_message)
             await interaction.respond(type=7, embed=drive_embed, components=self.get_buttons(active_drive.player))
 
         if action == symbols.UNLOAD:
+            drive_embed = self.get_drive_embed(active_drive.player, interaction.author.avatar_url)
+            item_options = []
+            for item in active_drive.player.loaded_items:
+                # add the item if it doesn't already is in the list
+                if item.name not in [o.value for o in item_options]:
+                    item_options.append(SelectOption(label=item.name, value=item.name, emoji=self.bot.get_emoji(item.emoji)))
+            select = Select(placeholder="Choose which items to unload", options=item_options)
+            await interaction.respond(type=7, embed=drive_embed, components=[select])
+            selection = await self.bot.wait_for("select_option", check=lambda i: i.author.id == interaction.author.id)
+            item = items.get(selection.component[0].label)
+            await players.unload_item(active_drive.player, item)
             current_job = jobs.get(interaction.author.id)
-            current_job.state = 2
-            await players.add_money(active_drive.player, current_job.reward)
-            jobs.remove(current_job)
-            await players.update(active_drive.player, position=active_drive.player.position,
-                           miles=active_drive.player.miles, truck_miles=active_drive.player.truck_miles, gas=active_drive.player.gas)
-            job_message = jobs.get_state(current_job) + await players.add_xp(active_drive.player, levels.get_job_reward_xp(active_drive.player.level))
-            drive_embed=self.get_drive_embed(active_drive.player, interaction.author.avatar_url)
-            drive_embed.add_field(name="Job Notification", value=job_message)
-            await interaction.respond(type=7, embed=drive_embed,
-                                           components=self.get_buttons(active_drive.player))
+            if item.name == current_job.place_from.produced_item:
+                current_job.state = jobs.STATE_DONE
+                await players.add_money(active_drive.player, current_job.reward)
+                jobs.remove(current_job)
+                await players.update(active_drive.player, position=active_drive.player.position,
+                               miles=active_drive.player.miles, truck_miles=active_drive.player.truck_miles, gas=active_drive.player.gas)
+                job_message = jobs.get_state(current_job) + await players.add_xp(active_drive.player, levels.get_job_reward_xp(active_drive.player.level))
+                # get the drive embed egain to fit the job update
+                drive_embed = self.get_drive_embed(active_drive.player, interaction.author.avatar_url)
+                drive_embed.add_field(name="Job Notification", value=job_message)
+            drive_embed.add_field(name="Unloading successful", value=f"You removed {self.bot.get_emoji(item.emoji)} {item.name} from your truck", inline=False)
+
+            await selection.respond(type=7, embed=drive_embed, components=self.get_buttons(active_drive.player))
+
+
 
         if action == symbols.REFILL:
             gas_amount = trucks.get(active_drive.player.truck_id).gas_capacity - active_drive.player.gas
@@ -218,8 +239,8 @@ class Driving(commands.Cog):
             active_drive = self.get_active_drive(ctx.author.id)
             await ctx.channel.send(embed=discord.Embed(title=f"Hey {ctx.author.name}",
                                    description="You can't drive on two roads at once!\n"
-                                   f"Click [here]({active_drive.message.jump_url}) to jump right back into your Truck"),
-                                   colour=discord.Colour.gold())
+                                   f"Click [here]({active_drive.message.jump_url}) to jump right back into your Truck",
+                                   colour=discord.Colour.gold()))
             return
         message = await ctx.channel.send(embed=self.get_drive_embed(player, ctx.author.avatar_url),
                                          components=self.get_buttons(player))
@@ -247,82 +268,6 @@ class Driving(commands.Cog):
                        truck_miles=active_drive.player.truck_miles,
                        gas=active_drive.player.gas)
 
-    @commands.group(pass_context=True)
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
-    async def truck(self, ctx):
-        """
-        Get details about your truck and change it
-        """
-        if ctx.invoked_subcommand == None:
-            player = await players.get(ctx.author.id)
-            truck = trucks.get(player.truck_id)
-
-            truck_embed = get_truck_embed(truck)
-            truck_embed.set_author(name=f"{ctx.author.name}'s truck", icon_url=ctx.author.avatar_url)
-            truck_embed.set_footer(icon_url=self.bot.user.avatar_url,
-                                       text="This is your Truck, see all trucks with `t.truck list` and change your truck with `t.truck buy`")
-
-            await ctx.channel.send(embed=truck_embed)
-
-    @truck.command()
-    async def buy(self, ctx, id) -> None:
-        """
-        Buy a new truck, your old one will be sold and your miles will be reset
-        """
-        if ctx.author.id in [a.player.user_id for a in self.active_drives]:
-            await ctx.channel.send(f"{ctx.author.mention} You can't buy a new truck while you are driving in the old one")
-            return
-        try:
-            id  = int(id)
-        except ValueError:
-            await ctx.channel.send("Wtf do you want to buy?")
-            return
-        player = await players.get(ctx.author.id)
-        old_truck = trucks.get(player.truck_id)
-        new_truck = trucks.get(id)
-        selling_price = round(old_truck.price - (old_truck.price / 10) * log(player.truck_miles + 1))
-        end_price = new_truck.price - selling_price
-        # this also adds money if the end price is negative
-        await players.debit_money(player, end_price)
-        await players.update(player, truck_miles=0, gas=new_truck.gas_capacity, truck_id=new_truck.truck_id)
-        answer_embed = discord.Embed(
-            description=f"You sold your old {old_truck.name} for ${selling_price} and bought a brand new {new_truck.name} for ${new_truck.price}",
-            colour=discord.Colour.gold())
-        answer_embed.set_author(name="You got a new truck", icon_url=self.bot.user.avatar_url)
-        answer_embed.set_footer(text="Check out your new baby with `t.truck`")
-        await ctx.channel.send(embed=answer_embed)
-
-    @truck.command()
-    async def show(self, ctx, id) -> None:
-        """
-        Shows details about a specific truck
-        """
-        try:
-            id  = int(id)
-            truck = trucks.get(id)
-            truck_embed = get_truck_embed(truck)
-            truck_embed.set_footer(icon_url=self.bot.user.avatar_url,
-                                   text="See all trucks with `t.truck list` and change your truck with `t.truck buy`")
-            await ctx.channel.send(embed=truck_embed)
-        except trucks.TruckNotFound:
-            await ctx.channel.send("Truck not found")
-        except ValueError:
-            await ctx.channel.send("Wtf do you want to show?")
-
-    @truck.command()
-    async def list(self, ctx) -> None:
-        """
-        Lists all available Trucks
-        """
-        list_embed = discord.Embed(title="All available trucks", colour=discord.Colour.gold())
-        for truck in trucks.get_all():
-            list_embed.add_field(name=truck.name,
-                                 value="Id: {} \n Price: ${:,}".format(truck.truck_id, truck.price), inline=False)
-        list_embed.set_footer(icon_url=self.bot.user.avatar_url,
-                              text="Get more information about a truck with `t.truck show <id>`")
-        await ctx.channel.send(embed=list_embed)
 
     @commands.command(aliases=["here"])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
@@ -394,7 +339,7 @@ class Driving(commands.Cog):
                                   value=str(navigation_place.position))
 
         if place.image_url is not None:
-            drive_embed.add_field(name="What is here?", value=items.get(place.produced_item).emoji+" "+place.name, inline=False)
+            drive_embed.add_field(name="What is here?", value=f"{self.bot.get_emoji(items.get(place.produced_item).emoji)} {place.name}", inline=False)
             drive_embed.set_image(url=assets.get_place_image(player, place))
         else:
             drive_embed.set_image(url=assets.get_default(player))
@@ -414,7 +359,7 @@ class Driving(commands.Cog):
                 map_place = places.get(position)
                 item = items.get(map_place.produced_item)
                 if item is not None:
-                    minimap_array[i][j] = items.get(map_place.produced_item).emoji
+                    minimap_array[i][j] = str(self.bot.get_emoji(items.get(map_place.produced_item).emoji))
                 elif position in (a.player.position for a in self.active_drives):
                     for active_drive in self.active_drives:
                         if active_drive.player.position == position:
@@ -445,6 +390,7 @@ class Driving(commands.Cog):
                 return active_drive
         return None
 
+    @tasks.loop(seconds=20)
     async def check_drives(self) -> None:
         """
         Drives that are inactive for more than 10 minutes get stopped
@@ -459,7 +405,6 @@ class Driving(commands.Cog):
                                    gas=active_drive.player.gas)
                     await active_drive.message.edit(
                         embed=self.get_drive_embed(active_drive.player, self.bot.user.avatar_url), components=[])
-            await asyncio.sleep(10)
 
     async def on_shutdown(self) -> None:
         """

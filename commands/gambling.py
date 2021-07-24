@@ -15,6 +15,9 @@ class Gambling(commands.Cog):
     """
     Lose your money here
     """
+    def __init__(self, bot) -> None:
+        self.bot = bot
+        super().__init__()
 
     @commands.command(aliases=["cf"])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
@@ -85,7 +88,7 @@ class Gambling(commands.Cog):
             chosen_items = choices(sample(items.get_all(), 8), k=3)
             machine = "<|"
             for item in chosen_items:
-                machine += item.emoji
+                machine += self.bot.get_emoji(item.emoji)
                 machine += "|"
             machine += ">"
 

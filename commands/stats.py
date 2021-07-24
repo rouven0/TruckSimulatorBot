@@ -15,6 +15,7 @@ class Stats(commands.Cog):
 
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
+        super().__init__()
 
     @commands.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
@@ -31,7 +32,7 @@ class Stats(commands.Cog):
         welcome_embed.set_author(name="Welcome to the Truck Simulator", icon_url=self.bot.user.avatar_url)
         await ctx.channel.send(embed=welcome_embed)
         if not await players.registered(ctx.author.id):
-            await players.insert(players.Player(ctx.author.id, ctx.author.name))
+            await players.insert(players.Player(ctx.author.id, ctx.author.name, money=1000))
             await ctx.channel.send("Welcome to the Truckers, {}".format(ctx.author.mention))
         else:
             await ctx.channel.send("You are already registered")

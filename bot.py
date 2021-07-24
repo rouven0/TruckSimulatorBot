@@ -21,6 +21,7 @@ from commands.stats import Stats
 from commands.economy import Economy
 from commands.gambling import Gambling
 from commands.misc import Misc
+from commands.trucks import Trucks
 
 load_dotenv('./.env')
 BOT_TOKEN = getenv('BOT_TOKEN', default="")
@@ -57,8 +58,9 @@ def main():
     bot.add_cog(driving_commands)
     bot.add_cog(Stats(bot))
     bot.add_cog(economy_commands)
-    bot.add_cog(Gambling())
+    bot.add_cog(Gambling(bot))
     bot.add_cog(Misc())
+    bot.add_cog(Trucks(bot, driving_commands))
 
     @tasks.loop(minutes=120)
     async def update_stats():
@@ -72,12 +74,9 @@ def main():
     if "--post-server-count" in sys.argv:
         update_stats.start()
 
-    loop = asyncio.get_event_loop()
-    loop.create_task(driving_commands.check_drives())
     asyncio.run(players.init())
     bot.run(BOT_TOKEN)
     asyncio.run(players.close())
-
 
 
 if __name__ == '__main__':

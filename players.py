@@ -7,6 +7,7 @@ import aiosqlite
 import logging
 import discord
 import levels
+import items
 
 
 async def init():
@@ -40,6 +41,7 @@ class Player:
     truck_miles: int = 0
     gas: int = 600
     truck_id: int = 0
+    loaded_items: list = field(default_factory=lambda: [])
 
 
 def __list_from_tuples(tups) -> list:
@@ -52,22 +54,23 @@ def __list_from_tuples(tups) -> list:
     return players
 
 
-def __from_tuple(tup) -> Player:
+def __from_tuple(tup: tuple) -> Player:
     """
     Returns a Player object from a received database tuple
     """
-    return Player(tup[0], tup[1], tup[2], tup[3], tup[4], __get_position(tup[5]), tup[6], tup[7], tup[8], tup[9])
+    return Player(tup[0], tup[1], tup[2], tup[3], tup[4], __get_position(tup[5]), tup[6],
+                  tup[7], tup[8], tup[9], __get_items(tup[10]))
 
 
-def __to_tuple(player) -> tuple:
+def __to_tuple(player: Player) -> tuple:
     """
     Transforms the player object into a tuple that can be inserted in the db
     """
-    return (player.user_id, player.name, player.level, player.xp, player.money,
-            __format_pos_to_db(player.position), player.miles, player.truck_miles, player.gas, player.truck_id)
+    return (player.user_id, player.name, player.level, player.xp, player.money, __format_pos_to_db(player.position),
+            player.miles, player.truck_miles, player.gas, player.truck_id, __format_items_to_db(player.loaded_items))
 
 
-def __get_position(db_pos) -> list:
+def __get_position(db_pos: str) -> list:
     """
     Parses the position from the database as list [x][y]
     """
@@ -76,11 +79,34 @@ def __get_position(db_pos) -> list:
     return [int(pos_x), int(pos_y)]
 
 
-def __format_pos_to_db(pos) -> str:
+def __format_pos_to_db(pos: list) -> str:
     """
     Returns a database-ready string that contains the position in the form x/y
     """
     return "{}/{}".format(pos[0], pos[1])
+
+
+def __get_items(db_items: str) -> list:
+    """
+    Parses the item list from the db string
+    """
+    if db_items == "":
+        return []
+    player_items = []
+    for item_name in db_items.split(";"):
+        player_items.append(items.get(item_name))
+    return player_items
+
+
+def __format_items_to_db(item_list: list) -> str:
+    """
+    Returns a database-ready string containing all the items
+    """
+    db_items = ""
+    for item in item_list:
+        db_items += item.name+";"
+    # remove the last ;
+    return db_items[:len(db_items)-1]
 
 
 async def add_xp(player: Player, amount: int) -> str:
@@ -111,11 +137,30 @@ async def debit_money(player, amount) -> None:
     await update(player, money=player.money-amount)
 
 
+async def load_item(player, item: items.Item) -> None:
+    new_items = player.loaded_items
+    new_items.append(item)
+    await update(player, loaded_items=new_items)
+
+
+async def unload_item(player, item: items.Item) -> None:
+    new_items = player.loaded_items
+    items_to_remove = []
+    for loaded_item in new_items:
+        if loaded_item.name == item.name:
+            items_to_remove.append(loaded_item)
+
+    for loaded_item in items_to_remove:
+        new_items.remove(loaded_item)
+
+    await update(player, loaded_items=new_items)
+
+
 async def insert(player: Player) -> None:
     """
     Inserts a player into the database
     """
-    await __con__.execute('INSERT INTO players VALUES (?,?,?,?,?,?,?,?,?,?)', __to_tuple(player))
+    await __con__.execute('INSERT INTO players VALUES (?,?,?,?,?,?,?,?,?,?,?)', __to_tuple(player))
     await __con__.commit()
     logging.info('Inserted %s into the database as %s', player.name, __to_tuple(player))
 
@@ -129,7 +174,7 @@ async def remove(player: Player) -> None:
     logging.info('Removed %s %s from the database', player.name, __to_tuple(player))
 
 
-async def update(player: Player, name:str=None, level:int=None, xp:int=None,  money:int=None, position:list=None, miles:int=None, truck_miles:int=None,  gas:int=None, truck_id:int=None) -> None:
+async def update(player: Player, name:str=None, level:int=None, xp:int=None,  money:int=None, position:list=None, miles:int=None, truck_miles:int=None,  gas:int=None, truck_id:int=None, loaded_items:list=None) -> None:
     """
     Updates a player in the database
     """
@@ -160,6 +205,9 @@ async def update(player: Player, name:str=None, level:int=None, xp:int=None,  mo
     if truck_id is not None:
         await __con__.execute('UPDATE players SET truck_id=? WHERE id=?', (truck_id, player.user_id))
         player.truck_id = truck_id
+    if loaded_items is not None:
+        await __con__.execute('UPDATE players SET loaded_items=? WHERE id=?', (__format_items_to_db(loaded_items), player.user_id))
+        player.loaded_items = loaded_items
     await __con__.commit()
     logging.debug('Updated player %s to %s', player.name, __to_tuple(player))
 
