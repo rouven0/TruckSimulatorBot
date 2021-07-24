@@ -95,14 +95,13 @@ def get(user_id) -> Job:
         return None
 
 
-def generate(player: Player) -> tuple:
+def generate(player: Player) -> Job:
     """
     This takes two random places from the list, calculates its reward based on the miles the player
     has to drive and returns the Job object and the job as a string in human readable format.
     """
     available_places = places.get_quest_active().copy()
     place_from = available_places[randint(0, len(available_places) - 1)]
-    item = items.get(place_from.produced_item)
     available_places.remove(place_from)
     place_to = available_places[randint(0, len(available_places) - 1)]
     arrival_miles_x = abs(player.position[0] - place_from.position[0])
@@ -114,18 +113,7 @@ def generate(player: Player) -> tuple:
     reward = round((job_reward + arrival_reward) * sqrt(player.level+1))
     new_job = Job(player.user_id, place_from, place_to, 0, reward)
     insert(new_job)
-    return (new_job,
-            "{} needs {} {} from {}. You get ${:,} for this transport".format(place_to.name, item.emoji, item.name, place_from.name, reward))
-
-
-def show(job: Job) -> str:
-    """
-    Prints out the current job in a human readable format
-    """
-    place_from = job.place_from
-    place_to = job.place_to
-    item = items.get(place_from.produced_item)
-    return "Bring {} {} from {} to {}.".format(item.emoji, item.name, place_from.name, place_to.name)
+    return new_job
 
 
 def get_state(job: Job) -> str:

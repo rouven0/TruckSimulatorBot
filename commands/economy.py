@@ -7,9 +7,9 @@ from random import randint
 import discord
 from discord.ext import commands
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-import levels
 import players
 import places
+import items
 import jobs
 import trucks
 
@@ -46,7 +46,6 @@ class Economy(commands.Cog):
                                   description="Gas prices for {}".format(datetime.utcnow().strftime("%A, %B %d %Y")),
                                   colour=discord.Colour.gold())
         gas_embed.add_field(name="Main gas station", value=f"${self.gas_price} per litre")
-        print(1)
         try:
             await self.news_channel.send(embed=gas_embed)
             self.driving_commands.gas_price = self.gas_price
@@ -72,9 +71,12 @@ class Economy(commands.Cog):
                              icon_url=ctx.author.avatar_url)
         if current_job is None:
             if args and args[0] == "new":
-                job_tuple = jobs.generate(player)
-                job_embed.add_field(name="You got a new Job", value=job_tuple[1], inline=False)
-                job_embed.add_field(name="Current state", value=jobs.get_state(job_tuple[0]))
+                job = jobs.generate(player)
+                item = items.get(job.place_from.produced_item)
+                job_message =  "{} needs {} {} from {}. You get ${:,} for this transport".format(
+                        job.place_to.name, self.bot.get_emoji(item.emoji), item.name, job.place_from.name, job.reward)
+                job_embed.add_field(name="You got a new Job", value=job_message, inline=False)
+                job_embed.add_field(name="Current state", value=jobs.get_state(job))
                 if ctx.author.id in [a.player.user_id for a in self.driving_commands.active_drives]:
                     active_drive = self.driving_commands.get_active_drive(ctx.author.id)
                     await active_drive.message.edit(embed=self.driving_commands.get_drive_embed(active_drive.player, ctx.author.avatar_url),
@@ -83,51 +85,14 @@ class Economy(commands.Cog):
                 job_embed.add_field(name="You don't have a job at the moment",
                                     value="Type `t.job new` to get one")
         else:
-            job_embed.add_field(name="Your current job", value=jobs.show(current_job), inline=False)
+            place_from = current_job.place_from
+            place_to = current_job.place_to
+            item = items.get(place_from.produced_item)
+            job_message= "Bring {} {} from {} to {}.".format(self.bot.get_emoji(item.emoji), item.name, place_from.name, place_to.name)
+            job_embed.add_field(name="Your current job", value=job_message, inline=False)
             job_embed.add_field(name="Current state", value=jobs.get_state(current_job))
         await ctx.channel.send(embed=job_embed)
 
-    @commands.command()
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
-    async def load(self, ctx) -> None:
-        """
-        If you have a job, you can load your Truck with items you have to transport
-        """
-        player = await players.get(ctx.author.id)
-        current_job = jobs.get(ctx.author.id)
-        if current_job is None:
-            await ctx.channel.send("Nothing to do here")
-            return
-        if player.position == current_job.place_from.position:
-            current_job.state = 1
-            await ctx.channel.send(jobs.get_state(current_job))
-            jobs.update(current_job, state=current_job.state)
-        else:
-            await ctx.channel.send("Nothing to do here")
-
-    @commands.command()
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
-    async def unload(self, ctx) -> None:
-        """
-        Unload your Truck at the right place to get your job done
-        """
-        player = await players.get(ctx.author.id)
-        current_job = jobs.get(ctx.author.id)
-        if current_job is None:
-            await ctx.channel.send("Nothing to do here")
-            return
-        if player.position == current_job.place_to.position and current_job.state == 1:
-            current_job.state = 2
-            await ctx.channel.send(
-                jobs.get_state(current_job) + await players.add_xp(player, levels.get_job_reward_xp(player.level)))
-            jobs.remove(current_job)
-            await players.add_money(player, current_job.reward)
-        else:
-            await ctx.channel.send("Nothing to do here")
 
     @commands.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True,

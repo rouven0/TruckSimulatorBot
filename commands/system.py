@@ -22,6 +22,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         self.branch = self.repo.active_branch.name
         self.commit = self.repo.head.commit.hexsha[:7]
         self.repo.close()
+        super().__init__()
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
@@ -87,6 +88,9 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
                 await ctx.channel.send(f"Command usage: `t.{ctx.invoked_parents[0]} {ctx.command.name} {ctx.command.signature}`")
             else:
                 await ctx.channel.send(f"Command usage: `t.{ctx.command.name} {ctx.command.signature}`")
+
+        elif isinstance(error, commands.errors.UserNotFound):
+            await ctx.channel.send(f"User **`{error.argument}`** not found")
 
         elif isinstance(error, commands.errors.CommandInvokeError):
             if isinstance(error.original, players.PlayerNotRegistered):

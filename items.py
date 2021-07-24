@@ -8,13 +8,13 @@ import sqlite3
 @dataclass
 class Item:
     name: str
-    emoji: str
+    emoji: int
 
 
 def __generate_list(lst) -> None:
     for i in __cur__.fetchall():
         name = i[0]
-        emoji = i[1]
+        emoji = int(i[1])
         lst.append(Item(name, emoji))
 
 
