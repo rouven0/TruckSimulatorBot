@@ -23,10 +23,10 @@ class Place:
     name: str
     position: list
     commands: list
-    image_url: str
-    image_url_better: str
+    image_url_default: str
+    image_url_jungle: str
     image_url_tropical: str
-    image_url_ultimate: str
+    image_url_hell: str
     produced_item: str
 
 def __get_position(db_pos) -> list:

@@ -7,35 +7,35 @@ from random import randint
 from players import Player
 
 __DEFAULT_DRIVE_IMAGE_LIST = [
-    "https://cdn.discordapp.com/attachments/837784531267223552/837785502127489064/default.png",
-    "https://cdn.discordapp.com/attachments/837784531267223552/838458133378105404/default_2.png",
-    "https://cdn.discordapp.com/attachments/837784531267223552/838458157608730654/default_3.png",
-    "https://cdn.discordapp.com/attachments/837784531267223552/838458177586593852/default_4.png",
-    "https://cdn.discordapp.com/attachments/837784531267223552/838458205679779901/default_5.png"
+    "https://cdn.discordapp.com/attachments/868845783225622559/868846294406418432/default_1-default_truck.png",
+    "https://cdn.discordapp.com/attachments/868845805606424607/868846408722182205/default_2-default_truck.png",
+    "https://cdn.discordapp.com/attachments/868845802141913118/868846461817851964/default_3-default_truck.png",
+    "https://cdn.discordapp.com/attachments/868845857028579368/868846576607576114/default_4-default_truck.png",
+    "https://cdn.discordapp.com/attachments/868845874015522827/868846632257585172/default_5-default_truck.png"
 ]
 
-__BETTER_DRIVE_IMAGE_LIST = [
-    "https://cdn.discordapp.com/attachments/861619885218332713/861634347094638612/default_better.png",
-    "https://cdn.discordapp.com/attachments/861619885218332713/861634327904780388/default_2_better.png",
-    "https://cdn.discordapp.com/attachments/861619885218332713/861634332959309864/default_3_better.png",
-    "https://cdn.discordapp.com/attachments/861619885218332713/861634337484963871/default_4_better.png",
-    "https://cdn.discordapp.com/attachments/861619885218332713/861634342199754782/default_5_better.png"
+__JUNGLE_DRIVE_IMAGE_LIST = [
+    "https://cdn.discordapp.com/attachments/868845783225622559/868846297837350912/default_1-jungle_truck.png",
+    "https://cdn.discordapp.com/attachments/868845805606424607/868846413142962196/default_2-jungle_truck.png",
+    "https://cdn.discordapp.com/attachments/868845802141913118/868846466989436928/default_3-jungle_truck.png",
+    "https://cdn.discordapp.com/attachments/868845857028579368/868846581363912704/default_4-jungle_truck.png",
+    "https://cdn.discordapp.com/attachments/868845874015522827/868846637399805982/default_5-jungle_truck.png"
 ]
 
 __TROPICAL_DRIVE_IMAGE_LIST = [
-    "https://cdn.discordapp.com/attachments/861619927185489931/861634126247624734/default_tropical.png",
-    "https://cdn.discordapp.com/attachments/861619927185489931/861634112288063538/default_2_tropical.png",
-    "https://cdn.discordapp.com/attachments/861619927185489931/861634115698294794/default_3_tropical.png",
-    "https://cdn.discordapp.com/attachments/861619927185489931/861634118928695356/default_4_tropical.png",
-    "https://cdn.discordapp.com/attachments/861619927185489931/861634122636460032/default_5_tropical.png"
+    "https://cdn.discordapp.com/attachments/868845783225622559/868846298558791680/default_1-tropical_breeze_truck.png",
+    "https://cdn.discordapp.com/attachments/868845805606424607/868846414636126228/default_2-tropical_breeze_truck.png",
+    "https://cdn.discordapp.com/attachments/868845802141913118/868846468683952168/default_3-tropical_breeze_truck.png",
+    "https://cdn.discordapp.com/attachments/868845857028579368/868846583603666954/default_4-tropical_breeze_truck.png",
+    "https://cdn.discordapp.com/attachments/868845874015522827/868846639203364905/default_5-tropical_breeze_truck.png"
 ]
 
-__ULTIMATE_DRIVE_IMAGE_LIST = [
-    "https://cdn.discordapp.com/attachments/861619966137860118/861634997403779092/default_ultimatre.png",
-    "https://cdn.discordapp.com/attachments/861619966137860118/861634981683003411/default_2_ultimate.png",
-    "https://cdn.discordapp.com/attachments/861619966137860118/861634986011394068/default_3_ultimate.png",
-    "https://cdn.discordapp.com/attachments/861619966137860118/861634990025211934/default_4_ultimate.png",
-    "https://cdn.discordapp.com/attachments/861619966137860118/861634993738350612/default_5_ultimate.png"
+__HELL_DRIVE_IMAGE_LIST = [
+    "https://cdn.discordapp.com/attachments/868845783225622559/868846296541331476/default_1-hell_truck.png",
+    "https://cdn.discordapp.com/attachments/868845805606424607/868846411616235520/default_2-hell_truck.png",
+    "https://cdn.discordapp.com/attachments/868845802141913118/868846464531570708/default_3-hell_truck.png",
+    "https://cdn.discordapp.com/attachments/868845857028579368/868846578943807488/default_4-hell_truck.png",
+    "https://cdn.discordapp.com/attachments/868845874015522827/868846634996494346/default_5-hell_truck.png"
 
 ]
 
@@ -45,11 +45,11 @@ def get_default(player: Player) -> str:
     Returns a randomly chosen image from the list
     """
     if player.truck_id == 1:
-        lst = __BETTER_DRIVE_IMAGE_LIST
+        lst = __JUNGLE_DRIVE_IMAGE_LIST
     elif player.truck_id == 2:
         lst = __TROPICAL_DRIVE_IMAGE_LIST
     elif player.truck_id == 3:
-        lst = __ULTIMATE_DRIVE_IMAGE_LIST
+        lst = __HELL_DRIVE_IMAGE_LIST
     else:
         lst = __DEFAULT_DRIVE_IMAGE_LIST
 
@@ -61,11 +61,11 @@ def get_place_image(player: Player, place: Place) -> str:
     Returns the places image url depending on the players truck
     """
     if player.truck_id == 1:
-        url = place.image_url_better
+        url = place.image_url_jungle
     elif player.truck_id == 2:
         url = place.image_url_tropical
     elif player.truck_id == 3:
-        url = place.image_url_ultimate
+        url = place.image_url_hell
     else:
-        url = place.image_url
+        url = place.image_url_default
     return url

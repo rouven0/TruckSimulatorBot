@@ -338,7 +338,7 @@ class Driving(commands.Cog):
             drive_embed.add_field(name="Navigation: Drive to {}".format(navigation_place.name),
                                   value=str(navigation_place.position))
 
-        if place.image_url is not None:
+        if place.image_url_default is not None:
             drive_embed.add_field(name="What is here?", value=f"{self.bot.get_emoji(items.get(place.produced_item).emoji)} {place.name}", inline=False)
             drive_embed.set_image(url=assets.get_place_image(player, place))
         else:
