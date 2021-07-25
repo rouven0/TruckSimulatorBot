@@ -5,6 +5,7 @@ import discord
 from discord.ext import commands
 import jobs
 import players
+import trucks
 import levels
 
 
@@ -88,6 +89,7 @@ class Stats(commands.Cog):
             if player.name != ctx.author.name:
                 await players.update(player, name=ctx.author.name)
 
+        truck = trucks.get(player.truck_id)
         xp = "{:,}".format(player.xp)
         next_xp = "{:,}".format(levels.get_next_xp(player.level))
         money = "{:,}".format(player.money)
@@ -98,6 +100,8 @@ class Stats(commands.Cog):
         profile_embed.add_field(name="Miles driven", value=f"{miles}\n({truck_miles} with current truck)",
                                 inline=False)
         profile_embed.add_field(name="Gas left", value=f"{player.gas} l", inline=False)
+        profile_embed.add_field(name="Current truck", value=truck.name)
+        profile_embed.set_image(url=truck.image_url)
         await ctx.channel.send(embed=profile_embed)
 
     @commands.command()

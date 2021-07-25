@@ -19,15 +19,14 @@ def get_truck_embed(truck: trucks.Truck) -> discord.Embed:
     truck_embed.add_field(name="Gas consumption", value=f"{truck.gas_consumption} litres per mile")
     truck_embed.add_field(name="Gas capacity", value=str(truck.gas_capacity) + " l")
     truck_embed.add_field(name="Price", value="$" + str(truck.price))
-    truck_embed.add_field(name="Loading capacity", value=truck.loading_capacity)
+    truck_embed.add_field(name="Loading capacity", value=f"{truck.loading_capacity} items")
     truck_embed.set_image(url=truck.image_url)
     return truck_embed
 
 
 class Trucks(commands.Cog):
-    #TODO rework this help text
     """
-    Do nice things with your Truck 
+    Check up your truck and its current load
     """
 
     def __init__(self, bot, driving_commands) -> None:
@@ -35,13 +34,13 @@ class Trucks(commands.Cog):
         self.driving_commands = driving_commands
         super().__init__()
 
-    @commands.group(pass_context=True)
+    @commands.group(pass_context=True, aliases=["t"])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
     async def truck(self, ctx):
         """
-        Get details about your truck and change it
+        Get details about your truck
         """
         if ctx.invoked_subcommand == None:
             player = await players.get(ctx.author.id)
@@ -117,6 +116,9 @@ class Trucks(commands.Cog):
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
     async def load(self, ctx) -> None:
+        """
+        Shows your current load
+        """
         player = await players.get(ctx.author.id)
         item_list = ""
         if len(player.loaded_items) == 0:
