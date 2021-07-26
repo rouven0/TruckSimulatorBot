@@ -88,7 +88,7 @@ class Gambling(commands.Cog):
             chosen_items = choices(sample(items.get_all(), 8), k=3)
             machine = "<|"
             for item in chosen_items:
-                machine += self.bot.get_emoji(item.emoji)
+                machine += str(self.bot.get_emoji(item.emoji))
                 machine += "|"
             machine += ">"
 
@@ -106,5 +106,5 @@ class Gambling(commands.Cog):
 
             await ctx.channel.send(embed=slots_embed)
 
-        except (TypeError, ValueError):
+        except (TypeError, ValueError) as e:
             await ctx.channel.send("**Syntax:** `t.slots <amount>`")
