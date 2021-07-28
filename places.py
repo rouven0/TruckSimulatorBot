@@ -91,13 +91,6 @@ def get_hidden() -> list:
     return __hidden_places__
 
 
-def get_quest_active() -> list:
-    """
-    Returns all places that can appear in jobs
-    """
-    return __quest_active_places__
-
-
 __con__ = sqlite3.connect('objects.db')
 __cur__ = __con__.cursor()
 
@@ -112,10 +105,6 @@ __generate_list(__public_places__)
 __hidden_places__ = []
 __cur__.execute('SELECT * FROM places WHERE visibility=1')
 __generate_list(__hidden_places__)
-
-__quest_active_places__ = []
-__cur__.execute('SELECT * FROM places WHERE quest_active=1')
-__generate_list(__quest_active_places__)
 
 __con__.close()
 
