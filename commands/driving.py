@@ -55,6 +55,10 @@ class Driving(commands.Cog):
             buttons.append(Button(style=3, label="New Job", id="new_job"))
         return buttons
 
+    @commands.Cog.listener()
+    async def on_ready(self) -> None:
+        self.check_drives.start()
+
 
     @commands.Cog.listener()
     async def on_button_click(self, interaction) -> None:
@@ -137,8 +141,6 @@ class Driving(commands.Cog):
             drive_embed.add_field(name="Unloading successful", value=f"You removed {self.bot.get_emoji(item.emoji)} {item.name} from your truck", inline=False)
 
             await selection.respond(type=7, embed=drive_embed, components=self.get_buttons(active_drive.player))
-
-
 
         if action == symbols.REFILL:
             gas_amount = trucks.get(active_drive.player.truck_id).gas_capacity - active_drive.player.gas
@@ -288,8 +290,8 @@ class Driving(commands.Cog):
         if len(place.commands) != 0 and len(place.commands[0]) != 0:
             position_embed.add_field(name="Available Commands",
                                      value=self.get_place_commands(place.commands))
-        if place.image_url is not None:
-            position_embed.set_image(url=place.image_url)
+        if place.image_url_default is not None:
+            position_embed.set_image(url=assets.get_place_image(player, place))
         await ctx.channel.send(embed=position_embed)
 
     @staticmethod
@@ -395,16 +397,15 @@ class Driving(commands.Cog):
         """
         Drives that are inactive for more than 10 minutes get stopped
         """
-        while True:
-            for active_drive in self.active_drives:
-                if time() - active_drive.last_action_time > 600:
-                    self.active_drives.remove(active_drive)
-                    await players.update(active_drive.player, position=active_drive.player.position,
-                                   miles=active_drive.player.miles,
-                                   truck_miles=active_drive.player.truck_miles,
-                                   gas=active_drive.player.gas)
-                    await active_drive.message.edit(
-                        embed=self.get_drive_embed(active_drive.player, self.bot.user.avatar_url), components=[])
+        for active_drive in self.active_drives:
+            if time() - active_drive.last_action_time > 600:
+                self.active_drives.remove(active_drive)
+                await players.update(active_drive.player, position=active_drive.player.position,
+                               miles=active_drive.player.miles,
+                               truck_miles=active_drive.player.truck_miles,
+                               gas=active_drive.player.gas)
+                await active_drive.message.edit(
+                    embed=self.get_drive_embed(active_drive.player, self.bot.user.avatar_url), components=[])
 
     async def on_shutdown(self) -> None:
         """

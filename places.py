@@ -52,7 +52,7 @@ def __generate_list(lst) -> None:
         image_url_better = tup[4]
         image_url_tropical = tup[5]
         image_url_ultimate = tup[6]
-        produced_item = tup[8]
+        produced_item = tup[7]
         lst.append(Place(name, position, commands, image_url, image_url_better, image_url_tropical, image_url_ultimate, produced_item))
 
 
