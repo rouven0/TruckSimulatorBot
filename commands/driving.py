@@ -94,8 +94,6 @@ class Driving(commands.Cog):
             self.active_drives.remove(active_drive)
             await interaction.message.channel.send("You stopped driving!, {}".format(interaction.author.name))
             await interaction.respond(type=7, components=[])
-            await players.update(active_drive.player, position=active_drive.player.position,
-                           miles=active_drive.player.miles, truck_miles=active_drive.player.truck_miles, gas=active_drive.player.gas)
 
         if action == symbols.LOAD:
             item = items.get(places.get(active_drive.player.position).produced_item)
@@ -103,7 +101,7 @@ class Driving(commands.Cog):
             job_message = None
 
             current_job = jobs.get(interaction.author.id)
-            if item.name == current_job.place_from.produced_item:
+            if current_job is not None and item.name == current_job.place_from.produced_item:
                 current_job.state = jobs.STATE_LOADED
                 job_message = jobs.get_state(current_job)
                 jobs.update(current_job, state=current_job.state)
@@ -127,13 +125,12 @@ class Driving(commands.Cog):
             selection = await self.bot.wait_for("select_option", check=lambda i: i.author.id == interaction.author.id)
             item = items.get(selection.component[0].label)
             await players.unload_item(active_drive.player, item)
+
             current_job = jobs.get(interaction.author.id)
-            if item.name == current_job.place_from.produced_item:
+            if current_job is not None and item.name == current_job.place_from.produced_item:
                 current_job.state = jobs.STATE_DONE
                 await players.add_money(active_drive.player, current_job.reward)
                 jobs.remove(current_job)
-                await players.update(active_drive.player, position=active_drive.player.position,
-                               miles=active_drive.player.miles, truck_miles=active_drive.player.truck_miles, gas=active_drive.player.gas)
                 job_message = jobs.get_state(current_job) + await players.add_xp(active_drive.player, levels.get_job_reward_xp(active_drive.player.level))
                 # get the drive embed egain to fit the job update
                 drive_embed = self.get_drive_embed(active_drive.player, interaction.author.avatar_url)
@@ -160,15 +157,11 @@ class Driving(commands.Cog):
                 else:
                     await interaction.channel.send(f"{interaction.author.mention} you don't have enough money to do this. "
                                             "Do some jobs and come back if you have enough")
-                await players.update(active_drive.player, position=active_drive.player.position,
-                               miles=active_drive.player.miles, truck_miles=active_drive.player.truck_miles)
                 drive_embed = self.get_drive_embed(active_drive.player, interaction.author.avatar_url)
                 await interaction.respond(type=7, embed=drive_embed, components=self.get_buttons(active_drive.player))
                 return
 
-            await players.update(active_drive.player, position=active_drive.player.position,
-                           miles=active_drive.player.miles, truck_miles=active_drive.player.truck_miles,
-                           gas=trucks.get(active_drive.player.truck_id).gas_capacity)
+            await players.update(active_drive.player, gas=trucks.get(active_drive.player.truck_id).gas_capacity)
             drive_embed = self.get_drive_embed(active_drive.player, interaction.author.avatar_url)
             drive_embed.add_field(name="Thank you for visiting our gas station",
                                   value=f"You filled {gas_amount} litres into your truck and payed ${price}")
@@ -205,9 +198,6 @@ class Driving(commands.Cog):
 
             if active_drive.player.gas <= 0:
                 active_drive.player.gas = 1
-                await players.update(active_drive.player, position=active_drive.player.position,
-                               miles=active_drive.player.miles, truck_miles=active_drive.player.truck_miles,
-                               gas=active_drive.player.gas)
                 await active_drive.message.channel.send(
                     f"<@{active_drive.player.user_id}> You messed up and ran out of gas. "
                     "The company had to have your truck towed away. You will pay $3000 for this incident!")
@@ -224,6 +214,11 @@ class Driving(commands.Cog):
             await interaction.message.edit(embed=self.get_drive_embed(active_drive.player, interaction.author.avatar_url),
                                            components=self.get_buttons(active_drive.player))
             await interaction.respond(type=6)
+
+        await players.update(active_drive.player, position=active_drive.player.position,
+                                                  miles=active_drive.player.miles,
+                                                  truck_miles=active_drive.player.truck_miles,
+                                                  gas=active_drive.player.gas)
 
     @commands.command()
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
@@ -322,7 +317,7 @@ class Driving(commands.Cog):
         Returns the drive embed that includes all the information about the current position and gas
         """
         place = places.get(player.position)
-        drive_embed = discord.Embed(description="Keep an eye on your gas!",
+        drive_embed = discord.Embed(description="Enjoy the new images",
                                     colour=discord.Colour.gold(),
                                     timestamp=datetime.utcnow())
         drive_embed.set_author(name="{} is driving".format(player.name), icon_url=avatar_url)
@@ -345,7 +340,7 @@ class Driving(commands.Cog):
             drive_embed.set_image(url=assets.get_place_image(player, place))
         else:
             drive_embed.set_image(url=assets.get_default(player))
-        drive_embed.set_footer(text="Note: Your position is only applied if you stop driving")
+        drive_embed.set_footer(text=f"Loaded items: {len(player.loaded_items)}/{trucks.get(player.truck_id).loading_capacity}")
         return drive_embed
 
     def generate_minimap(self, player: players.Player) -> str:
