@@ -75,6 +75,15 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         logging.warning("Shutdown command is executed")
         await self.bot.close()
 
+    @commands.command()
+    @commands.is_owner()
+    async def update(self, ctx) -> None:
+        await self.bot.change_presence(status=discord.Status.online,
+                                       activity=discord.Activity(
+                                           type=discord.ActivityType.watching,
+                                           name="t.help on " + str(len(self.bot.guilds)) + " Servers"))
+        await ctx.channel.send("Done")
+
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error: commands.CommandError) -> None:
         if isinstance(error, commands.errors.BotMissingPermissions):

@@ -39,7 +39,12 @@ def main():
 
     DiscordComponents(bot)
     logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
+
+
+    if "--debug" in sys.argv:
+        logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.INFO)
 
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT, datefmt="%Y-%m-%d %H:%M:%S"))

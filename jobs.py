@@ -100,7 +100,7 @@ def generate(player: Player) -> Job:
     This takes two random places from the list, calculates its reward based on the miles the player
     has to drive and returns the Job object and the job as a string in human readable format.
     """
-    available_places = places.get_quest_active().copy()
+    available_places = places.get_public().copy()
     place_from = available_places[randint(0, len(available_places) - 1)]
     available_places.remove(place_from)
     place_to = available_places[randint(0, len(available_places) - 1)]

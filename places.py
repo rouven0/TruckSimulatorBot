@@ -23,10 +23,10 @@ class Place:
     name: str
     position: list
     commands: list
-    image_url: str
-    image_url_better: str
+    image_url_default: str
+    image_url_jungle: str
     image_url_tropical: str
-    image_url_ultimate: str
+    image_url_hell: str
     produced_item: str
 
 def __get_position(db_pos) -> list:
@@ -52,7 +52,7 @@ def __generate_list(lst) -> None:
         image_url_better = tup[4]
         image_url_tropical = tup[5]
         image_url_ultimate = tup[6]
-        produced_item = tup[8]
+        produced_item = tup[7]
         lst.append(Place(name, position, commands, image_url, image_url_better, image_url_tropical, image_url_ultimate, produced_item))
 
 
@@ -91,13 +91,6 @@ def get_hidden() -> list:
     return __hidden_places__
 
 
-def get_quest_active() -> list:
-    """
-    Returns all places that can appear in jobs
-    """
-    return __quest_active_places__
-
-
 __con__ = sqlite3.connect('objects.db')
 __cur__ = __con__.cursor()
 
@@ -112,10 +105,6 @@ __generate_list(__public_places__)
 __hidden_places__ = []
 __cur__.execute('SELECT * FROM places WHERE visibility=1')
 __generate_list(__hidden_places__)
-
-__quest_active_places__ = []
-__cur__.execute('SELECT * FROM places WHERE quest_active=1')
-__generate_list(__quest_active_places__)
 
 __con__.close()
 
