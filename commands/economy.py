@@ -57,32 +57,20 @@ class Economy(commands.Cog):
         except AttributeError:
             pass
 
-    @commands.command()
+    # @commands.command()
+    @cog_ext.cog_subcommand(base="job", guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
-    async def job(self, ctx, *args) -> None:
+    async def show(self, ctx) -> None:
         """
-        Get yourself some jobs and earn money
+        Shows your current job
         """
-        player = await players.get(ctx.author.id)
         current_job = jobs.get(ctx.author.id)
         job_embed = discord.Embed(colour=discord.Colour.gold())
         job_embed.set_author(name="{}'s Job".format(ctx.author.name),
                              icon_url=ctx.author.avatar_url)
         if current_job is None:
-            if args and args[0] == "new":
-                job = jobs.generate(player)
-                item = items.get(job.place_from.produced_item)
-                job_message =  "{} needs {} {} from {}. You get ${:,} for this transport".format(
-                        job.place_to.name, self.bot.get_emoji(item.emoji), item.name, job.place_from.name, job.reward)
-                job_embed.add_field(name="You got a new Job", value=job_message, inline=False)
-                job_embed.add_field(name="Current state", value=jobs.get_state(job))
-                if ctx.author.id in [a.player.user_id for a in self.driving_commands.active_drives]:
-                    active_drive = self.driving_commands.get_active_drive(ctx.author.id)
-                    await active_drive.message.edit(embed=self.driving_commands.get_drive_embed(active_drive.player, ctx.author.avatar_url),
-                                                    components=self.driving_commands.get_buttons(active_drive.player))
-            else:
                 job_embed.add_field(name="You don't have a job at the moment",
                                     value="Type `t.job new` to get one")
         else:
@@ -94,9 +82,34 @@ class Economy(commands.Cog):
             job_embed.add_field(name="Current state", value=jobs.get_state(current_job))
         await ctx.send(embed=job_embed)
 
+    @cog_ext.cog_subcommand(base="job", guild_ids=[830928381100556338])
+    async def new(self, ctx):
+        """
+        Get a new job
+        """
+        player = await players.get(ctx.author.id)
+        current_job = jobs.get(ctx.author.id)
+        job_embed = discord.Embed(colour=discord.Colour.gold())
+        job_embed.set_author(name="{}'s Job".format(ctx.author.name),
+                             icon_url=ctx.author.avatar_url)
+        if current_job == None:
+            job = jobs.generate(player)
+            item = items.get(job.place_from.produced_item)
+            job_message =  "{} needs {} {} from {}. You get ${:,} for this transport".format(
+                    job.place_to.name, self.bot.get_emoji(item.emoji), item.name, job.place_from.name, job.reward)
+            job_embed.add_field(name="You got a new Job", value=job_message, inline=False)
+            job_embed.add_field(name="Current state", value=jobs.get_state(job))
+            if ctx.author.id in [a.player.user_id for a in self.driving_commands.active_drives]:
+                active_drive = self.driving_commands.get_active_drive(ctx.author.id)
+                await active_drive.message.edit(embed=self.driving_commands.get_drive_embed(active_drive.player, ctx.author.avatar_url),
+                                                components=self.driving_commands.get_buttons(active_drive.player))
+        else:
+            job_embed.add_field(name="You can't claim more than one job",
+                                value="Finish your current job before you start a new one")
+
 
     #@commands.command()
-    @cog_ext.cog_slash(guild_ids=[830928381100556338])
+    @cog_ext.cog_subcommand(base="truck", guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
@@ -150,19 +163,11 @@ class Economy(commands.Cog):
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
-    async def give(self, ctx, user: discord.User, amount) -> None:
+    async def give(self, ctx, user: discord.User, amount:int) -> None:
         """
         Do I really have to explain this?
         """
-        if user is None:
-            await ctx.send("No user specified")
-            return
-        if amount is None:
-            await ctx.send("No amount specified")
-        try:
-            amount = abs(int(amount))
-        except ValueError:
-            await ctx.send("Wtf")
+        amount = abs(int(amount))
         donator = await players.get(ctx.author.id)
         acceptor = await players.get(user.id)
         await players.debit_money(donator, amount)
