@@ -105,6 +105,7 @@ class Economy(commands.Cog):
         else:
             job_embed.add_field(name="You can't claim more than one job",
                                 value="Finish your current job before you start a new one")
+        await ctx.send(embed=job_embed)
 
 
     @cog_ext.cog_subcommand(base="truck", guild_ids=[830928381100556338])

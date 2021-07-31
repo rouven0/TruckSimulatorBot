@@ -239,6 +239,7 @@ class Driving(commands.Cog):
                                    f"Click [here]({active_drive.message.jump_url}) to jump right back into your Truck",
                                    colour=discord.Colour.gold()))
             return
+        await ctx.send("Preparing your Truck...")
         message = await ctx.channel.send(embed=self.get_drive_embed(player, ctx.author.avatar_url),
                                          components=self.get_buttons(player))
         self.active_drives.append(players.ActiveDrive(player, message, time()))
