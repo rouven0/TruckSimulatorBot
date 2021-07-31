@@ -6,6 +6,8 @@ import git
 
 import discord
 from discord.ext import commands
+from discord_slash import cog_ext
+from discord_slash.utils.manage_commands import create_permission
 
 import players
 import places
@@ -39,15 +41,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
                                            name="t.help on " + str(len(self.bot.guilds)) + " Servers"))
         logging.info("Joined {} [{}]".format(guild.name, guild.id))
 
-    @commands.command()
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
-    async def bing(self, ctx) -> None:
-        answer = await ctx.channel.send("Bong")
-        await ctx.channel.send(str(round((answer.created_at - ctx.message.created_at).total_seconds() * 1000)) + "ms")
-
-    @commands.command()
+    @cog_ext.cog_subcommand(base="system", guild_ids=[830928381100556338])
     async def info(self, ctx) -> None:
         info_embed = discord.Embed(title="Truck Simulator info", colour=discord.Colour.gold())
         uptime = datetime.now() - self.start_time
@@ -63,66 +57,21 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         info_embed.add_field(name="Driving Trucks", value=str(len(self.driving_commands.active_drives)))
         info_embed.add_field(name="Branch", value=self.branch)
         info_embed.add_field(name="Commit", value=self.commit)
-        await ctx.channel.send(embed=info_embed)
+        await ctx.send(embed=info_embed)
 
-    @commands.command()
+    @cog_ext.cog_slash(guild_ids=[830928381100556338],
+                       default_permission=False,
+                       permissions={
+                           830928381100556338: [
+                               create_permission(692796548282712074, 2, True)]})
+
     @commands.is_owner()
     async def shutdown(self, ctx) -> None:
         await self.driving_commands.on_shutdown()
         await self.bot.change_presence(status=discord.Status.idle)
-        await ctx.channel.send("Shutting down")
+        await ctx.send("Shutting down")
         logging.warning("Shutdown command is executed")
         await self.bot.close()
-
-    @commands.command()
-    @commands.is_owner()
-    async def update(self, ctx) -> None:
-        await self.bot.change_presence(status=discord.Status.online,
-                                       activity=discord.Activity(
-                                           type=discord.ActivityType.watching,
-                                           name="t.help on " + str(len(self.bot.guilds)) + " Servers"))
-        await ctx.channel.send("Done")
-
-    @commands.Cog.listener()
-    async def on_command_error(self, ctx, error: commands.CommandError) -> None:
-        if isinstance(error, commands.errors.BotMissingPermissions):
-            missing_permissions = '`'
-            for permission in error.missing_perms:
-                missing_permissions = missing_permissions + "\n" + permission
-            await ctx.channel.send("I'm missing the following permissions:" + missing_permissions + '`')
-
-        elif isinstance(error, commands.errors.MissingRequiredArgument):
-            if len(ctx.invoked_parents) > 0:
-                await ctx.channel.send(f"Command usage: `t.{ctx.invoked_parents[0]} {ctx.command.name} {ctx.command.signature}`")
-            else:
-                await ctx.channel.send(f"Command usage: `t.{ctx.command.name} {ctx.command.signature}`")
-
-        elif isinstance(error, commands.errors.UserNotFound):
-            await ctx.channel.send(f"User **`{error.argument}`** not found")
-
-        elif isinstance(error, commands.errors.CommandInvokeError):
-            if isinstance(error.original, players.PlayerNotRegistered):
-                await ctx.channel.send(
-                    "<@!{}> you are not registered yet! "
-                    "Try `t.register` to get started".format(error.original.requested_id))
-
-            elif isinstance(error.original, players.NotEnoughMoney):
-                await ctx.channel.send("{} you don't have enough money to do this".format(ctx.author.mention))
-
-            elif isinstance(error.original, places.WrongPlaceError):
-                await ctx.channel.send(error.original.message)
-
-            elif isinstance(error.original, TruckNotFound):
-                await ctx.channel.send("Truck not found")
-
-            else:
-                logging.error(f"Error at t.{ctx.command} in Server {ctx.guild.name} in channel {ctx.channel.name} from {ctx.author.name}: " + str(error))
-
-        elif isinstance(error, commands.errors.CommandNotFound):
-            pass
-
-        else:
-            logging.error(f"Error at t.{ctx.command} in Server {ctx.guild.name} in channel {ctx.channel.name} from {ctx.author.name}: " + str(error))
 
     @commands.Cog.listener()
     async def on_slash_command_error(self, ctx, error) -> None:
@@ -131,12 +80,6 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
             for permission in error.missing_perms:
                 missing_permissions = missing_permissions + "\n" + permission
             await ctx.send("I'm missing the following permissions:" + missing_permissions + '`')
-
-        elif isinstance(error, commands.errors.MissingRequiredArgument):
-            if len(ctx.invoked_parents) > 0:
-                await ctx.send(f"Command usage: `t.{ctx.invoked_parents[0]} {ctx.command.name} {ctx.command.signature}`")
-            else:
-                await ctx.send(f"Command usage: `t.{ctx.command.name} {ctx.command.signature}`")
 
         elif isinstance(error, commands.errors.UserNotFound):
             await ctx.send(f"User **`{error.argument}`** not found")

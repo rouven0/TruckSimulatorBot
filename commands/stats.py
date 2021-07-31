@@ -4,6 +4,7 @@ This module contains the Cog for all stat-related commands
 import discord
 from discord.ext import commands
 from discord_slash import cog_ext
+from discord_slash.utils.manage_commands import create_option
 import jobs
 import players
 import trucks
@@ -19,7 +20,6 @@ class Stats(commands.Cog):
         self.bot = bot
         super().__init__()
 
-    #@commands.command()
     @cog_ext.cog_subcommand(base="profile", guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
@@ -40,7 +40,6 @@ class Stats(commands.Cog):
         else:
             await ctx.send("You are already registered")
 
-    #@commands.command()
     @cog_ext.cog_subcommand(base="profile", guild_ids=[830928381100556338])
     async def delete(self, ctx) -> None:
         """
@@ -69,7 +68,6 @@ class Stats(commands.Cog):
         else:
             await ctx.send("Deletion aborted!")
 
-    #@commands.command(aliases=["p", "me"])
     @cog_ext.cog_subcommand(base="profile", name="show", guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
@@ -108,33 +106,37 @@ class Stats(commands.Cog):
         profile_embed.set_image(url=truck.image_url)
         await ctx.send(embed=profile_embed)
 
-    #@commands.command()
-    @cog_ext.cog_slash(guild_ids=[830928381100556338])
+    @cog_ext.cog_slash(guild_ids=[830928381100556338],
+            options=[
+                create_option(
+                    name="key",
+                    description="The list you want to view",
+                    option_type=3,
+                    choices=["level", "money", "miles"],
+                    required=True)])
+
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
-    async def top(self, ctx, key="level") -> None:
+    async def top(self, ctx, key) -> None:
         """
         If you appear in these lists you are one of the top 10 Players. Congratulations!
         """
-        top_players = await players.get_top(key.lower())
+        top_players = await players.get_top(key)
         top_body = ""
-        top_title = "level"
         count = 0
         top_embed = discord.Embed(title="Truck Simulator top list", colour=discord.Colour.gold())
 
         for player in top_players[0]:
-            if top_players[1] == "money":
+            if key == "money":
                 val = "{:,}".format(player.money)
-                top_title = top_players[1]
-            elif top_players[1] == "miles":
+            elif key == "miles":
                 val = "{:,}".format(player.miles)
-                top_title = top_players[1]
             else:
                 val = "{:,} ({}/{} xp)".format(player.level, player.xp, levels.get_next_xp(player.level))
                 top_embed.set_footer(text="You can also sort by money and miles", icon_url=self.bot.user.avatar_url)
             count += 1
             top_body += "**{}**. {} ~ {}{}\n".format(count, player.name,
-                                                      val, top_players[2])
-        top_embed.add_field(name="Top {}".format(top_title), value=top_body)
+                                                      val, top_players[1])
+        top_embed.add_field(name=f"Top {key}", value=top_body)
         await ctx.send(embed=top_embed)

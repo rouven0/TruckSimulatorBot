@@ -21,17 +21,16 @@ class Gambling(commands.Cog):
         self.bot = bot
         super().__init__()
 
-    # @commands.command(aliases=["cf"])
     @cog_ext.cog_slash(guild_ids=[830928381100556338],
             options=[
                 create_option(
-                    name="side", 
+                    name="side",
                     description="The side you bet on",
                     option_type=3,
                     choices=["heads", "tails"],
                     required=True),
                 create_option(
-                    name="amount", 
+                    name="amount",
                     description="The amount you bet",
                     option_type=10,
                     required=True) ])
@@ -46,6 +45,7 @@ class Gambling(commands.Cog):
         player = await players.get(ctx.author.id)
         if "coinflip" not in places.get(player.position).commands:
             raise places.WrongPlaceError("We are not in Las Vegas!!!")
+
         await players.debit_money(player, amount)
         if randint(0, 1) == 0:
             result = "heads"
@@ -58,7 +58,6 @@ class Gambling(commands.Cog):
         else:
             await ctx.send("Nope, it was {}. You lost ${}".format(result, "{:,}".format(amount)))
 
-    # @commands.command()
     @cog_ext.cog_slash(guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
@@ -66,7 +65,6 @@ class Gambling(commands.Cog):
     async def slots(self, ctx, amount:int) -> None:
         """
         Simple slot machine
-
         """
         player = await players.get(ctx.author.id)
         if "slots" not in places.get(player.position).commands:
@@ -86,10 +84,9 @@ class Gambling(commands.Cog):
         if chosen_items.count(chosen_items[0]) == 3:
             slots_embed.add_field(name="Result", value=":tada: Congratulations, you won {:,} :tada:".format(amount*10))
             await players.add_money(player, amount*11)
-        elif chosen_items.count(chosen_items[0]) == 2 or chosen_items.count(chosen_items[1]) == 2: 
+        elif chosen_items.count(chosen_items[0]) == 2 or chosen_items.count(chosen_items[1]) == 2:
             slots_embed.add_field(name="Result", value="You won ${:,}".format(amount))
             await players.add_money(player, amount*2)
         else:
             slots_embed.add_field(name="Result", value="You lost ${:,}".format(amount))
-
         await ctx.send(embed=slots_embed)

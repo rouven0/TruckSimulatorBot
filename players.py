@@ -224,7 +224,7 @@ async def get(user_id: int) -> Player:
     return __from_tuple(player_tuple)
 
 
-async def get_top(key="level") -> tuple:
+async def get_top(key) -> tuple:
     """
     Get the top 10 players from the database
     """
@@ -239,7 +239,7 @@ async def get_top(key="level") -> tuple:
         suffix = ""
     top_tuples = await cur.fetchmany(10)
     await cur.close()
-    return __list_from_tuples(top_tuples), key, suffix
+    return __list_from_tuples(top_tuples), suffix
 
 
 async def registered(user_id: int) -> bool:
