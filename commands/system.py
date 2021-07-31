@@ -1,4 +1,3 @@
-from discord import player
 from commands.driving import Driving
 from datetime import datetime
 from math import floor
@@ -124,3 +123,40 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
 
         else:
             logging.error(f"Error at t.{ctx.command} in Server {ctx.guild.name} in channel {ctx.channel.name} from {ctx.author.name}: " + str(error))
+
+    @commands.Cog.listener()
+    async def on_slash_command_error(self, ctx, error) -> None:
+        if isinstance(error, commands.errors.BotMissingPermissions):
+            missing_permissions = '`'
+            for permission in error.missing_perms:
+                missing_permissions = missing_permissions + "\n" + permission
+            await ctx.send("I'm missing the following permissions:" + missing_permissions + '`')
+
+        elif isinstance(error, commands.errors.MissingRequiredArgument):
+            if len(ctx.invoked_parents) > 0:
+                await ctx.send(f"Command usage: `t.{ctx.invoked_parents[0]} {ctx.command.name} {ctx.command.signature}`")
+            else:
+                await ctx.send(f"Command usage: `t.{ctx.command.name} {ctx.command.signature}`")
+
+        elif isinstance(error, commands.errors.UserNotFound):
+            await ctx.send(f"User **`{error.argument}`** not found")
+
+        elif isinstance(error, places.WrongPlaceError):
+            await ctx.send(error.message)
+            
+        elif isinstance(error, players.NotEnoughMoney):
+            await ctx.send("{} you don't have enough money to do this".format(ctx.author.mention))
+
+        if isinstance(error, players.PlayerNotRegistered):
+            await ctx.send(
+                "<@!{}> you are not registered yet! "
+                "Try `t.register` to get started".format(error.original.requested_id))
+
+        elif isinstance(error, TruckNotFound):
+                await ctx.send("Truck not found")
+
+        elif isinstance(error, commands.errors.CommandNotFound):
+            pass
+
+        else:
+            logging.error(f"Error at t.{ctx.command} in Server {ctx.guild.name} in channel {ctx.name} from {ctx.author.name}: " + str(error))

@@ -6,6 +6,7 @@ import logging
 from random import randint
 import discord
 from discord.ext import commands
+from discord_slash import cog_ext
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import players
 import places
@@ -47,7 +48,7 @@ class Economy(commands.Cog):
                                   colour=discord.Colour.gold())
         gas_embed.add_field(name="Main gas station", value=f"${self.gas_price} per litre")
         try:
-            await self.news_channel.send(embed=gas_embed)
+            await self.news_send(embed=gas_embed)
             self.driving_commands.gas_price = self.gas_price
             logging.info(f"The new gas price is {self.gas_price}")
             gas_file = open("gas.txt", "w")
@@ -91,10 +92,11 @@ class Economy(commands.Cog):
             job_message= "Bring {} {} from {} to {}.".format(self.bot.get_emoji(item.emoji), item.name, place_from.name, place_to.name)
             job_embed.add_field(name="Your current job", value=job_message, inline=False)
             job_embed.add_field(name="Current state", value=jobs.get_state(current_job))
-        await ctx.channel.send(embed=job_embed)
+        await ctx.send(embed=job_embed)
 
 
-    @commands.command()
+    #@commands.command()
+    @cog_ext.cog_slash(guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
@@ -106,7 +108,7 @@ class Economy(commands.Cog):
 
         if ctx.author.id in [a.player.user_id for a in self.driving_commands.active_drives]:
             active_drive = self.driving_commands.get_active_drive(ctx.author.id)
-            await ctx.channel.send(
+            await ctx.send(
                     embed=discord.Embed(title=f"Hey {ctx.author.name}",
                                        description="You can't refill a driving vehicle\n"
                                                    "Click [here]({}) to jump right back into your Truck".format(active_drive.message.jump_url),
@@ -123,7 +125,7 @@ class Economy(commands.Cog):
             await players.debit_money(player, price)
         except players.NotEnoughMoney:
             if player.gas < 170:
-                await ctx.channel.send(
+                await ctx.send(
                     f"{ctx.author.mention} We have a problem: You don't have enough money. Lets make a deal. "
                 "I will give you 100 litres of gas, and you lose 2 levels")
                 if player.level > 2:
@@ -131,7 +133,7 @@ class Economy(commands.Cog):
                 else:
                     await players.update(player, gas=player.gas+100, xp=0)
             else:
-                await ctx.channel.send(f"{ctx.author.mention} you don't have enough money to do this. "
+                await ctx.send(f"{ctx.author.mention} you don't have enough money to do this. "
                                             "Do some jobs and come back if you have enough")
             return
 
@@ -141,29 +143,30 @@ class Economy(commands.Cog):
         refill_embed.set_footer(
             text="Wonder how these prices are calculated? Check out the daily gas prices in the official server")
         await players.update(player, gas=trucks.get(player.truck_id).gas_capacity)
-        await ctx.channel.send(embed=refill_embed)
+        await ctx.send(embed=refill_embed)
 
-    @commands.command()
+    #@commands.command()
+    @cog_ext.cog_slash(guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
-    async def give(self, ctx, user: discord.User = None, amount=None) -> None:
+    async def give(self, ctx, user: discord.User, amount) -> None:
         """
         Do I really have to explain this?
         """
         if user is None:
-            await ctx.channel.send("No user specified")
+            await ctx.send("No user specified")
             return
         if amount is None:
-            await ctx.channel.send("No amount specified")
+            await ctx.send("No amount specified")
         try:
             amount = abs(int(amount))
         except ValueError:
-            await ctx.channel.send("Wtf")
+            await ctx.send("Wtf")
         donator = await players.get(ctx.author.id)
         acceptor = await players.get(user.id)
         await players.debit_money(donator, amount)
         await players.add_money(acceptor, amount)
         give_embed = discord.Embed(description=f"{donator.name} gave ${amount} to {acceptor.name}",
                                    colour=discord.Colour.gold())
-        await ctx.channel.send(embed=give_embed)
+        await ctx.send(embed=give_embed)
