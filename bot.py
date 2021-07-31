@@ -32,7 +32,7 @@ INGAME_NEWS_CHANNEL_ID = int(getenv('INGAME_NEWS_CHANNEL_ID', default=0))
 
 def main():
     bot = commands.Bot(command_prefix=BOT_PREFIX,
-                       help_command=None(),
+                       help_command=None,
                        case_insensitive=True)
 
     bot.topggpy = topgg.DBLClient(bot, DBL_TOKEN)
