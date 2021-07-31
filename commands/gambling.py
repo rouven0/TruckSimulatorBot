@@ -34,8 +34,8 @@ class Gambling(commands.Cog):
                     name="amount", 
                     description="The amount you bet",
                     option_type=10,
-                    required=True)
-            ])
+                    required=True) ])
+
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
