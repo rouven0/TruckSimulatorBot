@@ -3,6 +3,7 @@ This module contains the Cog for all stat-related commands
 """
 import discord
 from discord.ext import commands
+from discord_slash import cog_ext
 import jobs
 import players
 import trucks
@@ -18,36 +19,38 @@ class Stats(commands.Cog):
         self.bot = bot
         super().__init__()
 
-    @commands.command()
+    #@commands.command()
+    @cog_ext.cog_slash(guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
     async def register(self, ctx) -> None:
         """
-        Register yourself in a stunningly beautiful database that will definitely not deleted by accident anymore
+        Register yourself in a stunningly beautiful database
         """
         welcome_file = open("./messages/welcome.md", "r")
         welcome_embed = discord.Embed(title="Hey there, fellow Trucker,", description=welcome_file.read(),
                                       colour=discord.Colour.gold())
         welcome_file.close()
         welcome_embed.set_author(name="Welcome to the Truck Simulator", icon_url=self.bot.user.avatar_url)
-        await ctx.channel.send(embed=welcome_embed)
+        await ctx.send(embed=welcome_embed)
         if not await players.registered(ctx.author.id):
             await players.insert(players.Player(ctx.author.id, ctx.author.name, money=1000))
-            await ctx.channel.send("Welcome to the Truckers, {}".format(ctx.author.mention))
+            await ctx.send("Welcome to the Truckers, {}".format(ctx.author.mention))
         else:
-            await ctx.channel.send("You are already registered")
+            await ctx.send("You are already registered")
 
-    @commands.command()
+    #@commands.command()
+    @cog_ext.cog_slash(guild_ids=[830928381100556338])
     async def delete(self, ctx) -> None:
         """
         Delete your account
         """
         player = await players.get(ctx.author.id)
-        await ctx.channel.send("{} Are you sure you want to delete your profile? "
+        await ctx.send("{} Are you sure you want to delete your profile? "
                                "**All your ingame stats will be lost!**".format(ctx.author.mention))
         confirmation = "delete {}@trucksimulator".format(ctx.author.name)
-        await ctx.channel.send("Please type **`{}`** to confirm your deletion".format(confirmation))
+        await ctx.send("Please type **`{}`** to confirm your deletion".format(confirmation))
 
         def check(message):
             return message.author.id == ctx.author.id
@@ -62,11 +65,12 @@ class Stats(commands.Cog):
             job = jobs.get(ctx.author.id)
             if job is not None:
                 jobs.remove(job)
-            await ctx.channel.send("Your profile got deleted. We will miss you :(")
+            await ctx.send("Your profile got deleted. We will miss you :(")
         else:
-            await ctx.channel.send("Deletion aborted!")
+            await ctx.send("Deletion aborted!")
 
-    @commands.command(aliases=["p", "me"])
+    #@commands.command(aliases=["p", "me"])
+    @cog_ext.cog_slash(guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
@@ -102,9 +106,10 @@ class Stats(commands.Cog):
         profile_embed.add_field(name="Gas left", value=f"{player.gas} l", inline=False)
         profile_embed.add_field(name="Current truck", value=truck.name)
         profile_embed.set_image(url=truck.image_url)
-        await ctx.channel.send(embed=profile_embed)
+        await ctx.send(embed=profile_embed)
 
-    @commands.command()
+    #@commands.command()
+    @cog_ext.cog_slash(guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
@@ -132,4 +137,4 @@ class Stats(commands.Cog):
             top_body += "**{}**. {} ~ {}{}\n".format(count, player.name,
                                                       val, top_players[2])
         top_embed.add_field(name="Top {}".format(top_title), value=top_body)
-        await ctx.channel.send(embed=top_embed)
+        await ctx.send(embed=top_embed)
