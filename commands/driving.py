@@ -226,7 +226,6 @@ class Driving(commands.Cog):
                                                   truck_miles=active_drive.player.truck_miles,
                                                   gas=active_drive.player.gas)
 
-    # @commands.command()
     @cog_ext.cog_subcommand(base="truck", guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
@@ -250,14 +249,13 @@ class Driving(commands.Cog):
                                          components=self.get_buttons(player))
         self.active_drives.append(players.ActiveDrive(player, message, time()))
 
-    # @commands.command()
     @cog_ext.cog_subcommand(base="truck", guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
     async def stop(self, ctx) -> None:
         """
-        An alternate stop method to get your changes applied if there is a problem with the reactions
+        An alternate stop method if there is a problem with the buttons
         """
         active_drive = self.get_active_drive(ctx.author.id)
         if active_drive is None:
@@ -274,7 +272,6 @@ class Driving(commands.Cog):
                        gas=active_drive.player.gas)
 
 
-    # @commands.command(aliases=["here"])
     @cog_ext.cog_subcommand(base="truck", guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
