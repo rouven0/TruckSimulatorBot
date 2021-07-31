@@ -6,6 +6,7 @@ from datetime import datetime
 from discord.ext import commands
 from discord.ext import tasks
 from discord_components import DiscordComponents
+from discord_slash import SlashCommand
 
 import topgg
 
@@ -38,6 +39,7 @@ def main():
     bot.topggpy = topgg.DBLClient(bot, DBL_TOKEN)
 
     DiscordComponents(bot)
+    SlashCommand(bot, sync_commands=True)
     logger = logging.getLogger()
 
 

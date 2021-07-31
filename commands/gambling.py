@@ -5,6 +5,7 @@ from random import randint, sample, choices
 import discord
 
 from discord.ext import commands
+from discord_slash import cog_ext
 
 import players
 import places
@@ -19,11 +20,12 @@ class Gambling(commands.Cog):
         self.bot = bot
         super().__init__()
 
-    @commands.command(aliases=["cf"])
+    # @commands.command(aliases=["cf"])
+    @cog_ext.cog_slash(guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
-    async def coinflip(self, ctx, side=None, amount=None) -> None:
+    async def coinflip(self, ctx, side: str, amount:int) -> None:
         """
         Test your luck while throwing a coin
         """
@@ -39,7 +41,7 @@ class Gambling(commands.Cog):
                 amount = int(amount)
 
             if str.lower(side) not in ["h", "head", "t", "tails"]:
-                await ctx.channel.send("**Syntax:** `t.coinflip [h/t] <amount>`")
+                await ctx.send("**Syntax:** `t.coinflip [h/t] <amount>`")
                 return
 
             if side == "h":
@@ -53,25 +55,22 @@ class Gambling(commands.Cog):
                 result = "tails"
 
             if result == side:
-                await ctx.channel.send("Congratulations, it was {}. You won ${}".format(result, "{:,}".format(amount)))
+                await ctx.send("Congratulations, it was {}. You won ${}".format(result, "{:,}".format(amount)))
                 await players.add_money(player, amount*2)
             else:
-                await ctx.channel.send("Nope, it was {}. You lost ${}".format(result, "{:,}".format(amount)))
+                await ctx.send("Nope, it was {}. You lost ${}".format(result, "{:,}".format(amount)))
         except (TypeError, ValueError):
-            await ctx.channel.send("**Syntax:** `t.coinflip [h/t] <amount>`")
+            await ctx.send("**Syntax:** `t.coinflip [h/t] <amount>`")
 
-    @commands.command()
+    # @commands.command()
+    @cog_ext.cog_slash(guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
-    async def slots(self, ctx, amount=None) -> None:
+    async def slots(self, ctx, amount:int) -> None:
         """
         Simple slot machine
 
-        **__Payouts:__**
-        **No identical items:** You lose your money
-        **2 identical items:** You win the amount you bet
-        **3 identical items:** You win 10x the amount you bet
         """
         player = await players.get(ctx.author.id)
         if "slots" not in places.get(player.position).commands:
@@ -104,7 +103,7 @@ class Gambling(commands.Cog):
             else:
                 slots_embed.add_field(name="Result", value="You lost ${:,}".format(amount))
 
-            await ctx.channel.send(embed=slots_embed)
+            await ctx.send(embed=slots_embed)
 
         except (TypeError, ValueError) as e:
-            await ctx.channel.send("**Syntax:** `t.slots <amount>`")
+            await ctx.send("**Syntax:** `t.slots <amount>`")
