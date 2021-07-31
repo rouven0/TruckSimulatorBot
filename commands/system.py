@@ -143,14 +143,14 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
 
         elif isinstance(error, places.WrongPlaceError):
             await ctx.send(error.message)
-            
+
         elif isinstance(error, players.NotEnoughMoney):
             await ctx.send("{} you don't have enough money to do this".format(ctx.author.mention))
 
         if isinstance(error, players.PlayerNotRegistered):
             await ctx.send(
                 "<@!{}> you are not registered yet! "
-                "Try `t.register` to get started".format(error.original.requested_id))
+                "Try `t.register` to get started".format(error.requested_id))
 
         elif isinstance(error, TruckNotFound):
                 await ctx.send("Truck not found")

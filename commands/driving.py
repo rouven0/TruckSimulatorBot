@@ -6,6 +6,7 @@ from time import time
 import discord
 from discord.ext import commands
 from discord.ext import tasks
+from discord_slash import cog_ext
 from discord_components import Button, Select, SelectOption
 import players
 import items
@@ -147,7 +148,7 @@ class Driving(commands.Cog):
                 await players.debit_money(active_drive.player, price)
             except players.NotEnoughMoney:
                 if active_drive.player.gas < 170:
-                    await interaction.channel.send(
+                    await interaction.send(
                         f"{interaction.author.mention} We have a problem: You don't have enough money. Lets make a deal. "
                         "I will give you 100 litres of gas, and you lose 2 levels")
                     if active_drive.player.level > 2:
@@ -155,7 +156,7 @@ class Driving(commands.Cog):
                     else:
                         await players.update(active_drive.player, gas=active_drive.player.gas+100, xp=0)
                 else:
-                    await interaction.channel.send(f"{interaction.author.mention} you don't have enough money to do this. "
+                    await interaction.send(f"{interaction.author.mention} you don't have enough money to do this. "
                                             "Do some jobs and come back if you have enough")
                 drive_embed = self.get_drive_embed(active_drive.player, interaction.author.avatar_url)
                 await interaction.respond(type=7, embed=drive_embed, components=self.get_buttons(active_drive.player))
@@ -220,7 +221,8 @@ class Driving(commands.Cog):
                                                   truck_miles=active_drive.player.truck_miles,
                                                   gas=active_drive.player.gas)
 
-    @commands.command()
+    # @commands.command()
+    @cog_ext.cog_slash(guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
@@ -234,7 +236,7 @@ class Driving(commands.Cog):
             await players.update(player, name=ctx.author.name)
         if ctx.author.id in [a.player.user_id for a in self.active_drives]:
             active_drive = self.get_active_drive(ctx.author.id)
-            await ctx.channel.send(embed=discord.Embed(title=f"Hey {ctx.author.name}",
+            await ctx.send(embed=discord.Embed(title=f"Hey {ctx.author.name}",
                                    description="You can't drive on two roads at once!\n"
                                    f"Click [here]({active_drive.message.jump_url}) to jump right back into your Truck",
                                    colour=discord.Colour.gold()))
@@ -243,22 +245,23 @@ class Driving(commands.Cog):
                                          components=self.get_buttons(player))
         self.active_drives.append(players.ActiveDrive(player, message, time()))
 
-    @commands.command()
+    # @commands.command()
+    @cog_ext.cog_slash(guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
     async def stop(self, ctx) -> None:
         """
-        This is an alternate stop method to get your changes applied if there is a problem with the reactions
+        An alternate stop method to get your changes applied if there is a problem with the reactions
         """
         active_drive = self.get_active_drive(ctx.author.id)
         if active_drive is None:
-            await ctx.channel.send("Nothing to do here")
+            await ctx.send("Nothing to do here")
             return
         self.active_drives.remove(active_drive)
         await active_drive.message.edit(
             embed=self.get_drive_embed(active_drive.player, ctx.author.avatar_url), components=[])
-        await ctx.channel.send("You stopped driving!, {}".format(ctx.author.name))
+        await ctx.send("You stopped driving!, {}".format(ctx.author.name))
         await players.update(active_drive.player,
                        position=active_drive.player.position,
                        miles=active_drive.player.miles,
@@ -266,7 +269,8 @@ class Driving(commands.Cog):
                        gas=active_drive.player.gas)
 
 
-    @commands.command(aliases=["here"])
+    # @commands.command(aliases=["here"])
+    @cog_ext.cog_slash(guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
@@ -287,7 +291,7 @@ class Driving(commands.Cog):
                                      value=self.get_place_commands(place.commands))
         if place.image_url_default is not None:
             position_embed.set_image(url=assets.get_place_image(player, place))
-        await ctx.channel.send(embed=position_embed)
+        await ctx.send(embed=position_embed)
 
     @staticmethod
     def get_place_commands(command_list) -> str:
@@ -299,7 +303,8 @@ class Driving(commands.Cog):
             readable = "{}{}`{}`\n".format(readable, symbols.LIST_ITEM, command)
         return readable
 
-    @commands.command(aliases=["places", "ab", "map"])
+    # @commands.command(aliases=["places", "ab", "map"])
+    @cog_ext.cog_slash(guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
@@ -310,7 +315,7 @@ class Driving(commands.Cog):
         places_embed = discord.Embed(title="All public known Places", colour=discord.Colour.gold())
         for place in places.get_public():
             places_embed.add_field(name=place.name, value=place.position)
-        await ctx.channel.send(embed=places_embed)
+        await ctx.send(embed=places_embed)
 
     def get_drive_embed(self, player: players.Player, avatar_url: str) -> discord.Embed:
         """
@@ -410,9 +415,9 @@ class Driving(commands.Cog):
         for active_drive in self.active_drives:
             await active_drive.message.edit(
                 embed=self.get_drive_embed(active_drive.player, self.bot.user.avatar_url), components=[])
-            if active_drive.message.channel.id not in processed_channels:
+            if active_drive.message.id not in processed_channels:
                 await active_drive.message.channel.send("All trucks were stopped due to a bot shutdown!")
-                processed_channels.append(active_drive.message.channel.id)
+                processed_channels.append(active_drive.message.id)
             await players.update(active_drive.player, position=active_drive.player.position,
                            miles=active_drive.player.miles,
                            truck_miles=active_drive.player.truck_miles,
