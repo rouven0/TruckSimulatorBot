@@ -57,7 +57,6 @@ class Economy(commands.Cog):
         except AttributeError:
             pass
 
-    # @commands.command()
     @cog_ext.cog_subcommand(base="job", guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
@@ -108,7 +107,6 @@ class Economy(commands.Cog):
                                 value="Finish your current job before you start a new one")
 
 
-    #@commands.command()
     @cog_ext.cog_subcommand(base="truck", guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
@@ -158,7 +156,6 @@ class Economy(commands.Cog):
         await players.update(player, gas=trucks.get(player.truck_id).gas_capacity)
         await ctx.send(embed=refill_embed)
 
-    #@commands.command()
     @cog_ext.cog_slash(guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,

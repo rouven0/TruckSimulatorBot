@@ -10,7 +10,6 @@ class Misc(commands.Cog):
     """
     All commands I can't find a category to
     """
-    #@commands.command()
     @cog_ext.cog_subcommand(base="links", guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
@@ -26,7 +25,6 @@ class Misc(commands.Cog):
                                       colour=discord.Colour.gold())
         await ctx.send(embed=support_embed)
 
-    #@commands.command()
     @cog_ext.cog_subcommand(base="links", guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
@@ -41,7 +39,6 @@ class Misc(commands.Cog):
                                       colour=discord.Colour.gold())
         await ctx.send(embed=support_embed)
 
-    # @commands.command()
     @cog_ext.cog_subcommand(base="links", guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
@@ -56,7 +53,6 @@ class Misc(commands.Cog):
                                       colour=discord.Colour.gold())
         await ctx.send(embed=support_embed)
 
-    #@commands.command()
     @cog_ext.cog_slash(guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
@@ -77,7 +73,6 @@ class Misc(commands.Cog):
                                     "not get banned. But people who use them will be.")
         await ctx.send(embed=rules_embed)
 
-    # @commands.command()
     @cog_ext.cog_subcommand(base="links", guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
@@ -93,8 +88,6 @@ class Misc(commands.Cog):
         links_embed.add_field(name="Top.gg page", value="https://top.gg/bot/831052837353816066", inline=False)
         await ctx.send(embed=links_embed)
 
-
-    # @commands.command()
     @cog_ext.cog_slash(guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
@@ -109,7 +102,6 @@ class Misc(commands.Cog):
                                  colour=discord.Colour.gold())
         await ctx.send(embed=vote_embed)
 
-    # @commands.command(hidden=True)
     @cog_ext.cog_slash(guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
@@ -124,14 +116,6 @@ class Misc(commands.Cog):
                                                    "**Miriel** - _The brain_ - Gave a lot of great tips and constructive feedback",
                                                    colour=discord.Colour.gold()))
 
-    @commands.command(hidden=True)
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
-    async def rechts(self, ctx) -> None:
-        await ctx.send("<:ts_actor:845028860361965598>")
-
-    # @commands.command(hidden=True)
     @cog_ext.cog_slash(guild_ids=[830928381100556338])
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
