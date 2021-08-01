@@ -127,7 +127,7 @@ class Driving(commands.Cog):
             await players.unload_item(active_drive.player, item)
 
             current_job = jobs.get(interaction.author.id)
-            if current_job is not None and item.name == current_job.place_from.produced_item:
+            if current_job is not None and item.name == current_job.place_from.produced_item and active_drive.player.position==current_job.place_to.position:
                 current_job.state = jobs.STATE_DONE
                 await players.add_money(active_drive.player, current_job.reward)
                 jobs.remove(current_job)
