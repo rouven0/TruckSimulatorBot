@@ -11,9 +11,6 @@ class Misc(commands.Cog):
     All commands I can't find a category to
     """
     @cog_ext.cog_subcommand(base="links")
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
     async def support(self, ctx) -> None:
         """
         Truck Simulator support server
@@ -26,9 +23,6 @@ class Misc(commands.Cog):
         await ctx.send(embed=support_embed)
 
     @cog_ext.cog_subcommand(base="links")
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
     async def github(self, ctx) -> None:
         """
         The truck simulator github repo
@@ -40,9 +34,6 @@ class Misc(commands.Cog):
         await ctx.send(embed=support_embed)
 
     @cog_ext.cog_subcommand(base="links")
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
     async def invite(self, ctx) -> None:
         """
         Invite the truck simulator to your servers
@@ -54,9 +45,6 @@ class Misc(commands.Cog):
         await ctx.send(embed=support_embed)
 
     @cog_ext.cog_slash()
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
     async def rules(self, ctx) -> None:
         """
         Truck Simulator rules
@@ -74,9 +62,6 @@ class Misc(commands.Cog):
         await ctx.send(embed=rules_embed)
 
     @cog_ext.cog_subcommand(base="links")
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
     async def all(self, ctx) -> None:
         """
         All the links in a beautiful list
@@ -103,9 +88,6 @@ class Misc(commands.Cog):
         await ctx.send(embed=vote_embed)
 
     @cog_ext.cog_slash()
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
     async def credits(self, ctx) -> None:
         """
         Wonderful people
@@ -117,9 +99,6 @@ class Misc(commands.Cog):
                                                    colour=discord.Colour.gold()))
 
     @cog_ext.cog_slash()
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
     async def complain(self, ctx) -> None:
         await ctx.send("What a crap bot this is! :rage: "
                 "Hours of time wasted on this useless procuct of a terrible coder and a lousy artist "

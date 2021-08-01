@@ -34,10 +34,6 @@ class Gambling(commands.Cog):
                     description="The amount you bet",
                     option_type=10,
                     required=True) ])
-
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
     async def coinflip(self, ctx, side: str, amount:int) -> None:
         """
         Test your luck while throwing a coin
@@ -59,9 +55,6 @@ class Gambling(commands.Cog):
             await ctx.send("Nope, it was {}. You lost ${}".format(result, "{:,}".format(amount)))
 
     @cog_ext.cog_slash()
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
     async def slots(self, ctx, amount:int) -> None:
         """
         Simple slot machine
