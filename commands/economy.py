@@ -57,7 +57,7 @@ class Economy(commands.Cog):
         except AttributeError:
             pass
 
-    @cog_ext.cog_subcommand(base="job", guild_ids=[830928381100556338])
+    @cog_ext.cog_subcommand(base="job")
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
@@ -81,7 +81,7 @@ class Economy(commands.Cog):
             job_embed.add_field(name="Current state", value=jobs.get_state(current_job))
         await ctx.send(embed=job_embed)
 
-    @cog_ext.cog_subcommand(base="job", guild_ids=[830928381100556338])
+    @cog_ext.cog_subcommand(base="job")
     async def new(self, ctx):
         """
         Get a new job
@@ -108,7 +108,7 @@ class Economy(commands.Cog):
         await ctx.send(embed=job_embed)
 
 
-    @cog_ext.cog_subcommand(base="truck", guild_ids=[830928381100556338])
+    @cog_ext.cog_subcommand(base="truck")
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
@@ -157,7 +157,7 @@ class Economy(commands.Cog):
         await players.update(player, gas=trucks.get(player.truck_id).gas_capacity)
         await ctx.send(embed=refill_embed)
 
-    @cog_ext.cog_slash(guild_ids=[830928381100556338])
+    @cog_ext.cog_slash()
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
