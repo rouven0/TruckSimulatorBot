@@ -58,9 +58,6 @@ class Economy(commands.Cog):
             pass
 
     @cog_ext.cog_subcommand(base="job")
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
     async def show(self, ctx) -> None:
         """
         Shows your current job
@@ -109,9 +106,6 @@ class Economy(commands.Cog):
 
 
     @cog_ext.cog_subcommand(base="truck")
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
     async def refill(self, ctx):
         """
         If you're at the gas station, you can refill your truck's gas
@@ -158,9 +152,6 @@ class Economy(commands.Cog):
         await ctx.send(embed=refill_embed)
 
     @cog_ext.cog_slash()
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
     async def give(self, ctx, user: discord.User, amount:int) -> None:
         """
         Do I really have to explain this?

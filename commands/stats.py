@@ -21,9 +21,6 @@ class Stats(commands.Cog):
         super().__init__()
 
     @cog_ext.cog_subcommand(base="profile")
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
     async def register(self, ctx) -> None:
         """
         Register yourself in a stunningly beautiful database
@@ -69,9 +66,6 @@ class Stats(commands.Cog):
             await ctx.send("Deletion aborted!")
 
     @cog_ext.cog_subcommand(base="profile", name="show")
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
     async def profile(self, ctx, user: discord.User = None) -> None:
         """
         Shows your in-game profile. That's it
@@ -114,10 +108,6 @@ class Stats(commands.Cog):
                     option_type=3,
                     choices=["level", "money", "miles"],
                     required=True)])
-
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
     async def top(self, ctx, key) -> None:
         """
         If you appear in these lists you are one of the top 10 Players. Congratulations!

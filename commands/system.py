@@ -30,7 +30,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         await self.bot.change_presence(status=discord.Status.online,
                                        activity=discord.Activity(
                                            type=discord.ActivityType.watching,
-                                           name="t.help on " + str(len(self.bot.guilds)) + " Servers"))
+                                           name="The new slash commands"))
         logging.info("Connected to Discord")
 
     @commands.Cog.listener()
@@ -64,8 +64,6 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
                        permissions={
                            830928381100556338: [
                                create_permission(692796548282712074, 2, True)]})
-
-    @commands.is_owner()
     async def shutdown(self, ctx) -> None:
         await self.driving_commands.on_shutdown()
         await self.bot.change_presence(status=discord.Status.idle)
