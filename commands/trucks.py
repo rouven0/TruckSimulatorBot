@@ -35,11 +35,7 @@ class Trucks(commands.Cog):
         self.driving_commands = driving_commands
         super().__init__()
 
-    #@commands.group(pass_context=True, aliases=["t"])
     @cog_ext.cog_subcommand(base="truck")
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
     async def mine(self, ctx):
         """
         Get details about your truck
@@ -55,7 +51,6 @@ class Trucks(commands.Cog):
 
         await ctx.send(embed=truck_embed)
 
-    # @truck.command()
     @cog_ext.cog_subcommand(base="truck")
     async def buy(self, ctx, id) -> None:
         """
@@ -102,7 +97,6 @@ class Trucks(commands.Cog):
         except ValueError:
             await ctx.send("Wtf do you want to show?")
 
-    # @truck.command()
     @cog_ext.cog_subcommand(base="truck")
     async def list(self, ctx) -> None:
         """
@@ -118,9 +112,6 @@ class Trucks(commands.Cog):
 
     # @commands.command()
     @cog_ext.cog_subcommand(base="truck")
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
     async def load(self, ctx) -> None:
         """
         Shows what your Truck currently has loaded

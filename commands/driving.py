@@ -251,9 +251,6 @@ class Driving(commands.Cog):
         self.active_drives.append(players.ActiveDrive(player, message, time()))
 
     @cog_ext.cog_subcommand(base="truck")
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
     async def stop(self, ctx) -> None:
         """
         An alternate stop method if there is a problem with the buttons
@@ -274,9 +271,6 @@ class Driving(commands.Cog):
 
 
     @cog_ext.cog_subcommand(base="truck")
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
     async def position(self, ctx) -> None:
         """
         Provides some information about your current position and the things located there
@@ -308,9 +302,6 @@ class Driving(commands.Cog):
 
     # @commands.command(aliases=["places", "ab", "map"])
     @cog_ext.cog_slash()
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
     async def addressbook(self, ctx) -> None:
         """
         Lists all public places. Hidden ones are excluded
