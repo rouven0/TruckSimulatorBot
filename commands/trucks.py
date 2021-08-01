@@ -36,7 +36,7 @@ class Trucks(commands.Cog):
         super().__init__()
 
     #@commands.group(pass_context=True, aliases=["t"])
-    @cog_ext.cog_subcommand(base="truck", guild_ids=[830928381100556338])
+    @cog_ext.cog_subcommand(base="truck")
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
@@ -56,7 +56,7 @@ class Trucks(commands.Cog):
         await ctx.send(embed=truck_embed)
 
     # @truck.command()
-    @cog_ext.cog_subcommand(base="truck", guild_ids=[830928381100556338])
+    @cog_ext.cog_subcommand(base="truck")
     async def buy(self, ctx, id) -> None:
         """
         Buy a new truck, your old one will be sold and your miles will be reset
@@ -85,7 +85,7 @@ class Trucks(commands.Cog):
         await ctx.send(embed=answer_embed)
 
     # @truck.command()
-    @cog_ext.cog_subcommand(base="truck", guild_ids=[830928381100556338])
+    @cog_ext.cog_subcommand(base="truck")
     async def show(self, ctx, id:int) -> None:
         """
         Shows details about a specific truck
@@ -103,7 +103,7 @@ class Trucks(commands.Cog):
             await ctx.send("Wtf do you want to show?")
 
     # @truck.command()
-    @cog_ext.cog_subcommand(base="truck", guild_ids=[830928381100556338])
+    @cog_ext.cog_subcommand(base="truck")
     async def list(self, ctx) -> None:
         """
         Lists all available Trucks
@@ -117,7 +117,7 @@ class Trucks(commands.Cog):
         await ctx.send(embed=list_embed)
 
     # @commands.command()
-    @cog_ext.cog_subcommand(base="truck", guild_ids=[830928381100556338])
+    @cog_ext.cog_subcommand(base="truck")
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)

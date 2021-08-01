@@ -20,7 +20,7 @@ class Stats(commands.Cog):
         self.bot = bot
         super().__init__()
 
-    @cog_ext.cog_subcommand(base="profile", guild_ids=[830928381100556338])
+    @cog_ext.cog_subcommand(base="profile")
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
@@ -40,7 +40,7 @@ class Stats(commands.Cog):
         else:
             await ctx.send("You are already registered")
 
-    @cog_ext.cog_subcommand(base="profile", guild_ids=[830928381100556338])
+    @cog_ext.cog_subcommand(base="profile")
     async def delete(self, ctx) -> None:
         """
         Delete your account
@@ -68,7 +68,7 @@ class Stats(commands.Cog):
         else:
             await ctx.send("Deletion aborted!")
 
-    @cog_ext.cog_subcommand(base="profile", name="show", guild_ids=[830928381100556338])
+    @cog_ext.cog_subcommand(base="profile", name="show")
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
@@ -106,7 +106,7 @@ class Stats(commands.Cog):
         profile_embed.set_image(url=truck.image_url)
         await ctx.send(embed=profile_embed)
 
-    @cog_ext.cog_slash(guild_ids=[830928381100556338],
+    @cog_ext.cog_slash(
             options=[
                 create_option(
                     name="key",
