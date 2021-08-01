@@ -1,6 +1,7 @@
 """
 This module contains the Cog for all driving-related commands
 """
+import asyncio
 from datetime import datetime
 from time import time
 import discord
@@ -58,7 +59,6 @@ class Driving(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self) -> None:
         self.check_drives.start()
-
 
     @commands.Cog.listener()
     async def on_button_click(self, interaction) -> None:
@@ -121,23 +121,28 @@ class Driving(commands.Cog):
                 if item.name not in [o.value for o in item_options]:
                     item_options.append(SelectOption(label=item.name, value=item.name, emoji=self.bot.get_emoji(item.emoji)))
             select = Select(placeholder="Choose which items to unload", options=item_options)
-            await interaction.respond(type=7, embed=drive_embed, components=[select])
-            selection = await self.bot.wait_for("select_option", check=lambda i: i.author.id == interaction.author.id)
-            item = items.get(selection.component[0].label)
-            await players.unload_item(active_drive.player, item)
+            cancel_button = Button(id="cancel", label="Cancel", style=4)
+            await interaction.respond(type=7, embed=drive_embed, components=[select, cancel_button])
+            try:
+                selection = await self.bot.wait_for("select_option", check=lambda i: i.author.id == interaction.author.id, timeout=3)
+                item = items.get(selection.component[0].label)
+                await players.unload_item(active_drive.player, item)
+                current_job = jobs.get(interaction.author.id)
+                if current_job is not None and item.name == current_job.place_from.produced_item and active_drive.player.position==current_job.place_to.position:
+                    current_job.state = jobs.STATE_DONE
+                    await players.add_money(active_drive.player, current_job.reward)
+                    jobs.remove(current_job)
+                    job_message = jobs.get_state(current_job) + await players.add_xp(active_drive.player, levels.get_job_reward_xp(active_drive.player.level))
+                    # get the drive embed egain to fit the job update
+                    drive_embed = self.get_drive_embed(active_drive.player, interaction.author.avatar_url)
+                    drive_embed.add_field(name="Job Notification", value=job_message)
+                drive_embed.add_field(name="Unloading successful", value=f"You removed {self.bot.get_emoji(item.emoji)} {item.name} from your truck", inline=False)
+                await selection.respond(type=7, embed=drive_embed, components=self.get_buttons(active_drive.player))
+            except asyncio.exceptions.TimeoutError:
+                pass
 
-            current_job = jobs.get(interaction.author.id)
-            if current_job is not None and item.name == current_job.place_from.produced_item and active_drive.player.position==current_job.place_to.position:
-                current_job.state = jobs.STATE_DONE
-                await players.add_money(active_drive.player, current_job.reward)
-                jobs.remove(current_job)
-                job_message = jobs.get_state(current_job) + await players.add_xp(active_drive.player, levels.get_job_reward_xp(active_drive.player.level))
-                # get the drive embed egain to fit the job update
-                drive_embed = self.get_drive_embed(active_drive.player, interaction.author.avatar_url)
-                drive_embed.add_field(name="Job Notification", value=job_message)
-            drive_embed.add_field(name="Unloading successful", value=f"You removed {self.bot.get_emoji(item.emoji)} {item.name} from your truck", inline=False)
-
-            await selection.respond(type=7, embed=drive_embed, components=self.get_buttons(active_drive.player))
+        if action == "cancel":
+            await interaction.respond(type=7, embed=self.get_drive_embed(active_drive.player, interaction.author.avatar_url), components=self.get_buttons(active_drive.player))
 
         if action == symbols.REFILL:
             gas_amount = trucks.get(active_drive.player.truck_id).gas_capacity - active_drive.player.gas
