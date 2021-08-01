@@ -41,7 +41,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
                                            name="t.help on " + str(len(self.bot.guilds)) + " Servers"))
         logging.info("Joined {} [{}]".format(guild.name, guild.id))
 
-    @cog_ext.cog_subcommand(base="system", guild_ids=[830928381100556338])
+    @cog_ext.cog_subcommand(base="system")
     async def info(self, ctx) -> None:
         info_embed = discord.Embed(title="Truck Simulator info", colour=discord.Colour.gold())
         uptime = datetime.now() - self.start_time

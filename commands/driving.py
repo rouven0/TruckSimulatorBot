@@ -226,7 +226,7 @@ class Driving(commands.Cog):
                                                   truck_miles=active_drive.player.truck_miles,
                                                   gas=active_drive.player.gas)
 
-    @cog_ext.cog_subcommand(base="truck", guild_ids=[830928381100556338])
+    @cog_ext.cog_subcommand(base="truck")
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
@@ -250,7 +250,7 @@ class Driving(commands.Cog):
                                          components=self.get_buttons(player))
         self.active_drives.append(players.ActiveDrive(player, message, time()))
 
-    @cog_ext.cog_subcommand(base="truck", guild_ids=[830928381100556338])
+    @cog_ext.cog_subcommand(base="truck")
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
@@ -273,7 +273,7 @@ class Driving(commands.Cog):
                        gas=active_drive.player.gas)
 
 
-    @cog_ext.cog_subcommand(base="truck", guild_ids=[830928381100556338])
+    @cog_ext.cog_subcommand(base="truck")
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)
@@ -307,7 +307,7 @@ class Driving(commands.Cog):
         return readable
 
     # @commands.command(aliases=["places", "ab", "map"])
-    @cog_ext.cog_slash(guild_ids=[830928381100556338])
+    @cog_ext.cog_slash()
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)

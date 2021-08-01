@@ -21,7 +21,7 @@ class Gambling(commands.Cog):
         self.bot = bot
         super().__init__()
 
-    @cog_ext.cog_slash(guild_ids=[830928381100556338],
+    @cog_ext.cog_slash(
             options=[
                 create_option(
                     name="side",
@@ -58,7 +58,7 @@ class Gambling(commands.Cog):
         else:
             await ctx.send("Nope, it was {}. You lost ${}".format(result, "{:,}".format(amount)))
 
-    @cog_ext.cog_slash(guild_ids=[830928381100556338])
+    @cog_ext.cog_slash()
     @commands.bot_has_permissions(view_channel=True, send_messages=True,
                                   embed_links=True, attach_files=True, read_message_history=True,
                                   use_external_emojis=True)

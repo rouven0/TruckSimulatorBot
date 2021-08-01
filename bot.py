@@ -38,7 +38,7 @@ def main():
     bot.topggpy = topgg.DBLClient(bot, DBL_TOKEN)
 
     DiscordComponents(bot)
-    SlashCommand(bot, sync_commands=True)
+    SlashCommand(bot)
     logger = logging.getLogger()
 
 
