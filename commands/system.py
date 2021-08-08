@@ -30,15 +30,11 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         await self.bot.change_presence(status=discord.Status.online,
                                        activity=discord.Activity(
                                            type=discord.ActivityType.watching,
-                                           name="The new slash commands"))
+                                           name=f"slash commands on {len(self.bot.guilds)} servers"))
         logging.info("Connected to Discord")
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild) -> None:
-        await self.bot.change_presence(status=discord.Status.online,
-                                       activity=discord.Activity(
-                                           type=discord.ActivityType.watching,
-                                           name="t.help on " + str(len(self.bot.guilds)) + " Servers"))
         logging.info("Joined {} [{}]".format(guild.name, guild.id))
 
     @cog_ext.cog_subcommand(base="system")

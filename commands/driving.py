@@ -227,9 +227,6 @@ class Driving(commands.Cog):
                                                   gas=active_drive.player.gas)
 
     @cog_ext.cog_subcommand(base="truck")
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
     async def drive(self, ctx) -> None:
         """
         Start driving your Truck on the map and control it with buttons
