@@ -39,7 +39,7 @@ class Misc(commands.Cog):
     async def invite(self, ctx) -> None:
         support_embed = discord.Embed(title="Click here to add the bot to your servers",
                                       description="Go spread the word of the Truck Simulator",
-                                      url="https://discord.com/api/oauth2/authorize?client_id=831052837353816066&permissions=379904&scope=bot",
+                                      url="https://discord.com/api/oauth2/authorize?client_id=831052837353816066&permissions=379904&scope=bot%20applications.commands",
                                       colour=discord.Colour.gold())
         await ctx.channel.send(embed=support_embed)
 
