@@ -8,7 +8,7 @@ import discord
 from discord.ext import commands
 from discord.ext import tasks
 from discord_slash import cog_ext
-from discord_components import Button, Select, SelectOption
+from discord_slash.utils.manage_components import create_button, create_actionrow, create_select, create_select_option, ComponentContext, wait_for_component
 import players
 import items
 import levels
@@ -35,26 +35,27 @@ class Driving(commands.Cog):
         Returns buttons based on the players position
         """
         buttons = []
-        buttons.append([])
+        directional_buttons = []
         place = places.get(player.position)
         for symbol in symbols.get_all_drive_symbols():
             if symbol in symbols.get_drive_position_symbols(player.position):
-                buttons[0].append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbol)))
+                directional_buttons.append(create_button(style=1, emoji=self.bot.get_emoji(symbol), custom_id=str(symbol)))
             else:
-                buttons[0].append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbol), disabled=True))
-        buttons[0].append(Button(style=4, label=" ", emoji=self.bot.get_emoji(symbols.STOP)))
+                directional_buttons.append(create_button(style=1, emoji=self.bot.get_emoji(symbol), disabled=True))
+        directional_buttons.append(create_button(style=4, emoji=self.bot.get_emoji(symbols.STOP), custom_id="stop"))
+        buttons.append(create_actionrow(*directional_buttons))
         current_job = jobs.get(player.user_id)
         action_buttons = []
         if len(player.loaded_items) < trucks.get(player.truck_id).loading_capacity:
-            action_buttons.append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbols.LOAD)))
+            action_buttons.append(create_button(style=1, emoji=self.bot.get_emoji(symbols.LOAD), custom_id="load"))
         if len(player.loaded_items) > 0:
-            action_buttons.append(Button(style=1, label=" ", emoji=self.bot.get_emoji(symbols.UNLOAD)))
+            action_buttons.append(create_button(style=1, emoji=self.bot.get_emoji(symbols.UNLOAD), custom_id="unload"))
         if player.position == [7, 7]:
-            action_buttons.append(Button(style=2, label=" ", emoji=self.bot.get_emoji(symbols.REFILL)))
+            action_buttons.append(create_button(style=2, emoji=self.bot.get_emoji(symbols.REFILL), custom_id="refill"))
         if place.name != "Nothing":
-            buttons.append(action_buttons)
+            buttons.append(create_actionrow(*action_buttons))
         if current_job is None:
-            buttons.append(Button(style=3, label="New Job", id="new_job"))
+            buttons.append(create_actionrow(create_button(style=3, label="New Job", custom_id="new_job")))
         return buttons
 
     @commands.Cog.listener()
@@ -62,90 +63,84 @@ class Driving(commands.Cog):
         self.check_drives.start()
 
     @commands.Cog.listener()
-    async def on_button_click(self, interaction) -> None:
-        """
-        All the driving reactions are processed here
-        Only when the stop sign is he reaction emoji, changes will be applied
-        """
-        if isinstance(interaction.component, list):
-            # Return if buttons are clicked too fast
-            await interaction.respond(type=6)
-            return
-        active_drive = self.get_active_drive(interaction.author.id, message_id=interaction.message.id)
+    async def on_component(self, ctx: ComponentContext) -> None:
+        active_drive = self.get_active_drive(ctx.author.id, message_id=ctx.origin_message_id)
         if active_drive is None:
-            await interaction.respond(type=6)
             # Return if the wrong player clicked the button
+            await ctx.defer(ignore=True)
             return
 
         try:
-            action = int(interaction.component.emoji.id)
-        except AttributeError:
-            action = interaction.component.id
+            action = int(ctx.custom_id)
+        except ValueError:
+            action = ctx.custom_id
 
         if action == "new_job":
-            drive_embed = self.get_drive_embed(active_drive.player, interaction.author.avatar_url)
+            drive_embed = self.get_drive_embed(active_drive.player, ctx.author.avatar_url)
             job = jobs.generate(active_drive.player)
             item = items.get(job.place_from.produced_item)
             job_message =  "{} needs {} {} from {}. You get ${:,} for this transport".format(
                     job.place_to.name, self.bot.get_emoji(item.emoji), item.name, job.place_from.name, job.reward)
             drive_embed.add_field(name="You got a new Job", value=job_message, inline=False)
-            await interaction.respond(type=7, embed=drive_embed, components=self.get_buttons(active_drive.player))
+            await ctx.edit_origin(embed=drive_embed, components=self.get_buttons(active_drive.player))
 
-        if action == symbols.STOP:
+        if action == "stop":
             self.active_drives.remove(active_drive)
-            await interaction.message.channel.send("You stopped driving!, {}".format(interaction.author.name))
-            await interaction.respond(type=7, components=[])
+            await ctx.edit_origin(components=[])
+            await ctx.send("You stopped driving!, {}".format(ctx.author.name))
 
-        if action == symbols.LOAD:
+        if action == "load":
             item = items.get(places.get(active_drive.player.position).produced_item)
             await players.load_item(active_drive.player, item)
             job_message = None
 
-            current_job = jobs.get(interaction.author.id)
+            current_job = jobs.get(ctx.author.id)
             if current_job is not None and item.name == current_job.place_from.produced_item:
                 current_job.state = jobs.STATE_LOADED
                 job_message = jobs.get_state(current_job)
                 jobs.update(current_job, state=current_job.state)
 
-            drive_embed = self.get_drive_embed(active_drive.player, interaction.author.avatar_url)
+            drive_embed = self.get_drive_embed(active_drive.player, ctx.author.avatar_url)
             drive_embed.add_field(name="Loading successful", value=f"You loaded {self.bot.get_emoji(item.emoji)} {item.name} into your truck", inline=False)
             #This order is required to fit the navigation to the right place
             if job_message is not None:
                 drive_embed.add_field(name="Job Notification", value=job_message)
-            await interaction.respond(type=7, embed=drive_embed, components=self.get_buttons(active_drive.player))
+            await ctx.edit_origin(embed=drive_embed, components=self.get_buttons(active_drive.player))
 
-        if action == symbols.UNLOAD:
-            drive_embed = self.get_drive_embed(active_drive.player, interaction.author.avatar_url)
+        if action == "unload":
+            drive_embed = self.get_drive_embed(active_drive.player, ctx.author.avatar_url)
             item_options = []
             for item in active_drive.player.loaded_items:
                 # add the item if it doesn't already is in the list
                 if item.name not in [o.value for o in item_options]:
-                    item_options.append(SelectOption(label=item.name, value=item.name, emoji=self.bot.get_emoji(item.emoji)))
-            select = Select(placeholder="Choose which items to unload", options=item_options)
-            cancel_button = Button(id="cancel", label="Cancel", style=4)
-            await interaction.respond(type=7, embed=drive_embed, components=[select, cancel_button])
+                    item_options.append(create_select_option(label=item.name, value=item.name, emoji=self.bot.get_emoji(item.emoji)))
+            select = create_select(placeholder="Choose which items to unload", options=item_options)
+            cancel_button = create_button(custom_id="cancel", label="Cancel", style=4)
+            await ctx.edit_origin(embed=drive_embed, components=[create_actionrow(select), create_actionrow(cancel_button)])
             try:
-                selection = await self.bot.wait_for("select_option", check=lambda i: i.author.id == interaction.author.id, timeout=3)
-                item = items.get(selection.component[0].label)
+                selection_ctx: ComponentContext = await wait_for_component(self.bot, components=select, timeout=30)
+                # selection = await self.bot.wait_for("select_option", check=lambda i: i.author.id == ctx.author.id, timeout=3)
+                # item = items.get(selection.component[0].label)
+                item = items.get(selection_ctx.selected_options[0])
                 await players.unload_item(active_drive.player, item)
-                current_job = jobs.get(interaction.author.id)
+                drive_embed = self.get_drive_embed(active_drive.player, ctx.author.avatar_url)
+                current_job = jobs.get(ctx.author.id)
                 if current_job is not None and item.name == current_job.place_from.produced_item and active_drive.player.position==current_job.place_to.position:
                     current_job.state = jobs.STATE_DONE
                     await players.add_money(active_drive.player, current_job.reward)
                     jobs.remove(current_job)
                     job_message = jobs.get_state(current_job) + await players.add_xp(active_drive.player, levels.get_job_reward_xp(active_drive.player.level))
                     # get the drive embed egain to fit the job update
-                    drive_embed = self.get_drive_embed(active_drive.player, interaction.author.avatar_url)
                     drive_embed.add_field(name="Job Notification", value=job_message)
                 drive_embed.add_field(name="Unloading successful", value=f"You removed {self.bot.get_emoji(item.emoji)} {item.name} from your truck", inline=False)
-                await selection.respond(type=7, embed=drive_embed, components=self.get_buttons(active_drive.player))
+                await selection_ctx.edit_origin(embed=drive_embed, components=self.get_buttons(active_drive.player))
             except asyncio.exceptions.TimeoutError:
                 pass
 
         if action == "cancel":
-            await interaction.respond(type=7, embed=self.get_drive_embed(active_drive.player, interaction.author.avatar_url), components=self.get_buttons(active_drive.player))
+            await ctx.edit_origin(embed=self.get_drive_embed(active_drive.player, ctx.author.avatar_url), components=self.get_buttons(active_drive.player))
 
-        if action == symbols.REFILL:
+        if action == "refill":
             gas_amount = trucks.get(active_drive.player.truck_id).gas_capacity - active_drive.player.gas
             price = round(gas_amount * self.gas_price)
 
@@ -153,28 +148,28 @@ class Driving(commands.Cog):
                 await players.debit_money(active_drive.player, price)
             except players.NotEnoughMoney:
                 if active_drive.player.gas < 170:
-                    await interaction.send(
-                        f"{interaction.author.mention} We have a problem: You don't have enough money. Lets make a deal. "
+                    await ctx.send(
+                        f"{ctx.author.mention} We have a problem: You don't have enough money. Lets make a deal. "
                         "I will give you 100 litres of gas, and you lose 2 levels")
                     if active_drive.player.level > 2:
                         await players.update(active_drive.player, gas=active_drive.player.gas+100, level=active_drive.player.level - 2, xp=0)
                     else:
                         await players.update(active_drive.player, gas=active_drive.player.gas+100, xp=0)
                 else:
-                    await interaction.send(f"{interaction.author.mention} you don't have enough money to do this. "
+                    await ctx.send(f"{ctx.author.mention} you don't have enough money to do this. "
                                             "Do some jobs and come back if you have enough")
-                drive_embed = self.get_drive_embed(active_drive.player, interaction.author.avatar_url)
-                await interaction.respond(type=7, embed=drive_embed, components=self.get_buttons(active_drive.player))
+                drive_embed = self.get_drive_embed(active_drive.player, ctx.author.avatar_url)
+                await ctx.edit_origin(embed=drive_embed, components=self.get_buttons(active_drive.player))
                 return
 
             await players.update(active_drive.player, gas=trucks.get(active_drive.player.truck_id).gas_capacity)
-            drive_embed = self.get_drive_embed(active_drive.player, interaction.author.avatar_url)
+            drive_embed = self.get_drive_embed(active_drive.player, ctx.author.avatar_url)
             drive_embed.add_field(name="Thank you for visiting our gas station",
                                   value=f"You filled {gas_amount} litres into your truck and payed ${price}")
             drive_embed.set_footer(
                 text="Wonder how the gas prices are calculated? Check out the daily gas prices in the official server",
                 icon_url=self.bot.user.avatar_url)
-            await interaction.respond(type=7, embed=drive_embed, components=self.get_buttons(active_drive.player))
+            await ctx.edit_origin(embed=drive_embed, components=self.get_buttons(active_drive.player))
 
         position_changed = False
         if action == symbols.LEFT:
@@ -213,13 +208,12 @@ class Driving(commands.Cog):
                     await active_drive.message.channel.send(
                         "You are lucky that you don't have enough money. I'll let you go, for now...")
                 await players.update(active_drive.player, gas=50, position=[7, 7])
-                await interaction.respond(type=7, components=[])
+                await ctx.edit_origin(components=[])
                 self.active_drives.remove(active_drive)
                 return
 
-            await interaction.message.edit(embed=self.get_drive_embed(active_drive.player, interaction.author.avatar_url),
+            await ctx.edit_origin(embed=self.get_drive_embed(active_drive.player, ctx.author.avatar_url),
                                            components=self.get_buttons(active_drive.player))
-            await interaction.respond(type=6)
 
         await players.update(active_drive.player, position=active_drive.player.position,
                                                   miles=active_drive.player.miles,
@@ -242,8 +236,7 @@ class Driving(commands.Cog):
                                    f"Click [here]({active_drive.message.jump_url}) to jump right back into your Truck",
                                    colour=discord.Colour.gold()))
             return
-        await ctx.send("Preparing your Truck...")
-        message = await ctx.channel.send(embed=self.get_drive_embed(player, ctx.author.avatar_url),
+        message = await ctx.send(embed=self.get_drive_embed(player, ctx.author.avatar_url),
                                          components=self.get_buttons(player))
         self.active_drives.append(players.ActiveDrive(player, message, time()))
 

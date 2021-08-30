@@ -18,3 +18,4 @@ topggpy==1.3.0
 typing-extensions==3.10.0.0
 tzlocal==2.1
 yarl==1.6.3
+discord-py-interactions==3.0.2
