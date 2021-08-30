@@ -112,27 +112,35 @@ class Driving(commands.Cog):
             item_options = []
             for item in active_drive.player.loaded_items:
                 # add the item if it doesn't already is in the list
-                if item.name not in [o.value for o in item_options]:
+                if item.name not in [o["value"] for o in item_options]:
                     item_options.append(create_select_option(label=item.name, value=item.name, emoji=self.bot.get_emoji(item.emoji)))
-            select = create_select(placeholder="Choose which items to unload", options=item_options)
+            select = create_select(placeholder="Choose which items to unload", options=item_options, min_values=1, max_values=len(item_options))
             cancel_button = create_button(custom_id="cancel", label="Cancel", style=4)
             await ctx.edit_origin(embed=drive_embed, components=[create_actionrow(select), create_actionrow(cancel_button)])
             try:
+                item_string = ""
                 selection_ctx: ComponentContext = await wait_for_component(self.bot, components=select, timeout=30)
-                # selection = await self.bot.wait_for("select_option", check=lambda i: i.author.id == ctx.author.id, timeout=3)
-                # item = items.get(selection.component[0].label)
-                item = items.get(selection_ctx.selected_options[0])
-                await players.unload_item(active_drive.player, item)
+                for name in selection_ctx.selected_options:
+                    item = items.get(name)
+                    await players.unload_item(active_drive.player, item)
+                    if name == selection_ctx.selected_options[0]:
+                        item_string += f"{self.bot.get_emoji(item.emoji)} {item.name}"
+                    elif name == selection_ctx.selected_options[-1]:
+                        item_string += f" and {self.bot.get_emoji(item.emoji)} {item.name}"
+                    else:
+                        item_string += f", {self.bot.get_emoji(item.emoji)} {item.name}"
                 drive_embed = self.get_drive_embed(active_drive.player, ctx.author.avatar_url)
+
                 current_job = jobs.get(ctx.author.id)
-                if current_job is not None and item.name == current_job.place_from.produced_item and active_drive.player.position==current_job.place_to.position:
+                if current_job is not None and current_job.place_from.produced_item in selection_ctx.selected_options and active_drive.player.position==current_job.place_to.position:
                     current_job.state = jobs.STATE_DONE
                     await players.add_money(active_drive.player, current_job.reward)
                     jobs.remove(current_job)
                     job_message = jobs.get_state(current_job) + await players.add_xp(active_drive.player, levels.get_job_reward_xp(active_drive.player.level))
                     # get the drive embed egain to fit the job update
+                    drive_embed = self.get_drive_embed(active_drive.player, ctx.author.avatar_url)
                     drive_embed.add_field(name="Job Notification", value=job_message)
-                drive_embed.add_field(name="Unloading successful", value=f"You removed {self.bot.get_emoji(item.emoji)} {item.name} from your truck", inline=False)
+                drive_embed.add_field(name="Unloading successful", value=f"You removed {item_string} from your truck", inline=False)
                 await selection_ctx.edit_origin(embed=drive_embed, components=self.get_buttons(active_drive.player))
             except asyncio.exceptions.TimeoutError:
                 pass
