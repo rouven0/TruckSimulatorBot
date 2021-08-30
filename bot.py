@@ -5,7 +5,7 @@ import logging
 from datetime import datetime
 from discord.ext import commands
 from discord.ext import tasks
-from discord_components import DiscordComponents
+from discord_slash import SlashCommand
 
 import topgg
 
@@ -13,7 +13,6 @@ from dotenv import load_dotenv
 import players
 
 import config
-from help import TruckSimulatorHelpCommand
 
 from commands.system import System
 from commands.driving import Driving
@@ -32,12 +31,12 @@ INGAME_NEWS_CHANNEL_ID = int(getenv('INGAME_NEWS_CHANNEL_ID', default=0))
 
 def main():
     bot = commands.Bot(command_prefix=BOT_PREFIX,
-                       help_command=TruckSimulatorHelpCommand(),
+                       help_command=None,
                        case_insensitive=True)
 
     bot.topggpy = topgg.DBLClient(bot, DBL_TOKEN)
 
-    DiscordComponents(bot)
+    SlashCommand(bot, sync_commands=True)
     logger = logging.getLogger()
 
 

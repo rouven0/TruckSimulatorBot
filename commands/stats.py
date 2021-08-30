@@ -3,6 +3,8 @@ This module contains the Cog for all stat-related commands
 """
 import discord
 from discord.ext import commands
+from discord_slash import cog_ext
+from discord_slash.utils.manage_commands import create_option
 import jobs
 import players
 import trucks
@@ -18,36 +20,33 @@ class Stats(commands.Cog):
         self.bot = bot
         super().__init__()
 
-    @commands.command()
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
+    @cog_ext.cog_subcommand(base="profile")
     async def register(self, ctx) -> None:
         """
-        Register yourself in a stunningly beautiful database that will definitely not deleted by accident anymore
+        Register yourself in a stunningly beautiful database
         """
         welcome_file = open("./messages/welcome.md", "r")
         welcome_embed = discord.Embed(title="Hey there, fellow Trucker,", description=welcome_file.read(),
                                       colour=discord.Colour.gold())
         welcome_file.close()
         welcome_embed.set_author(name="Welcome to the Truck Simulator", icon_url=self.bot.user.avatar_url)
-        await ctx.channel.send(embed=welcome_embed)
+        await ctx.send(embed=welcome_embed)
         if not await players.registered(ctx.author.id):
             await players.insert(players.Player(ctx.author.id, ctx.author.name, money=1000))
-            await ctx.channel.send("Welcome to the Truckers, {}".format(ctx.author.mention))
+            await ctx.send("Welcome to the Truckers, {}".format(ctx.author.mention))
         else:
-            await ctx.channel.send("You are already registered")
+            await ctx.send("You are already registered")
 
-    @commands.command()
+    @cog_ext.cog_subcommand(base="profile")
     async def delete(self, ctx) -> None:
         """
         Delete your account
         """
         player = await players.get(ctx.author.id)
-        await ctx.channel.send("{} Are you sure you want to delete your profile? "
+        await ctx.send("{} Are you sure you want to delete your profile? "
                                "**All your ingame stats will be lost!**".format(ctx.author.mention))
         confirmation = "delete {}@trucksimulator".format(ctx.author.name)
-        await ctx.channel.send("Please type **`{}`** to confirm your deletion".format(confirmation))
+        await ctx.send("Please type **`{}`** to confirm your deletion".format(confirmation))
 
         def check(message):
             return message.author.id == ctx.author.id
@@ -62,14 +61,11 @@ class Stats(commands.Cog):
             job = jobs.get(ctx.author.id)
             if job is not None:
                 jobs.remove(job)
-            await ctx.channel.send("Your profile got deleted. We will miss you :(")
+            await ctx.send("Your profile got deleted. We will miss you :(")
         else:
-            await ctx.channel.send("Deletion aborted!")
+            await ctx.send("Deletion aborted!")
 
-    @commands.command(aliases=["p", "me"])
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
+    @cog_ext.cog_subcommand(base="profile", name="show")
     async def profile(self, ctx, user: discord.User = None) -> None:
         """
         Shows your in-game profile. That's it
@@ -102,34 +98,35 @@ class Stats(commands.Cog):
         profile_embed.add_field(name="Gas left", value=f"{player.gas} l", inline=False)
         profile_embed.add_field(name="Current truck", value=truck.name)
         profile_embed.set_image(url=truck.image_url)
-        await ctx.channel.send(embed=profile_embed)
+        await ctx.send(embed=profile_embed)
 
-    @commands.command()
-    @commands.bot_has_permissions(view_channel=True, send_messages=True,
-                                  embed_links=True, attach_files=True, read_message_history=True,
-                                  use_external_emojis=True)
-    async def top(self, ctx, key="level") -> None:
+    @cog_ext.cog_slash(
+            options=[
+                create_option(
+                    name="key",
+                    description="The list you want to view",
+                    option_type=3,
+                    choices=["level", "money", "miles"],
+                    required=True)])
+    async def top(self, ctx, key) -> None:
         """
         If you appear in these lists you are one of the top 10 Players. Congratulations!
         """
-        top_players = await players.get_top(key.lower())
+        top_players = await players.get_top(key)
         top_body = ""
-        top_title = "level"
         count = 0
         top_embed = discord.Embed(title="Truck Simulator top list", colour=discord.Colour.gold())
 
         for player in top_players[0]:
-            if top_players[1] == "money":
+            if key == "money":
                 val = "{:,}".format(player.money)
-                top_title = top_players[1]
-            elif top_players[1] == "miles":
+            elif key == "miles":
                 val = "{:,}".format(player.miles)
-                top_title = top_players[1]
             else:
                 val = "{:,} ({}/{} xp)".format(player.level, player.xp, levels.get_next_xp(player.level))
                 top_embed.set_footer(text="You can also sort by money and miles", icon_url=self.bot.user.avatar_url)
             count += 1
             top_body += "**{}**. {} ~ {}{}\n".format(count, player.name,
-                                                      val, top_players[2])
-        top_embed.add_field(name="Top {}".format(top_title), value=top_body)
-        await ctx.channel.send(embed=top_embed)
+                                                      val, top_players[1])
+        top_embed.add_field(name=f"Top {key}", value=top_body)
+        await ctx.send(embed=top_embed)
