@@ -5,7 +5,6 @@ import logging
 from datetime import datetime
 from discord.ext import commands
 from discord.ext import tasks
-from discord_components import DiscordComponents
 from discord_slash import SlashCommand
 
 import topgg
