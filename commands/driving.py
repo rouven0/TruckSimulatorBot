@@ -65,15 +65,20 @@ class Driving(commands.Cog):
     @commands.Cog.listener()
     async def on_component(self, ctx: ComponentContext) -> None:
         active_drive = self.get_active_drive(ctx.author.id, message_id=ctx.origin_message_id)
-        if active_drive is None:
-            # Return if the wrong player clicked the button
-            await ctx.defer(ignore=True)
-            return
-
         try:
             action = int(ctx.custom_id)
         except ValueError:
             action = ctx.custom_id
+
+        if active_drive is None and action in ["new_job", "stop", "unload", "load",
+                                               symbols.LEFT, symbols.RIGHT, symbols.UP,
+                                               symbols.DOWN, "cancel", "refill"]:
+            # Return if the wrong player clicked the button
+            await ctx.defer(ignore=True)
+            return
+
+        if active_drive is None:
+            return
 
         if action == "new_job":
             drive_embed = self.get_drive_embed(active_drive.player, ctx.author.avatar_url)

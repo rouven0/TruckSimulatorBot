@@ -8,6 +8,7 @@ import discord
 from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.utils.manage_commands import create_permission
+from discord_slash.utils.manage_components import create_button, create_actionrow, create_select, create_select_option, ComponentContext, wait_for_component
 
 import players
 import places
@@ -60,12 +61,25 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
                        permissions={
                            830928381100556338: [
                                create_permission(692796548282712074, 2, True)]})
-    async def shutdown(self, ctx) -> None:
+    async def shutdown(self, ctx):
+        await ctx.send("Are you sure?", hidden=True,
+                        components=[
+                            create_actionrow(
+                                create_button(style=3, label="Yes", custom_id="confirm_shutdown"),
+                                create_button(style=4, label="No", custom_id="abort_shutdown"))])
+
+    @cog_ext.cog_component()
+    async def confirm_shutdown(self, ctx: ComponentContext) -> None:
         await self.driving_commands.on_shutdown()
         await self.bot.change_presence(status=discord.Status.idle)
+        await ctx.edit_origin(components=[])
         await ctx.send("Shutting down")
         logging.warning("Shutdown command is executed")
         await self.bot.close()
+
+    @cog_ext.cog_component()
+    async def abort_shutdown(self, ctx: ComponentContext):
+        await ctx.edit_origin(content="Shutdown aborted", components=[])
 
     @commands.Cog.listener()
     async def on_slash_command_error(self, ctx, error) -> None:
@@ -96,4 +110,4 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
             pass
 
         else:
-            logging.error(f"Error at t.{ctx.command} in Server {ctx.guild.name} in channel {ctx.name} from {ctx.author.name}: " + str(error))
+            logging.error(f"Error at t.{ctx.command} in Server {ctx.guild.name} in channel {ctx.channel.name} from {ctx.author.name}: " + str(error))

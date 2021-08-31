@@ -5,6 +5,7 @@ import discord
 from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.utils.manage_commands import create_option
+from discord_slash.utils.manage_components import create_button, create_actionrow, create_select, create_select_option, ComponentContext, wait_for_component
 import jobs
 import players
 import trucks
@@ -42,28 +43,27 @@ class Stats(commands.Cog):
         """
         Delete your account
         """
+        await players.get(ctx.author.id)
+        await ctx.send("Are you sure you want to delete your profile? **All your ingame stats will be lost!**", hidden=True,
+                        components=[
+                            create_actionrow(
+                                create_button(style=3, label="Yes", custom_id="confirm_deletion"),
+                                create_button(style=4, label="No", custom_id="abort_deletion"))])
+
+    @cog_ext.cog_component()
+    async def confirm_deletion(self, ctx: ComponentContext):
         player = await players.get(ctx.author.id)
-        await ctx.send("{} Are you sure you want to delete your profile? "
-                               "**All your ingame stats will be lost!**".format(ctx.author.mention))
-        confirmation = "delete {}@trucksimulator".format(ctx.author.name)
-        await ctx.send("Please type **`{}`** to confirm your deletion".format(confirmation))
+        await players.remove(player)
+        job = jobs.get(ctx.author.id)
+        if job is not None:
+            jobs.remove(job)
+        await ctx.edit_origin(components=[])
+        await ctx.send("Your profile got deleted. We will miss you :(")
 
-        def check(message):
-            return message.author.id == ctx.author.id
 
-        try:
-            answer_message: discord.Message = await self.bot.wait_for('message', check=check, timeout=120)
-            answer = answer_message.content.lower()
-        except:
-            answer = ""
-        if answer == confirmation:
-            await players.remove(player)
-            job = jobs.get(ctx.author.id)
-            if job is not None:
-                jobs.remove(job)
-            await ctx.send("Your profile got deleted. We will miss you :(")
-        else:
-            await ctx.send("Deletion aborted!")
+    @cog_ext.cog_component()
+    async def abort_deletion(self, ctx: ComponentContext):
+        await ctx.edit_origin(content="Deletion aborted", components=[])
 
     @cog_ext.cog_subcommand(base="profile", name="show")
     async def profile(self, ctx, user: discord.User = None) -> None:
