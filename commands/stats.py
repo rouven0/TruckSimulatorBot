@@ -60,7 +60,6 @@ class Stats(commands.Cog):
         await ctx.edit_origin(components=[])
         await ctx.send("Your profile got deleted. We will miss you :(")
 
-
     @cog_ext.cog_component()
     async def abort_deletion(self, ctx: ComponentContext):
         await ctx.edit_origin(content="Deletion aborted", components=[])

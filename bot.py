@@ -3,6 +3,7 @@ import sys
 import asyncio
 import logging
 from datetime import datetime
+import discord
 from discord.ext import commands
 from discord.ext import tasks
 from discord_slash import SlashCommand
@@ -24,13 +25,12 @@ from commands.trucks import Trucks
 
 load_dotenv('./.env')
 BOT_TOKEN = getenv('BOT_TOKEN', default="")
-BOT_PREFIX = getenv('BOT_PREFIX', default="").split(";")
 DBL_TOKEN = getenv('DBL_TOKEN', default="")
 INGAME_NEWS_CHANNEL_ID = int(getenv('INGAME_NEWS_CHANNEL_ID', default=0))
 
 
 def main():
-    bot = commands.Bot(command_prefix=BOT_PREFIX,
+    bot = commands.Bot(command_prefix=["t.", "T."],
                        help_command=None,
                        case_insensitive=True)
 
@@ -65,6 +65,17 @@ def main():
     bot.add_cog(Gambling(bot))
     bot.add_cog(Misc())
     bot.add_cog(Trucks(bot, driving_commands))
+
+    @bot.command(aliases=["truck", "drive", "job"])
+    async def help(ctx):
+        await ctx.channel.send(
+            embed=discord.Embed(
+                title="Hey there fellow Trucker",
+                description="This bot has switched to slash commands. "
+                "Just type / and you will see a list of all available commands. "
+                "If you don't see them, make sure you grant the bot the slash commands scope ""using [this link]"
+                "(https://discord.com/api/oauth2/authorize?client_id=831052837353816066&permissions=379904&scope=bot%20applications.commands).",
+                colour=discord.Colour.gold()))
 
     @tasks.loop(minutes=120)
     async def update_stats():
