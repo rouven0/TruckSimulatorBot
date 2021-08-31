@@ -36,19 +36,22 @@ class Trucks(commands.Cog):
         super().__init__()
 
     @cog_ext.cog_subcommand(base="truck")
-    async def mine(self, ctx):
+    async def show(self, ctx, user: discord.User=None) -> None:
         """
-        Get details about your truck
+        Get details about your truck and the trucks of your friends
         """
-        # if ctx.invoked_subcommand == None:
-        player = await players.get(ctx.author.id)
+        if user is not None:
+            player = await players.get(user.id)
+            avatar_url = user.avatar_url
+        else:
+            player = await players.get(ctx.author.id)
+            avatar_url = ctx.author.avatar_url
         truck = trucks.get(player.truck_id)
-
         truck_embed = get_truck_embed(truck)
-        truck_embed.set_author(name=f"{ctx.author.name}'s truck", icon_url=ctx.author.avatar_url)
+        truck_embed.set_author(name="{}'s truck".format(player.name),
+                                 icon_url=avatar_url)
         truck_embed.set_footer(icon_url=self.bot.user.avatar_url,
-                                   text="This is your Truck, see all trucks with `t.truck list` and change your truck with `t.truck buy`")
-
+                               text="See all trucks with `/truck list` and change your truck with `/truck buy`")
         await ctx.send(embed=truck_embed)
 
     @cog_ext.cog_subcommand(base="truck")
@@ -76,21 +79,20 @@ class Trucks(commands.Cog):
             description=f"You sold your old {old_truck.name} for ${selling_price} and bought a brand new {new_truck.name} for ${new_truck.price}",
             colour=discord.Colour.gold())
         answer_embed.set_author(name="You got a new truck", icon_url=self.bot.user.avatar_url)
-        answer_embed.set_footer(text="Check out your new baby with `t.truck`")
+        answer_embed.set_footer(text="Check out your new baby with `/truck show`")
         await ctx.send(embed=answer_embed)
 
-    # @truck.command()
     @cog_ext.cog_subcommand(base="truck")
-    async def show(self, ctx, id:int) -> None:
+    async def view(self, ctx, id:int) -> None:
         """
-        Shows details about a specific truck
+        View details about a specific truck
         """
         try:
             id  = int(id)
             truck = trucks.get(id)
             truck_embed = get_truck_embed(truck)
             truck_embed.set_footer(icon_url=self.bot.user.avatar_url,
-                                   text="See all trucks with `t.truck list` and change your truck with `t.truck buy`")
+                                   text="See all trucks with `/truck list` and change your truck with `/truck buy`")
             await ctx.send(embed=truck_embed)
         except trucks.TruckNotFound:
             await ctx.send("Truck not found")
@@ -107,11 +109,10 @@ class Trucks(commands.Cog):
             list_embed.add_field(name=truck.name,
                                  value="Id: {} \n Price: ${:,}".format(truck.truck_id, truck.price), inline=False)
         list_embed.set_footer(icon_url=self.bot.user.avatar_url,
-                              text="Get more information about a truck with `t.truck show <id>`")
+                              text="Get more information about a truck with `/truck view <id>`")
         await ctx.send(embed=list_embed)
 
-    # @commands.command()
-    @cog_ext.cog_subcommand(base="truck")
+    @cog_ext.cog_slash()
     async def load(self, ctx) -> None:
         """
         Shows what your Truck currently has loaded

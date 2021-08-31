@@ -233,7 +233,7 @@ class Driving(commands.Cog):
                                                   truck_miles=active_drive.player.truck_miles,
                                                   gas=active_drive.player.gas)
 
-    @cog_ext.cog_subcommand(base="truck")
+    @cog_ext.cog_slash()
     async def drive(self, ctx) -> None:
         """
         Start driving your Truck on the map and control it with buttons
@@ -253,7 +253,7 @@ class Driving(commands.Cog):
                                          components=self.get_buttons(player))
         self.active_drives.append(players.ActiveDrive(player, message, time()))
 
-    @cog_ext.cog_subcommand(base="truck")
+    @cog_ext.cog_slash()
     async def stop(self, ctx) -> None:
         """
         An alternate stop method if there is a problem with the buttons
@@ -273,7 +273,7 @@ class Driving(commands.Cog):
                        gas=active_drive.player.gas)
 
 
-    @cog_ext.cog_subcommand(base="truck")
+    @cog_ext.cog_slash()
     async def position(self, ctx) -> None:
         """
         Provides some information about your current position and the things located there

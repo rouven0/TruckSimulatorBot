@@ -67,7 +67,7 @@ class Misc(commands.Cog):
         All the links in a beautiful list
         """
         links_embed = discord.Embed(title="Some useful links", colour=discord.Colour.gold())
-        links_embed.add_field(name="Invite Link", value="https://discord.com/api/oauth2/authorize?client_id=831052837353816066&permissions=379904&scope=bot", inline=False)
+        links_embed.add_field(name="Invite Link", value="https://discord.com/api/oauth2/authorize?client_id=831052837353816066&permissions=379904&scope=bot%20applications.commands", inline=False)
         links_embed.add_field(name="Github", value="https://www.github.com/therealr5/TruckSimulatorBot", inline=False)
         links_embed.add_field(name="Support server", value="https://discord.gg/BKmtTFbvxv", inline=False)
         links_embed.add_field(name="Top.gg page", value="https://top.gg/bot/831052837353816066", inline=False)
