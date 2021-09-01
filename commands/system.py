@@ -99,9 +99,6 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
                 missing_permissions = missing_permissions + "\n" + permission
             await ctx.send("I'm missing the following permissions:" + missing_permissions + "`")
 
-        elif isinstance(error, commands.errors.UserNotFound):
-            await ctx.send(f"User **`{error.argument}`** not found")
-
         elif isinstance(error, places.WrongPlaceError):
             await ctx.send(error.message)
 
@@ -115,7 +112,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
             )
 
         elif isinstance(error, TruckNotFound):
-            await ctx.send("Truck not found")
+            await ctx.send("Truck not found", hidden=True)
 
         elif isinstance(error, commands.errors.CommandNotFound):
             pass

@@ -7,6 +7,7 @@ from random import randint
 import discord
 from discord.ext import commands
 from discord_slash import cog_ext
+from discord_slash.utils.manage_components import ComponentContext
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import players
 import places
@@ -59,8 +60,8 @@ class Economy(commands.Cog):
         except AttributeError:
             pass
 
-    @cog_ext.cog_subcommand(base="job")
-    async def show(self, ctx) -> None:
+    @cog_ext.cog_component()
+    async def show_job(self, ctx: ComponentContext) -> None:
         """
         Shows your current job
         """
@@ -68,7 +69,10 @@ class Economy(commands.Cog):
         job_embed = discord.Embed(colour=discord.Colour.gold())
         job_embed.set_author(name="{}'s Job".format(ctx.author.name), icon_url=ctx.author.avatar_url)
         if current_job is None:
-            job_embed.add_field(name="You don't have a job at the moment", value="Type `t.job new` to get one")
+            job_embed.add_field(
+                name="You don't have a job at the moment",
+                value="Get yourself one with that fancy green button on the left",
+            )
         else:
             place_from = current_job.place_from
             place_to = current_job.place_to
@@ -78,65 +82,58 @@ class Economy(commands.Cog):
             )
             job_embed.add_field(name="Your current job", value=job_message, inline=False)
             job_embed.add_field(name="Current state", value=jobs.get_state(current_job))
-        await ctx.send(embed=job_embed)
+        await ctx.send(embed=job_embed, hidden=True)
 
-    @cog_ext.cog_subcommand(base="job")
-    async def new(self, ctx):
+    @cog_ext.cog_component()
+    async def new_job(self, ctx: ComponentContext) -> None:
         """
         Get a new job
         """
-        player = await players.get(ctx.author.id)
-        current_job = jobs.get(ctx.author.id)
+        active_drive = self.driving_commands.get_active_drive(ctx.author_id, ctx.origin_message_id)
         job_embed = discord.Embed(colour=discord.Colour.gold())
         job_embed.set_author(name="{}'s Job".format(ctx.author.name), icon_url=ctx.author.avatar_url)
-        if current_job == None:
-            job = jobs.generate(player)
-            item = items.get(job.place_from.produced_item)
-            job_message = "{} needs {} {} from {}. You get ${:,} for this transport".format(
-                job.place_to.name, self.bot.get_emoji(item.emoji), item.name, job.place_from.name, job.reward
-            )
-            job_embed.add_field(name="You got a new Job", value=job_message, inline=False)
-            job_embed.add_field(name="Current state", value=jobs.get_state(job))
-            if ctx.author.id in [a.player.user_id for a in self.driving_commands.active_drives]:
-                active_drive = self.driving_commands.get_active_drive(ctx.author.id)
-                await active_drive.message.edit(
-                    embed=self.driving_commands.get_drive_embed(active_drive.player, ctx.author.avatar_url),
-                    components=self.driving_commands.get_buttons(active_drive.player),
-                )
-        else:
-            job_embed.add_field(
-                name="You can't claim more than one job", value="Finish your current job before you start a new one"
-            )
-        await ctx.send(embed=job_embed)
+        job = jobs.generate(active_drive.player)
+        item = items.get(job.place_from.produced_item)
+        job_message = "{} needs {} {} from {}. You get ${:,} for this transport".format(
+            job.place_to.name, self.bot.get_emoji(item.emoji), item.name, job.place_from.name, job.reward
+        )
+        job_embed.add_field(name="You got a new Job", value=job_message, inline=False)
+        job_embed.add_field(name="Current state", value=jobs.get_state(job))
+        await ctx.edit_origin(embed=self.driving_commands.get_drive_embed(active_drive.player, ctx.author.avatar_url))
+        await ctx.send(embed=job_embed, hidden=True)
 
-    @cog_ext.cog_subcommand(base="truck")
-    async def refill(self, ctx):
+    @cog_ext.cog_component()
+    async def refill(self, ctx: ComponentContext):
         """
         If you're at the gas station, you can refill your truck's gas
         """
-        player = await players.get(ctx.author.id)
-        if "refill" not in places.get(player.position).commands:
-            raise places.WrongPlaceError("Do you see a gas pump here?")
-
-        gas_amount = trucks.get(player.truck_id).gas_capacity - player.gas
+        active_drive = self.driving_commands.get_active_drive(ctx.author_id, ctx.origin_message_id)
+        gas_amount = trucks.get(active_drive.player.truck_id).gas_capacity - active_drive.player.gas
         price = round(gas_amount * self.gas_price)
 
         try:
-            await players.debit_money(player, price)
+            await players.debit_money(active_drive.player, price)
         except players.NotEnoughMoney:
-            if player.gas < 170:
+            if active_drive.player.gas < 170:
                 await ctx.send(
                     f"{ctx.author.mention} We have a problem: You don't have enough money. Lets make a deal. "
-                    "I will give you 100 litres of gas, and you lose 2 levels"
+                    "I will give you 100 litres of gas, and you lose 2 levels",
+                    hidden=True,
                 )
-                if player.level > 2:
-                    await players.update(player, gas=player.gas + 100, level=player.level - 2, xp=0)
+                if active_drive.player.level > 2:
+                    await players.update(
+                        active_drive.player,
+                        gas=active_drive.player.gas + 100,
+                        level=active_drive.player.level - 2,
+                        xp=0,
+                    )
                 else:
-                    await players.update(player, gas=player.gas + 100, xp=0)
+                    await players.update(active_drive.player, gas=active_drive.player.gas + 100, xp=0)
             else:
                 await ctx.send(
                     f"{ctx.author.mention} you don't have enough money to do this. "
-                    "Do some jobs and come back if you have enough"
+                    "Do some jobs and come back if you have enough",
+                    hidden=True,
                 )
             return
 
@@ -148,8 +145,9 @@ class Economy(commands.Cog):
         refill_embed.set_footer(
             text="Wonder how these prices are calculated? Check out the daily gas prices in the official server"
         )
-        await players.update(player, gas=trucks.get(player.truck_id).gas_capacity)
-        await ctx.send(embed=refill_embed)
+        await players.update(active_drive.player, gas=trucks.get(active_drive.player.truck_id).gas_capacity)
+        await ctx.edit_origin(embed=self.driving_commands.get_drive_embed(active_drive.player, ctx.author.avatar_url))
+        await ctx.send(embed=refill_embed, hidden=True)
 
     @cog_ext.cog_slash()
     async def give(self, ctx, user: discord.User, amount: int) -> None:
