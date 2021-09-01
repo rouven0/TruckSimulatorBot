@@ -1,4 +1,3 @@
-
 """
 This module contains the Cog for all truck-related commands
 """
@@ -36,7 +35,7 @@ class Trucks(commands.Cog):
         super().__init__()
 
     @cog_ext.cog_subcommand(base="truck")
-    async def show(self, ctx, user: discord.User=None) -> None:
+    async def show(self, ctx, user: discord.User = None) -> None:
         """
         Get details about your truck and the trucks of your friends
         """
@@ -48,10 +47,11 @@ class Trucks(commands.Cog):
             avatar_url = ctx.author.avatar_url
         truck = trucks.get(player.truck_id)
         truck_embed = get_truck_embed(truck)
-        truck_embed.set_author(name="{}'s truck".format(player.name),
-                                 icon_url=avatar_url)
-        truck_embed.set_footer(icon_url=self.bot.user.avatar_url,
-                               text="See all trucks with `/truck list` and change your truck with `/truck buy`")
+        truck_embed.set_author(name="{}'s truck".format(player.name), icon_url=avatar_url)
+        truck_embed.set_footer(
+            icon_url=self.bot.user.avatar_url,
+            text="See all trucks with `/truck list` and change your truck with `/truck buy`",
+        )
         await ctx.send(embed=truck_embed)
 
     @cog_ext.cog_subcommand(base="truck")
@@ -63,7 +63,7 @@ class Trucks(commands.Cog):
             await ctx.send(f"{ctx.author.mention} You can't buy a new truck while you are driving in the old one")
             return
         try:
-            id  = int(id)
+            id = int(id)
         except ValueError:
             await ctx.send("Wtf do you want to buy?")
             return
@@ -77,22 +77,25 @@ class Trucks(commands.Cog):
         await players.update(player, truck_miles=0, gas=new_truck.gas_capacity, truck_id=new_truck.truck_id)
         answer_embed = discord.Embed(
             description=f"You sold your old {old_truck.name} for ${selling_price} and bought a brand new {new_truck.name} for ${new_truck.price}",
-            colour=discord.Colour.gold())
+            colour=discord.Colour.gold(),
+        )
         answer_embed.set_author(name="You got a new truck", icon_url=self.bot.user.avatar_url)
         answer_embed.set_footer(text="Check out your new baby with `/truck show`")
         await ctx.send(embed=answer_embed)
 
     @cog_ext.cog_subcommand(base="truck")
-    async def view(self, ctx, id:int) -> None:
+    async def view(self, ctx, id: int) -> None:
         """
         View details about a specific truck
         """
         try:
-            id  = int(id)
+            id = int(id)
             truck = trucks.get(id)
             truck_embed = get_truck_embed(truck)
-            truck_embed.set_footer(icon_url=self.bot.user.avatar_url,
-                                   text="See all trucks with `/truck list` and change your truck with `/truck buy`")
+            truck_embed.set_footer(
+                icon_url=self.bot.user.avatar_url,
+                text="See all trucks with `/truck list` and change your truck with `/truck buy`",
+            )
             await ctx.send(embed=truck_embed)
         except trucks.TruckNotFound:
             await ctx.send("Truck not found")
@@ -106,10 +109,12 @@ class Trucks(commands.Cog):
         """
         list_embed = discord.Embed(title="All available trucks", colour=discord.Colour.gold())
         for truck in trucks.get_all():
-            list_embed.add_field(name=truck.name,
-                                 value="Id: {} \n Price: ${:,}".format(truck.truck_id, truck.price), inline=False)
-        list_embed.set_footer(icon_url=self.bot.user.avatar_url,
-                              text="Get more information about a truck with `/truck view <id>`")
+            list_embed.add_field(
+                name=truck.name, value="Id: {} \n Price: ${:,}".format(truck.truck_id, truck.price), inline=False
+            )
+        list_embed.set_footer(
+            icon_url=self.bot.user.avatar_url, text="Get more information about a truck with `/truck view <id>`"
+        )
         await ctx.send(embed=list_embed)
 
     @cog_ext.cog_slash()
@@ -124,6 +129,10 @@ class Trucks(commands.Cog):
         else:
             for item in player.loaded_items:
                 item_list += f"{symbols.LIST_ITEM} {self.bot.get_emoji(item.emoji)} {item.name}\n"
-        load_embed = discord.Embed(title="Your currently loaded items", description=item_list, colour=discord.Colour.gold())
-        load_embed.set_footer(text=f"Loaded items: {len(player.loaded_items)}/{trucks.get(player.truck_id).loading_capacity}")
+        load_embed = discord.Embed(
+            title="Your currently loaded items", description=item_list, colour=discord.Colour.gold()
+        )
+        load_embed.set_footer(
+            text=f"Loaded items: {len(player.loaded_items)}/{trucks.get(player.truck_id).loading_capacity}"
+        )
         await ctx.send(embed=load_embed)

@@ -5,7 +5,11 @@ import discord
 from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.utils.manage_commands import create_option
-from discord_slash.utils.manage_components import create_button, create_actionrow, create_select, create_select_option, ComponentContext, wait_for_component
+from discord_slash.utils.manage_components import (
+    create_button,
+    create_actionrow,
+    ComponentContext,
+)
 import jobs
 import players
 import trucks
@@ -27,8 +31,9 @@ class Stats(commands.Cog):
         Register yourself in a stunningly beautiful database
         """
         welcome_file = open("./messages/welcome.md", "r")
-        welcome_embed = discord.Embed(title="Hey there, fellow Trucker,", description=welcome_file.read(),
-                                      colour=discord.Colour.gold())
+        welcome_embed = discord.Embed(
+            title="Hey there, fellow Trucker,", description=welcome_file.read(), colour=discord.Colour.gold()
+        )
         welcome_file.close()
         welcome_embed.set_author(name="Welcome to the Truck Simulator", icon_url=self.bot.user.avatar_url)
         await ctx.send(embed=welcome_embed)
@@ -44,11 +49,16 @@ class Stats(commands.Cog):
         Delete your account
         """
         await players.get(ctx.author.id)
-        await ctx.send("Are you sure you want to delete your profile? **All your ingame stats will be lost!**", hidden=True,
-                        components=[
-                            create_actionrow(
-                                create_button(style=3, label="Yes", custom_id="confirm_deletion"),
-                                create_button(style=4, label="No", custom_id="abort_deletion"))])
+        await ctx.send(
+            "Are you sure you want to delete your profile? **All your ingame stats will be lost!**",
+            hidden=True,
+            components=[
+                create_actionrow(
+                    create_button(style=3, label="Yes", custom_id="confirm_deletion"),
+                    create_button(style=4, label="No", custom_id="abort_deletion"),
+                )
+            ],
+        )
 
     @cog_ext.cog_component()
     async def confirm_deletion(self, ctx: ComponentContext):
@@ -73,13 +83,11 @@ class Stats(commands.Cog):
         if user is not None:
             player = await players.get(user.id)
             profile_embed.set_thumbnail(url=user.avatar_url)
-            profile_embed.set_author(name="{}'s Profile".format(player.name),
-                                     icon_url=user.avatar_url)
+            profile_embed.set_author(name="{}'s Profile".format(player.name), icon_url=user.avatar_url)
         else:
             player = await players.get(ctx.author.id)
             profile_embed.set_thumbnail(url=ctx.author.avatar_url)
-            profile_embed.set_author(name="{}'s Profile".format(player.name),
-                                     icon_url=ctx.author.avatar_url)
+            profile_embed.set_author(name="{}'s Profile".format(player.name), icon_url=ctx.author.avatar_url)
             # Detect, when the player is renamed
             if player.name != ctx.author.name:
                 await players.update(player, name=ctx.author.name)
@@ -92,21 +100,23 @@ class Stats(commands.Cog):
         truck_miles = "{:,}".format(player.truck_miles)
         profile_embed.add_field(name="Level", value=f"{player.level} ({xp}/{next_xp} xp)", inline=False)
         profile_embed.add_field(name="Money", value=f"${money}")
-        profile_embed.add_field(name="Miles driven", value=f"{miles}\n({truck_miles} with current truck)",
-                                inline=False)
+        profile_embed.add_field(name="Miles driven", value=f"{miles}\n({truck_miles} with current truck)", inline=False)
         profile_embed.add_field(name="Gas left", value=f"{player.gas} l", inline=False)
         profile_embed.add_field(name="Current truck", value=truck.name)
         profile_embed.set_image(url=truck.image_url)
         await ctx.send(embed=profile_embed)
 
     @cog_ext.cog_slash(
-            options=[
-                create_option(
-                    name="key",
-                    description="The list you want to view",
-                    option_type=3,
-                    choices=["level", "money", "miles"],
-                    required=True)])
+        options=[
+            create_option(
+                name="key",
+                description="The list you want to view",
+                option_type=3,
+                choices=["level", "money", "miles"],
+                required=True,
+            )
+        ]
+    )
     async def top(self, ctx, key) -> None:
         """
         If you appear in these lists you are one of the top 10 Players. Congratulations!
@@ -125,7 +135,6 @@ class Stats(commands.Cog):
                 val = "{:,} ({}/{} xp)".format(player.level, player.xp, levels.get_next_xp(player.level))
                 top_embed.set_footer(text="You can also sort by money and miles", icon_url=self.bot.user.avatar_url)
             count += 1
-            top_body += "**{}**. {} ~ {}{}\n".format(count, player.name,
-                                                      val, top_players[1])
+            top_body += "**{}**. {} ~ {}{}\n".format(count, player.name, val, top_players[1])
         top_embed.add_field(name=f"Top {key}", value=top_body)
         await ctx.send(embed=top_embed)

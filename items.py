@@ -29,10 +29,10 @@ def get_all() -> list:
     return __all_items__
 
 
-__con__ = sqlite3.connect('objects.db')
+__con__ = sqlite3.connect("objects.db")
 __cur__ = __con__.cursor()
 
-__cur__.execute('SELECT * FROM items')
+__cur__.execute("SELECT * FROM items")
 __all_items__ = []
 __generate_list(__all_items__)
 

@@ -8,7 +8,11 @@ import discord
 from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.utils.manage_commands import create_permission
-from discord_slash.utils.manage_components import create_button, create_actionrow, create_select, create_select_option, ComponentContext, wait_for_component
+from discord_slash.utils.manage_components import (
+    create_button,
+    create_actionrow,
+    ComponentContext,
+)
 
 import players
 import places
@@ -28,10 +32,12 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
-        await self.bot.change_presence(status=discord.Status.online,
-                                       activity=discord.Activity(
-                                           type=discord.ActivityType.watching,
-                                           name=f"slash commands on {len(self.bot.guilds)} servers"))
+        await self.bot.change_presence(
+            status=discord.Status.online,
+            activity=discord.Activity(
+                type=discord.ActivityType.watching, name=f"slash commands on {len(self.bot.guilds)} servers"
+            ),
+        )
         logging.info("Connected to Discord")
 
     @commands.Cog.listener()
@@ -46,8 +52,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         hours = floor(uptime.seconds / 3600)
         minutes = floor(uptime.seconds / 60) - hours * 60
         seconds = uptime.seconds - hours * 3600 - minutes * 60
-        info_embed.add_field(name="Uptime",
-                             value="{}d {}h {}m {}s".format(days, hours, minutes, seconds))
+        info_embed.add_field(name="Uptime", value="{}d {}h {}m {}s".format(days, hours, minutes, seconds))
         info_embed.add_field(name="Latency", value=str(round(self.bot.latency * 1000)) + " ms")
         info_embed.add_field(name="Registered Players", value=str(await players.get_count()))
         info_embed.add_field(name="Servers", value=str(len(self.bot.guilds)))
@@ -56,17 +61,22 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         info_embed.add_field(name="Commit", value=self.commit)
         await ctx.send(embed=info_embed)
 
-    @cog_ext.cog_slash(guild_ids=[830928381100556338],
-                       default_permission=False,
-                       permissions={
-                           830928381100556338: [
-                               create_permission(692796548282712074, 2, True)]})
+    @cog_ext.cog_slash(
+        guild_ids=[830928381100556338],
+        default_permission=False,
+        permissions={830928381100556338: [create_permission(692796548282712074, 2, True)]},
+    )
     async def shutdown(self, ctx):
-        await ctx.send("Are you sure?", hidden=True,
-                        components=[
-                            create_actionrow(
-                                create_button(style=3, label="Yes", custom_id="confirm_shutdown"),
-                                create_button(style=4, label="No", custom_id="abort_shutdown"))])
+        await ctx.send(
+            "Are you sure?",
+            hidden=True,
+            components=[
+                create_actionrow(
+                    create_button(style=3, label="Yes", custom_id="confirm_shutdown"),
+                    create_button(style=4, label="No", custom_id="abort_shutdown"),
+                )
+            ],
+        )
 
     @cog_ext.cog_component()
     async def confirm_shutdown(self, ctx: ComponentContext) -> None:
@@ -84,10 +94,10 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
     @commands.Cog.listener()
     async def on_slash_command_error(self, ctx, error) -> None:
         if isinstance(error, commands.errors.BotMissingPermissions):
-            missing_permissions = '`'
+            missing_permissions = "`"
             for permission in error.missing_perms:
                 missing_permissions = missing_permissions + "\n" + permission
-            await ctx.send("I'm missing the following permissions:" + missing_permissions + '`')
+            await ctx.send("I'm missing the following permissions:" + missing_permissions + "`")
 
         elif isinstance(error, commands.errors.UserNotFound):
             await ctx.send(f"User **`{error.argument}`** not found")
@@ -101,13 +111,17 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         if isinstance(error, players.PlayerNotRegistered):
             await ctx.send(
                 "<@!{}> you are not registered yet! "
-                "Try `/profile register` to get started".format(error.requested_id))
+                "Try `/profile register` to get started".format(error.requested_id)
+            )
 
         elif isinstance(error, TruckNotFound):
-                await ctx.send("Truck not found")
+            await ctx.send("Truck not found")
 
         elif isinstance(error, commands.errors.CommandNotFound):
             pass
 
         else:
-            logging.error(f"Error at t.{ctx.command} in Server {ctx.guild.name} in channel {ctx.channel.name} from {ctx.author.name}: " + str(error))
+            logging.error(
+                f"Error at t.{ctx.command} in Server {ctx.guild.name} in channel {ctx.channel.name} from {ctx.author.name}: "
+                + str(error)
+            )

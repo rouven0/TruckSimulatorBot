@@ -12,12 +12,14 @@ import items
 
 async def init():
     global __con__
-    __con__ = await aiosqlite.connect('players.db')
+    __con__ = await aiosqlite.connect("players.db")
     logging.info("Initialized player database")
+
 
 async def close():
     await __con__.close()
     logging.info("Closed player database connection")
+
 
 @dataclass
 class Player:
@@ -31,10 +33,11 @@ class Player:
         position: Position on the 2 dimensional array that I call map
         miles: Amount of miles the Player has driven
     """
+
     user_id: int
     name: str
     level: int = 0
-    xp:int = 0
+    xp: int = 0
     money: int = 0
     position: list = field(default_factory=lambda: [0, 0])
     miles: int = 0
@@ -58,24 +61,46 @@ def __from_tuple(tup: tuple) -> Player:
     """
     Returns a Player object from a received database tuple
     """
-    return Player(tup[0], tup[1], tup[2], tup[3], tup[4], __get_position(tup[5]), tup[6],
-                  tup[7], tup[8], tup[9], __get_items(tup[10]))
+    return Player(
+        tup[0],
+        tup[1],
+        tup[2],
+        tup[3],
+        tup[4],
+        __get_position(tup[5]),
+        tup[6],
+        tup[7],
+        tup[8],
+        tup[9],
+        __get_items(tup[10]),
+    )
 
 
 def __to_tuple(player: Player) -> tuple:
     """
     Transforms the player object into a tuple that can be inserted in the db
     """
-    return (player.user_id, player.name, player.level, player.xp, player.money, __format_pos_to_db(player.position),
-            player.miles, player.truck_miles, player.gas, player.truck_id, __format_items_to_db(player.loaded_items))
+    return (
+        player.user_id,
+        player.name,
+        player.level,
+        player.xp,
+        player.money,
+        __format_pos_to_db(player.position),
+        player.miles,
+        player.truck_miles,
+        player.gas,
+        player.truck_id,
+        __format_items_to_db(player.loaded_items),
+    )
 
 
 def __get_position(db_pos: str) -> list:
     """
     Parses the position from the database as list [x][y]
     """
-    pos_x = db_pos[:db_pos.find("/")]
-    pos_y = db_pos[db_pos.find("/") + 1:]
+    pos_x = db_pos[: db_pos.find("/")]
+    pos_y = db_pos[db_pos.find("/") + 1 :]
     return [int(pos_x), int(pos_y)]
 
 
@@ -104,9 +129,9 @@ def __format_items_to_db(item_list: list) -> str:
     """
     db_items = ""
     for item in item_list:
-        db_items += item.name+";"
+        db_items += item.name + ";"
     # remove the last ;
-    return db_items[:len(db_items)-1]
+    return db_items[: len(db_items) - 1]
 
 
 async def add_xp(player: Player, amount: int) -> str:
@@ -114,10 +139,10 @@ async def add_xp(player: Player, amount: int) -> str:
     Adds xp to the player and performs a level up if neede
     """
     answer = "\nYou got {:,} xp".format(amount)
-    await update(player, xp=int(player.xp)+amount)
-    while int(player.xp) >=  levels.get_next_xp(player.level):
-        await update(player, level=player.level+1, xp=player.xp-levels.get_next_xp(player.level))
-        answer+=f"\n:tada: You leveled up to level {player.level} :tada:"
+    await update(player, xp=int(player.xp) + amount)
+    while int(player.xp) >= levels.get_next_xp(player.level):
+        await update(player, level=player.level + 1, xp=player.xp - levels.get_next_xp(player.level))
+        answer += f"\n:tada: You leveled up to level {player.level} :tada:"
     return answer
 
 
@@ -125,7 +150,7 @@ async def add_money(player, amount) -> None:
     """
     Add money to the players account
     """
-    await update(player, money=player.money+amount)
+    await update(player, money=player.money + amount)
 
 
 async def debit_money(player, amount) -> None:
@@ -134,7 +159,7 @@ async def debit_money(player, amount) -> None:
     """
     if amount > player.money:
         raise NotEnoughMoney()
-    await update(player, money=player.money-amount)
+    await update(player, money=player.money - amount)
 
 
 async def load_item(player, item: items.Item) -> None:
@@ -160,56 +185,72 @@ async def insert(player: Player) -> None:
     """
     Inserts a player into the database
     """
-    await __con__.execute('INSERT INTO players VALUES (?,?,?,?,?,?,?,?,?,?,?)', __to_tuple(player))
+    await __con__.execute("INSERT INTO players VALUES (?,?,?,?,?,?,?,?,?,?,?)", __to_tuple(player))
     await __con__.commit()
-    logging.info('Inserted %s into the database as %s', player.name, __to_tuple(player))
+    logging.info("Inserted %s into the database as %s", player.name, __to_tuple(player))
 
 
 async def remove(player: Player) -> None:
     """
     Removes a player from the database
     """
-    await __con__.execute('DELETE FROM players WHERE id=:id', {"id": player.user_id})
+    await __con__.execute("DELETE FROM players WHERE id=:id", {"id": player.user_id})
     await __con__.commit()
-    logging.info('Removed %s %s from the database', player.name, __to_tuple(player))
+    logging.info("Removed %s %s from the database", player.name, __to_tuple(player))
 
 
-async def update(player: Player, name:str=None, level:int=None, xp:int=None,  money:int=None, position:list=None, miles:int=None, truck_miles:int=None,  gas:int=None, truck_id:int=None, loaded_items:list=None) -> None:
+async def update(
+    player: Player,
+    name: str = None,
+    level: int = None,
+    xp: int = None,
+    money: int = None,
+    position: list = None,
+    miles: int = None,
+    truck_miles: int = None,
+    gas: int = None,
+    truck_id: int = None,
+    loaded_items: list = None,
+) -> None:
     """
     Updates a player in the database
     """
     if name is not None:
-        await __con__.execute('UPDATE players SET name=? WHERE id=?', (name, player.user_id))
+        await __con__.execute("UPDATE players SET name=? WHERE id=?", (name, player.user_id))
         player.name = name
     if level is not None:
-        await __con__.execute('UPDATE players SET level=? WHERE id=?', (level, player.user_id))
+        await __con__.execute("UPDATE players SET level=? WHERE id=?", (level, player.user_id))
         player.level = level
     if xp is not None:
-        await __con__.execute('UPDATE players SET xp=? WHERE id=?', (xp, player.user_id))
+        await __con__.execute("UPDATE players SET xp=? WHERE id=?", (xp, player.user_id))
         player.xp = xp
     if money is not None:
-        await __con__.execute('UPDATE players SET money=? WHERE id=?', (money, player.user_id))
+        await __con__.execute("UPDATE players SET money=? WHERE id=?", (money, player.user_id))
         player.money = money
     if position is not None:
-        await __con__.execute('UPDATE players SET position=? WHERE id=?', (__format_pos_to_db(position), player.user_id))
+        await __con__.execute(
+            "UPDATE players SET position=? WHERE id=?", (__format_pos_to_db(position), player.user_id)
+        )
         player.position = position
     if miles is not None:
-        await __con__.execute('UPDATE players SET miles=? WHERE id=?', (miles, player.user_id))
+        await __con__.execute("UPDATE players SET miles=? WHERE id=?", (miles, player.user_id))
         player.miles = miles
     if truck_miles is not None:
-        await __con__.execute('UPDATE players SET truck_miles=? WHERE id=?', (truck_miles, player.user_id))
+        await __con__.execute("UPDATE players SET truck_miles=? WHERE id=?", (truck_miles, player.user_id))
         player.truck_miles = truck_miles
     if gas is not None:
-        await __con__.execute('UPDATE players SET gas=? WHERE id=?', (gas, player.user_id))
+        await __con__.execute("UPDATE players SET gas=? WHERE id=?", (gas, player.user_id))
         player.gas = gas
     if truck_id is not None:
-        await __con__.execute('UPDATE players SET truck_id=? WHERE id=?', (truck_id, player.user_id))
+        await __con__.execute("UPDATE players SET truck_id=? WHERE id=?", (truck_id, player.user_id))
         player.truck_id = truck_id
     if loaded_items is not None:
-        await __con__.execute('UPDATE players SET loaded_items=? WHERE id=?', (__format_items_to_db(loaded_items), player.user_id))
+        await __con__.execute(
+            "UPDATE players SET loaded_items=? WHERE id=?", (__format_items_to_db(loaded_items), player.user_id)
+        )
         player.loaded_items = loaded_items
     await __con__.commit()
-    logging.debug('Updated player %s to %s', player.name, __to_tuple(player))
+    logging.debug("Updated player %s to %s", player.name, __to_tuple(player))
 
 
 async def get(user_id: int) -> Player:
@@ -219,7 +260,7 @@ async def get(user_id: int) -> Player:
     if not await registered(user_id):
         raise PlayerNotRegistered(user_id)
     cur = await __con__.execute("SELECT * FROM players WHERE id=:id", {"id": user_id})
-    player_tuple =  await cur.fetchone()
+    player_tuple = await cur.fetchone()
     await cur.close()
     return __from_tuple(player_tuple)
 
@@ -273,6 +314,7 @@ class ActiveDrive:
         message: Discord message where the drive is displayed and where the reactions are
         last_action_time: Time used to keep the list clean and time out drives
     """
+
     player: Player
     message: discord.Message
     last_action_time: float
@@ -282,6 +324,7 @@ class PlayerNotRegistered(Exception):
     """
     Exception raised when a player that is not registered is requested
     """
+
     def __init__(self, requested_id, *args: object) -> None:
         self.requested_id = requested_id
         super().__init__(*args)
@@ -294,5 +337,6 @@ class NotEnoughMoney(Exception):
     """
     Exception raised when more money is withdrawn than the player has
     """
+
     def __str__(self) -> str:
         return "The requested player doesn't have enough money to perform this action"

@@ -9,4 +9,4 @@ def get_next_xp(level: int) -> int:
 
 
 def get_job_reward_xp(level: int) -> int:
-    return randint(round((level ** 3)/20), round((get_next_xp(level)/6) + 7))
+    return randint(round((level ** 3) / 20), round((get_next_xp(level) / 6) + 7))

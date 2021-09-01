@@ -22,6 +22,7 @@ class Truck:
         gas_capacity: Amount of gas the player can fill in the Truck
         image_url: Url of an image that is show to the user
     """
+
     truck_id: int
     name: str
     description: str
@@ -47,10 +48,10 @@ def get_all() -> list:
     return __all_trucks__
 
 
-__con__ = sqlite3.connect('objects.db')
+__con__ = sqlite3.connect("objects.db")
 __cur__ = __con__.cursor()
 
-__cur__.execute('SELECT * FROM trucks')
+__cur__.execute("SELECT * FROM trucks")
 __all_trucks__ = []
 __generate_list(__all_trucks__)
 

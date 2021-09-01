@@ -9,7 +9,7 @@ from players import Player
 import places
 import items
 
-__con__ = sqlite3.connect('players.db')
+__con__ = sqlite3.connect("players.db")
 __cur__ = __con__.cursor()
 
 STATE_CLAIMED = 0
@@ -29,6 +29,7 @@ class Job:
         reward: Amount of money the player gets for this job
 
     """
+
     player_id: int
     place_from: places.Place
     place_to: places.Place
@@ -47,8 +48,13 @@ def __to_tuple(job) -> tuple:
     """
     Transforms the job object into a tuple that can be inserted in the db
     """
-    return (job.player_id, __format_pos_to_db(job.place_from.position),
-            __format_pos_to_db(job.place_to.position), job.state, job.reward)
+    return (
+        job.player_id,
+        __format_pos_to_db(job.place_from.position),
+        __format_pos_to_db(job.place_to.position),
+        job.state,
+        job.reward,
+    )
 
 
 def __format_pos_to_db(pos) -> str:
@@ -62,7 +68,7 @@ def insert(job: Job) -> None:
     """
     Inserts a Job object into the players database
     """
-    __cur__.execute('INSERT INTO jobs VALUES (?,?,?,?,?)', __to_tuple(job))
+    __cur__.execute("INSERT INTO jobs VALUES (?,?,?,?,?)", __to_tuple(job))
     __con__.commit()
 
 
@@ -70,7 +76,7 @@ def remove(job: Job) -> None:
     """
     Removes a job from the player database
     """
-    __cur__.execute('DELETE FROM jobs WHERE player_id=:id', {"id": job.player_id})
+    __cur__.execute("DELETE FROM jobs WHERE player_id=:id", {"id": job.player_id})
     __con__.commit()
 
 
@@ -79,7 +85,7 @@ def update(job: Job, state=None) -> None:
     Updates a job's state
     """
     if state is not None:
-        __cur__.execute('UPDATE jobs SET state=? WHERE player_id=?', (state, job.player_id))
+        __cur__.execute("UPDATE jobs SET state=? WHERE player_id=?", (state, job.player_id))
     __con__.commit()
 
 
@@ -110,7 +116,7 @@ def generate(player: Player) -> Job:
     job_miles_x = abs(place_from.position[0] - place_to.position[0])
     job_miles_y = abs(place_from.position[1] - place_to.position[1])
     job_reward = round(sqrt(job_miles_x ** 2 + job_miles_y ** 2) * 79)
-    reward = round((job_reward + arrival_reward) * sqrt(player.level+1))
+    reward = round((job_reward + arrival_reward) * sqrt(player.level + 1))
     new_job = Job(player.user_id, place_from, place_to, 0, reward)
     insert(new_job)
     return new_job
@@ -123,8 +129,7 @@ def get_state(job: Job) -> str:
     if job.state == 0:
         return "You claimed this job. Drive to {} and load your truck".format(job.place_from.name)
     if job.state == 1:
-        return "You loaded your truck with the needed items. Now drive to {} and unload them".format(
-            job.place_to.name)
+        return "You loaded your truck with the needed items. Now drive to {} and unload them".format(job.place_to.name)
     if job.state == 2:
         return "Your job is done and you got ${:,}.".format(job.reward)
     return "Something went wrong"

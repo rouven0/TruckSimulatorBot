@@ -23,22 +23,19 @@ from commands.gambling import Gambling
 from commands.misc import Misc
 from commands.trucks import Trucks
 
-load_dotenv('./.env')
-BOT_TOKEN = getenv('BOT_TOKEN', default="")
-DBL_TOKEN = getenv('DBL_TOKEN', default="")
-INGAME_NEWS_CHANNEL_ID = int(getenv('INGAME_NEWS_CHANNEL_ID', default=0))
+load_dotenv("./.env")
+BOT_TOKEN = getenv("BOT_TOKEN", default="")
+DBL_TOKEN = getenv("DBL_TOKEN", default="")
+INGAME_NEWS_CHANNEL_ID = int(getenv("INGAME_NEWS_CHANNEL_ID", default=0))
 
 
 def main():
-    bot = commands.Bot(command_prefix=["t.", "T."],
-                       help_command=None,
-                       case_insensitive=True)
+    bot = commands.Bot(command_prefix=["t.", "T."], help_command=None, case_insensitive=True)
 
     bot.topggpy = topgg.DBLClient(bot, DBL_TOKEN)
 
     SlashCommand(bot, sync_commands=True)
     logger = logging.getLogger()
-
 
     if "--debug" in sys.argv:
         logger.setLevel(logging.DEBUG)
@@ -50,8 +47,7 @@ def main():
     logger.addHandler(console_handler)
 
     if "--enable-log-file" in sys.argv:
-        file_handler = logging.FileHandler("./logs/{}.log"
-                                           .format(datetime.now().strftime("%Y-%m-%d_%H:%M")))
+        file_handler = logging.FileHandler("./logs/{}.log".format(datetime.now().strftime("%Y-%m-%d_%H:%M")))
         file_handler.setFormatter(logging.Formatter(config.LOG_FORMAT, datefmt="%Y-%m-%d %H:%M:%S"))
         logger.addHandler(file_handler)
         logging.info("Logging into file is enabled")
@@ -73,9 +69,12 @@ def main():
                 title="Hey there fellow Trucker",
                 description="This bot has switched to slash commands. "
                 "Just type / and you will see a list of all available commands. "
-                "If you don't see them, make sure you grant the bot the slash commands scope ""using [this link]"
+                "If you don't see them, make sure you grant the bot the slash commands scope "
+                "using [this link]"
                 "(https://discord.com/api/oauth2/authorize?client_id=831052837353816066&permissions=379904&scope=bot%20applications.commands).",
-                colour=discord.Colour.gold()))
+                colour=discord.Colour.gold(),
+            )
+        )
 
     @tasks.loop(minutes=120)
     async def update_stats():
@@ -94,5 +93,5 @@ def main():
     asyncio.run(players.close())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
