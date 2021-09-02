@@ -334,7 +334,7 @@ class Driving(commands.Cog):
         """
         place = places.get(player.position)
         drive_embed = discord.Embed(
-            description="Enjoy the new images", colour=discord.Colour.gold(), timestamp=datetime.utcnow()
+            description="Now with slash commands!", colour=discord.Colour.gold(), timestamp=datetime.utcnow()
         )
         drive_embed.set_author(name="{} is driving".format(player.name), icon_url=avatar_url)
 

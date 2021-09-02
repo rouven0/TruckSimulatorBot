@@ -55,7 +55,7 @@ class Misc(commands.Cog):
         """
         Truck Simulator rules
         """
-        rules_embed = discord.Embed(title="Truck Simulator Rules", colour=discord.Colour.gold())
+        rules_embed = discord.Embed(title="Truck Simulator Ingame Rules", colour=discord.Colour.gold())
         rules_embed.add_field(
             name="Trading ingame currency for real money",
             value="Not only that is is pretty stupid to trade real world's money in exchange of a number "
@@ -67,6 +67,32 @@ class Misc(commands.Cog):
             value="Since it's quite hard to write them for the Truck Simulator and it's a good amount "
             "of work, people who manage to write (working) automation software for this bot will "
             "not get banned. But people who use them will be.",
+        )
+        await ctx.send(embed=rules_embed)
+
+    @cog_ext.cog_slash(guild_ids=[839580174282260510, 830928381100556338])
+    async def serverrules(self, ctx) -> None:
+        """
+        Truck Simulator server rules
+        """
+        rules_embed = discord.Embed(title="Truck Simulator Server Rules", colour=discord.Colour.gold())
+        rules_embed.add_field(
+            name="Be civil and respectful",
+            value="Treat everyone with respect. Absolutely no harassment, witch hunting, sexism, racism, "
+            "or hate speech will be tolerated.",
+            inline=False,
+        )
+        rules_embed.add_field(
+            name="No spam or self-promotion",
+            value="No spam or self-promotion (server invites, advertisements, etc) without permission "
+            "from a staff member. This includes DMing fellow members.",
+            inline=False,
+        )
+        rules_embed.add_field(
+            name="No NSFW or obscene content",
+            value="This includes text, images, or links featuring nudity, sex, hard violence, "
+            "or other graphically disturbing content.",
+            inline=False,
         )
         await ctx.send(embed=rules_embed)
 
