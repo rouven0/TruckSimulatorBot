@@ -44,6 +44,11 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
     async def on_guild_join(self, guild: discord.Guild) -> None:
         logging.info("Joined {} [{}]".format(guild.name, guild.id))
 
+    @commands.Cog.listener()
+    async def on_dbl_test(data):
+        """An event that is called whenever someone tests the webhook system for your bot on Top.gg."""
+        logging.info(f"Received a test vote:\n{data}")
+
     @cog_ext.cog_subcommand(base="system")
     async def info(self, ctx) -> None:
         info_embed = discord.Embed(title="Truck Simulator info", colour=discord.Colour.gold())

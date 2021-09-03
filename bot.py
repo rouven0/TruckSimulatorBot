@@ -33,6 +33,9 @@ def main():
     bot = commands.Bot(command_prefix=["t.", "T."], help_command=None, case_insensitive=True)
 
     bot.topggpy = topgg.DBLClient(bot, DBL_TOKEN)
+    bot.topggpy = topgg.DBLClient(bot, DBL_TOKEN)
+    bot.topgg_webhook = topgg.WebhookManager(bot).dbl_webhook("/dblwebhook", "TruckSimulator")
+    bot.topgg_webhook.run(5000)
 
     SlashCommand(bot, sync_commands=True)
     logger = logging.getLogger()
@@ -87,6 +90,13 @@ def main():
 
     if "--post-server-count" in sys.argv:
         update_stats.start()
+
+    @bot.event
+    async def on_dbl_vote(data):
+        """An event that is called whenever someone votes for the bot on Top.gg."""
+        if data["type"] == "test":
+            return bot.dispatch("dbl_test", data)
+        logging.info(f"Received a vote:\n{data}")
 
     asyncio.run(players.init())
     bot.run(BOT_TOKEN)
