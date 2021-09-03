@@ -68,20 +68,14 @@ class Economy(commands.Cog):
         current_job = jobs.get(ctx.author.id)
         job_embed = discord.Embed(colour=discord.Colour.gold())
         job_embed.set_author(name="{}'s Job".format(ctx.author.name), icon_url=ctx.author.avatar_url)
-        if current_job is None:
-            job_embed.add_field(
-                name="You don't have a job at the moment",
-                value="Get yourself one with that fancy green button on the left",
-            )
-        else:
-            place_from = current_job.place_from
-            place_to = current_job.place_to
-            item = items.get(place_from.produced_item)
-            job_message = "Bring {} {} from {} to {}.".format(
-                self.bot.get_emoji(item.emoji), item.name, place_from.name, place_to.name
-            )
-            job_embed.add_field(name="Your current job", value=job_message, inline=False)
-            job_embed.add_field(name="Current state", value=jobs.get_state(current_job))
+        place_from = current_job.place_from
+        place_to = current_job.place_to
+        item = items.get(place_from.produced_item)
+        job_message = "Bring {} {} from {} to {}.".format(
+            self.bot.get_emoji(item.emoji), item.name, place_from.name, place_to.name
+        )
+        job_embed.add_field(name="Your current job", value=job_message, inline=False)
+        job_embed.add_field(name="Current state", value=jobs.get_state(current_job))
         await ctx.send(embed=job_embed, hidden=True)
 
     @cog_ext.cog_component()
@@ -99,7 +93,10 @@ class Economy(commands.Cog):
         )
         job_embed.add_field(name="You got a new Job", value=job_message, inline=False)
         job_embed.add_field(name="Current state", value=jobs.get_state(job))
-        await ctx.edit_origin(embed=self.driving_commands.get_drive_embed(active_drive.player, ctx.author.avatar_url))
+        await ctx.edit_origin(
+            embed=self.driving_commands.get_drive_embed(active_drive.player, ctx.author.avatar_url),
+            components=self.driving_commands.get_buttons(active_drive.player),
+        )
         await ctx.send(embed=job_embed, hidden=True)
 
     @cog_ext.cog_component()

@@ -75,7 +75,7 @@ class Driving(commands.Cog):
         buttons.append(
             create_actionrow(
                 create_button(style=3, label="New Job", custom_id="new_job", disabled=(current_job is not None)),
-                create_button(style=2, label="Show Job", custom_id="show_job"),
+                create_button(style=2, label="Show Job", custom_id="show_job", disabled=(current_job is None)),
             )
         )
         return buttons
