@@ -4,6 +4,7 @@ This module contains the Cog for all stat-related commands
 import discord
 from discord.ext import commands
 from discord_slash import cog_ext
+from discord_slash.context import MenuContext
 from discord_slash.utils.manage_commands import create_option
 from discord_slash.utils.manage_components import (
     create_button,
@@ -79,19 +80,24 @@ class Stats(commands.Cog):
         """
         Shows your in-game profile. That's it
         """
-        profile_embed = discord.Embed(colour=discord.Colour.gold())
         if user is not None:
-            player = await players.get(user.id)
-            profile_embed.set_thumbnail(url=user.avatar_url)
-            profile_embed.set_author(name="{}'s Profile".format(player.name), icon_url=user.avatar_url)
+            target_user = user
         else:
-            player = await players.get(ctx.author.id)
-            profile_embed.set_thumbnail(url=ctx.author.avatar_url)
-            profile_embed.set_author(name="{}'s Profile".format(player.name), icon_url=ctx.author.avatar_url)
-            # Detect, when the player is renamed
-            if player.name != ctx.author.name:
-                await players.update(player, name=ctx.author.name)
+            target_user = ctx.author
+        await ctx.send(embed=await self.get_profile_embed(target_user.id))
 
+    @cog_ext.cog_context_menu(name="Check Profile", target=2, guild_ids=[839580174282260510, 830928381100556338])
+    async def context_profile(self, ctx: MenuContext) -> None:
+        await ctx.send(embed=await self.get_profile_embed(ctx.target_id), hidden=True)
+
+    async def get_profile_embed(self, user_id: int) -> discord.Embed:
+        profile_embed = discord.Embed(colour=discord.Colour.gold())
+        user = self.bot.get_user(user_id)
+        if user is None:
+            user = await self.bot.fetch_user(user_id)
+        player = await players.get(user.id)
+        profile_embed.set_thumbnail(url=user.avatar_url)
+        profile_embed.set_author(name="{}'s Profile".format(player.name), icon_url=user.avatar_url)
         truck = trucks.get(player.truck_id)
         xp = "{:,}".format(player.xp)
         next_xp = "{:,}".format(levels.get_next_xp(player.level))
@@ -104,7 +110,7 @@ class Stats(commands.Cog):
         profile_embed.add_field(name="Gas left", value=f"{player.gas} l", inline=False)
         profile_embed.add_field(name="Current truck", value=truck.name)
         profile_embed.set_image(url=truck.image_url)
-        await ctx.send(embed=profile_embed)
+        return profile_embed
 
     @cog_ext.cog_slash(
         options=[
@@ -135,6 +141,9 @@ class Stats(commands.Cog):
                 val = "{:,} ({}/{} xp)".format(player.level, player.xp, levels.get_next_xp(player.level))
                 top_embed.set_footer(text="You can also sort by money and miles", icon_url=self.bot.user.avatar_url)
             count += 1
-            top_body += "**{}**. {} ~ {}{}\n".format(count, player.name, val, top_players[1])
+            if ctx.guild.id in [839580174282260510, 830928381100556338]:
+                top_body += "**{}**. <@{}> ~ {}{}\n".format(count, player.user_id, val, top_players[1])
+            else:
+                top_body += "**{}**. {} ~ {}{}\n".format(count, player.name, val, top_players[1])
         top_embed.add_field(name=f"Top {key}", value=top_body)
         await ctx.send(embed=top_embed)

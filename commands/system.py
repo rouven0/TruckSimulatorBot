@@ -108,7 +108,8 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         if isinstance(error, players.PlayerNotRegistered):
             await ctx.send(
                 "<@!{}> you are not registered yet! "
-                "Try `/profile register` to get started".format(error.requested_id)
+                "Try `/profile register` to get started".format(error.requested_id),
+                hidden=True,
             )
 
         elif isinstance(error, TruckNotFound):
