@@ -71,7 +71,7 @@ def main():
                 "Just type / and you will see a list of all available commands. "
                 "If you don't see them, make sure you grant the bot the slash commands scope "
                 "using [this link]"
-                "(https://discord.com/api/oauth2/authorize?client_id=831052837353816066&permissions=379904&scope=bot%20applications.commands).",
+                "(https://discord.com/api/oauth2/authorize?client_id=831052837353816066&permissions=3072&scope=bot%20applications.commands).",
                 colour=discord.Colour.gold(),
             )
         )
