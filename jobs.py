@@ -3,11 +3,11 @@ This module provides the Job class and all the methods to operate with jobs in t
 """
 from dataclasses import dataclass
 import sqlite3
+from typing import Union
 from random import randint
 from math import sqrt
 from players import Player
 import places
-import items
 
 __con__ = sqlite3.connect("players.db")
 __cur__ = __con__.cursor()
@@ -89,11 +89,11 @@ def update(job: Job, state=None) -> None:
     __con__.commit()
 
 
-def get(user_id) -> Job:
-    # TODO better up job getting using exceptions and has_job(): -> boolean
+def get(user_id) -> Union[Job, None]:
     """
     Get the Players current job as Job object
     """
+    # TODO add job exception
     __cur__.execute("SELECT * FROM jobs WHERE player_id=:id", {"id": user_id})
     try:
         return __from_tuple(__cur__.fetchone())

@@ -4,7 +4,10 @@ This module contains the Cog for all driving-related commands
 import asyncio
 from datetime import datetime
 from time import time
+from typing import Union
+
 import discord
+from discord.asset import Asset
 from discord.ext import commands
 from discord.ext import tasks
 from discord_slash import cog_ext
@@ -216,6 +219,8 @@ class Driving(commands.Cog):
             # Return if the wrong player clicked the button
             await ctx.defer(ignore=True)
             return
+        if active_drive is None:
+            return
 
         if direction == symbols.LEFT:
             active_drive.player.position = [active_drive.player.position[0] - 1, active_drive.player.position[1]]
@@ -274,7 +279,8 @@ class Driving(commands.Cog):
         # Detect, when the player is renamed
         if player.name != ctx.author.name:
             await players.update(player, name=ctx.author.name)
-        if ctx.author.id in [a.player.user_id for a in self.active_drives]:
+        active_drive = self.get_active_drive(ctx.author.id)
+        if active_drive is not None:
             active_drive = self.get_active_drive(ctx.author.id)
             await ctx.send(
                 embed=discord.Embed(
@@ -284,11 +290,11 @@ class Driving(commands.Cog):
                     colour=discord.Colour.gold(),
                 )
             )
-            return
-        message = await ctx.send(
-            embed=self.get_drive_embed(player, ctx.author.avatar_url), components=self.get_buttons(player)
-        )
-        self.active_drives.append(players.ActiveDrive(player, message, time()))
+        else:
+            message = await ctx.send(
+                embed=self.get_drive_embed(player, ctx.author.avatar_url), components=self.get_buttons(player)
+            )
+            self.active_drives.append(players.ActiveDrive(player, message, time()))
 
     @cog_ext.cog_slash()
     async def position(self, ctx) -> None:
@@ -328,7 +334,7 @@ class Driving(commands.Cog):
             places_embed.add_field(name=place.name, value=place.position)
         await ctx.send(embed=places_embed)
 
-    def get_drive_embed(self, player: players.Player, avatar_url: str) -> discord.Embed:
+    def get_drive_embed(self, player: players.Player, avatar_url: Asset) -> discord.Embed:
         """
         Returns the drive embed that includes all the information about the current position and gas
         """
@@ -395,7 +401,7 @@ class Driving(commands.Cog):
             minimap = minimap + "\n"
         return minimap
 
-    def get_active_drive(self, player_id, message_id=None) -> players.ActiveDrive:
+    def get_active_drive(self, player_id, message_id=None) -> Union[players.ActiveDrive, None]:
         """
         Returns an ActiveDrive object for a specific player and message
         """

@@ -4,13 +4,13 @@ This module contains the Cog for all economy-related commands
 from datetime import datetime
 import logging
 from random import randint
+from typing import Optional
 import discord
 from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.utils.manage_components import ComponentContext
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import players
-import places
 import items
 import jobs
 import trucks
@@ -24,20 +24,21 @@ class Economy(commands.Cog):
     def __init__(self, bot: commands.Bot, news_channel_id: int, driving_commands) -> None:
         self.bot = bot
         self.news_channel_id = news_channel_id
+        self.news_channel: Optional[discord.TextChannel] = None
         self.scheduler = AsyncIOScheduler()
         self.scheduler.add_job(self.daily_gas_prices, trigger="cron", day_of_week="mon-sun", hour=2)
         self.driving_commands = driving_commands
-        super().__init__()
-
-    @commands.Cog.listener()
-    async def on_ready(self) -> None:
-        self.news_channel: discord.TextChannel = self.bot.get_channel(self.news_channel_id)
-        self.scheduler.start()
         gas_file = open("gas.txt", "r")
         self.gas_price = float(gas_file.readline())
         self.driving_commands.gas_price = self.gas_price
         logging.info(f"Starting with gas price {self.gas_price}")
         gas_file.close()
+        super().__init__()
+
+    @commands.Cog.listener()
+    async def on_ready(self) -> None:
+        self.news_channel = self.bot.get_channel(self.news_channel_id)
+        self.scheduler.start()
 
     async def daily_gas_prices(self) -> None:
         """
@@ -50,15 +51,14 @@ class Economy(commands.Cog):
             colour=discord.Colour.gold(),
         )
         gas_embed.add_field(name="Main gas station", value=f"${self.gas_price} per litre")
-        try:
-            await self.news_send(embed=gas_embed)
-            self.driving_commands.gas_price = self.gas_price
-            logging.info(f"The new gas price is {self.gas_price}")
-            gas_file = open("gas.txt", "w")
-            gas_file.write(str(self.gas_price))
-            gas_file.close()
-        except AttributeError:
-            pass
+        if self.news_channel is None:
+            return
+        await self.news_channel.send(embed=gas_embed)
+        self.driving_commands.gas_price = self.gas_price
+        logging.info(f"The new gas price is {self.gas_price}")
+        gas_file = open("gas.txt", "w")
+        gas_file.write(str(self.gas_price))
+        gas_file.close()
 
     @cog_ext.cog_component()
     async def show_job(self, ctx: ComponentContext) -> None:
@@ -66,6 +66,9 @@ class Economy(commands.Cog):
         Shows your current job
         """
         current_job = jobs.get(ctx.author.id)
+        if current_job is None:
+            # return when there are errors with the job
+            return
         job_embed = discord.Embed(colour=discord.Colour.gold())
         job_embed.set_author(name="{}'s Job".format(ctx.author.name), icon_url=ctx.author.avatar_url)
         place_from = current_job.place_from

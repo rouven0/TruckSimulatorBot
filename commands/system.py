@@ -45,7 +45,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         logging.info("Joined {} [{}]".format(guild.name, guild.id))
 
     @commands.Cog.listener()
-    async def on_dbl_test(data):
+    async def on_dbl_test(self, data):
         """An event that is called whenever someone tests the webhook system for your bot on Top.gg."""
         logging.info(f"Received a test vote:\n{data}")
 
@@ -88,7 +88,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         await self.driving_commands.on_shutdown()
         await self.bot.change_presence(status=discord.Status.idle)
         await ctx.edit_origin(components=[])
-        await ctx.send("Shutting down")
+        await ctx.send("Shutting down", hidden=True)
         logging.warning("Shutdown command is executed")
         await self.bot.close()
 
@@ -125,6 +125,6 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
 
         else:
             logging.error(
-                f"Error at t.{ctx.command} in Server {ctx.guild.name} in channel {ctx.channel.name} from {ctx.author.name}: "
+                f"Error at /{ctx.command} in Server {ctx.guild.name} in channel {ctx.channel.name} from {ctx.author.name}: "
                 + str(error)
             )

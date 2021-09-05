@@ -1,4 +1,3 @@
-REQUIREMENTS=$()
 install:
 ifeq (, $(wildcard ./players.db))
 	@echo Setting up player database...
@@ -31,7 +30,7 @@ endif
 	@echo Setting up the virtual environment...
 	@python3 -m venv venv
 	@echo Installing requirements...
-	@venv/bin/pip install $(shell cat ./requirements.txt)
+	@venv/bin/pip install -r requirements.txt
 	@echo Done.
 	@echo Setting up the systemd service...
 	@sed -i 's|WORKINGDIRECTORY|'$(PWD)'|g' TruckSimulatorBot.service

@@ -22,7 +22,7 @@ def get(name) -> Item:
     for item in __all_items__:
         if item.name == name:
             return item
-    return None
+    raise ItemNotFound()
 
 
 def get_all() -> list:
@@ -37,3 +37,10 @@ __all_items__ = []
 __generate_list(__all_items__)
 
 __con__.close()
+
+
+class ItemNotFound(Exception):
+    """Exception raised when requested item is not found"""
+
+    def __str__(self) -> str:
+        return "Requested item not found"

@@ -5,7 +5,7 @@ async-timeout==3.0.1
 attrs==21.2.0
 chardet==4.0.0
 discord-py-interactions==3.0.2
-discord.py==1.7.3
+discord==1.7.3
 gitdb==4.0.7
 GitPython==3.1.18
 idna==3.2

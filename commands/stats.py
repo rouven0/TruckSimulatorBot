@@ -69,7 +69,7 @@ class Stats(commands.Cog):
         if job is not None:
             jobs.remove(job)
         await ctx.edit_origin(components=[])
-        await ctx.send("Your profile got deleted. We will miss you :(")
+        await ctx.send("Your profile got deleted. We will miss you :(", hidden=True)
 
     @cog_ext.cog_component()
     async def abort_deletion(self, ctx: ComponentContext):

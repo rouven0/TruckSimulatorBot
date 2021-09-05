@@ -3,6 +3,7 @@ This module provides the Place class and several lists of places easy to access
 """
 from dataclasses import dataclass
 import sqlite3
+from typing import Optional
 
 
 @dataclass
@@ -24,11 +25,11 @@ class Place:
     name: str
     position: list
     commands: list
-    image_url_default: str
-    image_url_jungle: str
-    image_url_tropical: str
-    image_url_hell: str
-    produced_item: str
+    image_url_default: Optional[str]
+    image_url_jungle: Optional[str]
+    image_url_tropical: Optional[str]
+    image_url_hell: Optional[str]
+    produced_item: Optional[str]
 
 
 def __get_position(db_pos) -> list:
