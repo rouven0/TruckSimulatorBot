@@ -150,7 +150,7 @@ class Misc(commands.Cog):
 
     @cog_ext.cog_slash()
     async def complain(self, ctx) -> None:
-        await ctx.channel.send(
+        await ctx.send(
             "What a crap bot this is! :rage: "
             "Hours of time wasted on this useless procuct of a terrible coder and a lousy artist "
             ":rage: :rage: Is this bot even TESTED before the updates are published... "
