@@ -383,7 +383,10 @@ class Driving(commands.Cog):
                 minimap_array[i].append("")
                 position = [player.position[0] - 3 + j, player.position[1] + 3 - i]
                 map_place = places.get(position)
-                item = items.get(map_place.produced_item)
+                try:
+                    item = items.get(map_place.produced_item)
+                except items.ItemNotFound:
+                    item = None
                 if item is not None:
                     minimap_array[i][j] = str(self.bot.get_emoji(items.get(map_place.produced_item).emoji))
                 elif position in (a.player.position for a in self.active_drives):
