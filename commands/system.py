@@ -34,9 +34,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
     async def on_ready(self) -> None:
         await self.bot.change_presence(
             status=discord.Status.online,
-            activity=discord.Activity(
-                type=discord.ActivityType.watching, name=f"slash commands on {len(self.bot.guilds)} servers"
-            ),
+            activity=discord.Activity(type=discord.ActivityType.watching, name=f"slash commands"),
         )
         logging.info("Connected to Discord")
 

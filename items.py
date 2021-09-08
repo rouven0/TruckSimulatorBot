@@ -9,13 +9,12 @@ import sqlite3
 class Item:
     name: str
     emoji: int
+    description: str
 
 
 def __generate_list(lst) -> None:
     for i in __cur__.fetchall():
-        name = i[0]
-        emoji = int(i[1])
-        lst.append(Item(name, emoji))
+        lst.append(Item(i[0], int(i[1]), i[2]))
 
 
 def get(name) -> Item:

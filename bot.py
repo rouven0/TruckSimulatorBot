@@ -33,7 +33,6 @@ def main():
     bot = commands.Bot(command_prefix=["t.", "T."], help_command=None, case_insensitive=True)
 
     bot.topggpy = topgg.DBLClient(bot, DBL_TOKEN)
-    bot.topggpy = topgg.DBLClient(bot, DBL_TOKEN)
     bot.topgg_webhook = topgg.WebhookManager(bot).dbl_webhook("/dblwebhook", "TruckSimulator")
     bot.topgg_webhook.run(5000)
 
