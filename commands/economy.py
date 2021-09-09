@@ -156,6 +156,15 @@ class Economy(commands.Cog):
         """
         Do I really have to explain this?
         """
+        if ctx.auhor.id == user.id:
+            await ctx.send(
+                discord.Embed(
+                    title=f"Hey {ctx.author.name}",
+                    description="You can't give money to yourself!",
+                    colour=discord.Colour.gold(),
+                )
+            )
+            return
         amount = abs(int(amount))
         donator = await players.get(ctx.author.id)
         acceptor = await players.get(user.id)
