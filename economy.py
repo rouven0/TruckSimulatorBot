@@ -166,6 +166,15 @@ class Economy(commands.Cog):
             return
         amount = abs(int(amount))
         donator = await players.get(ctx.author.id)
+        if donator.level < 1:
+            await ctx.send(
+                discord.Embed(
+                    title=f"Hey {ctx.author.name}",
+                    description="You have to be at least level 1 to give money!",
+                    colour=discord.Colour.gold(),
+                )
+            )
+            return
         acceptor = await players.get(user.id)
         await players.debit_money(donator, amount)
         await players.add_money(acceptor, amount)
