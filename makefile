@@ -1,7 +1,7 @@
 install:
-ifeq (, $(wildcard ./players.db))
+ifeq (, $(wildcard ./api/players.db))
 	@echo Setting up player database...
-	@cp ./templates/template_players.db players.db
+	@cp ./templates/template_players.db ./api/players.db
 	@echo Done.
 else
 	@echo Found existing player database, skipping this step.
@@ -23,8 +23,8 @@ ifeq (, $(wildcard ./logs/))
 	@mkdir logs
 endif
 
-ifeq (, $(wildcard ./gas.txt))
-	@cp ./templates/template_gas.txt gas.txt
+ifeq (, $(wildcard ./api/gas.txt))
+	@cp ./templates/template_gas.txt ./api/gas.txt
 endif
 
 	@echo Setting up the virtual environment...
