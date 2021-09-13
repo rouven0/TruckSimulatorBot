@@ -6,10 +6,10 @@ import sqlite3
 from typing import Union
 from random import randint
 from math import sqrt
-from players import Player
-import places
+from api.players import Player
+import api.places as places
 
-__con__ = sqlite3.connect("players.db")
+__con__ = sqlite3.connect("./api/players.db")
 __cur__ = __con__.cursor()
 
 STATE_CLAIMED = 0
@@ -17,6 +17,7 @@ STATE_LOADED = 1
 STATE_DONE = 2
 
 
+# noinspection PyUnresolvedReferences
 @dataclass
 class Job:
     """

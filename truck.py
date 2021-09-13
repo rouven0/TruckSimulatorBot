@@ -6,9 +6,9 @@ import discord
 from discord.ext import commands
 from discord_slash import cog_ext
 
-import players
-import trucks
-import symbols
+import api.players as players
+import api.trucks as trucks
+import api.symbols as symbols
 
 
 def get_truck_embed(truck: trucks.Truck) -> discord.Embed:

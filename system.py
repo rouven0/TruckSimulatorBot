@@ -1,4 +1,4 @@
-from commands.driving import Driving
+from driving import Driving
 from datetime import datetime
 from math import floor
 import logging
@@ -14,9 +14,9 @@ from discord_slash.utils.manage_components import (
     ComponentContext,
 )
 
-import players
-import places
-from trucks import TruckNotFound
+import api.players as players
+import api.places as places
+from api.trucks import TruckNotFound
 
 
 class System(commands.Cog, command_attrs=dict(hidden=True)):

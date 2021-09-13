@@ -8,19 +8,20 @@ from typing import Optional
 
 @dataclass
 class Place:
+    # noinspection PyUnresolvedReferences
     """
-    Attributes:
-        name: The name of the place
-        position: the Place's position in the 2 dimensional array that I call Map
-        commands: all local available commands stored as strings in a list
-        image_url: Every place has an image that is shown while driving
-                   Images are hosted on a ressource discord server and displayed in embeds via URL
-        image_url_better: image with the better truck
-        image_url_tropical: image with the tropical truck
-        image_url_ultimate: image with the ultimate truck
-        produced_item: Items this place produces in jobs.
-                       This is None when the place is not quest_active
-    """
+        Attributes:
+            name: The name of the place
+            position: the Place's position in the 2 dimensional array that I call Map
+            commands: all local available commands stored as strings in a list
+            image_url: Every place has an image that is shown while driving
+                       Images are hosted on a ressource discord server and displayed in embeds via URL
+            image_url_better: image with the better truck
+            image_url_tropical: image with the tropical truck
+            image_url_ultimate: image with the ultimate truck
+            produced_item: Items this place produces in jobs.
+                           This is None when the place is not quest_active
+        """
 
     name: str
     position: list
@@ -37,7 +38,7 @@ def __get_position(db_pos) -> list:
     Formats the position string from the database into a list what we can operate with
     """
     pos_x = db_pos[: db_pos.find("/")]
-    pos_y = db_pos[db_pos.find("/") + 1 :]
+    pos_y = db_pos[db_pos.find("/") + 1:]
     return [int(pos_x), int(pos_y)]
 
 
@@ -104,7 +105,7 @@ def get_hidden() -> list:
     return __hidden_places__
 
 
-__con__ = sqlite3.connect("objects.db")
+__con__ = sqlite3.connect("./api/objects.db")
 __cur__ = __con__.cursor()
 
 __all_places__ = []

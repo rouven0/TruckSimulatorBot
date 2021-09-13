@@ -64,9 +64,7 @@ class Misc(commands.Cog):
         )
         rules_embed.add_field(
             name="Autotypers",
-            value="Since it's quite hard to write them for the Truck Simulator and it's a good amount "
-            "of work, people who manage to write (working) automation software for this bot will "
-            "not get banned. But people who use them will be.",
+            value="Don't even try, it's just wasted work only to get you banned from this bot.",
         )
         await ctx.send(embed=rules_embed)
 

@@ -11,10 +11,10 @@ from discord_slash.utils.manage_components import (
     create_actionrow,
     ComponentContext,
 )
-import jobs
-import players
-import trucks
-import levels
+import api.jobs as jobs
+import api.players as players
+import api.trucks as trucks
+import api.levels as levels
 
 
 class Stats(commands.Cog):

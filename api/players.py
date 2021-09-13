@@ -6,13 +6,13 @@ from dataclasses import dataclass, field
 import aiosqlite
 import logging
 import discord
-import levels
-import items
+import api.levels as levels
+import api.items as items
 
 
 async def init():
     global __con__
-    __con__ = await aiosqlite.connect("players.db")
+    __con__ = await aiosqlite.connect("./api/players.db")
     logging.info("Initialized player database")
 
 
@@ -100,7 +100,7 @@ def __get_position(db_pos: str) -> list:
     Parses the position from the database as list [x][y]
     """
     pos_x = db_pos[: db_pos.find("/")]
-    pos_y = db_pos[db_pos.find("/") + 1 :]
+    pos_y = db_pos[db_pos.find("/") + 1:]
     return [int(pos_x), int(pos_y)]
 
 

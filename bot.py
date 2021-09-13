@@ -7,21 +7,22 @@ import discord
 from discord.ext import commands
 from discord.ext import tasks
 from discord_slash import SlashCommand
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 import topgg
 
 from dotenv import load_dotenv
-import players
+import api.players as players
 
 import config
 
-from commands.system import System
-from commands.driving import Driving
-from commands.stats import Stats
-from commands.economy import Economy
-from commands.gambling import Gambling
-from commands.misc import Misc
-from commands.trucks import Trucks
+from system import System
+from driving import Driving
+from stats import Stats
+from economy import Economy
+from gambling import Gambling
+from misc import Misc
+from truck import Trucks
 
 load_dotenv("./.env")
 BOT_TOKEN = getenv("BOT_TOKEN", default="")
@@ -44,6 +45,7 @@ def main():
     else:
         logger.setLevel(logging.INFO)
 
+    logging.getLogger("discord.gateway").setLevel(logging.WARNING)
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT, datefmt="%Y-%m-%d %H:%M:%S"))
     logger.addHandler(console_handler)
@@ -54,8 +56,10 @@ def main():
         logger.addHandler(file_handler)
         logging.info("Logging into file is enabled")
 
+    scheduler = AsyncIOScheduler()
+
     driving_commands = Driving(bot)
-    economy_commands = Economy(bot, INGAME_NEWS_CHANNEL_ID, driving_commands)
+    economy_commands = Economy(bot, scheduler, INGAME_NEWS_CHANNEL_ID, driving_commands)
     bot.add_cog(System(bot, driving_commands))
     bot.add_cog(driving_commands)
     bot.add_cog(Stats(bot))
@@ -77,6 +81,10 @@ def main():
                 colour=discord.Colour.gold(),
             )
         )
+
+    @bot.event
+    async def on_ready():
+        scheduler.start()
 
     @tasks.loop(minutes=120)
     async def update_stats():

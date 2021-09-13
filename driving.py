@@ -19,14 +19,14 @@ from discord_slash.utils.manage_components import (
     ComponentContext,
     wait_for_component,
 )
-import players
-import items
-import levels
-import places
-import symbols
-import assets
-import jobs
-import trucks
+import api.players as players
+import api.items as items
+import api.levels as levels
+import api.places as places
+import api.symbols as symbols
+import api.assets as assets
+import api.jobs as jobs
+import api.trucks as trucks
 
 
 class Driving(commands.Cog):
@@ -280,6 +280,7 @@ class Driving(commands.Cog):
         if player.name != ctx.author.name:
             await players.update(player, name=ctx.author.name)
         active_drive = self.get_active_drive(ctx.author.id)
+        # TODO rework active drive and make exceptions
         if active_drive is not None:
             active_drive = self.get_active_drive(ctx.author.id)
             await ctx.send(

@@ -11,11 +11,11 @@ from discord_slash import cog_ext
 from discord_slash.utils.manage_components import ComponentContext
 from discord_slash.utils.manage_commands import create_option
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-import players
-import places
-import items
-import jobs
-import trucks
+import api.players as players
+import api.places as places
+import api.items as items
+import api.jobs as jobs
+import api.trucks as trucks
 
 
 class Economy(commands.Cog):
@@ -23,14 +23,14 @@ class Economy(commands.Cog):
     Earn money, trade it and buy better Trucks
     """
 
-    def __init__(self, bot: commands.Bot, news_channel_id: int, driving_commands) -> None:
+    def __init__(self, bot: commands.Bot, scheduler: AsyncIOScheduler, news_channel_id: int, driving_commands) -> None:
         self.bot = bot
         self.news_channel_id = news_channel_id
         self.news_channel: Optional[discord.TextChannel] = None
-        self.scheduler = AsyncIOScheduler()
+        self.scheduler = scheduler
         self.scheduler.add_job(self.daily_gas_prices, trigger="cron", day_of_week="mon-sun", hour=2)
         self.driving_commands = driving_commands
-        gas_file = open("gas.txt", "r")
+        gas_file = open("./api/gas.txt", "r")
         self.gas_price = float(gas_file.readline())
         self.driving_commands.gas_price = self.gas_price
         logging.info(f"Starting with gas price {self.gas_price}")
@@ -40,7 +40,6 @@ class Economy(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self) -> None:
         self.news_channel = self.bot.get_channel(self.news_channel_id)
-        self.scheduler.start()
 
     async def daily_gas_prices(self) -> None:
         """
@@ -58,7 +57,7 @@ class Economy(commands.Cog):
         await self.news_channel.send(embed=gas_embed)
         self.driving_commands.gas_price = self.gas_price
         logging.info(f"The new gas price is {self.gas_price}")
-        gas_file = open("gas.txt", "w")
+        gas_file = open("./api/gas.txt", "w")
         gas_file.write(str(self.gas_price))
         gas_file.close()
 
