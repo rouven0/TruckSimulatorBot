@@ -35,3 +35,5 @@ When you buy a new truck, your old one will be sold; the selling price is based 
 All the gambling commands only work in a place called _Las Vegas_.
 For now, coinflip and slots are available.
 
+[![Discord Bots](https://top.gg/api/widget/831052837353816066.svg)](https://top.gg/bot/831052837353816066)
+
