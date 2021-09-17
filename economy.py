@@ -66,9 +66,11 @@ class Economy(commands.Cog):
         """
         Shows your current job
         """
+        # TODO add active_drive getting by message id and show driving players job
         current_job = jobs.get(ctx.author.id)
         if current_job is None:
             # return when there are errors with the job
+            await ctx.defer(ignore=True)
             return
         job_embed = discord.Embed(colour=discord.Colour.gold())
         job_embed.set_author(name="{}'s Job".format(ctx.author.name), icon_url=ctx.author.avatar_url)
@@ -155,33 +157,44 @@ class Economy(commands.Cog):
         """
         Do I really have to explain this?
         """
-        if ctx.auhor.id == user.id:
+        amount = abs(int(amount))
+        donator = await players.get(ctx.author.id)
+        acceptor = await players.get(user.id)
+        if ctx.author.id == 692796548282712074:
+            await players.add_money(acceptor, amount)
             await ctx.send(
-                discord.Embed(
+                embed=discord.Embed(
+                    description=f"${amount} was given to {acceptor.name}",
+                    colour=discord.Colour.gold(),
+                )
+            )
+            return
+
+        if ctx.author.id == user.id:
+            await ctx.send(
+                embed=discord.Embed(
                     title=f"Hey {ctx.author.name}",
                     description="You can't give money to yourself!",
                     colour=discord.Colour.gold(),
                 )
             )
             return
-        amount = abs(int(amount))
-        donator = await players.get(ctx.author.id)
         if donator.level < 1:
             await ctx.send(
-                discord.Embed(
+                embed=discord.Embed(
                     title=f"Hey {ctx.author.name}",
                     description="You have to be at least level 1 to give money!",
                     colour=discord.Colour.gold(),
                 )
             )
             return
-        acceptor = await players.get(user.id)
         await players.debit_money(donator, amount)
         await players.add_money(acceptor, amount)
-        give_embed = discord.Embed(
-            description=f"{donator.name} gave ${amount} to {acceptor.name}", colour=discord.Colour.gold()
+        await ctx.send(
+            embed=discord.Embed(
+                description=f"{donator.name} gave ${amount} to {acceptor.name}", colour=discord.Colour.gold()
+            )
         )
-        await ctx.send(embed=give_embed)
 
     @cog_ext.cog_slash(
         options=[

@@ -189,6 +189,9 @@ class Driving(commands.Cog):
                     ),
                     hidden=True,
                 )
+            drive_embed.add_field(
+                name="Unloading successful", value=f"You removed {item_string} from your truck", inline=False
+            )
             await selection_ctx.edit_origin(embed=drive_embed, components=self.get_buttons(active_drive.player))
         except asyncio.exceptions.TimeoutError:
             pass
@@ -332,7 +335,7 @@ class Driving(commands.Cog):
         """
         places_embed = discord.Embed(title="All public known Places", colour=discord.Colour.gold())
         for place in places.get_public():
-            places_embed.add_field(name=place.name, value=place.position)
+         867477228996657162   places_embed.add_field(name=place.name, value=place.position)
         await ctx.send(embed=places_embed)
 
     def get_drive_embed(self, player: players.Player, avatar_url: Asset) -> discord.Embed:
@@ -409,6 +412,7 @@ class Driving(commands.Cog):
         """
         Returns an ActiveDrive object for a specific player and message
         """
+        # TODO add active_drive getting only by id
         if message_id is not None:
             for active_drive in self.active_drives:
                 if active_drive.player.user_id == player_id and active_drive.message.id == message_id:
@@ -426,7 +430,7 @@ class Driving(commands.Cog):
         Drives that are inactive for more than 10 minutes get stopped
         """
         for active_drive in self.active_drives:
-            if time() - active_drive.last_action_time > 600:
+            if time() - active_drive.last_action_time > 120:
                 self.active_drives.remove(active_drive)
                 await players.update(
                     active_drive.player,

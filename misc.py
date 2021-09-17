@@ -58,7 +58,7 @@ class Misc(commands.Cog):
         rules_embed = discord.Embed(title="Truck Simulator Ingame Rules", colour=discord.Colour.gold())
         rules_embed.add_field(
             name="Trading ingame currency for real money",
-            value="Not only that is is pretty stupid to trade real world's money in exchange of a number "
+            value="Not only that it is pretty stupid to trade real world's money in exchange of a number "
             "somewhere in a random database it will also get you banned from this bot.",
             inline=False,
         )
