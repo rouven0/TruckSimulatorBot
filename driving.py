@@ -10,6 +10,7 @@ import discord
 from discord.asset import Asset
 from discord.ext import commands
 from discord.ext import tasks
+from discord.ext.commands.core import guild_only
 from discord_slash import cog_ext
 from discord_slash.utils.manage_components import (
     create_button,
@@ -242,8 +243,6 @@ class Driving(commands.Cog):
         active_drive.player.miles += 1
         active_drive.player.truck_miles += 1
         active_drive.player.gas -= trucks.get(active_drive.player.truck_id).gas_consumption
-        if 60 < active_drive.player.gas < 70:
-            await ctx.send("You are running out of gas. Please drive to the nearest gas station", hidden=True)
 
         if active_drive.player.gas <= 0:
             await ctx.edit_origin(components=[])
@@ -265,6 +264,8 @@ class Driving(commands.Cog):
             embed=self.get_drive_embed(active_drive.player, ctx.author.avatar_url),
             components=self.get_buttons(active_drive.player),
         )
+        if 60 < active_drive.player.gas < 70:
+            await ctx.send("You are running out of gas. Please drive to the nearest gas station", hidden=True)
 
         await players.update(
             active_drive.player,

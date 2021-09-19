@@ -66,6 +66,11 @@ class Economy(commands.Cog):
         """
         Shows your current job
         """
+        active_drive = self.driving_commands.get_active_drive(ctx.author_id, ctx.origin_message_id)
+        if active_drive is None:
+            await ctx.defer(ignore=True)
+            return
+
         # TODO add active_drive getting by message id and show driving players job
         current_job = jobs.get(ctx.author.id)
         if current_job is None:
@@ -90,6 +95,9 @@ class Economy(commands.Cog):
         Get a new job
         """
         active_drive = self.driving_commands.get_active_drive(ctx.author_id, ctx.origin_message_id)
+        if active_drive is None:
+            await ctx.defer(ignore=True)
+            return
         job_embed = discord.Embed(colour=discord.Colour.gold())
         job_embed.set_author(name="{}'s Job".format(ctx.author.name), icon_url=ctx.author.avatar_url)
         job = jobs.generate(active_drive.player)
@@ -111,6 +119,9 @@ class Economy(commands.Cog):
         If you're at the gas station, you can refill your truck's gas
         """
         active_drive = self.driving_commands.get_active_drive(ctx.author_id, ctx.origin_message_id)
+        if active_drive is None:
+            await ctx.defer(ignore=True)
+            return
         gas_amount = trucks.get(active_drive.player.truck_id).gas_capacity - active_drive.player.gas
         price = round(gas_amount * self.gas_price)
 
