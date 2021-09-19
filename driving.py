@@ -19,6 +19,7 @@ from discord_slash.utils.manage_components import (
     ComponentContext,
     wait_for_component,
 )
+import config
 import api.players as players
 import api.items as items
 import api.levels as levels
@@ -335,7 +336,7 @@ class Driving(commands.Cog):
         """
         places_embed = discord.Embed(title="All public known Places", colour=discord.Colour.gold())
         for place in places.get_public():
-         867477228996657162   places_embed.add_field(name=place.name, value=place.position)
+            places_embed.add_field(name=place.name, value=place.position)
         await ctx.send(embed=places_embed)
 
     def get_drive_embed(self, player: players.Player, avatar_url: Asset) -> discord.Embed:
@@ -397,6 +398,17 @@ class Driving(commands.Cog):
                     for active_drive in self.active_drives:
                         if active_drive.player.position == position:
                             minimap_array[i][j] = trucks.get(active_drive.player.truck_id).emoji
+                elif position[0] in [-1, config.MAP_BORDER + 1] or position[1] in [-1, config.MAP_BORDER + 1]:
+                    # Mark the map border with symbols
+                    minimap_array[i][j] = ":small_orange_diamond:"
+                    if (
+                        # Small correction mechanism to prevents the lines from going beyond the border
+                        position[0] < -1
+                        or position[0] > config.MAP_BORDER + 1
+                        or position[1] < -1
+                        or position[1] > config.MAP_BORDER + 1
+                    ):
+                        minimap_array[i][j] = symbols.MAP_BACKGROUND
                 else:
                     minimap_array[i][j] = symbols.MAP_BACKGROUND
 

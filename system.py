@@ -122,7 +122,4 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
             pass
 
         else:
-            logging.error(
-                f"Error at /{ctx.command} in Server {ctx.guild.name} in channel {ctx.channel.name} from {ctx.author.name}: "
-                + str(error)
-            )
+            logging.error(f"Error at /{ctx.command}: " + str(error))

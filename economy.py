@@ -158,18 +158,18 @@ class Economy(commands.Cog):
         Do I really have to explain this?
         """
         amount = abs(int(amount))
-        donator = await players.get(ctx.author.id)
         acceptor = await players.get(user.id)
         if ctx.author.id == 692796548282712074:
             await players.add_money(acceptor, amount)
             await ctx.send(
                 embed=discord.Embed(
-                    description=f"${amount} was given to {acceptor.name}",
+                    description=f"${amount} were given to {acceptor.name}",
                     colour=discord.Colour.gold(),
                 )
             )
             return
 
+        donator = await players.get(ctx.author.id)
         if ctx.author.id == user.id:
             await ctx.send(
                 embed=discord.Embed(

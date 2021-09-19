@@ -72,7 +72,7 @@ class Gambling(commands.Cog):
 
         if chosen_items.count(chosen_items[0]) == 3:
             slots_embed.add_field(
-                name="Result", value=":tada: Congratulations, you won {:,} :tada:".format(amount * 10)
+                name="Result", value=":tada: Congratulations, you won ${:,} :tada:".format(amount * 10)
             )
             await players.add_money(player, amount * 11)
         elif chosen_items.count(chosen_items[0]) == 2 or chosen_items.count(chosen_items[1]) == 2:
