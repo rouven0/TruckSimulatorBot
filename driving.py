@@ -74,7 +74,7 @@ class Driving(commands.Cog):
             )
         )
 
-        if player.position == [7, 7]:
+        if "refill" in place.commands:
             action_buttons.append(create_button(style=2, emoji=self.bot.get_emoji(symbols.REFILL), custom_id="refill"))
         buttons.append(create_actionrow(*action_buttons))
         buttons.append(

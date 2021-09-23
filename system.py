@@ -96,19 +96,13 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.Cog.listener()
     async def on_slash_command_error(self, ctx, error) -> None:
-        if isinstance(error, commands.errors.BotMissingPermissions):
-            missing_permissions = "`"
-            for permission in error.missing_perms:
-                missing_permissions = missing_permissions + "\n" + permission
-            await ctx.send("I'm missing the following permissions:" + missing_permissions + "`")
-
-        elif isinstance(error, places.WrongPlaceError):
+        if isinstance(error, places.WrongPlaceError):
             await ctx.send(error.message)
 
         elif isinstance(error, players.NotEnoughMoney):
             await ctx.send("{} you don't have enough money to do this".format(ctx.author.mention))
 
-        if isinstance(error, players.PlayerNotRegistered):
+        elif isinstance(error, players.PlayerNotRegistered):
             await ctx.send(
                 "<@!{}> you are not registered yet! "
                 "Try `/profile register` to get started".format(error.requested_id),
@@ -118,8 +112,5 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         elif isinstance(error, TruckNotFound):
             await ctx.send("Truck not found", hidden=True)
 
-        elif isinstance(error, commands.errors.CommandNotFound):
-            pass
-
         else:
-            logging.error(f"Error at /{ctx.command}: " + str(error))
+            logging.error(f"{error.__class__.__name__} at /{ctx.command} executed by {ctx.author.name}: " + str(error))

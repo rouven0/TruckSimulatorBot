@@ -35,9 +35,6 @@ class Gambling(commands.Cog):
         Test your luck while throwing a coin
         """
         player = await players.get(ctx.author.id)
-        if "coinflip" not in places.get(player.position).commands:
-            raise places.WrongPlaceError("We are not in Las Vegas!!!")
-
         await players.debit_money(player, amount)
         if randint(0, 1) == 0:
             result = "heads"
@@ -56,8 +53,6 @@ class Gambling(commands.Cog):
         Simple slot machine
         """
         player = await players.get(ctx.author.id)
-        if "slots" not in places.get(player.position).commands:
-            raise places.WrongPlaceError("We are not in Las Vegas!!!")
         await players.debit_money(player, amount)
 
         chosen_items = choices(sample(items.get_all(), 8), k=3)

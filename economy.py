@@ -9,10 +9,8 @@ import discord
 from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.utils.manage_components import ComponentContext
-from discord_slash.utils.manage_commands import create_option
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import api.players as players
-import api.places as places
 import api.items as items
 import api.jobs as jobs
 import api.trucks as trucks
@@ -206,26 +204,3 @@ class Economy(commands.Cog):
                 description=f"{donator.name} gave ${amount} to {acceptor.name}", colour=discord.Colour.gold()
             )
         )
-
-    @cog_ext.cog_slash(
-        options=[
-            create_option(
-                name="item",
-                description="The item you want to view",
-                option_type=3,
-                choices=[i.name for i in items.get_all()],
-                required=True,
-            )
-        ]
-    )
-    async def iteminfo(self, ctx, item: str) -> None:
-        requested_item = items.get(item)
-        item_embed = discord.Embed(
-            title=f"Item info for {requested_item.name}",
-            description=requested_item.description,
-            colour=discord.Colour.gold(),
-        )
-        for place in places.get_all():
-            if place.produced_item == item:
-                item_embed.add_field(name="Found at", value=place.name)
-        await ctx.send(embed=item_embed)

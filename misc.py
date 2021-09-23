@@ -111,14 +111,6 @@ class Misc(commands.Cog):
         await ctx.send(embed=links_embed)
 
     @cog_ext.cog_slash()
-    @commands.bot_has_permissions(
-        view_channel=True,
-        send_messages=True,
-        embed_links=True,
-        attach_files=True,
-        read_message_history=True,
-        use_external_emojis=True,
-    )
     async def vote(self, ctx) -> None:
         """
         Support the bot by voting for it on top.gg
