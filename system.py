@@ -38,15 +38,6 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         )
         logging.info("Connected to Discord")
 
-    @commands.Cog.listener()
-    async def on_guild_join(self, guild: discord.Guild) -> None:
-        logging.info("Joined {} [{}]".format(guild.name, guild.id))
-
-    @commands.Cog.listener()
-    async def on_dbl_test(self, data):
-        """An event that is called whenever someone tests the webhook system for your bot on Top.gg."""
-        logging.info(f"Received a test vote:\n{data}")
-
     @cog_ext.cog_subcommand(base="system")
     async def info(self, ctx) -> None:
         info_embed = discord.Embed(title="Truck Simulator info", colour=discord.Colour.gold())
@@ -96,10 +87,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.Cog.listener()
     async def on_slash_command_error(self, ctx, error) -> None:
-        if isinstance(error, places.WrongPlaceError):
-            await ctx.send(error.message)
-
-        elif isinstance(error, players.NotEnoughMoney):
+        if isinstance(error, players.NotEnoughMoney):
             await ctx.send("{} you don't have enough money to do this".format(ctx.author.mention))
 
         elif isinstance(error, players.PlayerNotRegistered):

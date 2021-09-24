@@ -5,11 +5,8 @@ import logging
 from datetime import datetime
 import discord
 from discord.ext import commands
-from discord.ext import tasks
 from discord_slash import SlashCommand
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
-import topgg
 
 from dotenv import load_dotenv
 import api.players as players
@@ -26,16 +23,11 @@ from truck import Trucks
 
 load_dotenv("./.env")
 BOT_TOKEN = getenv("BOT_TOKEN", default="")
-DBL_TOKEN = getenv("DBL_TOKEN", default="")
 INGAME_NEWS_CHANNEL_ID = int(getenv("INGAME_NEWS_CHANNEL_ID", default=0))
 
 
 def main():
     bot = commands.Bot(command_prefix=["t.", "T."], help_command=None, case_insensitive=True)
-
-    bot.topggpy = topgg.DBLClient(bot, DBL_TOKEN)
-    bot.topgg_webhook = topgg.WebhookManager(bot).dbl_webhook("/dblwebhook", "TruckSimulator")
-    bot.topgg_webhook.run(5000)
 
     SlashCommand(bot, sync_commands=True)
     logger = logging.getLogger()
@@ -85,25 +77,6 @@ def main():
     @bot.event
     async def on_ready():
         scheduler.start()
-
-    @tasks.loop(minutes=120)
-    async def update_stats():
-        """This function runs every 30 minutes to automatically update your server count."""
-        try:
-            await bot.topggpy.post_guild_count()
-            logging.info(f"Posted server count ({bot.topggpy.guild_count})")
-        except Exception as e:
-            logging.error(f"Failed to post server count\n{e.__class__.__name__}: {e}")
-
-    if "--post-server-count" in sys.argv:
-        update_stats.start()
-
-    @bot.event
-    async def on_dbl_vote(data):
-        """An event that is called whenever someone votes for the bot on Top.gg."""
-        if data["type"] == "test":
-            return bot.dispatch("dbl_test", data)
-        logging.info(f"Received a vote:\n{data}")
 
     asyncio.run(players.init())
     bot.run(BOT_TOKEN)

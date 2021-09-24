@@ -12,8 +12,6 @@ ifeq (, $(wildcard ./.env))
 	@cp ./templates/template_env .env
 	@read -p "Enter bot token: " token; \
 	sed -i 's|<TOKEN>|'$$token'|g' .env
-	@read -p "Enter topgg token: " topggtoken; \
-	sed -i 's|<TOPGGTOKEN>|'$$topggtoken'|g' .env
 	@echo Done.
 else
 	@echo Found existing environment, skipping this step.

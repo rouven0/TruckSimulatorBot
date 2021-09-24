@@ -4,7 +4,7 @@ Description=Truck Simulator Discord bot
 [Service]
 User=USER
 WorkingDirectory=WORKINGDIRECTORY
-ExecStart=WORKINGDIRECTORY/venv/bin/python3 bot.py --enable-log-file --post-server-count
+ExecStart=WORKINGDIRECTORY/venv/bin/python3 bot.py --enable-log-file
 
 [Install]
 WantedBy=multi-user.target

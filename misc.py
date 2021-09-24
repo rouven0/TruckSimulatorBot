@@ -45,7 +45,7 @@ class Misc(commands.Cog):
         support_embed = discord.Embed(
             title="Click here to add the bot to your servers",
             description="Go spread the word of the Truck Simulator",
-            url="https://discord.com/api/oauth2/authorize?client_id=831052837353816066&permissions=3072&scope=bot%20applications.commands",
+            url="https://discord.com/api/oauth2/authorize?client_id=831052837353816066&scope=applications.commands",
             colour=discord.Colour.gold(),
         )
         await ctx.send(embed=support_embed)
@@ -102,7 +102,7 @@ class Misc(commands.Cog):
         links_embed = discord.Embed(title="Some useful links", colour=discord.Colour.gold())
         links_embed.add_field(
             name="Invite Link",
-            value="https://discord.com/api/oauth2/authorize?client_id=831052837353816066&permissions=3072&scope=bot%20applications.commands",
+            value="https://discord.com/api/oauth2/authorize?client_id=831052837353816066&scope=applications.commands",
             inline=False,
         )
         links_embed.add_field(name="Github", value="https://www.github.com/therealr5/TruckSimulatorBot", inline=False)
