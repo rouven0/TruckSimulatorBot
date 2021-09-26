@@ -47,9 +47,7 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         minutes = floor(uptime.seconds / 60) - hours * 60
         seconds = uptime.seconds - hours * 3600 - minutes * 60
         info_embed.add_field(name="Uptime", value="{}d {}h {}m {}s".format(days, hours, minutes, seconds))
-        info_embed.add_field(name="Latency", value=str(round(self.bot.latency * 1000)) + " ms")
         info_embed.add_field(name="Registered Players", value=str(await players.get_count()))
-        info_embed.add_field(name="Servers", value=str(len(self.bot.guilds)))
         info_embed.add_field(name="Driving Trucks", value=str(len(self.driving_commands.active_drives)))
         info_embed.add_field(name="Branch", value=self.branch)
         info_embed.add_field(name="Commit", value=self.commit)
