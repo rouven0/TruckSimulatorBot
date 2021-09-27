@@ -167,7 +167,10 @@ class Economy(commands.Cog):
         Do I really have to explain this?
         """
         amount = abs(int(amount))
-        acceptor = await players.get(user.id)
+        if isinstance(user, str):
+            acceptor = await players.get(int(user))
+        else:
+            acceptor = await players.get(user.id)
         if ctx.author.id == 692796548282712074:
             await players.add_money(acceptor, amount)
             await ctx.send(

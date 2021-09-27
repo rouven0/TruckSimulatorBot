@@ -39,6 +39,8 @@ class Trucks(commands.Cog):
         """
         Get details about your truck and the trucks of your friends
         """
+        if isinstance(user, str):
+            user = await self.bot.fetch_user(int(user))
         if user is not None:
             player = await players.get(user.id)
             avatar_url = user.avatar_url

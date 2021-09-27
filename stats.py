@@ -80,6 +80,8 @@ class Stats(commands.Cog):
         """
         Shows your in-game profile. That's it
         """
+        if isinstance(user, str):
+            user = await self.bot.fetch_user(int(user))
         if user is not None:
             target_user = user
         else:
