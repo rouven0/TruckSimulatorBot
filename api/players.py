@@ -100,7 +100,7 @@ def __get_position(db_pos: str) -> list:
     Parses the position from the database as list [x][y]
     """
     pos_x = db_pos[: db_pos.find("/")]
-    pos_y = db_pos[db_pos.find("/") + 1:]
+    pos_y = db_pos[db_pos.find("/") + 1 :]
     return [int(pos_x), int(pos_y)]
 
 

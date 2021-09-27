@@ -182,7 +182,7 @@ class Economy(commands.Cog):
             return
 
         donator = await players.get(ctx.author.id)
-        if ctx.author.id == user.id:
+        if ctx.author.id == acceptor.user_id:
             await ctx.send(
                 embed=discord.Embed(
                     title=f"Hey {ctx.author.name}",
