@@ -6,8 +6,8 @@ import sqlite3
 
 
 def __generate_list(lst) -> None:
-    for i in __cur__.fetchall():
-        lst.append(Truck(i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8]))
+    for tup in __cur__.fetchall():
+        lst.append(Truck(*tup))
 
 
 @dataclass

@@ -35,7 +35,7 @@ class Gambling(commands.Cog):
         Test your luck while throwing a coin
         """
         player = await players.get(ctx.author.id)
-        await players.debit_money(player, amount)
+        await player.debit_money(amount)
         if randint(0, 1) == 0:
             result = "heads"
         else:
@@ -43,7 +43,7 @@ class Gambling(commands.Cog):
 
         if result == side:
             await ctx.send("Congratulations, it was {}. You won ${}".format(result, "{:,}".format(amount)))
-            await players.add_money(player, amount * 2)
+            await player.add_money(amount * 2)
         else:
             await ctx.send("Nope, it was {}. You lost ${}".format(result, "{:,}".format(amount)))
 
@@ -53,7 +53,7 @@ class Gambling(commands.Cog):
         Simple slot machine
         """
         player = await players.get(ctx.author.id)
-        await players.debit_money(player, amount)
+        await player.debit_money(amount)
 
         chosen_items = choices(sample(items.get_all(), 8), k=3)
         machine = "<|"
@@ -69,10 +69,10 @@ class Gambling(commands.Cog):
             slots_embed.add_field(
                 name="Result", value=":tada: Congratulations, you won ${:,} :tada:".format(amount * 10)
             )
-            await players.add_money(player, amount * 11)
+            await player.add_money(amount * 11)
         elif chosen_items.count(chosen_items[0]) == 2 or chosen_items.count(chosen_items[1]) == 2:
             slots_embed.add_field(name="Result", value="You won ${:,}".format(amount))
-            await players.add_money(player, amount * 2)
+            await player.add_money(amount * 2)
         else:
             slots_embed.add_field(name="Result", value="You lost ${:,}".format(amount))
         await ctx.send(embed=slots_embed)

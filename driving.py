@@ -10,7 +10,6 @@ import discord
 from discord.asset import Asset
 from discord.ext import commands
 from discord.ext import tasks
-from discord.ext.commands.core import guild_only
 from discord_slash import cog_ext
 from discord_slash.utils.manage_components import (
     create_button,
@@ -108,7 +107,7 @@ class Driving(commands.Cog):
             return
 
         item = items.get(places.get(active_drive.player.position).produced_item)
-        await players.load_item(active_drive.player, item)
+        await active_drive.player.load_item(item)
         job_message = None
 
         current_job = jobs.get(ctx.author.id)
@@ -159,7 +158,7 @@ class Driving(commands.Cog):
             selection_ctx: ComponentContext = await wait_for_component(self.bot, components=select, timeout=30)
             for name in selection_ctx.selected_options:
                 item = items.get(name)
-                await players.unload_item(active_drive.player, item)
+                await active_drive.player.unload_item(item)
                 if name == selection_ctx.selected_options[0]:
                     item_string += f"{self.bot.get_emoji(item.emoji)} {item.name}"
                 elif name == selection_ctx.selected_options[-1]:
@@ -178,10 +177,10 @@ class Driving(commands.Cog):
                 and active_drive.player.position == current_job.place_to.position
             ):
                 current_job.state = jobs.STATE_DONE
-                await players.add_money(active_drive.player, current_job.reward)
+                await active_drive.player.add_money(current_job.reward)
                 jobs.remove(current_job)
-                job_message = jobs.get_state(current_job) + await players.add_xp(
-                    active_drive.player, levels.get_job_reward_xp(active_drive.player.level)
+                job_message = jobs.get_state(current_job) + await active_drive.player.add_xp(
+                    levels.get_job_reward_xp(active_drive.player.level)
                 )
                 # get the drive embed egain to fit the job update
                 drive_embed = self.get_drive_embed(active_drive.player, ctx.author.avatar_url)
@@ -251,7 +250,7 @@ class Driving(commands.Cog):
                 "The company had to have your truck towed away. You will pay $3000 for this incident!"
             )
             try:
-                await players.debit_money(active_drive.player, 3000)
+                await active_drive.player.debit_money(3000)
             except players.NotEnoughMoney:
                 await ctx.send("You are lucky that you don't have enough money. I'll let you go, for now...")
             await players.update(

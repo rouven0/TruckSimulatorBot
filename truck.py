@@ -75,7 +75,7 @@ class Trucks(commands.Cog):
         selling_price = round(old_truck.price - (old_truck.price / 10) * log(player.truck_miles + 1))
         end_price = new_truck.price - selling_price
         # this also adds money if the end price is negative
-        await players.debit_money(player, end_price)
+        await player.debit_money(end_price)
         await players.update(player, truck_miles=0, gas=new_truck.gas_capacity, truck_id=new_truck.truck_id)
         answer_embed = discord.Embed(
             description=f"You sold your old {old_truck.name} for ${selling_price} and bought a brand new {new_truck.name} for ${new_truck.price}",

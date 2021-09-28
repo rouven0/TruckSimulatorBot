@@ -14,7 +14,7 @@ class Item:
 
 def __generate_list(lst) -> None:
     for i in __cur__.fetchall():
-        lst.append(Item(i[0], int(i[1]), i[2]))
+        lst.append(Item(*i))
 
 
 def get(name) -> Item:

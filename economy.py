@@ -124,7 +124,7 @@ class Economy(commands.Cog):
         price = round(gas_amount * self.gas_price)
 
         try:
-            await players.debit_money(active_drive.player, price)
+            await active_drive.player.debit_money(price)
         except players.NotEnoughMoney:
             if active_drive.player.gas < 170:
                 await ctx.send(
@@ -172,7 +172,7 @@ class Economy(commands.Cog):
         else:
             acceptor = await players.get(user.id)
         if ctx.author.id == 692796548282712074:
-            await players.add_money(acceptor, amount)
+            await acceptor.add_money(amount)
             await ctx.send(
                 embed=discord.Embed(
                     description=f"${amount} were given to {acceptor.name}",
@@ -200,8 +200,8 @@ class Economy(commands.Cog):
                 )
             )
             return
-        await players.debit_money(donator, amount)
-        await players.add_money(acceptor, amount)
+        await donator.debit_money(amount)
+        await acceptor.add_money(amount)
         await ctx.send(
             embed=discord.Embed(
                 description=f"{donator.name} gave ${amount} to {acceptor.name}", colour=discord.Colour.gold()
