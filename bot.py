@@ -29,12 +29,13 @@ INGAME_NEWS_CHANNEL_ID = int(getenv("INGAME_NEWS_CHANNEL_ID", default=0))
 def main():
     bot = commands.Bot(command_prefix=["t.", "T."], help_command=None, case_insensitive=True)
 
-    SlashCommand(bot, sync_commands=True)
     logger = logging.getLogger()
 
     if "--debug" in sys.argv:
+        SlashCommand(bot, sync_commands=True, debug_guild=830928381100556338)
         logger.setLevel(logging.DEBUG)
     else:
+        SlashCommand(bot, sync_commands=True)
         logger.setLevel(logging.INFO)
 
     logging.getLogger("discord.gateway").setLevel(logging.WARNING)

@@ -257,7 +257,7 @@ async def get_top(key) -> tuple:
     await cur.close()
     top_players = []
     for tup in top_tuples:
-        top_players.append(*tup)
+        top_players.append(Player(*tup))
     return top_players, suffix
 
 

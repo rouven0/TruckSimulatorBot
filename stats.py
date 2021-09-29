@@ -88,7 +88,7 @@ class Stats(commands.Cog):
             target_user = ctx.author
         await ctx.send(embed=await self.get_profile_embed(target_user.id))
 
-    @cog_ext.cog_context_menu(name="Check Profile", target=2, guild_ids=[839580174282260510, 830928381100556338])
+    @cog_ext.cog_context_menu(name="Check Profile", target=2)
     async def context_profile(self, ctx: MenuContext) -> None:
         await ctx.send(embed=await self.get_profile_embed(ctx.target_id), hidden=True)
 
