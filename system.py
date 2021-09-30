@@ -15,7 +15,6 @@ from discord_slash.utils.manage_components import (
 )
 
 import api.players as players
-import api.places as places
 from api.trucks import TruckNotFound
 
 
@@ -25,8 +24,8 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         self.driving_commands = driving_commands
         self.start_time = datetime.now()
         self.repo = git.Repo()
-        self.branch = self.repo.active_branch.name
         self.commit = self.repo.head.commit.hexsha[:7]
+        self.summary = self.repo.head.commit.summary
         self.repo.close()
         super().__init__()
 
@@ -40,6 +39,9 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
 
     @cog_ext.cog_subcommand(base="system")
     async def info(self, ctx) -> None:
+        """
+        System information (mostly useful for the dev)
+        """
         info_embed = discord.Embed(title="Truck Simulator info", colour=discord.Colour.gold())
         uptime = datetime.now() - self.start_time
         days = uptime.days
@@ -50,8 +52,8 @@ class System(commands.Cog, command_attrs=dict(hidden=True)):
         info_embed.add_field(name="Latency", value=str(round(self.bot.latency * 1000)) + " ms")
         info_embed.add_field(name="Registered Players", value=str(await players.get_count()))
         info_embed.add_field(name="Driving Trucks", value=str(len(self.driving_commands.active_drives)))
-        info_embed.add_field(name="Branch", value=self.branch)
         info_embed.add_field(name="Commit", value=self.commit)
+        info_embed.add_field(name="Commit Summary", value=self.summary)
         await ctx.send(embed=info_embed)
 
     @cog_ext.cog_slash(
