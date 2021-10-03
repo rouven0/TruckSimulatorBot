@@ -5,7 +5,7 @@ import logging
 from datetime import datetime
 import discord
 from discord.ext import commands
-from discord_slash import SlashCommand
+from discord_slash import SlashCommand, SlashContext
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from dotenv import load_dotenv
@@ -27,7 +27,7 @@ INGAME_NEWS_CHANNEL_ID = int(getenv("INGAME_NEWS_CHANNEL_ID", default=0))
 
 
 def main():
-    bot = commands.Bot(command_prefix=["t.", "T."], help_command=None, case_insensitive=True)
+    bot = commands.Bot(command_prefix="", help_command=None, case_insensitive=True, intents=discord.Intents.none())
 
     logger = logging.getLogger()
 
@@ -37,8 +37,8 @@ def main():
     else:
         SlashCommand(bot, sync_commands=True)
         logger.setLevel(logging.INFO)
+        logging.getLogger("discord.gateway").setLevel(logging.WARNING)
 
-    logging.getLogger("discord.gateway").setLevel(logging.WARNING)
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT, datefmt="%Y-%m-%d %H:%M:%S"))
     logger.addHandler(console_handler)
@@ -60,20 +60,6 @@ def main():
     bot.add_cog(Gambling(bot))
     bot.add_cog(Misc())
     bot.add_cog(Trucks(bot, driving_commands))
-
-    @bot.command(aliases=["truck", "drive", "job"])
-    async def help(ctx):
-        await ctx.channel.send(
-            embed=discord.Embed(
-                title="Hey there fellow Trucker",
-                description="This bot has switched to slash commands. "
-                "Just type / and you will see a list of all available commands. "
-                "If you don't see them, make sure you have the permission to use application commands and your server "
-                "admin granted the bot the slash commands scope using [this link]"
-                "(https://discord.com/api/oauth2/authorize?client_id=831052837353816066&permissions=3072&scope=bot%20applications.commands).",
-                colour=discord.Colour.gold(),
-            )
-        )
 
     @bot.event
     async def on_ready():
