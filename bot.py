@@ -27,7 +27,9 @@ INGAME_NEWS_CHANNEL_ID = int(getenv("INGAME_NEWS_CHANNEL_ID", default=0))
 
 
 def main():
-    bot = commands.Bot(command_prefix="", help_command=None, case_insensitive=True, intents=discord.Intents.none())
+    intents = discord.Intents.none()
+    intents.guilds = True
+    bot = commands.Bot(command_prefix="", help_command=None, case_insensitive=True, intents=intents)
 
     logger = logging.getLogger()
 
