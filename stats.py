@@ -44,7 +44,7 @@ class Stats(commands.Cog):
         else:
             await ctx.send("You are already registered")
 
-    @cog_ext.cog_subcommand(base="profile")
+    @cog_ext.cog_subcommand(base="profile", guild_ids=[839580174282260510, 830928381100556338])
     async def delete(self, ctx) -> None:
         """
         Delete your account
