@@ -42,14 +42,8 @@ def main():
         logging.getLogger("discord.gateway").setLevel(logging.WARNING)
 
     console_handler = logging.StreamHandler()
-    console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT, datefmt="%Y-%m-%d %H:%M:%S"))
+    console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
     logger.addHandler(console_handler)
-
-    if "--enable-log-file" in sys.argv:
-        file_handler = logging.FileHandler("./logs/{}.log".format(datetime.now().strftime("%Y-%m-%d_%H:%M")))
-        file_handler.setFormatter(logging.Formatter(config.LOG_FORMAT, datefmt="%Y-%m-%d %H:%M:%S"))
-        logger.addHandler(file_handler)
-        logging.info("Logging into file is enabled")
 
     scheduler = AsyncIOScheduler()
 

@@ -17,10 +17,6 @@ else
 	@echo Found existing environment, skipping this step.
 endif
 
-ifeq (, $(wildcard ./logs/))
-	@mkdir logs
-endif
-
 ifeq (, $(wildcard ./api/gas.txt))
 	@cp ./templates/template_gas.txt ./api/gas.txt
 endif
