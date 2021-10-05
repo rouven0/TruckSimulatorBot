@@ -80,7 +80,7 @@ class Misc(commands.Cog):
             inline=False,
         )
         links_embed.add_field(name="Github", value="https://www.github.com/therealr5/TruckSimulatorBot", inline=False)
-        links_embed.add_field(name="Support server", value="https://discord.gg/BKmtTFbvxv", inline=False)
+        links_embed.add_field(name="Support server", value="https://discord.gg/FzAxtGTUhN", inline=False)
         links_embed.add_field(name="Top.gg page", value="https://top.gg/bot/831052837353816066", inline=False)
         await ctx.send(embed=links_embed)
 
