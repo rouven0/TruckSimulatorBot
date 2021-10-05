@@ -19,7 +19,7 @@ class Misc(commands.Cog):
         support_embed = discord.Embed(
             title="Click here to get to the support server",
             description="Any problems with the TruckSimulator? \n" "Report a bug or ask questions there :)",
-            url="https://discord.gg/BKmtTFbvxv",
+            url="https://discord.gg/FzAxtGTUhN",
             colour=discord.Colour.gold(),
         )
         await ctx.send(embed=support_embed)
