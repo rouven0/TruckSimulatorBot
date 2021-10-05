@@ -68,32 +68,6 @@ class Misc(commands.Cog):
         )
         await ctx.send(embed=rules_embed)
 
-    @cog_ext.cog_slash(guild_ids=[839580174282260510, 830928381100556338])
-    async def serverrules(self, ctx) -> None:
-        """
-        Truck Simulator server rules
-        """
-        rules_embed = discord.Embed(title="Truck Simulator Server Rules", colour=discord.Colour.gold())
-        rules_embed.add_field(
-            name="Be civil and respectful",
-            value="Treat everyone with respect. Absolutely no harassment, witch hunting, sexism, racism, "
-            "or hate speech will be tolerated.",
-            inline=False,
-        )
-        rules_embed.add_field(
-            name="No spam or self-promotion",
-            value="No spam or self-promotion (server invites, advertisements, etc) without permission "
-            "from a staff member. This includes DMing fellow members.",
-            inline=False,
-        )
-        rules_embed.add_field(
-            name="No NSFW or obscene content",
-            value="This includes text, images, or links featuring nudity, sex, hard violence, "
-            "or other graphically disturbing content.",
-            inline=False,
-        )
-        await ctx.send(embed=rules_embed)
-
     @cog_ext.cog_subcommand(base="links")
     async def all(self, ctx) -> None:
         """

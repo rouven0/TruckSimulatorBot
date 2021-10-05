@@ -44,37 +44,6 @@ class Stats(commands.Cog):
         else:
             await ctx.send("You are already registered")
 
-    @cog_ext.cog_subcommand(base="profile", guild_ids=[839580174282260510, 830928381100556338])
-    async def delete(self, ctx) -> None:
-        """
-        Delete your account
-        """
-        await players.get(ctx.author.id)
-        await ctx.send(
-            "Are you sure you want to delete your profile? **All your ingame stats will be lost!**",
-            hidden=True,
-            components=[
-                create_actionrow(
-                    create_button(style=3, label="Yes", custom_id="confirm_deletion"),
-                    create_button(style=4, label="No", custom_id="abort_deletion"),
-                )
-            ],
-        )
-
-    @cog_ext.cog_component()
-    async def confirm_deletion(self, ctx: ComponentContext):
-        player = await players.get(ctx.author.id)
-        await players.remove(player)
-        job = jobs.get(ctx.author.id)
-        if job is not None:
-            jobs.remove(job)
-        await ctx.edit_origin(components=[])
-        await ctx.send("Your profile got deleted. We will miss you :(", hidden=True)
-
-    @cog_ext.cog_component()
-    async def abort_deletion(self, ctx: ComponentContext):
-        await ctx.edit_origin(content="Deletion aborted", components=[])
-
     @cog_ext.cog_subcommand(base="profile", name="show")
     async def profile(self, ctx, user: discord.User = None) -> None:
         """

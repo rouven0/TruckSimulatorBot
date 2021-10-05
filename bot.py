@@ -2,10 +2,9 @@ from os import getenv
 import sys
 import asyncio
 import logging
-from datetime import datetime
 import discord
 from discord.ext import commands
-from discord_slash import SlashCommand, SlashContext
+from discord_slash import SlashCommand
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from dotenv import load_dotenv
@@ -19,6 +18,7 @@ from stats import Stats
 from economy import Economy
 from gambling import Gambling
 from misc import Misc
+from server import Server
 from truck import Trucks
 
 load_dotenv("./.env")
@@ -56,6 +56,7 @@ def main():
     bot.add_cog(Gambling(bot))
     bot.add_cog(Misc())
     bot.add_cog(Trucks(bot, driving_commands))
+    bot.add_cog(Server(bot))
 
     @bot.event
     async def on_ready():
