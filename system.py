@@ -18,7 +18,7 @@ import api.players as players
 from api.trucks import TruckNotFound
 
 
-class System(commands.Cog, command_attrs=dict(hidden=True)):
+class System(commands.Cog):
     def __init__(self, bot: commands.Bot, driving_commands: Driving) -> None:
         self.bot = bot
         self.driving_commands = driving_commands

@@ -18,7 +18,6 @@ from stats import Stats
 from economy import Economy
 from gambling import Gambling
 from misc import Misc
-from server import Server
 from guide import Guide
 from truck import Trucks
 
@@ -57,7 +56,6 @@ def main():
     bot.add_cog(Gambling(bot))
     bot.add_cog(Misc())
     bot.add_cog(Trucks(bot, driving_commands))
-    bot.add_cog(Server(bot))
     bot.add_cog(Guide(bot))
 
     @bot.event
