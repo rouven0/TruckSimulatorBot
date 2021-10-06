@@ -3,12 +3,13 @@ This module contains the Player class, several methods to operate with players i
 the ActiveDrive, used to manage driving sessions
 """
 from dataclasses import dataclass
-from typing import Union
+from typing import Optional, Union
 import aiosqlite
 import logging
 import discord
 import api.levels as levels
 import api.items as items
+from api.jobs import Job
 
 
 def _format_pos_to_db(pos: list) -> str:
@@ -50,6 +51,9 @@ class Player:
         money: Amount of ingame currency the player has
         position: Position on the 2 dimensional array that I call map
         miles: Amount of miles the Player has driven
+        gas: amount of gas the player has
+        truck_id: id of the player's truck
+        loaded_items: a list of items the player has loaded
     """
 
     def __init__(
@@ -156,6 +160,38 @@ class Player:
             new_items.remove(loaded_item)
 
         await update(self, loaded_items=new_items)
+
+    async def add_job(self, job: Job) -> None:
+        """
+        Inserts a Job object into the players database
+        """
+        await __con__.execute("INSERT INTO jobs VALUES (?,?,?,?,?)", tuple(job))
+        await __con__.commit()
+
+    async def update_job(self, job: Job, state: int) -> None:
+        """
+        Updates a job's state
+        """
+        await __con__.execute("UPDATE jobs SET state=? WHERE player_id=?", (state, job.player_id))
+        await __con__.commit()
+
+    async def remove_job(self, job: Job) -> None:
+        """
+        Removes a job from the player database
+        """
+        await __con__.execute("DELETE FROM jobs WHERE player_id=:id", {"id": job.player_id})
+        await __con__.commit()
+
+    async def get_job(self) -> Optional[Job]:
+        """
+        Get the Players current job
+        """
+        cur = await __con__.execute("SELECT * FROM jobs WHERE player_id=:id", {"id": self.user_id})
+        job_tuple = await cur.fetchall()
+        if len(job_tuple) > 0:
+            return Job(*(job_tuple[0]))
+        else:
+            return None
 
 
 async def insert(player: Player) -> None:

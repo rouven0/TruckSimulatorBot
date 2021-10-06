@@ -1,24 +1,22 @@
 """
 This module provides the Job class and all the methods to operate with jobs in the database
 """
-from dataclasses import dataclass
-import sqlite3
-from typing import Union
 from random import randint
 from math import sqrt
-from api.players import Player
 import api.places as places
-
-__con__ = sqlite3.connect("./api/players.db")
-__cur__ = __con__.cursor()
 
 STATE_CLAIMED = 0
 STATE_LOADED = 1
 STATE_DONE = 2
 
 
-# noinspection PyUnresolvedReferences
-@dataclass
+def _format_pos_to_db(pos) -> str:
+    """
+    Returns a database-ready string that contains the position in the form x/y
+    """
+    return "{}/{}".format(pos[0], pos[1])
+
+
 class Job:
     """
     Attributes:
@@ -28,81 +26,38 @@ class Job:
         place_to: Place the player has to drive to when the truck is loaded
         state: current state, see get_state() for more information about the states
         reward: Amount of money the player gets for this job
-
     """
 
-    player_id: int
-    place_from: places.Place
-    place_to: places.Place
-    state: int
-    reward: int
+    def __init__(
+        self, player_id: int, place_from: places.Place, place_to: places.Place, state: int, reward: int
+    ) -> None:
+        self.player_id = player_id
+        if isinstance(place_from, str):
+            self.place_from = places.get(place_from)
+            self.place_to = places.get(place_to)
+        else:
+            self.place_from = place_from
+            self.place_to = place_to
+        self.state = state
+        self.reward = reward
+
+    def __iter__(self):
+        self.n = 0
+        return self
+
+    def __next__(self):
+        if self.n < len(vars(self)) - 1:
+            attr = list(vars(self).keys())[self.n]
+            self.n += 1
+            if attr in ["place_from", "place_to"]:
+                return _format_pos_to_db(self.__getattribute__(attr).position)
+            else:
+                return self.__getattribute__(attr)
+        else:
+            raise StopIteration
 
 
-def __from_tuple(tup) -> Job:
-    """
-    Returns a Job object from a received database tuple
-    """
-    return Job(tup[0], places.get(tup[1]), places.get(tup[2]), tup[3], tup[4])
-
-
-def __to_tuple(job) -> tuple:
-    """
-    Transforms the job object into a tuple that can be inserted in the db
-    """
-    return (
-        job.player_id,
-        __format_pos_to_db(job.place_from.position),
-        __format_pos_to_db(job.place_to.position),
-        job.state,
-        job.reward,
-    )
-
-
-def __format_pos_to_db(pos) -> str:
-    """
-    Returns a database-ready string that contains the position in the form x/y
-    """
-    return "{}/{}".format(pos[0], pos[1])
-
-
-def insert(job: Job) -> None:
-    """
-    Inserts a Job object into the players database
-    """
-    __cur__.execute("INSERT INTO jobs VALUES (?,?,?,?,?)", __to_tuple(job))
-    __con__.commit()
-
-
-def remove(job: Job) -> None:
-    """
-    Removes a job from the player database
-    """
-    __cur__.execute("DELETE FROM jobs WHERE player_id=:id", {"id": job.player_id})
-    __con__.commit()
-
-
-def update(job: Job, state=None) -> None:
-    """
-    Updates a job's state
-    """
-    if state is not None:
-        __cur__.execute("UPDATE jobs SET state=? WHERE player_id=?", (state, job.player_id))
-    __con__.commit()
-
-
-def get(user_id) -> Union[Job, None]:
-    """
-    Get the Players current job as Job object
-    """
-    # TODO add job exception
-    __cur__.execute("SELECT * FROM jobs WHERE player_id=:id", {"id": user_id})
-    try:
-        return __from_tuple(__cur__.fetchone())
-    except TypeError:
-        return None
-
-
-def generate(player: Player) -> Job:
+def generate(player) -> Job:
     """
     This takes two random places from the list, calculates its reward based on the miles the player
     has to drive and returns the Job object and the job as a string in human readable format.
@@ -119,7 +74,6 @@ def generate(player: Player) -> Job:
     job_reward = round(sqrt(job_miles_x ** 2 + job_miles_y ** 2) * 79)
     reward = round((job_reward + arrival_reward) * (player.level + 1))
     new_job = Job(player.user_id, place_from, place_to, 0, reward)
-    insert(new_job)
     return new_job
 
 

@@ -1,3 +1,4 @@
+import traceback
 from driving import Driving
 from datetime import datetime
 from math import floor
@@ -103,3 +104,4 @@ class System(commands.Cog):
 
         else:
             logging.error(f"{error.__class__.__name__} at /{ctx.command} executed by {ctx.author.name}: " + str(error))
+            traceback.print_tb(error.__traceback__)

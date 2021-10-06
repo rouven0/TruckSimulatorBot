@@ -40,7 +40,7 @@ class Driving(commands.Cog):
         self.active_drives = []
         super().__init__()
 
-    def get_buttons(self, player: players.Player) -> list:
+    async def get_buttons(self, player: players.Player) -> list:
         """
         Returns buttons based on the players position
         """
@@ -56,7 +56,7 @@ class Driving(commands.Cog):
                 directional_buttons.append(create_button(style=1, emoji=self.bot.get_emoji(symbol), disabled=True))
         directional_buttons.append(create_button(style=4, emoji=self.bot.get_emoji(symbols.STOP), custom_id="stop"))
         buttons.append(create_actionrow(*directional_buttons))
-        current_job = jobs.get(player.user_id)
+        current_job = await player.get_job()
         action_buttons = []
         load_disabled = not (len(player.loaded_items) < trucks.get(player.truck_id).loading_capacity)
         unload_disabled = not (len(player.loaded_items) > 0)
@@ -110,20 +110,20 @@ class Driving(commands.Cog):
         await active_drive.player.load_item(item)
         job_message = None
 
-        current_job = jobs.get(ctx.author.id)
+        current_job = await active_drive.player.get_job()
         if current_job is not None and item.name == current_job.place_from.produced_item:
             current_job.state = jobs.STATE_LOADED
             job_message = jobs.get_state(current_job)
-            jobs.update(current_job, state=current_job.state)
+            await active_drive.player.update_job(current_job, state=current_job.state)
 
-        drive_embed = self.get_drive_embed(active_drive.player, ctx.author.avatar_url)
+        drive_embed = await self.get_drive_embed(active_drive.player, ctx.author.avatar_url)
         drive_embed.add_field(
             name="Loading successful",
             value=f"You loaded {self.bot.get_emoji(item.emoji)} {item.name} into your truck",
             inline=False,
         )
         # This order is required to fit the navigation to the right place
-        await ctx.edit_origin(embed=drive_embed, components=self.get_buttons(active_drive.player))
+        await ctx.edit_origin(embed=drive_embed, components=await self.get_buttons(active_drive.player))
         if job_message is not None:
             await ctx.send(
                 embed=discord.Embed(title="Job Notification", description=job_message, colour=discord.Colour.gold()),
@@ -137,7 +137,7 @@ class Driving(commands.Cog):
             await ctx.defer(ignore=True)
             return
 
-        drive_embed = self.get_drive_embed(active_drive.player, ctx.author.avatar_url)
+        drive_embed = await self.get_drive_embed(active_drive.player, ctx.author.avatar_url)
         item_options = []
         for item in active_drive.player.loaded_items:
             # add the item if it doesn't already is in the list
@@ -165,9 +165,9 @@ class Driving(commands.Cog):
                     item_string += f" and {self.bot.get_emoji(item.emoji)} {item.name}"
                 else:
                     item_string += f", {self.bot.get_emoji(item.emoji)} {item.name}"
-            drive_embed = self.get_drive_embed(active_drive.player, ctx.author.avatar_url)
+            drive_embed = await self.get_drive_embed(active_drive.player, ctx.author.avatar_url)
 
-            current_job = jobs.get(ctx.author.id)
+            current_job = await active_drive.player.get_job()
             drive_embed.add_field(
                 name="Unloading successful", value=f"You removed {item_string} from your truck", inline=False
             )
@@ -178,12 +178,12 @@ class Driving(commands.Cog):
             ):
                 current_job.state = jobs.STATE_DONE
                 await active_drive.player.add_money(current_job.reward)
-                jobs.remove(current_job)
+                await active_drive.player.remove_job(current_job)
                 job_message = jobs.get_state(current_job) + await active_drive.player.add_xp(
                     levels.get_job_reward_xp(active_drive.player.level)
                 )
                 # get the drive embed egain to fit the job update
-                drive_embed = self.get_drive_embed(active_drive.player, ctx.author.avatar_url)
+                drive_embed = await self.get_drive_embed(active_drive.player, ctx.author.avatar_url)
                 await ctx.send(
                     embed=discord.Embed(
                         title="Job Notification", description=job_message, colour=discord.Colour.gold()
@@ -193,7 +193,7 @@ class Driving(commands.Cog):
             drive_embed.add_field(
                 name="Unloading successful", value=f"You removed {item_string} from your truck", inline=False
             )
-            await selection_ctx.edit_origin(embed=drive_embed, components=self.get_buttons(active_drive.player))
+            await selection_ctx.edit_origin(embed=drive_embed, components=await self.get_buttons(active_drive.player))
         except asyncio.exceptions.TimeoutError:
             pass
 
@@ -204,8 +204,8 @@ class Driving(commands.Cog):
             await ctx.defer(ignore=True)
             return
         await ctx.edit_origin(
-            embed=self.get_drive_embed(active_drive.player, ctx.author.avatar_url),
-            components=self.get_buttons(active_drive.player),
+            embed=await self.get_drive_embed(active_drive.player, ctx.author.avatar_url),
+            components=await self.get_buttons(active_drive.player),
         )
 
     @commands.Cog.listener()
@@ -260,8 +260,8 @@ class Driving(commands.Cog):
             return
 
         await ctx.edit_origin(
-            embed=self.get_drive_embed(active_drive.player, ctx.author.avatar_url),
-            components=self.get_buttons(active_drive.player),
+            embed=await self.get_drive_embed(active_drive.player, ctx.author.avatar_url),
+            components=await self.get_buttons(active_drive.player),
         )
         if 60 < active_drive.player.gas < 70:
             await ctx.send("You are running out of gas. Please drive to the nearest gas station", hidden=True)
@@ -297,7 +297,8 @@ class Driving(commands.Cog):
             )
         else:
             message = await ctx.send(
-                embed=self.get_drive_embed(player, ctx.author.avatar_url), components=self.get_buttons(player)
+                embed=await self.get_drive_embed(player, ctx.author.avatar_url),
+                components=await self.get_buttons(player),
             )
             self.active_drives.append(players.ActiveDrive(player, message, time()))
 
@@ -339,7 +340,7 @@ class Driving(commands.Cog):
             places_embed.add_field(name=place.name, value=place.position)
         await ctx.send(embed=places_embed)
 
-    def get_drive_embed(self, player: players.Player, avatar_url: Asset) -> discord.Embed:
+    async def get_drive_embed(self, player: players.Player, avatar_url: Asset) -> discord.Embed:
         """
         Returns the drive embed that includes all the information about the current position and gas
         """
@@ -353,7 +354,7 @@ class Driving(commands.Cog):
         drive_embed.add_field(name="Position", value=str(player.position))
         drive_embed.add_field(name="Gas left", value=f"{player.gas} l")
 
-        current_job = jobs.get(player.user_id)
+        current_job = await player.get_job()
         if current_job is not None:
             if current_job.state == 0:
                 navigation_place = current_job.place_from
@@ -452,7 +453,7 @@ class Driving(commands.Cog):
                     gas=active_drive.player.gas,
                 )
                 await active_drive.message.edit(
-                    embed=self.get_drive_embed(active_drive.player, self.bot.user.avatar_url), components=[]
+                    embed=await self.get_drive_embed(active_drive.player, self.bot.user.avatar_url), components=[]
                 )
 
     async def on_shutdown(self) -> None:
@@ -462,7 +463,7 @@ class Driving(commands.Cog):
         processed_channels = []
         for active_drive in self.active_drives:
             await active_drive.message.edit(
-                embed=self.get_drive_embed(active_drive.player, self.bot.user.avatar_url), components=[]
+                embed=await self.get_drive_embed(active_drive.player, self.bot.user.avatar_url), components=[]
             )
             if active_drive.message.id not in processed_channels:
                 await active_drive.message.channel.send("All trucks were stopped due to a bot shutdown!")

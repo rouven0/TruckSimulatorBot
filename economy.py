@@ -69,12 +69,7 @@ class Economy(commands.Cog):
             await ctx.defer(ignore=True)
             return
 
-        # TODO add active_drive getting by message id and show driving players job
-        current_job = jobs.get(ctx.author.id)
-        if current_job is None:
-            # return when there are errors with the job
-            await ctx.defer(ignore=True)
-            return
+        current_job = await active_drive.player.get_job()
         job_embed = discord.Embed(colour=discord.Colour.gold())
         job_embed.set_author(name="{}'s Job".format(ctx.author.name), icon_url=ctx.author.avatar_url)
         place_from = current_job.place_from
@@ -99,6 +94,7 @@ class Economy(commands.Cog):
         job_embed = discord.Embed(colour=discord.Colour.gold())
         job_embed.set_author(name="{}'s Job".format(ctx.author.name), icon_url=ctx.author.avatar_url)
         job = jobs.generate(active_drive.player)
+        await active_drive.player.add_job(job)
         item = items.get(job.place_from.produced_item)
         job_message = "{} needs {} {} from {}. You get ${:,} for this transport".format(
             job.place_to.name, self.bot.get_emoji(item.emoji), item.name, job.place_from.name, job.reward
@@ -106,8 +102,8 @@ class Economy(commands.Cog):
         job_embed.add_field(name="You got a new Job", value=job_message, inline=False)
         job_embed.add_field(name="Current state", value=jobs.get_state(job))
         await ctx.edit_origin(
-            embed=self.driving_commands.get_drive_embed(active_drive.player, ctx.author.avatar_url),
-            components=self.driving_commands.get_buttons(active_drive.player),
+            embed=await self.driving_commands.get_drive_embed(active_drive.player, ctx.author.avatar_url),
+            components=await self.driving_commands.get_buttons(active_drive.player),
         )
         await ctx.send(embed=job_embed, hidden=True)
 
@@ -158,7 +154,9 @@ class Economy(commands.Cog):
             text="Wonder how these prices are calculated? Check out the daily gas prices in the official server"
         )
         await players.update(active_drive.player, gas=trucks.get(active_drive.player.truck_id).gas_capacity)
-        await ctx.edit_origin(embed=self.driving_commands.get_drive_embed(active_drive.player, ctx.author.avatar_url))
+        await ctx.edit_origin(
+            embed=await self.driving_commands.get_drive_embed(active_drive.player, ctx.author.avatar_url)
+        )
         await ctx.send(embed=refill_embed, hidden=True)
 
     @cog_ext.cog_slash()
