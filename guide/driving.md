@@ -9,7 +9,7 @@ In the following table I will explain you, what each button does to your truck
 <:left:853353650491752459> will move your truck one field to the left (Your new position is [7, 9])
 <:down:853353650905677884> will move your truck one field down (Your new position is [8, 8])
 <:up:853353627383889980> will move your truck one field up (Your new position is [8, 10])
-<:right:853352377255854090> will move your truck one field to the right (Your new position is [9, 8])
+<:right:853352377255854090> will move your truck one field to the right (Your new position is [9, 9])
 
 **Truck operations**
 <:load:861353140476706877> will load the current place's item into your truck. Check your loaded items with `/load`
