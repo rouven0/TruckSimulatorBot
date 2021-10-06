@@ -6,11 +6,7 @@ __pycache__
 players.db
 
 # log and temp files
-*.log
 *.swp
 
 # virtual environment
 venv/
-
-#bot generated files
-gas.txt
