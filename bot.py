@@ -5,7 +5,6 @@ import logging
 import discord
 from discord.ext import commands
 from discord_slash import SlashCommand
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from dotenv import load_dotenv
 import api.players as players
@@ -23,7 +22,6 @@ from truck import Trucks
 
 load_dotenv("./.env")
 BOT_TOKEN = getenv("BOT_TOKEN", default="")
-INGAME_NEWS_CHANNEL_ID = int(getenv("INGAME_NEWS_CHANNEL_ID", default=0))
 
 
 def main():
@@ -35,21 +33,18 @@ def main():
 
     if "--debug" in sys.argv:
         SlashCommand(bot, sync_commands=True, debug_guild=830928381100556338)
-        # logger.setLevel(logging.DEBUG)
-        logger.setLevel(logging.INFO)
+        logger.setLevel(logging.DEBUG)
     else:
         SlashCommand(bot, sync_commands=True)
         logger.setLevel(logging.INFO)
-        logging.getLogger("discord.gateway").setLevel(logging.WARNING)
+    logging.getLogger("discord.gateway").setLevel(logging.WARNING)
 
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
     logger.addHandler(console_handler)
 
-    scheduler = AsyncIOScheduler()
-
     driving_commands = Driving(bot)
-    economy_commands = Economy(bot, scheduler, INGAME_NEWS_CHANNEL_ID, driving_commands)
+    economy_commands = Economy(bot, driving_commands)
     bot.add_cog(System(bot, driving_commands))
     bot.add_cog(driving_commands)
     bot.add_cog(Stats(bot))
@@ -58,10 +53,6 @@ def main():
     bot.add_cog(Misc())
     bot.add_cog(Trucks(bot, driving_commands))
     bot.add_cog(Guide(bot))
-
-    @bot.event
-    async def on_ready():
-        scheduler.start()
 
     asyncio.run(players.init())
     bot.run(BOT_TOKEN)
