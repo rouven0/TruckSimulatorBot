@@ -40,7 +40,7 @@ class Guide(commands.Cog):
         item_embed = discord.Embed(
             title=f"Item info for {requested_item.name}",
             description=requested_item.description,
-            colour=discord.Colour.gold(),
+            colour=discord.Colour.lighter_grey(),
         )
         for place in places.get_all():
             if place.produced_item == item:
@@ -71,7 +71,7 @@ class Guide(commands.Cog):
             await ctx.send("Requested topic not found")
             return
         guide_embed = discord.Embed(
-            title=f"{str.upper(topic[0])}{topic[1:]}", description=guide_file.read(), colour=discord.Colour.gold()
+            title=f"{str.upper(topic[0])}{topic[1:]}", description=guide_file.read(), colour=discord.Colour.lighter_grey()
         )
         guide_embed.set_author(name="Truck Simulator Guide", icon_url=self.bot.user.avatar_url)
         await ctx.send(embed=guide_embed)

@@ -15,7 +15,7 @@ def get_truck_embed(truck: trucks.Truck) -> discord.Embed:
     """
     Returns an embed with details about the given Truck
     """
-    truck_embed = discord.Embed(title=truck.name, description=truck.description, colour=discord.Colour.gold())
+    truck_embed = discord.Embed(title=truck.name, description=truck.description, colour=discord.Colour.lighter_grey())
     truck_embed.add_field(name="Gas consumption", value=f"{truck.gas_consumption} litres per mile")
     truck_embed.add_field(name="Gas capacity", value=str(truck.gas_capacity) + " l")
     truck_embed.add_field(name="Price", value="$" + str(truck.price))
@@ -79,7 +79,7 @@ class Trucks(commands.Cog):
         await players.update(player, truck_miles=0, gas=new_truck.gas_capacity, truck_id=new_truck.truck_id)
         answer_embed = discord.Embed(
             description=f"You sold your old {old_truck.name} for ${selling_price} and bought a brand new {new_truck.name} for ${new_truck.price}",
-            colour=discord.Colour.gold(),
+            colour=discord.Colour.lighter_grey(),
         )
         answer_embed.set_author(name="You got a new truck", icon_url=self.bot.user.avatar_url)
         answer_embed.set_footer(text="Check out your new baby with `/truck show`")
@@ -109,7 +109,7 @@ class Trucks(commands.Cog):
         """
         Lists all available Trucks
         """
-        list_embed = discord.Embed(title="All available trucks", colour=discord.Colour.gold())
+        list_embed = discord.Embed(title="All available trucks", colour=discord.Colour.lighter_grey())
         for truck in trucks.get_all():
             list_embed.add_field(
                 name=truck.name, value="Id: {} \n Price: ${:,}".format(truck.truck_id, truck.price), inline=False
@@ -132,7 +132,7 @@ class Trucks(commands.Cog):
             for item in player.loaded_items:
                 item_list += f"{symbols.LIST_ITEM} {self.bot.get_emoji(item.emoji)} {item.name}\n"
         load_embed = discord.Embed(
-            title="Your currently loaded items", description=item_list, colour=discord.Colour.gold()
+            title="Your currently loaded items", description=item_list, colour=discord.Colour.lighter_grey()
         )
         load_embed.set_footer(
             text=f"Loaded items: {len(player.loaded_items)}/{trucks.get(player.truck_id).loading_capacity}"

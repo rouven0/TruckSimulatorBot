@@ -20,7 +20,7 @@ class Misc(commands.Cog):
             title="Click here to get to the support server",
             description="Any problems with the TruckSimulator? \n" "Report a bug or ask questions there :)",
             url="https://discord.gg/FzAxtGTUhN",
-            colour=discord.Colour.gold(),
+            colour=discord.Colour.lighter_grey(),
         )
         await ctx.send(embed=support_embed)
 
@@ -33,7 +33,7 @@ class Misc(commands.Cog):
             title="Truck Simulator github repo",
             description="Check out the beautiful code behind the TruckSimulator or use the issue tracker to report bugs and problems",
             url="https://github.com/therealr5/TruckSimulatorBot",
-            colour=discord.Colour.gold(),
+            colour=discord.Colour.lighter_grey(),
         )
         await ctx.send(embed=support_embed)
 
@@ -46,7 +46,7 @@ class Misc(commands.Cog):
             title="Click here to add the bot to your servers",
             description="Go spread the word of the Truck Simulator",
             url="https://discord.com/api/oauth2/authorize?client_id=831052837353816066&scope=applications.commands",
-            colour=discord.Colour.gold(),
+            colour=discord.Colour.lighter_grey(),
         )
         await ctx.send(embed=support_embed)
 
@@ -55,7 +55,7 @@ class Misc(commands.Cog):
         """
         Truck Simulator rules
         """
-        rules_embed = discord.Embed(title="Truck Simulator Ingame Rules", colour=discord.Colour.gold())
+        rules_embed = discord.Embed(title="Truck Simulator Ingame Rules", colour=discord.Colour.lighter_grey())
         rules_embed.add_field(
             name="Trading ingame currency for real money",
             value="Not only that it is pretty stupid to trade real world's money in exchange of a number "
@@ -73,7 +73,7 @@ class Misc(commands.Cog):
         """
         All the links in a beautiful list
         """
-        links_embed = discord.Embed(title="Some useful links", colour=discord.Colour.gold())
+        links_embed = discord.Embed(title="Some useful links", colour=discord.Colour.lighter_grey())
         links_embed.add_field(
             name="Invite Link",
             value="https://discord.com/api/oauth2/authorize?client_id=831052837353816066&scope=applications.commands",
@@ -93,7 +93,7 @@ class Misc(commands.Cog):
             title="Click here to vote for the Truck Simulator",
             description="There are no rewards yet :frowning: , do it if you want to support this bot.",
             url="https://top.gg/bot/831052837353816066/vote",
-            colour=discord.Colour.gold(),
+            colour=discord.Colour.lighter_grey(),
         )
         await ctx.send(embed=vote_embed)
 
@@ -108,7 +108,7 @@ class Misc(commands.Cog):
                 description="**LeBogo** - _Testing helper_ - Contributed 2 lines of code\n"
                 "**FlyingPanda** - _EPIC Artist_ - Drew almost all of the images you see (and had the idea of this bot)\n"
                 "**Miriel** - _The brain_ - Gave a lot of great tips and constructive feedback",
-                colour=discord.Colour.gold(),
+                colour=discord.Colour.lighter_grey(),
             )
         )
 

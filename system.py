@@ -43,7 +43,7 @@ class System(commands.Cog):
         """
         System information (mostly useful for the dev)
         """
-        info_embed = discord.Embed(title="Truck Simulator info", colour=discord.Colour.gold())
+        info_embed = discord.Embed(title="Truck Simulator info", colour=discord.Colour.lighter_grey())
         uptime = datetime.now() - self.start_time
         days = uptime.days
         hours = floor(uptime.seconds / 3600)

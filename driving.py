@@ -126,7 +126,7 @@ class Driving(commands.Cog):
         await ctx.edit_origin(embed=drive_embed, components=await self.get_buttons(active_drive.player))
         if job_message is not None:
             await ctx.send(
-                embed=discord.Embed(title="Job Notification", description=job_message, colour=discord.Colour.gold()),
+                embed=discord.Embed(title="Job Notification", description=job_message, colour=discord.Colour.lighter_grey()),
                 hidden=True,
             )
 
@@ -186,7 +186,7 @@ class Driving(commands.Cog):
                 drive_embed = await self.get_drive_embed(active_drive.player, ctx.author.avatar_url)
                 await ctx.send(
                     embed=discord.Embed(
-                        title="Job Notification", description=job_message, colour=discord.Colour.gold()
+                        title="Job Notification", description=job_message, colour=discord.Colour.lighter_grey()
                     ),
                     hidden=True,
                 )
@@ -292,7 +292,7 @@ class Driving(commands.Cog):
                     title=f"Hey {ctx.author.name}",
                     description="You can't drive on two roads at once!\n"
                     f"Click [here]({active_drive.message.jump_url}) to jump right back into your Truck",
-                    colour=discord.Colour.gold(),
+                    colour=discord.Colour.lighter_grey(),
                 )
             )
         else:
@@ -310,7 +310,7 @@ class Driving(commands.Cog):
         player = await players.get(ctx.author.id)
         place = places.get(player.position)
         position_embed = discord.Embed(
-            description="You are at {}".format(player.position), colour=discord.Colour.gold()
+            description="You are at {}".format(player.position), colour=discord.Colour.lighter_grey()
         )
         position_embed.set_author(name="{}'s Position".format(ctx.author.name), icon_url=ctx.author.avatar_url)
         position_embed.add_field(name="What is here?", value=symbols.LIST_ITEM + place.name, inline=False)
@@ -335,7 +335,7 @@ class Driving(commands.Cog):
         """
         Lists all public places. Hidden ones are excluded
         """
-        places_embed = discord.Embed(title="All public known Places", colour=discord.Colour.gold())
+        places_embed = discord.Embed(title="All public known Places", colour=discord.Colour.lighter_grey())
         for place in places.get_public():
             places_embed.add_field(name=place.name, value=place.position)
         await ctx.send(embed=places_embed)
@@ -346,7 +346,7 @@ class Driving(commands.Cog):
         """
         place = places.get(player.position)
         drive_embed = discord.Embed(
-            description="Now with slash commands!", colour=discord.Colour.gold(), timestamp=datetime.utcnow()
+            description="Now with slash commands!", colour=discord.Colour.lighter_grey(), timestamp=datetime.utcnow()
         )
         drive_embed.set_author(name="{} is driving".format(player.name), icon_url=avatar_url)
 

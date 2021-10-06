@@ -62,7 +62,7 @@ class Gambling(commands.Cog):
             machine += "|"
         machine += ">"
 
-        slots_embed = discord.Embed(description=machine, colour=discord.Colour.gold())
+        slots_embed = discord.Embed(description=machine, colour=discord.Colour.lighter_grey())
         slots_embed.set_author(name=f"{ctx.author.name}'s slots", icon_url=ctx.author.avatar_url)
 
         if chosen_items.count(chosen_items[0]) == 3:

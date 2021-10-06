@@ -33,7 +33,7 @@ class Stats(commands.Cog):
         """
         welcome_file = open("./messages/welcome.md", "r")
         welcome_embed = discord.Embed(
-            title="Hey there, fellow Trucker,", description=welcome_file.read(), colour=discord.Colour.gold()
+            title="Hey there, fellow Trucker,", description=welcome_file.read(), colour=discord.Colour.lighter_grey()
         )
         welcome_file.close()
         welcome_embed.set_author(name="Welcome to the Truck Simulator", icon_url=self.bot.user.avatar_url)
@@ -62,7 +62,7 @@ class Stats(commands.Cog):
         await ctx.send(embed=await self.get_profile_embed(ctx.target_id), hidden=True)
 
     async def get_profile_embed(self, user_id: int) -> discord.Embed:
-        profile_embed = discord.Embed(colour=discord.Colour.gold())
+        profile_embed = discord.Embed(colour=discord.Colour.lighter_grey())
         user = self.bot.get_user(user_id)
         if user is None:
             user = await self.bot.fetch_user(user_id)
@@ -132,7 +132,7 @@ class Stats(commands.Cog):
         top_players = await players.get_top(key)
         top_body = ""
         count = 0
-        top_embed = discord.Embed(title="Truck Simulator top list", colour=discord.Colour.gold())
+        top_embed = discord.Embed(title="Truck Simulator top list", colour=discord.Colour.lighter_grey())
 
         for player in top_players[0]:
             if key == "money":

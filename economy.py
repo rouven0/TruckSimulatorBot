@@ -32,7 +32,7 @@ class Economy(commands.Cog):
             return
 
         current_job = await active_drive.player.get_job()
-        job_embed = discord.Embed(colour=discord.Colour.gold())
+        job_embed = discord.Embed(colour=discord.Colour.lighter_grey())
         job_embed.set_author(name="{}'s Job".format(ctx.author.name), icon_url=ctx.author.avatar_url)
         place_from = current_job.place_from
         place_to = current_job.place_to
@@ -53,7 +53,7 @@ class Economy(commands.Cog):
         if active_drive is None:
             await ctx.defer(ignore=True)
             return
-        job_embed = discord.Embed(colour=discord.Colour.gold())
+        job_embed = discord.Embed(colour=discord.Colour.lighter_grey())
         job_embed.set_author(name="{}'s Job".format(ctx.author.name), icon_url=ctx.author.avatar_url)
         job = jobs.generate(active_drive.player)
         await active_drive.player.add_job(job)
@@ -110,7 +110,7 @@ class Economy(commands.Cog):
         refill_embed = discord.Embed(
             title="Thank you for visiting our gas station",
             description=f"You filled {gas_amount} litres into your truck and payed ${price}",
-            colour=discord.Colour.gold(),
+            colour=discord.Colour.lighter_grey(),
         )
         refill_embed.set_footer(text="Current gas price: $1.2 per litre")
         await players.update(active_drive.player, gas=trucks.get(active_drive.player.truck_id).gas_capacity)
@@ -134,7 +134,7 @@ class Economy(commands.Cog):
             await ctx.send(
                 embed=discord.Embed(
                     description=f"${amount} were given to {acceptor.name}",
-                    colour=discord.Colour.gold(),
+                    colour=discord.Colour.lighter_grey(),
                 )
             )
             return
@@ -145,7 +145,7 @@ class Economy(commands.Cog):
                 embed=discord.Embed(
                     title=f"Hey {ctx.author.name}",
                     description="You can't give money to yourself!",
-                    colour=discord.Colour.gold(),
+                    colour=discord.Colour.lighter_grey(),
                 )
             )
             return
@@ -154,7 +154,7 @@ class Economy(commands.Cog):
                 embed=discord.Embed(
                     title=f"Hey {ctx.author.name}",
                     description="You have to be at least level 1 to give money!",
-                    colour=discord.Colour.gold(),
+                    colour=discord.Colour.lighter_grey(),
                 )
             )
             return
@@ -162,6 +162,6 @@ class Economy(commands.Cog):
         await acceptor.add_money(amount)
         await ctx.send(
             embed=discord.Embed(
-                description=f"{donator.name} gave ${amount} to {acceptor.name}", colour=discord.Colour.gold()
+                description=f"{donator.name} gave ${amount} to {acceptor.name}", colour=discord.Colour.lighter_grey()
             )
         )
