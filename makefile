@@ -36,3 +36,11 @@ uninstall:
 	@sudo rm /etc/systemd/system/TruckSimulatorBot.service
 	@sudo systemctl daemon-reload
 	@echo Done.
+
+start:
+	@sudo systemctl start TruckSimulatorBot.service
+	@echo Service started
+
+stop:
+	@sudo systemctl stop TruckSimulatorBot.service
+	@echo Service stopped
