@@ -11,7 +11,7 @@ class Misc(commands.Cog):
     All commands I can't find a category to
     """
 
-    @cog_ext.cog_subcommand(base="links")
+    @cog_ext.cog_slash()
     async def support(self, ctx) -> None:
         """
         Truck Simulator support server
@@ -24,20 +24,7 @@ class Misc(commands.Cog):
         )
         await ctx.send(embed=support_embed)
 
-    @cog_ext.cog_subcommand(base="links")
-    async def github(self, ctx) -> None:
-        """
-        The truck simulator github repo
-        """
-        support_embed = discord.Embed(
-            title="Truck Simulator github repo",
-            description="Check out the beautiful code behind the TruckSimulator or use the issue tracker to report bugs and problems",
-            url="https://github.com/therealr5/TruckSimulatorBot",
-            colour=discord.Colour.lighter_grey(),
-        )
-        await ctx.send(embed=support_embed)
-
-    @cog_ext.cog_subcommand(base="links")
+    @cog_ext.cog_slash()
     async def invite(self, ctx) -> None:
         """
         Invite the truck simulator to your servers
@@ -64,25 +51,9 @@ class Misc(commands.Cog):
         )
         rules_embed.add_field(
             name="Autotypers",
-            value="Don't even try, it's just wasted work only to get you banned from this bot.",
+            value="Don't even try, it's just wasted work only to get you blacklisted.",
         )
         await ctx.send(embed=rules_embed)
-
-    @cog_ext.cog_subcommand(base="links")
-    async def all(self, ctx) -> None:
-        """
-        All the links in a beautiful list
-        """
-        links_embed = discord.Embed(title="Some useful links", colour=discord.Colour.lighter_grey())
-        links_embed.add_field(
-            name="Invite Link",
-            value="https://discord.com/api/oauth2/authorize?client_id=831052837353816066&scope=applications.commands",
-            inline=False,
-        )
-        links_embed.add_field(name="Github", value="https://www.github.com/therealr5/TruckSimulatorBot", inline=False)
-        links_embed.add_field(name="Support server", value="https://discord.gg/FzAxtGTUhN", inline=False)
-        links_embed.add_field(name="Top.gg page", value="https://top.gg/bot/831052837353816066", inline=False)
-        await ctx.send(embed=links_embed)
 
     @cog_ext.cog_slash()
     async def vote(self, ctx) -> None:
@@ -91,7 +62,7 @@ class Misc(commands.Cog):
         """
         vote_embed = discord.Embed(
             title="Click here to vote for the Truck Simulator",
-            description="There are no rewards yet :frowning: , do it if you want to support this bot.",
+            description="If you are a member of the official server, you will get a special color role for 12 hours",
             url="https://top.gg/bot/831052837353816066/vote",
             colour=discord.Colour.lighter_grey(),
         )

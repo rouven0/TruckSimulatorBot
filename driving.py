@@ -126,7 +126,9 @@ class Driving(commands.Cog):
         await ctx.edit_origin(embed=drive_embed, components=await self.get_buttons(active_drive.player))
         if job_message is not None:
             await ctx.send(
-                embed=discord.Embed(title="Job Notification", description=job_message, colour=discord.Colour.lighter_grey()),
+                embed=discord.Embed(
+                    title="Job Notification", description=job_message, colour=discord.Colour.lighter_grey()
+                ),
                 hidden=True,
             )
 
@@ -314,8 +316,6 @@ class Driving(commands.Cog):
         )
         position_embed.set_author(name="{}'s Position".format(ctx.author.name), icon_url=ctx.author.avatar_url)
         position_embed.add_field(name="What is here?", value=symbols.LIST_ITEM + place.name, inline=False)
-        if len(place.commands) != 0 and len(place.commands[0]) != 0:
-            position_embed.add_field(name="Available Commands", value=self.get_place_commands(place.commands))
         if place.image_url_default is not None:
             position_embed.set_image(url=assets.get_place_image(player, place))
         await ctx.send(embed=position_embed)
