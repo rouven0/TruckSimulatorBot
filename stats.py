@@ -106,9 +106,6 @@ class Stats(commands.Cog):
                 val = "{:,} ({}/{} xp)".format(player.level, player.xp, levels.get_next_xp(player.level))
                 top_embed.set_footer(text="You can also sort by money and miles", icon_url=self.bot.user.avatar_url)
             count += 1
-            if ctx.guild.id in [839580174282260510, 830928381100556338]:
-                top_body += "**{}**. <@{}> ~ {}{}\n".format(count, player.user_id, val, top_players[1])
-            else:
-                top_body += "**{}**. {} ~ {}{}\n".format(count, player.name, val, top_players[1])
+            top_body += "**{}**. {} ~ {}{}\n".format(count, player.name, val, top_players[1])
         top_embed.add_field(name=f"Top {key}", value=top_body)
         await ctx.send(embed=top_embed)
