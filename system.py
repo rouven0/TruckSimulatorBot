@@ -30,23 +30,40 @@ class System(commands.Cog):
         self.repo.close()
         super().__init__()
 
-    @cog_ext.cog_subcommand(base="system")
+    @cog_ext.cog_slash()
     async def info(self, ctx) -> None:
         """
-        System information (mostly useful for the dev)
+        System information and credits
         """
         info_embed = discord.Embed(title="Truck Simulator info", colour=discord.Colour.lighter_grey())
+        info_embed.set_footer(
+            text="Developer: r5#2253",
+            icon_url="https://cdn.discordapp.com/avatars/692796548282712074/36f66390f3958970755416410237430a.png",
+        )
+        info_embed.set_thumbnail(url=self.bot.user.avatar_url)
+
         uptime = datetime.now() - self.start_time
         days = uptime.days
         hours = floor(uptime.seconds / 3600)
         minutes = floor(uptime.seconds / 60) - hours * 60
         seconds = uptime.seconds - hours * 3600 - minutes * 60
-        info_embed.add_field(name="Uptime", value="{}d {}h {}m {}s".format(days, hours, minutes, seconds))
-        info_embed.add_field(name="Latency", value=str(round(self.bot.latency * 1000)) + " ms")
-        info_embed.add_field(name="Registered Players", value=str(await players.get_count()))
-        info_embed.add_field(name="Driving Trucks", value=str(len(self.driving_commands.active_drives)))
-        info_embed.add_field(name="Commit", value=self.commit)
-        info_embed.add_field(name="Commit Summary", value=self.summary)
+        player_count = await players.get_count()
+        system_info = (
+            f"```Uptime: {days}d {hours}h {minutes}m {seconds}s\n"
+            f"Latency: {str(round(self.bot.latency * 1000))} ms\n"
+            f"Registered Players: {player_count}\n"
+            f"Driving Trucks: {str(len(self.driving_commands.active_drives))}\n"
+            f"Commit: {self.commit}\n"
+            f"Commit Summary: {self.summary}```"
+        )
+        info_embed.add_field(name="System information", value=system_info, inline=False)
+
+        credits = (
+            "LeBogo#3073 - _Testing helper_ - Contributed 2 lines of code\n"
+            "FlyingPanda#0328 - _EPIC Artist_ - Drew almost all of the images you see (and had the idea of this bot)\n"
+            "Miriel#0001 - _The brain_ - Gave a lot of great tips and constructive feedback"
+        )
+        info_embed.add_field(name="Credits", value=credits, inline=False)
         await ctx.send(embed=info_embed)
 
     @cog_ext.cog_slash(

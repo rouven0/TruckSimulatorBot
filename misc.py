@@ -69,21 +69,6 @@ class Misc(commands.Cog):
         await ctx.send(embed=vote_embed)
 
     @cog_ext.cog_slash()
-    async def credits(self, ctx) -> None:
-        """
-        Wonderful people
-        """
-        await ctx.send(
-            embed=discord.Embed(
-                title="All the wonderful persons that helped the Truck Simulator evolve",
-                description="**LeBogo** - _Testing helper_ - Contributed 2 lines of code\n"
-                "**FlyingPanda** - _EPIC Artist_ - Drew almost all of the images you see (and had the idea of this bot)\n"
-                "**Miriel** - _The brain_ - Gave a lot of great tips and constructive feedback",
-                colour=discord.Colour.lighter_grey(),
-            )
-        )
-
-    @cog_ext.cog_slash()
     async def complain(self, ctx) -> None:
         await ctx.send(
             "What a crap bot this is! :rage: "
