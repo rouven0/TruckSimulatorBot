@@ -103,8 +103,13 @@ class System(commands.Cog):
 
         elif isinstance(error, players.PlayerNotRegistered):
             await ctx.send(
-                "<@!{}> you are not registered yet! "
-                "Try `/profile register` to get started".format(error.requested_id),
+                f"<@!{error.requested_id}> you are not registered yet! Try `/profile register` to get started",
+                hidden=True,
+            )
+
+        elif isinstance(error, players.PlayerBlacklisted):
+            await ctx.send(
+                f"<@!{error.requested_id}> you are blacklisted for reason {error.reason}",
                 hidden=True,
             )
 

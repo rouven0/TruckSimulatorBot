@@ -273,7 +273,10 @@ async def get(user_id: int) -> Player:
     cur = await __con__.execute("SELECT * FROM players WHERE id=:id", {"id": user_id})
     player_tuple: tuple = await cur.fetchone()
     await cur.close()
-    return Player(*player_tuple)
+    player = Player(*player_tuple)
+    if player.xp == -1:
+        raise PlayerBlacklisted(player.user_id, player.name)
+    return player
 
 
 async def get_top(key) -> tuple:
@@ -345,6 +348,20 @@ class PlayerNotRegistered(Exception):
 
     def __str__(self) -> str:
         return f"The requested player ({self.requested_id}) is not registered"
+
+
+class PlayerBlacklisted(Exception):
+    """
+    Exception raised when a player is blacklisted
+    """
+
+    def __init__(self, requested_id, reason, *args: object) -> None:
+        self.requested_id = requested_id
+        self.reason = reason
+        super().__init__(*args)
+
+    def __str__(self) -> str:
+        return f"The requested player ({self.requested_id}) is blacklisted for reason {self.reason}"
 
 
 class NotEnoughMoney(Exception):
