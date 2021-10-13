@@ -66,10 +66,52 @@ class System(commands.Cog):
         info_embed.add_field(name="Credits", value=credits, inline=False)
         await ctx.send(embed=info_embed)
 
+    @cog_ext.cog_subcommand(
+        base="blacklist",
+        guild_ids=[839580174282260510],
+        base_default_permission=False,
+        base_permissions={839580174282260510: [create_permission(692796548282712074, 2, True)]},
+    )
+    async def add(self, ctx, user_id, reason: str) -> None:
+        user_id = int(user_id)
+        try:
+            player = await players.get(user_id)
+            await ctx.send(
+                embed=discord.Embed(
+                    description=f":white_check_mark: **{player.name}** got blacklisted",
+                    colour=discord.Colour.lighter_grey(),
+                )
+            )
+            await players.update(player, name=reason, xp=-1)
+        except players.PlayerBlacklisted:
+            await ctx.send("Player already blacklisted")
+
+    @cog_ext.cog_subcommand(
+        base="blacklist",
+        guild_ids=[839580174282260510],
+        base_default_permission=False,
+        base_permissions={839580174282260510: [create_permission(692796548282712074, 2, True)]},
+    )
+    async def remove(self, ctx, user_id) -> None:
+        user_id = int(user_id)
+        try:
+            await players.get(user_id)
+            await ctx.send("Player not on blacklist")
+        except players.PlayerBlacklisted:
+            user = await self.bot.fetch_user(user_id)
+            player = players.Player(user_id, user.name)
+            await players.update(player, xp=0, name=user.name)
+            await ctx.send(
+                embed=discord.Embed(
+                    description=f":white_check_mark: **{player.name}** got removed from the blacklist",
+                    colour=discord.Colour.lighter_grey(),
+                )
+            )
+
     @cog_ext.cog_slash(
-        guild_ids=[830928381100556338],
+        guild_ids=[839580174282260510],
         default_permission=False,
-        permissions={830928381100556338: [create_permission(692796548282712074, 2, True)]},
+        permissions={839580174282260510: [create_permission(692796548282712074, 2, True)]},
     )
     async def shutdown(self, ctx):
         await ctx.send(
@@ -109,7 +151,7 @@ class System(commands.Cog):
 
         elif isinstance(error, players.PlayerBlacklisted):
             await ctx.send(
-                f"<@!{error.requested_id}> you are blacklisted for reason {error.reason}",
+                f"<@!{error.requested_id}> you are blacklisted for reason: {error.reason}",
                 hidden=True,
             )
 
