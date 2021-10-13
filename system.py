@@ -59,9 +59,9 @@ class System(commands.Cog):
         info_embed.add_field(name="System information", value=system_info, inline=False)
 
         credits = (
-            "LeBogo#3073 - _Testing helper_ - Contributed 2 lines of code\n"
-            "FlyingPanda#0328 - _EPIC Artist_ - Drew almost all of the images you see (and had the idea of this bot)\n"
-            "Miriel#0001 - _The brain_ - Gave a lot of great tips and constructive feedback"
+            "<:lebogo:897861933418565652> LeBogo#3073 - _Testing helper_ - Contributed 2 lines of code\n"
+            "<:panda:897860673898426462> FlyingPanda#0328 - _EPIC Artist_ - Drew almost all of the images you see (and had the idea of this bot)\n"
+            "<:miri:897860673546117122> Miriel#0001 - _The brain_ - Gave a lot of great tips and constructive feedback"
         )
         info_embed.add_field(name="Credits", value=credits, inline=False)
         await ctx.send(embed=info_embed)
