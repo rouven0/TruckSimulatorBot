@@ -139,6 +139,7 @@ class Driving(commands.Cog):
             await ctx.defer(ignore=True)
             return
 
+        place = places.get(active_drive.player.position)
         drive_embed = await self.get_drive_embed(active_drive.player, ctx.author.avatar_url)
         item_options = []
         for item in active_drive.player.loaded_items:
@@ -155,49 +156,61 @@ class Driving(commands.Cog):
         )
         cancel_button = create_button(custom_id="cancel", label="Cancel", style=4)
         await ctx.edit_origin(embed=drive_embed, components=[create_actionrow(select), create_actionrow(cancel_button)])
+        item_string = ""
         try:
-            item_string = ""
             selection_ctx: ComponentContext = await wait_for_component(self.bot, components=select, timeout=30)
-            for name in selection_ctx.selected_options:
-                item = items.get(name)
-                await active_drive.player.unload_item(item)
-                if name == selection_ctx.selected_options[0]:
-                    item_string += f"{self.bot.get_emoji(item.emoji)} {item.name}"
-                elif name == selection_ctx.selected_options[-1]:
-                    item_string += f" and {self.bot.get_emoji(item.emoji)} {item.name}"
-                else:
-                    item_string += f", {self.bot.get_emoji(item.emoji)} {item.name}"
-            drive_embed = await self.get_drive_embed(active_drive.player, ctx.author.avatar_url)
-
-            current_job = await active_drive.player.get_job()
-            drive_embed.add_field(
-                name="Unloading successful", value=f"You removed {item_string} from your truck", inline=False
-            )
-            if (
-                current_job is not None
-                and current_job.place_from.produced_item in selection_ctx.selected_options
-                and active_drive.player.position == current_job.place_to.position
-            ):
-                current_job.state = jobs.STATE_DONE
-                await active_drive.player.add_money(current_job.reward)
-                await active_drive.player.remove_job(current_job)
-                job_message = jobs.get_state(current_job) + await active_drive.player.add_xp(
-                    levels.get_job_reward_xp(active_drive.player.level)
-                )
-                # get the drive embed egain to fit the job update
-                drive_embed = await self.get_drive_embed(active_drive.player, ctx.author.avatar_url)
-                await ctx.send(
-                    embed=discord.Embed(
-                        title="Job Notification", description=job_message, colour=discord.Colour.lighter_grey()
-                    ),
-                    hidden=True,
-                )
-            drive_embed.add_field(
-                name="Unloading successful", value=f"You removed {item_string} from your truck", inline=False
-            )
-            await selection_ctx.edit_origin(embed=drive_embed, components=await self.get_buttons(active_drive.player))
         except asyncio.exceptions.TimeoutError:
-            pass
+            return
+        for name in selection_ctx.selected_options:
+            item = items.get(name)
+            await active_drive.player.unload_item(item)
+            if name == selection_ctx.selected_options[0]:
+                item_string += f"{self.bot.get_emoji(item.emoji)} {item.name}"
+            elif name == selection_ctx.selected_options[-1]:
+                item_string += f" and {self.bot.get_emoji(item.emoji)} {item.name}"
+            else:
+                item_string += f", {self.bot.get_emoji(item.emoji)} {item.name}"
+
+        drive_embed = await self.get_drive_embed(active_drive.player, ctx.author.avatar_url)
+
+        current_job = await active_drive.player.get_job()
+        drive_embed.add_field(
+            name="Unloading successful", value=f"You removed {item_string} from your truck", inline=False
+        )
+        if (
+            current_job is not None
+            and current_job.place_from.produced_item in selection_ctx.selected_options
+            and active_drive.player.position == current_job.place_to.position
+        ):
+            current_job.state = jobs.STATE_DONE
+            await active_drive.player.add_money(current_job.reward)
+            await active_drive.player.remove_job(current_job)
+            job_message = jobs.get_state(current_job) + await active_drive.player.add_xp(
+                levels.get_job_reward_xp(active_drive.player.level)
+            )
+            # get the drive embed egain to fit the job update
+            drive_embed = await self.get_drive_embed(active_drive.player, ctx.author.avatar_url)
+            await ctx.send(
+                embed=discord.Embed(
+                    title="Job Notification", description=job_message, colour=discord.Colour.lighter_grey()
+                ),
+                hidden=True,
+            )
+        if place.accepted_item in selection_ctx.selected_options:
+            await active_drive.player.add_money(place.item_reward)
+            await ctx.send(
+                embed=discord.Embed(
+                    title="Minijob Notification",
+                    description=f"{place.name} gave you ${place.item_reward * (active_drive.player.level + 1):,} for bringing them {place.accepted_item}",
+                    colour=discord.Colour.lighter_grey(),
+                ),
+                hidden=True,
+            )
+
+        drive_embed.add_field(
+            name="Unloading successful", value=f"You removed {item_string} from your truck", inline=False
+        )
+        await selection_ctx.edit_origin(embed=drive_embed, components=await self.get_buttons(active_drive.player))
 
     @cog_ext.cog_component()
     async def cancel(self, ctx: ComponentContext):

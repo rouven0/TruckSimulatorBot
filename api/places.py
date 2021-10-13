@@ -18,8 +18,9 @@ class Place:
         image_url_better: image with the better truck
         image_url_tropical: image with the tropical truck
         image_url_ultimate: image with the ultimate truck
-        produced_item: Items this place produces in jobs.
-                       This is None when the place is not quest_active
+        produced_item: Item this place produces in jobs.
+        accepted_item: Item this place rewards
+        item_reward: money payed when the accepted_item is unloaded
     """
 
     name: str
@@ -30,6 +31,8 @@ class Place:
     image_url_tropical: Optional[str]
     image_url_hell: Optional[str]
     produced_item: Optional[str]
+    accepted_item: Optional[str]
+    item_reward: Optional[int]
 
 
 def __get_position(db_pos) -> list:
@@ -56,6 +59,8 @@ def __generate_list(lst) -> None:
         image_url_tropical = tup[5]
         image_url_ultimate = tup[6]
         produced_item = tup[7]
+        accepted_item = tup[8]
+        item_reward = tup[9]
         lst.append(
             Place(
                 name,
@@ -66,6 +71,8 @@ def __generate_list(lst) -> None:
                 image_url_tropical,
                 image_url_ultimate,
                 produced_item,
+                accepted_item,
+                item_reward,
             )
         )
 
@@ -80,7 +87,7 @@ def get(position) -> Place:
     for place in get_all():
         if place.position == position:
             return place
-    return Place("Nothing", position, [], None, None, None, None, None)
+    return Place("Nothing", position, [], None, None, None, None, None, None, None)
 
 
 def get_all() -> list:

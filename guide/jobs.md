@@ -1,4 +1,4 @@
-Jobs are the primary way to make money. After you got a job, drive to the first place, load the needed items then  drive to the second place and unload the right item.
+Jobs are the primary way to make money and gain xp. After you got a job, drive to the first place, load the needed items then  drive to the second place and unload the right item.
 The Truck Simulator has a navigation system that always tells you what to do.
 You can view your current job anytime with the **Show Job** button.
 

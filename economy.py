@@ -6,8 +6,10 @@ from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.utils.manage_components import ComponentContext
 import api.players as players
+import api.places as places
 import api.items as items
 import api.jobs as jobs
+import api.symbols as symbols
 import api.trucks as trucks
 
 
@@ -43,6 +45,22 @@ class Economy(commands.Cog):
         job_embed.add_field(name="Your current job", value=job_message, inline=False)
         job_embed.add_field(name="Current state", value=jobs.get_state(current_job))
         await ctx.send(embed=job_embed, hidden=True)
+
+    @cog_ext.cog_slash()
+    async def minijobs(self, ctx):
+        """
+        Prints out all permanently running minijobs
+        """
+        player = await players.get(ctx.author.id)
+        minijob_list = ""
+        for place in places.get_all():
+            if place.accepted_item is not None:
+                minijob_list += f"\n{symbols.LIST_ITEM}**{place.name}** will give you ${place.item_reward*(player.level+1):,} if you bring them *{place.accepted_item}*."
+        await ctx.send(
+            embed=discord.Embed(
+                title="All available minijobs", description=minijob_list, colour=discord.Colour.lighter_grey()
+            )
+        )
 
     @cog_ext.cog_component()
     async def new_job(self, ctx: ComponentContext) -> None:
