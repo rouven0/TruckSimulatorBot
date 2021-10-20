@@ -35,7 +35,7 @@ def main():
         SlashCommand(bot, sync_commands=True, debug_guild=830928381100556338)
         logger.setLevel(logging.DEBUG)
     else:
-        SlashCommand(bot, sync_commands=True)
+        SlashCommand(bot, sync_commands=True, delete_from_unused_guilds=True)
         logger.setLevel(logging.INFO)
     logging.getLogger("discord.gateway").setLevel(logging.WARNING)
 

@@ -3,6 +3,7 @@ This module contains the Cog for all driving-related commands
 """
 import asyncio
 from datetime import datetime
+import logging
 from time import time
 from typing import Union
 
@@ -98,6 +99,7 @@ class Driving(commands.Cog):
         self.active_drives.remove(active_drive)
         await ctx.edit_origin(components=[])
         await ctx.send("You stopped driving!, {}".format(ctx.author.name))
+        logging.info("%s stopped driving", ctx.author.name)
 
     @cog_ext.cog_component()
     async def load(self, ctx: ComponentContext):
@@ -311,6 +313,7 @@ class Driving(commands.Cog):
                 )
             )
         else:
+            logging.info("%s started driving", ctx.author.name)
             message = await ctx.send(
                 embed=await self.get_drive_embed(player, ctx.author.avatar_url),
                 components=await self.get_buttons(player),
