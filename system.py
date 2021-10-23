@@ -120,6 +120,9 @@ class System(commands.Cog):
         base_permissions={839580174282260510: [create_permission(692796548282712074, 2, True)]},
     )
     async def load(self, ctx, extension: str) -> None:
+        """
+        Load an extension
+        """
         try:
             self.bot.load_extension(extension)
             await ctx.send(f"Loaded {extension}")
@@ -142,6 +145,9 @@ class System(commands.Cog):
         base_permissions={839580174282260510: [create_permission(692796548282712074, 2, True)]},
     )
     async def unload(self, ctx, extension: str) -> None:
+        """
+        Unload an extension
+        """
         try:
             self.bot.unload_extension(extension)
             await ctx.send(f"Unloaded {extension}")
@@ -163,7 +169,10 @@ class System(commands.Cog):
         base_default_permission=False,
         base_permissions={839580174282260510: [create_permission(692796548282712074, 2, True)]},
     )
-    async def reoad(self, ctx, extension: str) -> None:
+    async def reload(self, ctx, extension: str) -> None:
+        """
+        Reload an extension
+        """
         self.bot.reload_extension(extension)
         await ctx.send(f"Reloaded {extension}")
 

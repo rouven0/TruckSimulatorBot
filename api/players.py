@@ -316,7 +316,8 @@ async def get_count(table: str) -> int:
     """
     Returns the player count
     """
-    cur = await __con__.execute("SELECT COUNT(*) FROM ?", table)
+    # i know it's bad, but I have to do it
+    cur = await __con__.execute(f"SELECT COUNT(*) FROM {table}")
     number_tuple = await cur.fetchall()
     await cur.close()
     return number_tuple[0][0]
