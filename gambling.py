@@ -76,3 +76,7 @@ class Gambling(commands.Cog):
         else:
             slots_embed.add_field(name="Result", value="You lost ${:,}".format(amount))
         await ctx.send(embed=slots_embed)
+
+
+def setup(bot):
+    bot.add_cog(Gambling(bot))

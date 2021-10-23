@@ -78,3 +78,7 @@ class Misc(commands.Cog):
             "This child would probably have made it better than THAT :rage: "
             'The core system is buggy the economy is unbalanced and there is no goal in this _"game bot"_ :rage:'
         )
+
+
+def setup(bot):
+    bot.add_cog(Misc(bot))

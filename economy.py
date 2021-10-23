@@ -166,3 +166,7 @@ class Economy(commands.Cog):
                 description=f"{donator.name} gave ${amount} to {acceptor.name}", colour=discord.Colour.lighter_grey()
             )
         )
+
+
+def setup(bot):
+    bot.add_cog(Economy(bot))

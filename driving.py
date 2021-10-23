@@ -426,3 +426,7 @@ class Driving(commands.Cog):
                     )
                 except Exception as e:
                     logging.error(e)
+
+
+def setup(bot):
+    bot.add_cog(Driving(bot))

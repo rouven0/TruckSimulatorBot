@@ -2,13 +2,15 @@ import traceback
 from datetime import datetime
 from math import floor
 import logging
+from discord.ext.commands.errors import ExtensionAlreadyLoaded, ExtensionNotLoaded
 import git
 
 import discord
 from discord.ext import commands
 from discord_slash import cog_ext
-from discord_slash.utils.manage_commands import create_permission
+from discord_slash.utils.manage_commands import create_option, create_permission
 
+import config
 import api.players as players
 from api.trucks import TruckNotFound
 
@@ -102,6 +104,69 @@ class System(commands.Cog):
                 )
             )
 
+    @cog_ext.cog_subcommand(
+        base="extension",
+        options=[
+            create_option(
+                name="extension",
+                description="Extension to be loaded",
+                option_type=3,
+                choices=config.EXTENSIONS,
+                required=True,
+            )
+        ],
+        guild_ids=[839580174282260510],
+        base_default_permission=False,
+        base_permissions={839580174282260510: [create_permission(692796548282712074, 2, True)]},
+    )
+    async def load(self, ctx, extension: str) -> None:
+        try:
+            self.bot.load_extension(extension)
+            await ctx.send(f"Loaded {extension}")
+        except ExtensionAlreadyLoaded:
+            await ctx.send("Extension already loaded")
+
+    @cog_ext.cog_subcommand(
+        base="extension",
+        options=[
+            create_option(
+                name="extension",
+                description="Extension to be unloaded",
+                option_type=3,
+                choices=config.EXTENSIONS,
+                required=True,
+            )
+        ],
+        guild_ids=[839580174282260510],
+        base_default_permission=False,
+        base_permissions={839580174282260510: [create_permission(692796548282712074, 2, True)]},
+    )
+    async def unload(self, ctx, extension: str) -> None:
+        try:
+            self.bot.unload_extension(extension)
+            await ctx.send(f"Unloaded {extension}")
+        except ExtensionNotLoaded:
+            await ctx.send("Extension already unloaded")
+
+    @cog_ext.cog_subcommand(
+        base="extension",
+        options=[
+            create_option(
+                name="extension",
+                description="Extension to be reloaded",
+                option_type=3,
+                choices=config.EXTENSIONS,
+                required=True,
+            )
+        ],
+        guild_ids=[839580174282260510],
+        base_default_permission=False,
+        base_permissions={839580174282260510: [create_permission(692796548282712074, 2, True)]},
+    )
+    async def reoad(self, ctx, extension: str) -> None:
+        self.bot.reload_extension(extension)
+        await ctx.send(f"Reloaded {extension}")
+
     @commands.Cog.listener()
     async def on_slash_command_error(self, ctx, error) -> None:
         if isinstance(error, players.NotEnoughMoney):
@@ -133,3 +198,7 @@ class System(commands.Cog):
         else:
             logging.error(f"{error.__class__.__name__} on a component: " + str(error))
             traceback.print_tb(error.__traceback__)
+
+
+def setup(bot):
+    bot.add_cog(System(bot))

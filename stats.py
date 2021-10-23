@@ -109,3 +109,7 @@ class Stats(commands.Cog):
             top_body += "**{}**. {} ~ {}{}\n".format(count, player.name, val, top_players[1])
         top_embed.add_field(name=f"Top {key}", value=top_body)
         await ctx.send(embed=top_embed)
+
+
+def setup(bot):
+    bot.add_cog(Stats(bot))

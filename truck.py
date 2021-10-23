@@ -137,3 +137,7 @@ class Trucks(commands.Cog):
             text=f"Loaded items: {len(player.loaded_items)}/{trucks.get(player.truck_id).loading_capacity}"
         )
         await ctx.send(embed=load_embed)
+
+
+def setup(bot):
+    bot.add_cog(Trucks(bot))

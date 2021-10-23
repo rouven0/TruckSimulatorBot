@@ -11,15 +11,6 @@ import api.players as players
 
 import config
 
-from system import System
-from driving import Driving
-from stats import Stats
-from economy import Economy
-from gambling import Gambling
-from misc import Misc
-from guide import Guide
-from truck import Trucks
-
 load_dotenv("./.env")
 BOT_TOKEN = getenv("BOT_TOKEN", default="")
 
@@ -32,11 +23,10 @@ def main():
     logger = logging.getLogger()
 
     if "--debug" in sys.argv:
-        SlashCommand(bot, sync_commands=True, debug_guild=830928381100556338)
-        # logger.setLevel(logging.DEBUG)
-        logger.setLevel(logging.INFO)
+        SlashCommand(bot, sync_commands=True, debug_guild=830928381100556338, sync_on_cog_reload=True)
+        logger.setLevel(logging.DEBUG)
     else:
-        SlashCommand(bot, sync_commands=True, delete_from_unused_guilds=True)
+        SlashCommand(bot, sync_commands=True, delete_from_unused_guilds=True, sync_on_cog_reload=True)
         logger.setLevel(logging.INFO)
     logging.getLogger("discord.gateway").setLevel(logging.WARNING)
 
@@ -44,17 +34,8 @@ def main():
     console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
     logger.addHandler(console_handler)
 
-    driving_commands = Driving(bot)
-    economy_commands = Economy(bot)
-    bot.add_cog(System(bot))
-    bot.add_cog(driving_commands)
-    bot.add_cog(Stats(bot))
-    bot.add_cog(economy_commands)
-    bot.add_cog(Gambling(bot))
-    bot.add_cog(Misc())
-    bot.add_cog(Trucks(bot))
-    bot.add_cog(Guide(bot))
-
+    for extension in config.EXTENSIONS:
+        bot.load_extension(extension)
     asyncio.run(players.init())
     bot.run(BOT_TOKEN)
     asyncio.run(players.close())
