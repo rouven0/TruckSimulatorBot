@@ -29,9 +29,8 @@ class Trucks(commands.Cog):
     Check up your truck and its current load
     """
 
-    def __init__(self, bot, driving_commands) -> None:
+    def __init__(self, bot) -> None:
         self.bot = bot
-        self.driving_commands = driving_commands
         super().__init__()
 
     @cog_ext.cog_subcommand(base="truck")
@@ -61,7 +60,7 @@ class Trucks(commands.Cog):
         """
         Buy a new truck, your old one will be sold and your miles will be reset
         """
-        if ctx.author.id in [a.player.user_id for a in self.driving_commands.active_drives]:
+        if await players.is_driving(ctx.author.id):
             await ctx.send(f"{ctx.author.mention} You can't buy a new truck while you are driving in the old one")
             return
         try:

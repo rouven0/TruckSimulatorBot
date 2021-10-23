@@ -18,9 +18,8 @@ class Economy(commands.Cog):
     Earn money, trade it and buy better Trucks
     """
 
-    def __init__(self, bot: commands.Bot, driving_commands) -> None:
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
-        self.driving_commands = driving_commands
         super().__init__()
 
     @cog_ext.cog_component()
@@ -28,12 +27,8 @@ class Economy(commands.Cog):
         """
         Shows your current job
         """
-        active_drive = self.driving_commands.get_active_drive(ctx.author_id, ctx.origin_message_id)
-        if active_drive is None:
-            await ctx.defer(ignore=True)
-            return
-
-        current_job = await active_drive.player.get_job()
+        player = await players.get_driving_player(ctx.author_id, ctx.origin_message_id)
+        current_job = await player.get_job()
         job_embed = discord.Embed(colour=discord.Colour.lighter_grey())
         job_embed.set_author(name="{}'s Job".format(ctx.author.name), icon_url=ctx.author.avatar_url)
         place_from = current_job.place_from
@@ -67,24 +62,17 @@ class Economy(commands.Cog):
         """
         Get a new job
         """
-        active_drive = self.driving_commands.get_active_drive(ctx.author_id, ctx.origin_message_id)
-        if active_drive is None:
-            await ctx.defer(ignore=True)
-            return
+        player = await players.get_driving_player(ctx.author_id, ctx.origin_message_id)
         job_embed = discord.Embed(colour=discord.Colour.lighter_grey())
         job_embed.set_author(name="{}'s Job".format(ctx.author.name), icon_url=ctx.author.avatar_url)
-        job = jobs.generate(active_drive.player)
-        await active_drive.player.add_job(job)
+        job = jobs.generate(player)
+        await player.add_job(job)
         item = items.get(job.place_from.produced_item)
         job_message = "{} needs {} {} from {}. You get ${:,} for this transport".format(
             job.place_to.name, self.bot.get_emoji(item.emoji), item.name, job.place_from.name, job.reward
         )
         job_embed.add_field(name="You got a new Job", value=job_message, inline=False)
         job_embed.add_field(name="Current state", value=jobs.get_state(job))
-        await ctx.edit_origin(
-            embed=await self.driving_commands.get_drive_embed(active_drive.player, ctx.author.avatar_url),
-            components=await self.driving_commands.get_buttons(active_drive.player),
-        )
         await ctx.send(embed=job_embed, hidden=True)
 
     @cog_ext.cog_component()
@@ -92,31 +80,28 @@ class Economy(commands.Cog):
         """
         If you're at the gas station, you can refill your truck's gas
         """
-        active_drive = self.driving_commands.get_active_drive(ctx.author_id, ctx.origin_message_id)
-        if active_drive is None:
-            await ctx.defer(ignore=True)
-            return
-        gas_amount = trucks.get(active_drive.player.truck_id).gas_capacity - active_drive.player.gas
+        player = await players.get_driving_player(ctx.author_id, ctx.origin_message_id)
+        gas_amount = trucks.get(player.truck_id).gas_capacity - player.gas
         price = round(gas_amount * 1.2)
 
         try:
-            await active_drive.player.debit_money(price)
+            await player.debit_money(price)
         except players.NotEnoughMoney:
-            if active_drive.player.gas < 170:
+            if player.gas < 170:
                 await ctx.send(
                     f"{ctx.author.mention} We have a problem: You don't have enough money. Lets make a deal. "
                     "I will give you 100 litres of gas, and you lose 2 levels",
                     hidden=True,
                 )
-                if active_drive.player.level > 2:
+                if player.level > 2:
                     await players.update(
-                        active_drive.player,
-                        gas=active_drive.player.gas + 100,
-                        level=active_drive.player.level - 2,
+                        player,
+                        gas=player.gas + 100,
+                        level=player.level - 2,
                         xp=0,
                     )
                 else:
-                    await players.update(active_drive.player, gas=active_drive.player.gas + 100, xp=0)
+                    await players.update(player, gas=player.gas + 100, xp=0)
             else:
                 await ctx.send(
                     f"{ctx.author.mention} you don't have enough money to do this. "
@@ -131,10 +116,8 @@ class Economy(commands.Cog):
             colour=discord.Colour.lighter_grey(),
         )
         refill_embed.set_footer(text="Current gas price: $1.2 per litre")
-        await players.update(active_drive.player, gas=trucks.get(active_drive.player.truck_id).gas_capacity)
-        await ctx.edit_origin(
-            embed=await self.driving_commands.get_drive_embed(active_drive.player, ctx.author.avatar_url)
-        )
+        await players.update(player, gas=trucks.get(player.truck_id).gas_capacity)
+        await ctx.edit_origin(embed=await self.driving_commands.get_drive_embed(player, ctx.author.avatar_url))
         await ctx.send(embed=refill_embed, hidden=True)
 
     @cog_ext.cog_slash()

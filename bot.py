@@ -33,7 +33,8 @@ def main():
 
     if "--debug" in sys.argv:
         SlashCommand(bot, sync_commands=True, debug_guild=830928381100556338)
-        logger.setLevel(logging.DEBUG)
+        # logger.setLevel(logging.DEBUG)
+        logger.setLevel(logging.INFO)
     else:
         SlashCommand(bot, sync_commands=True, delete_from_unused_guilds=True)
         logger.setLevel(logging.INFO)
@@ -44,14 +45,14 @@ def main():
     logger.addHandler(console_handler)
 
     driving_commands = Driving(bot)
-    economy_commands = Economy(bot, driving_commands)
-    bot.add_cog(System(bot, driving_commands))
+    economy_commands = Economy(bot)
+    bot.add_cog(System(bot))
     bot.add_cog(driving_commands)
     bot.add_cog(Stats(bot))
     bot.add_cog(economy_commands)
     bot.add_cog(Gambling(bot))
     bot.add_cog(Misc())
-    bot.add_cog(Trucks(bot, driving_commands))
+    bot.add_cog(Trucks(bot))
     bot.add_cog(Guide(bot))
 
     asyncio.run(players.init())

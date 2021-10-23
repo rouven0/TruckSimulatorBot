@@ -198,9 +198,9 @@ async def insert(player: Player) -> None:
     """
     Inserts a player into the database
     """
-    logging.info("Inserted %s into the database as %s", player.name, tuple(player))
     await __con__.execute("INSERT INTO players VALUES (?,?,?,?,?,?,?,?,?,?,?)", tuple(player))
     await __con__.commit()
+    logging.info("Inserted %s into the database as %s", player.name, tuple(player))
 
 
 async def remove(player: Player) -> None:
@@ -312,29 +312,104 @@ async def registered(user_id: int) -> bool:
     return False
 
 
-async def get_count() -> int:
+async def get_count(table: str) -> int:
     """
     Returns the player count
     """
-    cur = await __con__.execute("SELECT COUNT(*) FROM players")
+    cur = await __con__.execute("SELECT COUNT(*) FROM ?", table)
     number_tuple = await cur.fetchall()
     await cur.close()
     return number_tuple[0][0]
 
 
-@dataclass
-class ActiveDrive:
+class DrivingPlayer(Player):
     """
     Object to manage current driving session and prevent duplicate driving
     Attributes:
-        player: Player object of the driving player
         message: Discord message where the drive is displayed and where the reactions are
         last_action_time: Time used to keep the list clean and time out drives
     """
 
-    player: Player
-    message: discord.Message
-    last_action_time: float
+    def __init__(self, *args, message_id=0, last_action_time=0) -> None:
+        super().__init__(*args)
+        self.message_id = message_id
+        self.last_action_time = last_action_time
+
+    async def start_drive(self) -> None:
+        await __con__.execute(
+            "INSERT INTO driving_players VALUES (?,?,?)", (self.user_id, self.message_id, self.last_action_time)
+        )
+        await __con__.commit()
+        logging.info("%s started driving", self.name)
+
+    async def stop_drive(self) -> None:
+        await __con__.execute("DELETE FROM driving_players WHERE user_id=:id", {"id": self.user_id})
+        await __con__.commit()
+        logging.info("%s stopped driving", self.name)
+
+    async def set_last_action_time(self, time) -> None:
+        await __con__.execute("UPDATE driving_players SET last_action_time=? WHERE user_id=?", (time, self.user_id))
+        await __con__.commit()
+
+
+async def is_driving(user_id: int) -> bool:
+    """
+    Checks whether a specific user is driving
+    """
+    cur = await __con__.execute("SELECT * FROM driving_players WHERE user_id=:id", {"id": user_id})
+    if len(await cur.fetchall()) == 1:
+        await cur.close()
+        return True
+    await cur.close()
+    return False
+
+
+async def is_active_drive(user_id: int, message_id: int) -> bool:
+    """
+    Checks whether an interaction is done by a driving player
+    """
+    cur = await __con__.execute(
+        "SELECT * FROM driving_players WHERE user_id=:user_id AND message_id=:message_id",
+        {"user_id": user_id, "message_id": message_id},
+    )
+    if len(await cur.fetchall()) == 1:
+        await cur.close()
+        return True
+    await cur.close()
+    return False
+
+
+async def get_driving_player(user_id: int, message_id: int = None) -> DrivingPlayer:
+    if message_id is not None:
+        if await is_active_drive(user_id, message_id):
+            cur = await __con__.execute(
+                "SELECT * FROM driving_players WHERE user_id=:user_id AND message_id=:message_id",
+                {"user_id": user_id, "message_id": message_id},
+            )
+            data_tuple: tuple = await cur.fetchone()
+            last_action_time = data_tuple[2]
+            await cur.close()
+            return DrivingPlayer(*tuple(await get(user_id)), message_id=message_id, last_action_time=last_action_time)
+        else:
+            raise NotDriving()
+    else:
+        # get drive by user id only
+        cur = await __con__.execute("SELECT * FROM driving_players WHERE user_id=:user_id", {"user_id": user_id})
+        data_tuple: tuple = await cur.fetchone()
+        last_action_time = data_tuple[2]
+        await cur.close()
+        return DrivingPlayer(*tuple(await get(user_id)), message_id=message_id, last_action_time=last_action_time)
+
+
+async def get_all_driving_players() -> list:
+    cur = await __con__.execute("SELECT * from driving_players")
+    driving_players = []
+    for data_tuple in await cur.fetchall():
+        driving_players.append(
+            DrivingPlayer(*tuple(await get(data_tuple[0])), message_id=data_tuple[1], last_action_time=data_tuple[2])
+        )
+    await cur.close()
+    return driving_players
 
 
 class PlayerNotRegistered(Exception):
@@ -371,3 +446,12 @@ class NotEnoughMoney(Exception):
 
     def __str__(self) -> str:
         return "The requested player doesn't have enough money to perform this action"
+
+
+class NotDriving(Exception):
+    """
+    Exception raised when a requested driving player is not driving
+    """
+
+    def __str__(self) -> str:
+        return "The requested driving player isn't driving"

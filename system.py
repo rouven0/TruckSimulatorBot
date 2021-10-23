@@ -1,5 +1,4 @@
 import traceback
-from driving import Driving
 from datetime import datetime
 from math import floor
 import logging
@@ -9,20 +8,14 @@ import discord
 from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.utils.manage_commands import create_permission
-from discord_slash.utils.manage_components import (
-    create_button,
-    create_actionrow,
-    ComponentContext,
-)
 
 import api.players as players
 from api.trucks import TruckNotFound
 
 
 class System(commands.Cog):
-    def __init__(self, bot: commands.Bot, driving_commands: Driving) -> None:
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
-        self.driving_commands = driving_commands
         self.start_time = datetime.now()
         self.repo = git.Repo()
         self.commit = self.repo.head.commit.hexsha[:7]
@@ -47,12 +40,13 @@ class System(commands.Cog):
         hours = floor(uptime.seconds / 3600)
         minutes = floor(uptime.seconds / 60) - hours * 60
         seconds = uptime.seconds - hours * 3600 - minutes * 60
-        player_count = await players.get_count()
+        player_count = await players.get_count("players")
+        driving_player_count = await players.get_count("driving_players")
         system_info = (
             f"```Uptime: {days}d {hours}h {minutes}m {seconds}s\n"
             f"Latency: {str(round(self.bot.latency * 1000))} ms\n"
             f"Registered Players: {player_count}\n"
-            f"Driving Trucks: {str(len(self.driving_commands.active_drives))}\n"
+            f"Driving Trucks: {driving_player_count}\n"
             f"Commit: {self.commit}\n"
             f"Commit Summary: {self.summary}```"
         )
@@ -108,36 +102,6 @@ class System(commands.Cog):
                 )
             )
 
-    @cog_ext.cog_slash(
-        guild_ids=[839580174282260510],
-        default_permission=False,
-        permissions={839580174282260510: [create_permission(692796548282712074, 2, True)]},
-    )
-    async def shutdown(self, ctx):
-        await ctx.send(
-            "Are you sure?",
-            hidden=True,
-            components=[
-                create_actionrow(
-                    create_button(style=3, label="Yes", custom_id="confirm_shutdown"),
-                    create_button(style=4, label="No", custom_id="abort_shutdown"),
-                )
-            ],
-        )
-
-    @cog_ext.cog_component()
-    async def confirm_shutdown(self, ctx: ComponentContext) -> None:
-        await self.driving_commands.on_shutdown()
-        await self.bot.change_presence(status=discord.Status.idle)
-        await ctx.edit_origin(components=[])
-        await ctx.send("Shutting down", hidden=True)
-        logging.warning("Shutdown command is executed")
-        await self.bot.close()
-
-    @cog_ext.cog_component()
-    async def abort_shutdown(self, ctx: ComponentContext):
-        await ctx.edit_origin(content="Shutdown aborted", components=[])
-
     @commands.Cog.listener()
     async def on_slash_command_error(self, ctx, error) -> None:
         if isinstance(error, players.NotEnoughMoney):
@@ -160,4 +124,12 @@ class System(commands.Cog):
 
         else:
             logging.error(f"{error.__class__.__name__} at /{ctx.command} executed by {ctx.author.name}: " + str(error))
+            traceback.print_tb(error.__traceback__)
+
+    @commands.Cog.listener()
+    async def on_component_callback_error(self, ctx, error) -> None:
+        if isinstance(error, players.NotDriving):
+            await ctx.defer(ignore=True)
+        else:
+            logging.error(f"{error.__class__.__name__} on a component: " + str(error))
             traceback.print_tb(error.__traceback__)
