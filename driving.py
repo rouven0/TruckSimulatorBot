@@ -413,19 +413,12 @@ class Driving(commands.Cog):
     @tasks.loop(seconds=20)
     async def check_drives(self) -> None:
         """
-        Drives that are inactive for more than 10 minutes get stopped
+        Drives that are inactive for more than 1 hour get stopped
         """
         for player in await players.get_all_driving_players():
-            if time() - player.last_action_time > 120:
+            if time() - player.last_action_time > 3600:
                 logging.info("Driving of %s timed out", player.name)
                 await player.stop_drive()
-                try:
-                    message = self.bot.fetc(player.message_id)
-                    await message.edit(
-                        embed=await self.get_drive_embed(player, self.bot.user.avatar_url), components=[]
-                    )
-                except Exception as e:
-                    logging.error(e)
 
 
 def setup(bot):

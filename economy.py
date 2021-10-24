@@ -67,6 +67,13 @@ class Economy(commands.Cog):
         job_embed.set_author(name="{}'s Job".format(ctx.author.name), icon_url=ctx.author.avatar_url)
         job = jobs.generate(player)
         await player.add_job(job)
+
+        drive_embed = ctx.origin_message.embeds[0]
+        drive_embed.add_field(
+            name="Navigation: Drive to {}".format(job.place_from.name), value=str(job.place_from.position)
+        )
+        await ctx.edit_origin(embed=drive_embed)
+
         item = items.get(job.place_from.produced_item)
         job_message = "{} needs {} {} from {}. You get ${:,} for this transport".format(
             job.place_to.name, self.bot.get_emoji(item.emoji), item.name, job.place_from.name, job.reward
@@ -116,8 +123,11 @@ class Economy(commands.Cog):
             colour=discord.Colour.lighter_grey(),
         )
         refill_embed.set_footer(text="Current gas price: $1.2 per litre")
+
         await players.update(player, gas=trucks.get(player.truck_id).gas_capacity)
-        await ctx.edit_origin(embed=await self.driving_commands.get_drive_embed(player, ctx.author.avatar_url))
+        drive_embed = ctx.origin_message.embeds[0]
+        drive_embed.set_field_at(2, name="Gas left", value=player.gas)
+        await ctx.edit_origin(embed=drive_embed)
         await ctx.send(embed=refill_embed, hidden=True)
 
     @cog_ext.cog_slash()

@@ -24,7 +24,8 @@ def main():
 
     if "--debug" in sys.argv:
         SlashCommand(bot, sync_commands=True, debug_guild=830928381100556338, sync_on_cog_reload=True)
-        logger.setLevel(logging.DEBUG)
+        # logger.setLevel(logging.DEBUG)
+        logger.setLevel(logging.INFO)
     else:
         SlashCommand(bot, sync_commands=True, delete_from_unused_guilds=True, sync_on_cog_reload=True)
         logger.setLevel(logging.INFO)
