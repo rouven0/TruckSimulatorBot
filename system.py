@@ -3,7 +3,6 @@ from datetime import datetime
 from math import floor
 import logging
 from discord.ext.commands.errors import ExtensionAlreadyLoaded, ExtensionNotLoaded
-import git
 
 import discord
 from discord.ext import commands
@@ -19,10 +18,6 @@ class System(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.start_time = datetime.now()
-        self.repo = git.Repo()
-        self.commit = self.repo.head.commit.hexsha[:7]
-        self.summary = self.repo.head.commit.summary
-        self.repo.close()
         super().__init__()
 
     @cog_ext.cog_slash()
@@ -49,8 +44,6 @@ class System(commands.Cog):
             f"Latency: {str(round(self.bot.latency * 1000))} ms\n"
             f"Registered Players: {player_count}\n"
             f"Driving Trucks: {driving_player_count}\n"
-            f"Commit: {self.commit}\n"
-            f"Commit Summary: {self.summary}```"
         )
         info_embed.add_field(name="System information", value=system_info, inline=False)
 
