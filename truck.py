@@ -46,6 +46,9 @@ class Trucks(commands.Cog):
         else:
             player = await players.get(ctx.author.id)
             avatar_url = ctx.author.avatar_url
+        # Detect, when the player is renamed
+        if player.name != ctx.author.name:
+            await players.update(player, name=ctx.author.name)
         truck = trucks.get(player.truck_id)
         truck_embed = get_truck_embed(truck)
         truck_embed.set_author(name="{}'s truck".format(player.name), icon_url=avatar_url)

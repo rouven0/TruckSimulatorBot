@@ -61,6 +61,9 @@ class Stats(commands.Cog):
         if user is None:
             user = await self.bot.fetch_user(user_id)
         player = await players.get(user.id)
+        # Detect, when the player is renamed
+        if player.name != user.name:
+            await players.update(player, name=user.name)
         profile_embed.set_thumbnail(url=user.avatar_url)
         profile_embed.set_author(name="{}'s Profile".format(player.name), icon_url=user.avatar_url)
         truck = trucks.get(player.truck_id)
