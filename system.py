@@ -43,7 +43,7 @@ class System(commands.Cog):
             f"```Uptime: {days}d {hours}h {minutes}m {seconds}s\n"
             f"Latency: {str(round(self.bot.latency * 1000))} ms\n"
             f"Registered Players: {player_count}\n"
-            f"Driving Trucks: {driving_player_count}\n"
+            f"Driving Trucks: {driving_player_count}```"
         )
         info_embed.add_field(name="System information", value=system_info, inline=False)
 
