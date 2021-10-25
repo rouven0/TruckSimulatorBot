@@ -35,8 +35,6 @@ class Stats(commands.Cog):
         if not await players.registered(ctx.author.id):
             await players.insert(players.Player(ctx.author.id, ctx.author.name, money=1000))
             await ctx.send("Welcome to the Truckers, {}".format(ctx.author.mention))
-        else:
-            await ctx.send("You are already registered")
 
     @cog_ext.cog_subcommand(base="profile", name="show")
     async def profile(self, ctx, user: discord.User = None) -> None:

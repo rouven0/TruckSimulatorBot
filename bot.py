@@ -7,7 +7,7 @@ from discord.ext import commands
 from discord_slash import SlashCommand
 
 from dotenv import load_dotenv
-import api.players as players
+import api.database as database
 
 import config
 
@@ -37,9 +37,9 @@ def main():
 
     for extension in config.EXTENSIONS:
         bot.load_extension(extension)
-    asyncio.run(players.init())
+    asyncio.run(database.init())
     bot.run(BOT_TOKEN)
-    asyncio.run(players.close())
+    asyncio.run(database.close())
 
 
 if __name__ == "__main__":

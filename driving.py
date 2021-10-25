@@ -92,7 +92,6 @@ class Driving(commands.Cog):
         player = await players.get_driving_player(ctx.author_id, ctx.origin_message_id)
         await player.stop_drive()
         await ctx.edit_origin(components=[])
-        await ctx.send("You stopped driving!, {}".format(ctx.author.name))
 
     @cog_ext.cog_component()
     async def load(self, ctx: ComponentContext):
