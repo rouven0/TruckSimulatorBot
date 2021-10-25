@@ -27,7 +27,7 @@ def main():
         # logger.setLevel(logging.DEBUG)
         logger.setLevel(logging.INFO)
     else:
-        SlashCommand(bot, sync_commands=True, delete_from_unused_guilds=True, sync_on_cog_reload=True)
+        SlashCommand(bot, sync_commands=True, delete_from_unused_guilds=True)
         logger.setLevel(logging.INFO)
     logging.getLogger("discord.gateway").setLevel(logging.WARNING)
 

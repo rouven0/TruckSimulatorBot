@@ -2,7 +2,6 @@ import traceback
 from datetime import datetime
 from math import floor
 import logging
-from discord.ext.commands.errors import ExtensionAlreadyLoaded, ExtensionNotLoaded
 
 import discord
 from discord.ext import commands
@@ -96,56 +95,6 @@ class System(commands.Cog):
                     colour=discord.Colour.lighter_grey(),
                 )
             )
-
-    @cog_ext.cog_subcommand(
-        base="extension",
-        options=[
-            create_option(
-                name="extension",
-                description="Extension to be loaded",
-                option_type=3,
-                choices=config.EXTENSIONS,
-                required=True,
-            )
-        ],
-        guild_ids=[839580174282260510],
-        base_default_permission=False,
-        base_permissions={839580174282260510: [create_permission(692796548282712074, 2, True)]},
-    )
-    async def load(self, ctx, extension: str) -> None:
-        """
-        Load an extension
-        """
-        try:
-            self.bot.load_extension(extension)
-            await ctx.send(f"Loaded {extension}")
-        except ExtensionAlreadyLoaded:
-            await ctx.send("Extension already loaded")
-
-    @cog_ext.cog_subcommand(
-        base="extension",
-        options=[
-            create_option(
-                name="extension",
-                description="Extension to be unloaded",
-                option_type=3,
-                choices=config.EXTENSIONS,
-                required=True,
-            )
-        ],
-        guild_ids=[839580174282260510],
-        base_default_permission=False,
-        base_permissions={839580174282260510: [create_permission(692796548282712074, 2, True)]},
-    )
-    async def unload(self, ctx, extension: str) -> None:
-        """
-        Unload an extension
-        """
-        try:
-            self.bot.unload_extension(extension)
-            await ctx.send(f"Unloaded {extension}")
-        except ExtensionNotLoaded:
-            await ctx.send("Extension already unloaded")
 
     @cog_ext.cog_subcommand(
         base="extension",
