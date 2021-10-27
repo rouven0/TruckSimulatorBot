@@ -131,8 +131,10 @@ class System(commands.Cog):
         try:
             cur = await database.con.execute(query)
             await database.con.commit()
-            await ctx.send(f"`Done. {cur.rowcount} row(s) affected`")
-            await ctx.send(f"```\n{await cur.fetchall()}```")
+            if cur.rowcount != -1:
+                await ctx.send(f"`Done. {cur.rowcount} row(s) affected`")
+            else:
+                await ctx.send(f"```\n{await cur.fetchall()}```")
             await cur.close()
         except Exception as e:
             await ctx.send("Error: " + str(e))
