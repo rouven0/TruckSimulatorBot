@@ -9,6 +9,7 @@ from discord_slash import cog_ext
 from discord_slash.utils.manage_commands import create_option, create_permission
 
 import config
+import api.database as database
 import api.players as players
 from api.trucks import TruckNotFound
 
@@ -117,6 +118,24 @@ class System(commands.Cog):
         """
         self.bot.reload_extension(extension)
         await ctx.send(f"Reloaded {extension}")
+
+    @cog_ext.cog_subcommand(
+        base="execute",
+        guild_ids=[839580174282260510],
+        base_default_permission=False,
+        base_permissions={839580174282260510: [create_permission(692796548282712074, 2, True)]},
+    )
+    @commands.is_owner()
+    async def sql(self, ctx, query: str):
+        await ctx.defer()
+        try:
+            cur = await database.con.execute(query)
+            await database.con.commit()
+            await ctx.send(f"`Done. {cur.rowcount} row(s) affected`")
+            await ctx.send(f"```\n{await cur.fetchall()}```")
+            await cur.close()
+        except Exception as e:
+            await ctx.send("Error: " + str(e))
 
     @commands.Cog.listener()
     async def on_slash_command_error(self, ctx, error) -> None:
