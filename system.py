@@ -4,9 +4,18 @@ from math import floor
 import logging
 
 import discord
+from discord import embeds
 from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.utils.manage_commands import create_option, create_permission
+from discord_slash.utils.manage_components import (
+    create_button,
+    create_actionrow,
+    create_select,
+    create_select_option,
+    ComponentContext,
+    wait_for_component,
+)
 
 import config
 import api.database as database
@@ -20,11 +29,7 @@ class System(commands.Cog):
         self.start_time = datetime.now()
         super().__init__()
 
-    @cog_ext.cog_slash()
-    async def info(self, ctx) -> None:
-        """
-        System information and credits
-        """
+    async def get_info_embed(self) -> discord.Embed:
         info_embed = discord.Embed(title="Truck Simulator info", colour=discord.Colour.lighter_grey())
         info_embed.set_footer(
             text="Developer: r5#2253",
@@ -53,7 +58,27 @@ class System(commands.Cog):
             "<:miri:897860673546117122> Miriel#0001 - _The brain_ - Gave a lot of great tips and constructive feedback"
         )
         info_embed.add_field(name="Credits", value=credits, inline=False)
-        await ctx.send(embed=info_embed)
+        return info_embed
+
+    @cog_ext.cog_slash()
+    async def info(self, ctx) -> None:
+        """
+        System information and credits
+        """
+        await ctx.send(
+            embed=await self.get_info_embed(),
+            components=[
+                create_actionrow(
+                    create_button(
+                        style=2, label="Refresh data", custom_id="refresh", emoji=self.bot.get_emoji(903581225149665290)
+                    )
+                )
+            ],
+        )
+
+    @cog_ext.cog_component()
+    async def refresh(self, ctx):
+        await ctx.edit_origin(embed=await self.get_info_embed())
 
     @cog_ext.cog_subcommand(
         base="blacklist",
