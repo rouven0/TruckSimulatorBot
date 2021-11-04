@@ -62,7 +62,7 @@ class Misc(commands.Cog):
         """
         vote_embed = discord.Embed(
             title="Click here to vote for the Truck Simulator",
-            description="If you are a member of the official server, you will get a special color role for 12 hours",
+            description="If you are a member of the official server, you will get a special color role",
             url="https://top.gg/bot/831052837353816066/vote",
             colour=discord.Colour.lighter_grey(),
         )
