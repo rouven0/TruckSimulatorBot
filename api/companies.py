@@ -3,8 +3,9 @@ This module contains the company class
 """
 
 import logging
+from typing import Union
 from typing import Optional
-from api.places import get_position
+from api.places import __get_position
 import api.database as database
 
 
@@ -15,6 +16,7 @@ def _format_pos_to_db(pos: list) -> str:
     """
     return "{}/{}".format(pos[0], pos[1])
 
+
 class Company:
     """
     Attributes:
@@ -22,14 +24,18 @@ class Company:
         logo: emoji displayed as logo on the map
         hq_position: position of the company's headquarters
         founder: founder of the company, has control over it
+        net_worth: money the company holds
     """
 
-    def __init__(self, name: str, logo: str, hq_position: str, founder: int) -> None:
+    def __init__(self, name: str, logo: str, hq_position: Union[str, list], founder: int, net_worth: int) -> None:
         self.name = name
         self.logo = logo
-        self.hq_position = get_position(hq_position)
+        if isinstance(hq_position, str):
+            self.hq_position = __get_position(hq_position)
+        else:
+            self.hq_position = hq_position
         self.founder = founder
-
+        self.net_worth = net_worth
 
     def __iter__(self):
         self.n = 0
@@ -49,16 +55,28 @@ class Company:
     def __str__(self) -> str:
         return f"{self.name} founded by {self.founder}"
 
+    async def add_net_worth(self, amount: int):
+        await database.con.execute(
+            "UPDATE companies SET net_worth=? WHERE name=?", (self.net_worth + amount, self.name)
+        )
+        self.net_worth += amount
 
-async def get(name: str) -> Optional[Company]:
+    async def remove_net_worth(self, amount: int):
+        await database.con.execute(
+            "UPDATE companies SET net_worth=? WHERE name=?", (self.net_worth - amount, self.name)
+        )
+        self.net_worth -= amount
+
+
+async def get(name: str) -> Company:
     cur = await database.con.execute("SELECT * FROM companies WHERE name=:name", {"name": name})
     company_tuple: tuple = await cur.fetchone()
     await cur.close()
     try:
         company = Company(*company_tuple)
         return company
-    except Exception:
-        return None
+    except TypeError:
+        raise CompanyNotFound()
 
 
 async def insert(company: Company) -> None:
@@ -74,10 +92,7 @@ async def remove(company: Company) -> None:
 
 
 async def update(
-    company: Company,
-    logo: str = None,
-    hq_position: list = None,
-    founder: int = None,
+    company: Company, logo: str = None, hq_position: list = None, founder: int = None, net_worth: int = None
 ) -> None:
     """
     Updates a company in the database
@@ -93,8 +108,12 @@ async def update(
     if founder is not None:
         await database.con.execute("UPDATE companies SET founder=? WHERE id=?", (founder, company.name))
         company.founder = founder
+    if net_worth is not None:
+        await database.con.execute("UPDATE companies SET net_worth=? WHERE id=?", (net_worth, company.name))
+        company.net_worth = net_worth
     await database.con.commit()
     logging.info("Updated company %s to %s", company.name, tuple(company))
+
 
 class CompanyNotFound(Exception):
     """
@@ -103,4 +122,3 @@ class CompanyNotFound(Exception):
 
     def __str__(self) -> str:
         return "Requested company was not found"
-    """
