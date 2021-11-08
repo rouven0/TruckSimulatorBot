@@ -5,6 +5,7 @@ from math import log
 import discord
 from discord.ext import commands
 from discord_slash import cog_ext
+from discord_slash.utils.manage_commands import create_choice, create_option
 
 import api.players as players
 import api.trucks as trucks
@@ -22,6 +23,13 @@ def get_truck_embed(truck: trucks.Truck) -> discord.Embed:
     truck_embed.add_field(name="Loading capacity", value=f"{truck.loading_capacity} items")
     truck_embed.set_image(url=truck.image_url)
     return truck_embed
+
+
+def get_truck_choices() -> list:
+    choices = []
+    for truck in trucks.get_all():
+        choices.append(create_choice(name=truck.name, value=truck.truck_id))
+    return choices
 
 
 class Trucks(commands.Cog):
@@ -58,22 +66,28 @@ class Trucks(commands.Cog):
         )
         await ctx.send(embed=truck_embed)
 
-    @cog_ext.cog_subcommand(base="truck")
-    async def buy(self, ctx, id) -> None:
+    @cog_ext.cog_subcommand(
+        base="truck",
+        options=[
+            create_option(
+                name="truck",
+                description="The truck you want to buy",
+                option_type=4,
+                required=True,
+                choices=get_truck_choices(),
+            )
+        ],
+    )
+    async def buy(self, ctx, truck) -> None:
         """
         Buy a new truck, your old one will be sold and your miles will be reset
         """
         if await players.is_driving(ctx.author.id):
             await ctx.send(f"{ctx.author.mention} You can't buy a new truck while you are driving in the old one")
             return
-        try:
-            id = int(id)
-        except ValueError:
-            await ctx.send("Wtf do you want to buy?")
-            return
         player = await players.get(ctx.author.id)
         old_truck = trucks.get(player.truck_id)
-        new_truck = trucks.get(id)
+        new_truck = trucks.get(truck)
         selling_price = round(old_truck.price - (old_truck.price / 10) * log(player.truck_miles + 1))
         end_price = new_truck.price - selling_price
         # this also adds money if the end price is negative
