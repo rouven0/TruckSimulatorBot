@@ -4,17 +4,12 @@ from math import floor
 import logging
 
 import discord
-from discord import embeds
 from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.utils.manage_commands import create_option, create_permission
 from discord_slash.utils.manage_components import (
     create_button,
     create_actionrow,
-    create_select,
-    create_select_option,
-    ComponentContext,
-    wait_for_component,
 )
 
 import config
@@ -186,6 +181,9 @@ class System(commands.Cog):
 
         else:
             logging.error(f"{error.__class__.__name__} at /{ctx.command} executed by {ctx.author.name}: " + str(error))
+            await ctx.send(
+                f"Looks like we got an error here. ```{error.__class__.__name__}: {error}``` If this occurs multiple times feel free to report it in the support server"
+            )
             traceback.print_tb(error.__traceback__)
 
     @commands.Cog.listener()
