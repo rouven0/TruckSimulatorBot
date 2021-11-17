@@ -21,6 +21,7 @@ from discord_slash.utils.manage_components import (
 )
 import config
 import api.players as players
+import api.companies as companies
 import api.items as items
 import api.levels as levels
 import api.places as places
@@ -333,12 +334,13 @@ class Driving(commands.Cog):
         Returns the drive embed that includes all the information about the current position and gas
         """
         place = places.get(player.position)
+        all_companies = await companies.get_all()
         drive_embed = discord.Embed(
             description="Now with slash commands!", colour=discord.Colour.lighter_grey(), timestamp=datetime.utcnow()
         )
         drive_embed.set_author(name="{} is driving".format(player.name), icon_url=avatar_url)
 
-        drive_embed.add_field(name="Minimap", value=await self.generate_minimap(player), inline=False)
+        drive_embed.add_field(name="Minimap", value=await self.generate_minimap(player, all_companies), inline=False)
         drive_embed.add_field(name="Position", value=str(player.position))
         drive_embed.add_field(name="Gas left", value=f"{player.gas} l")
 
@@ -361,12 +363,20 @@ class Driving(commands.Cog):
             drive_embed.set_image(url=assets.get_place_image(player, place))
         else:
             drive_embed.set_image(url=assets.get_default(player))
+        if player.position in [c.hq_position for c in all_companies]:
+            for company in all_companies:
+                if company.hq_position == player.position:
+                    drive_embed.add_field(
+                        name="What is here?",
+                        value=f"A company called **{company.name}**",
+                        inline=False,
+                    )
         drive_embed.set_footer(
             text=f"Loaded items: {len(player.loaded_items)}/{trucks.get(player.truck_id).loading_capacity}"
         )
         return drive_embed
 
-    async def generate_minimap(self, player: players.Player) -> str:
+    async def generate_minimap(self, player: players.Player, all_companies: list[companies.Company]) -> str:
         """
         This generate the minimap shown in t.drive
         """
@@ -384,6 +394,10 @@ class Driving(commands.Cog):
                     item = None
                 if item is not None:
                     minimap_array[i][j] = str(self.bot.get_emoji(items.get(map_place.produced_item).emoji))
+                elif position in [c.hq_position for c in all_companies]:
+                    for company in all_companies:
+                        if company.hq_position == position:
+                            minimap_array[i][j] = company.logo
                 elif position[0] in [-1, config.MAP_BORDER + 1] or position[1] in [-1, config.MAP_BORDER + 1]:
                     # Mark the map border with symbols
                     minimap_array[i][j] = ":small_orange_diamond:"

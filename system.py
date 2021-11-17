@@ -1,3 +1,4 @@
+from api.companies import CompanyNotFound
 import traceback
 from datetime import datetime
 from math import floor
@@ -179,11 +180,14 @@ class System(commands.Cog):
         elif isinstance(error, TruckNotFound):
             await ctx.send("Truck not found", hidden=True)
 
+        elif isinstance(error, CompanyNotFound):
+            await ctx.send("You are not member of a company at the moment. Get hired or found a new one", hidden=True)
+
         else:
-            logging.error(f"{error.__class__.__name__} at /{ctx.command} executed by {ctx.author.name}: " + str(error))
             await ctx.send(
                 f"Looks like we got an error here. ```{error.__class__.__name__}: {error}``` If this occurs multiple times feel free to report it in the support server"
             )
+            logging.error(f"{error.__class__.__name__} at /{ctx.command} executed by {ctx.author.name}: " + str(error))
             traceback.print_tb(error.__traceback__)
 
     @commands.Cog.listener()
@@ -191,6 +195,9 @@ class System(commands.Cog):
         if isinstance(error, players.NotDriving):
             await ctx.defer(ignore=True)
         else:
+            await ctx.send(
+                f"Looks like we got an error here. ```{error.__class__.__name__}: {error}``` If this occurs multiple times feel free to report it in the support server"
+            )
             logging.error(f"{error.__class__.__name__} on a component: " + str(error))
             traceback.print_tb(error.__traceback__)
 

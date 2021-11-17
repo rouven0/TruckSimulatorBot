@@ -7,6 +7,7 @@ from discord_slash import cog_ext
 from discord_slash.context import MenuContext
 from discord_slash.utils.manage_commands import create_option
 import api.players as players
+import api.companies as companies
 import api.trucks as trucks
 import api.levels as levels
 
@@ -76,6 +77,11 @@ class Stats(commands.Cog):
         profile_embed.add_field(name="Gas left", value=f"{player.gas} l", inline=False)
         profile_embed.add_field(name="Current truck", value=truck.name)
         profile_embed.set_image(url=truck.image_url)
+        try:
+            company = await companies.get(player.company)
+            profile_embed.add_field(name="Company", value=f"{company.logo} {company.name}")
+        except companies.CompanyNotFound:
+            pass
         return profile_embed
 
     @cog_ext.cog_slash(

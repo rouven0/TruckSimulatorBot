@@ -21,14 +21,15 @@ def main():
     bot = commands.Bot(command_prefix="", help_command=None, case_insensitive=True, intents=intents)
 
     logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+
+    if "--full" in sys.argv:
+        logger.setLevel(logging.DEBUG)
 
     if "--debug" in sys.argv:
         SlashCommand(bot, sync_commands=True, debug_guild=830928381100556338, sync_on_cog_reload=True)
-        # logger.setLevel(logging.DEBUG)
-        logger.setLevel(logging.INFO)
     else:
         SlashCommand(bot, sync_commands=True, delete_from_unused_guilds=True)
-        logger.setLevel(logging.INFO)
     logging.getLogger("discord.gateway").setLevel(logging.WARNING)
 
     console_handler = logging.StreamHandler()

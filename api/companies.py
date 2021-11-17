@@ -17,6 +17,15 @@ def _format_pos_to_db(pos: list) -> str:
     return "{}/{}".format(pos[0], pos[1])
 
 
+def _get_position(db_pos) -> list:
+    """
+    Formats the position string from the database into a list what we can operate with
+    """
+    pos_x = db_pos[: db_pos.find("/")]
+    pos_y = db_pos[db_pos.find("/") + 1 :]
+    return [int(pos_x), int(pos_y)]
+
+
 class Company:
     """
     Attributes:
@@ -31,7 +40,7 @@ class Company:
         self.name = name
         self.logo = logo
         if isinstance(hq_position, str):
-            self.hq_position = __get_position(hq_position)
+            self.hq_position = _get_position(hq_position)
         else:
             self.hq_position = hq_position
         self.founder = founder
@@ -79,6 +88,15 @@ async def get(name: str) -> Company:
         raise CompanyNotFound()
 
 
+async def get_all() -> list[Company]:
+    cur = await database.con.execute("SELECT * from companies")
+    companies = []
+    for data_tuple in await cur.fetchall():
+        companies.append(Company(*data_tuple))
+    await cur.close()
+    return companies
+
+
 async def insert(company: Company) -> None:
     await database.con.execute("INSERT INTO companies VALUES (?,?,?,?,?)", tuple(company))
     await database.con.commit()
@@ -98,21 +116,21 @@ async def update(
     Updates a company in the database
     """
     if logo is not None:
-        await database.con.execute("UPDATE companies SET logo=? WHERE id=?", (logo, company.name))
+        await database.con.execute("UPDATE companies SET logo=? WHERE name=?", (logo, company.name))
         company.logo = logo
     if hq_position is not None:
         await database.con.execute(
-            "UPDATE companies SET hq_position=? WHERE id=?", (_format_pos_to_db(hq_position), company.name)
+            "UPDATE companies SET hq_position=? WHERE name=?", (_format_pos_to_db(hq_position), company.name)
         )
         company.hq_position = hq_position
     if founder is not None:
-        await database.con.execute("UPDATE companies SET founder=? WHERE id=?", (founder, company.name))
+        await database.con.execute("UPDATE companies SET founder=? WHERE name=?", (founder, company.name))
         company.founder = founder
     if net_worth is not None:
-        await database.con.execute("UPDATE companies SET net_worth=? WHERE id=?", (net_worth, company.name))
+        await database.con.execute("UPDATE companies SET net_worth=? WHERE name=?", (net_worth, company.name))
         company.net_worth = net_worth
     await database.con.commit()
-    logging.info("Updated company %s to %s", company.name, tuple(company))
+    logging.debug("Updated company %s to %s", company.name, tuple(company))
 
 
 class CompanyNotFound(Exception):
