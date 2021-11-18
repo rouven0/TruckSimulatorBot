@@ -69,10 +69,13 @@ class Economy(commands.Cog):
         await player.add_job(job)
 
         drive_embed = ctx.origin_message.embeds[0]
+        components = ctx.origin_message.components
         drive_embed.add_field(
             name="Navigation: Drive to {}".format(job.place_from.name), value=str(job.place_from.position)
         )
-        await ctx.edit_origin(embed=drive_embed)
+        components[2]["components"][0]["disabled"] = True
+        components[2]["components"][1]["disabled"] = False
+        await ctx.edit_origin(embed=drive_embed, components=components)
 
         item = items.get(job.place_from.produced_item)
         job_message = "{} needs {} {} from {}. You get ${:,} for this transport".format(
