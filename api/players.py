@@ -286,7 +286,7 @@ async def get_top(key) -> tuple:
     else:
         cur = await database.con.execute("SELECT * FROM players ORDER BY level DESC, xp DESC")
         suffix = ""
-    top_tuples = await cur.fetchmany(10)
+    top_tuples = await cur.fetchmany(15)
     await cur.close()
     top_players = []
     for tup in top_tuples:
