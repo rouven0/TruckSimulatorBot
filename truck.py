@@ -101,24 +101,28 @@ class Trucks(commands.Cog):
         answer_embed.set_footer(text="Check out your new baby with `/truck show`")
         await ctx.send(embed=answer_embed)
 
-    @cog_ext.cog_subcommand(base="truck")
-    async def view(self, ctx, id: int) -> None:
+    @cog_ext.cog_subcommand(
+        base="truck",
+        options=[
+            create_option(
+                name="truck",
+                description="The truck you want to view",
+                option_type=4,
+                required=True,
+                choices=get_truck_choices(),
+            )
+        ],
+    )
+    async def view(self, ctx, truck) -> None:
         """
         View details about a specific truck
         """
-        try:
-            id = int(id)
-            truck = trucks.get(id)
-            truck_embed = get_truck_embed(truck)
-            truck_embed.set_footer(
-                icon_url=self.bot.user.avatar_url,
-                text="See all trucks with `/truck list` and change your truck with `/truck buy`",
-            )
-            await ctx.send(embed=truck_embed)
-        except trucks.TruckNotFound:
-            await ctx.send("Truck not found")
-        except ValueError:
-            await ctx.send("Wtf do you want to show?")
+        truck_embed = get_truck_embed(trucks.get(truck))
+        truck_embed.set_footer(
+            icon_url=self.bot.user.avatar_url,
+            text="See all trucks with `/truck list` and change your truck with `/truck buy`",
+        )
+        await ctx.send(embed=truck_embed)
 
     @cog_ext.cog_subcommand(base="truck")
     async def list(self, ctx) -> None:
