@@ -29,7 +29,7 @@ class System(commands.Cog):
         info_embed = discord.Embed(title="Truck Simulator info", colour=discord.Colour.lighter_grey())
         info_embed.set_footer(
             text="Developer: r5#2253",
-            icon_url="https://cdn.discordapp.com/avatars/692796548282712074/36f66390f3958970755416410237430a.png",
+            icon_url="https://cdn.discordapp.com/avatars/692796548282712074/d848bffc86871b36ebd93bd43949ce49.png",
         )
         info_embed.set_thumbnail(url=self.bot.user.avatar_url)
 
