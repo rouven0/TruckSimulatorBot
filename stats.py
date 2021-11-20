@@ -97,7 +97,7 @@ class Stats(commands.Cog):
     )
     async def top(self, ctx, key) -> None:
         """
-        If you appear in these lists you are one of the top 10 Players. Congratulations!
+        If you appear in these lists you are one of the top Players. Congratulations!
         """
         top_players = await players.get_top(key)
         top_body = ""
