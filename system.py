@@ -23,13 +23,18 @@ class System(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.start_time = datetime.now()
+        self.owner_avatar = ""
         super().__init__()
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        self.owner_avatar = (await self.bot.fetch_user(692796548282712074)).avatar_url
 
     async def get_info_embed(self) -> discord.Embed:
         info_embed = discord.Embed(title="Truck Simulator info", colour=discord.Colour.lighter_grey())
         info_embed.set_footer(
             text="Developer: r5#2253",
-            icon_url="https://cdn.discordapp.com/avatars/692796548282712074/d848bffc86871b36ebd93bd43949ce49.png",
+            icon_url=self.owner_avatar,
         )
         info_embed.set_thumbnail(url=self.bot.user.avatar_url)
 
