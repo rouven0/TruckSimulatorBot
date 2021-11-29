@@ -185,6 +185,13 @@ class Player:
         else:
             return None
 
+    async def remove_from_company(self):
+        """
+        Method I had to make to set a player's company to None
+        """
+        await database.con.execute("UPDATE players SET company=? WHERE id=?", (None, self.user_id))
+        await database.con.commit()
+
 
 async def insert(player: Player) -> None:
     """

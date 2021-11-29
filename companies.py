@@ -80,6 +80,9 @@ class Companies(commands.Cog):
 
     @cog_ext.cog_subcommand(base="company")
     async def hire(self, ctx, user: discord.User):
+        """
+        Get a new player into your company
+        """
         player = await players.get(ctx.author.id)
         if isinstance(user, str):
             invited_player = await players.get(int(user))
@@ -89,19 +92,101 @@ class Companies(commands.Cog):
         if ctx.author.id != company.founder:
             await ctx.send("You are not the company founder!")
             return
-        # TODO add confirmation of invited player
-        if invited_player.company is None:
-            await players.update(invited_player, company=company.name)
-            await ctx.send("Done")
-        else:
-            await ctx.send(
-                f"**{invited_player.name}** you are already member of a company. Leave that one before you join a new one"
+        if invited_player.company is not None:
+            await ctx.send(f"**{invited_player.name}** already is member of a company.")
+            return
+
+        confirm_buttons = [
+            create_actionrow(
+                create_button(style=3, label="Confirm", custom_id="confirm_company_hire"),
+                create_button(style=4, label="Cancel", custom_id="cancel_company_hire"),
             )
+        ]
+        await ctx.send(
+            f"<@{invited_player.user_id}> **{player.name}** wants to hire you for their company. "
+            f"Please confirm that you want to work for {company.logo} **{company.name}**",
+            components=confirm_buttons,
+        )
+        confirm: ComponentContext = await wait_for_component(
+            self.bot, components=confirm_buttons, check=lambda i: i.author.id == invited_player.user_id, timeout=30
+        )
+
+        if confirm.custom_id == "confirm_company_hire":
+            await ctx.send(
+                f"It's official! **{invited_player.name}** is now a member of **{company.name}** <:PandaHappy:869202868555624478>"
+            )
+            await players.update(invited_player, company=company.name)
+        await confirm.edit_origin(components=[])
+
+    @cog_ext.cog_subcommand(base="company")
+    async def fire(self, ctx, user: discord.User):
+        """
+        Remove a player from your company
+        """
+        player = await players.get(ctx.author.id)
+        if isinstance(user, str):
+            fired_player = await players.get(int(user))
+        else:
+            fired_player = await players.get(user.id)
+        company = await companies.get(player.company)
+        if ctx.author.id != company.founder:
+            await ctx.send("You are not the company founder!")
+            return
+        if fired_player.company is not company.name:
+            await ctx.send(f"**{fired_player.name}** is not a member of your company.")
+            return
+
+        confirm_buttons = [
+            create_actionrow(
+                create_button(style=3, label="Yes", custom_id="confirm_company_fire"),
+                create_button(style=4, label="No", custom_id="cancel_company_fire"),
+            )
+        ]
+        await ctx.send(
+            f"Are you sure you want to remove {fired_player.name} from **{company.name}**?",
+            components=confirm_buttons,
+            hidden=True,
+        )
+        confirm: ComponentContext = await wait_for_component(self.bot, components=confirm_buttons, timeout=30)
+
+        if confirm.custom_id == "confirm_company_fire":
+            await ctx.send(f"**{fired_player.name}** was removed from**{company.name}**")
+            await fired_player.remove_from_company()
+        await confirm.edit_origin(components=[])
+
+    @cog_ext.cog_subcommand(base="company")
+    async def leave(self, ctx):
+        """
+        Leave your company
+        """
+        player = await players.get(ctx.author.id)
+        if player.company is None:
+            await ctx.send("You don't have company to leave!")
+            return
+        company = await companies.get(player.company)
+        if ctx.author.id == company.founder:
+            await ctx.send("You can't leave the company you founded!")
+            return
+        confirm_buttons = [
+            create_actionrow(
+                create_button(style=3, label="Yes", custom_id="confirm_company_leave"),
+                create_button(style=4, label="No", custom_id="cancel_company_leave"),
+            )
+        ]
+        await ctx.send("Are you sure that you want to leave your company?", components=confirm_buttons, hidden=True)
+        confirm: ComponentContext = await wait_for_component(self.bot, components=confirm_buttons, timeout=30)
+        if confirm.custom_id == "confirm_company_leave":
+            await ctx.send(f"<@{player.user_id}> You left **{player.company}**")
+            await player.remove_from_company()
+        await confirm.edit_origin(components=[])
 
     @cog_ext.cog_subcommand(
         base="company", subcommand_group="update", subcommand_group_description="Make changes to your company"
     )
     async def logo(self, ctx, logo):
+        """
+        Change your company's logo
+        """
         player = await players.get(ctx.author.id)
         if re.match("<a*:\\w*:\\d*>", logo):
             company = await companies.get(player.company)
@@ -112,6 +197,30 @@ class Companies(commands.Cog):
             await ctx.send(f"Done. Your company logo was set to {logo}")
         else:
             await ctx.send("That's not an emoji")
+
+    @cog_ext.cog_subcommand(base="company")
+    async def show(self, ctx):
+        """
+        Show details about your company
+        """
+        player = await players.get(ctx.author.id)
+        company = await companies.get(player.company)
+        founder = self.bot.get_user(company.founder)
+        if founder is None:
+            await ctx.defer()
+            founder = await self.bot.fetch_user(company.founder)
+        company_embed = discord.Embed(title=company.name, colour=discord.Colour.lighter_grey())
+        company_embed.set_author(name=f"{player.name}'s company", icon_url=ctx.author.avatar_url)
+        logo_id = company.logo[company.logo.find(":", 2) + 1 : company.logo.find(">")]
+        company_embed.set_thumbnail(url=f"https://cdn.discordapp.com/emojis/{logo_id}.png")
+        company_embed.set_footer(text=f"Founded by {founder.name}#{founder.discriminator}", icon_url=founder.avatar_url)
+        company_embed.add_field(name="Headquarters position", value=company.hq_position)
+        company_embed.add_field(name="Net worth", value=f"${company.net_worth}", inline=False)
+        members = ""
+        for member in await company.get_members():
+            members += f"{member.name} \n"
+        company_embed.add_field(name="Members", value=members, inline=False)
+        await ctx.send(embed=company_embed)
 
 
 def setup(bot):

@@ -4,9 +4,8 @@ This module contains the company class
 
 import logging
 from typing import Union
-from typing import Optional
-from api.places import __get_position
 import api.database as database
+from api.players import Player
 
 
 # TODO make these funtions global so I don't have to paste them for every class
@@ -75,6 +74,15 @@ class Company:
             "UPDATE companies SET net_worth=? WHERE name=?", (self.net_worth - amount, self.name)
         )
         self.net_worth -= amount
+
+    async def get_members(self) -> list[Player]:
+        members = []
+        cur = await database.con.execute("SELECT * FROM players WHERE company=:name", {"name": self.name})
+        member_tuple = await cur.fetchall()
+        await cur.close()
+        for member in member_tuple:
+            members.append(Player(*member))
+        return members
 
 
 async def get(name: str) -> Company:
