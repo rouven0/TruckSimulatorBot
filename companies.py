@@ -62,7 +62,9 @@ class Companies(commands.Cog):
         confirm: ComponentContext = await wait_for_component(self.bot, components=confirm_buttons, timeout=30)
         if confirm.custom_id == "confirm_company_found":
             try:
-                company = companies.Company(name, f":regional_indicator_{name[0]}:", player.position, ctx.author.id, 0)
+                company = companies.Company(
+                    name, f":regional_indicator_{name[0]}:", player.position, ctx.author.id, 3000
+                )
                 await companies.insert(company)
                 await players.update(player, company=name)
                 await ctx.send(
@@ -150,7 +152,7 @@ class Companies(commands.Cog):
         confirm: ComponentContext = await wait_for_component(self.bot, components=confirm_buttons, timeout=30)
 
         if confirm.custom_id == "confirm_company_fire":
-            await ctx.send(f"**{fired_player.name}** was removed from**{company.name}**")
+            await ctx.send(f"**{fired_player.name}** was removed from **{company.name}**")
             await fired_player.remove_from_company()
         await confirm.edit_origin(components=[])
 

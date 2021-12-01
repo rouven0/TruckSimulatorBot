@@ -175,6 +175,10 @@ class Driving(commands.Cog):
             await player.add_money(current_job.reward)
             await player.remove_job(current_job)
             job_message = jobs.get_state(current_job) + await player.add_xp(levels.get_job_reward_xp(player.level))
+            if player.company is not None:
+                company = await companies.get(player.company)
+                await company.add_net_worth(int(current_job.reward / 10))
+                job_message += f"\nYour company's net worth was increased by ${int(current_job.reward/10):,}"
             # get the drive embed egain to fit the job update
             drive_embed = await self.get_drive_embed(player, ctx.author.avatar_url)
             await ctx.send(
