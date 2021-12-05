@@ -250,7 +250,7 @@ class Driving(commands.Cog):
             await ctx.edit_origin(components=[])
             await ctx.send(
                 "You messed up and ran out of gas. "
-                "The company had to have your truck towed away. You will pay $3000 for this incident!"
+                "Your company had to have your truck towed away. You will pay $3000 for this incident!"
             )
             try:
                 await player.debit_money(3000)

@@ -16,13 +16,7 @@ class Misc(commands.Cog):
         """
         Truck Simulator support server
         """
-        support_embed = discord.Embed(
-            title="Click here to get to the support server",
-            description="Any problems with the TruckSimulator? \n" "Report a bug or ask questions there :)",
-            url="https://discord.gg/FzAxtGTUhN",
-            colour=discord.Colour.lighter_grey(),
-        )
-        await ctx.send(embed=support_embed)
+        await ctx.send("https://discord.gg/FzAxtGTUhN")
 
     @cog_ext.cog_slash()
     async def invite(self, ctx) -> None:
