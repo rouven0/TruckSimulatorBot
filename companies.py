@@ -63,7 +63,7 @@ class Companies(commands.Cog):
         if confirm.custom_id == "confirm_company_found":
             try:
                 company = companies.Company(
-                    name, f":regional_indicator_{name[0]}:", player.position, ctx.author.id, 3000
+                    name, f":regional_indicator_{str.lower(name[0])}:", player.position, ctx.author.id, 3000
                 )
                 await companies.insert(company)
                 await players.update(player, company=name)
@@ -189,8 +189,15 @@ class Companies(commands.Cog):
         """
         Change your company's logo
         """
+        await ctx.defer()
+        # logo = logo.encode("unicode-escape").decode("ASCII")
         player = await players.get(ctx.author.id)
-        if re.match("<a*:\\w*:\\d*>", logo):
+        if re.match(
+            # did I mention that I love regex?
+            # match any emoji
+            r"([\u2600-\u26ff]|[\U0001f000-\U0001faff])|<a*:\w*:\d+>",
+            logo,
+        ):
             company = await companies.get(player.company)
             if ctx.author.id != company.founder:
                 await ctx.send("You are not the company founder!")
