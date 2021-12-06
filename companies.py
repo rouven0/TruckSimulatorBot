@@ -195,7 +195,7 @@ class Companies(commands.Cog):
         if re.match(
             # did I mention that I love regex?
             # match any emoji
-            r"([\u2600-\u26ff]|[\U0001f000-\U0001faff])|<a*:\w*:\d+>",
+            r"^([\u2600-\u26ff]|[\U0001f000-\U0001faff])|<a*:\w*:\d+>$",
             logo,
         ):
             company = await companies.get(player.company)
