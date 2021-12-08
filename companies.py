@@ -203,23 +203,36 @@ class Companies(commands.Cog):
                 await ctx.send("You are not the company founder!")
                 return
             await companies.update(company, logo=logo)
-            await ctx.send(f"Done. Your company logo was set to {logo}")
+            await ctx.send(
+                f"Done. Your company logo was set to {logo} Please note that your logo can be reset at any time if it is found not working or inappropriate"
+            )
         else:
             await ctx.send("That's not an emoji")
 
     @cog_ext.cog_subcommand(base="company")
-    async def show(self, ctx):
+    async def show(self, ctx, user: discord.User = None):
         """
         Show details about your company
         """
-        player = await players.get(ctx.author.id)
-        company = await companies.get(player.company)
+        if isinstance(user, str):
+            user = await self.bot.fetch_user(int(user))
+        if user is not None:
+            target_user = user
+        else:
+            target_user = ctx.author
+        player = await players.get(target_user.id)
+        try:
+            company = await companies.get(player.company)
+        except companies.CompanyNotFound:
+            begin = "You are " if user is None else f"{user.name} is "
+            await ctx.send(begin + "not member of a company at the moment", hidden=True)
+            return
         founder = self.bot.get_user(company.founder)
         if founder is None:
             await ctx.defer()
             founder = await self.bot.fetch_user(company.founder)
         company_embed = discord.Embed(title=company.name, colour=discord.Colour.lighter_grey())
-        company_embed.set_author(name=f"{player.name}'s company", icon_url=ctx.author.avatar_url)
+        company_embed.set_author(name=f"{player.name}'s company", icon_url=target_user.avatar_url)
         logo_id = company.logo[company.logo.find(":", 2) + 1 : company.logo.find(">")]
         company_embed.set_thumbnail(url=f"https://cdn.discordapp.com/emojis/{logo_id}.png")
         company_embed.set_footer(text=f"Founded by {founder.name}#{founder.discriminator}", icon_url=founder.avatar_url)
