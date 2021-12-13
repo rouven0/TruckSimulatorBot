@@ -8,8 +8,8 @@ from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.utils.manage_commands import create_option
 
-import api.players as players
-import api.items as items
+import ressources.players as players
+import ressources.items as items
 
 
 class Gambling(commands.Cog):

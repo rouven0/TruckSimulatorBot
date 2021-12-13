@@ -13,9 +13,9 @@ from discord_slash.utils.manage_components import (
     wait_for_component,
 )
 
-import api.players as players
-import api.places as places
-import api.companies as companies
+import ressources.players as players
+import ressources.places as places
+import ressources.companies as companies
 from aiosqlite import IntegrityError
 
 

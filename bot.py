@@ -7,7 +7,7 @@ from discord.ext import commands
 from discord_slash import SlashCommand
 
 from dotenv import load_dotenv
-import api.database as database
+import ressources.database as database
 
 import config
 

@@ -20,15 +20,15 @@ from discord_slash.utils.manage_components import (
     wait_for_component,
 )
 import config
-import api.players as players
-import api.companies as companies
-import api.items as items
-import api.levels as levels
-import api.places as places
-import api.symbols as symbols
-import api.assets as assets
-import api.jobs as jobs
-import api.trucks as trucks
+import ressources.players as players
+import ressources.companies as companies
+import ressources.items as items
+import ressources.levels as levels
+import ressources.places as places
+import ressources.symbols as symbols
+import ressources.assets as assets
+import ressources.jobs as jobs
+import ressources.trucks as trucks
 
 
 class Driving(commands.Cog):
