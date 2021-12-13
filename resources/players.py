@@ -4,10 +4,10 @@ the DrivingPlayer, used to manage driving sessions
 """
 from typing import Optional, Union
 import logging
-import ressources.database as database
-import ressources.levels as levels
-import ressources.items as items
-from ressources.jobs import Job
+import resources.database as database
+import resources.levels as levels
+import resources.items as items
+from resources.jobs import Job
 
 
 def _format_pos_to_db(pos: list) -> str:

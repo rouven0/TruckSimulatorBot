@@ -7,7 +7,7 @@ import logging
 
 async def init():
     global con
-    con = await aiosqlite.connect("./ressources/players.db")
+    con = await aiosqlite.connect("./resources/players.db")
     logging.info("Initialized player database")
 
 

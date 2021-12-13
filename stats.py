@@ -6,10 +6,10 @@ from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.context import MenuContext
 from discord_slash.utils.manage_commands import create_option
-import ressources.players as players
-import ressources.companies as companies
-import ressources.trucks as trucks
-import ressources.levels as levels
+import resources.players as players
+import resources.companies as companies
+import resources.trucks as trucks
+import resources.levels as levels
 
 
 class Stats(commands.Cog):

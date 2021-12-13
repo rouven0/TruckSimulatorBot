@@ -111,7 +111,7 @@ def get_hidden() -> list:
     return __hidden_places__
 
 
-__con__ = sqlite3.connect("./ressources/objects.db")
+__con__ = sqlite3.connect("./resources/objects.db")
 __cur__ = __con__.cursor()
 
 __all_places__ = []

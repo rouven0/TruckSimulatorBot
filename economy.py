@@ -5,12 +5,12 @@ import discord
 from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.utils.manage_components import ComponentContext
-import ressources.players as players
-import ressources.places as places
-import ressources.items as items
-import ressources.jobs as jobs
-import ressources.symbols as symbols
-import ressources.trucks as trucks
+import resources.players as players
+import resources.places as places
+import resources.items as items
+import resources.jobs as jobs
+import resources.symbols as symbols
+import resources.trucks as trucks
 
 
 class Economy(commands.Cog):

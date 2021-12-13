@@ -8,8 +8,8 @@ from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.utils.manage_commands import create_option
 
-import ressources.items as items
-import ressources.places as places
+import resources.items as items
+import resources.places as places
 
 
 class Guide(commands.Cog):

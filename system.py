@@ -1,4 +1,4 @@
-from ressources.companies import CompanyNotFound
+from resources.companies import CompanyNotFound
 import traceback
 from datetime import datetime
 from math import floor
@@ -14,9 +14,9 @@ from discord_slash.utils.manage_components import (
 )
 
 import config
-import ressources.database as database
-import ressources.players as players
-from ressources.trucks import TruckNotFound
+import resources.database as database
+import resources.players as players
+from resources.trucks import TruckNotFound
 
 
 class System(commands.Cog):

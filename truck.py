@@ -7,9 +7,9 @@ from discord.ext import commands
 from discord_slash import cog_ext
 from discord_slash.utils.manage_commands import create_choice, create_option
 
-import ressources.players as players
-import ressources.trucks as trucks
-import ressources.symbols as symbols
+import resources.players as players
+import resources.trucks as trucks
+import resources.symbols as symbols
 
 
 def get_truck_embed(truck: trucks.Truck) -> discord.Embed:

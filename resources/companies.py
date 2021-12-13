@@ -4,8 +4,8 @@ This module contains the company class
 
 import logging
 from typing import Union
-import ressources.database as database
-from ressources.players import Player
+import resources.database as database
+from resources.players import Player
 
 
 # TODO make these funtions global so I don't have to paste them for every class
