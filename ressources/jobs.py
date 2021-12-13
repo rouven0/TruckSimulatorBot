@@ -3,7 +3,7 @@ This module provides the Job class and all the methods to operate with jobs in t
 """
 from random import randint
 from math import sqrt
-import api.places as places
+import ressources.places as places
 
 STATE_CLAIMED = 0
 STATE_LOADED = 1

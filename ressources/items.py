@@ -28,7 +28,7 @@ def get_all() -> list:
     return __all_items__
 
 
-__con__ = sqlite3.connect("./api/objects.db")
+__con__ = sqlite3.connect("./ressources/objects.db")
 __cur__ = __con__.cursor()
 
 __cur__.execute("SELECT * FROM items")

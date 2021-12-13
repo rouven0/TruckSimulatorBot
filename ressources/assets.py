@@ -2,8 +2,8 @@
 This file contains some of the image urls that the bot uses
 The images are hosted on a discord server
 """
-from api.places import Place
-from api.players import Player
+from ressources.places import Place
+from ressources.players import Player
 from random import randint
 
 __DEFAULT_DRIVE_IMAGE_LIST = [
