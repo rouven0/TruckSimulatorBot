@@ -84,13 +84,13 @@ class Player:
         self.company = company
 
     def __iter__(self):
-        self.n = 0
+        self._n = 0
         return self
 
     def __next__(self):
-        if self.n < len(vars(self)) - 1:
-            attr = list(vars(self).keys())[self.n]
-            self.n += 1
+        if self._n < len(vars(self)) - 1:
+            attr = list(vars(self).keys())[self._n]
+            self._n += 1
             if attr == "position":
                 return _format_pos_to_db(self.__getattribute__(attr))
             elif attr == "loaded_items":
