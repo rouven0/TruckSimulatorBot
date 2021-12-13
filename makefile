@@ -1,7 +1,7 @@
 install:
-ifeq (, $(wildcard ./api/players.db))
+ifeq (, $(wildcard ./resources/players.db))
 	@echo Setting up player database...
-	@cp ./templates/template_players.db ./api/players.db
+	@cp ./templates/template_players.db ./resources/players.db
 	@echo Done.
 else
 	@echo Found existing player database, skipping this step.
