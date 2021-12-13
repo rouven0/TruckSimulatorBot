@@ -12,7 +12,7 @@ class Place:
     Attributes:
         name: The name of the place
         position: the Place's position in the 2 dimensional array that I call Map
-        commands: all local available commands stored as strings in a list
+        available_actions: all local available commands stored as strings in a list
         image_url: Every place has an image that is shown while driving
                    Images are hosted on a ressource discord server and displayed in embeds via URL
         image_url_better: image with the better truck
@@ -25,7 +25,7 @@ class Place:
 
     name: str
     position: list
-    commands: list
+    available_actions: list
     image_url_default: Optional[str]
     image_url_jungle: Optional[str]
     image_url_tropical: Optional[str]
@@ -51,9 +51,9 @@ def __generate_list(lst) -> None:
     for tup in __cur__.fetchall():
         name = tup[0]
         position = __get_position(tup[1])
-        commands = []
+        available_actions = []
         if tup[2] is not None:
-            commands = tup[2].split(";")
+            available_actions = tup[2].split(";")
         image_url = tup[3]
         image_url_better = tup[4]
         image_url_tropical = tup[5]
@@ -65,7 +65,7 @@ def __generate_list(lst) -> None:
             Place(
                 name,
                 position,
-                commands,
+                available_actions,
                 image_url,
                 image_url_better,
                 image_url_tropical,

@@ -73,7 +73,7 @@ class Driving(commands.Cog):
             )
         )
 
-        if "refill" in place.commands:
+        if "refill" in place.available_actions:
             action_buttons.append(create_button(style=2, emoji=self.bot.get_emoji(symbols.REFILL), custom_id="refill"))
         buttons.append(create_actionrow(*action_buttons))
         buttons.append(
