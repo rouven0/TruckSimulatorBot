@@ -1,8 +1,10 @@
 from flask import Flask, json
 
 import asyncio
+import logging
 
 from werkzeug.exceptions import HTTPException, abort
+import config
 import resources.database as database
 import resources.players as players
 import resources.players as players
@@ -52,7 +54,11 @@ def handle_exception(e):
     return response
 
 
-if __name__ == "__main__":
+@app.before_first_request
+def before_first_request():
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
+    logger.addHandler(console_handler)
     asyncio.run(database.init())
-    app.run()
-    asyncio.run(database.close())

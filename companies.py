@@ -189,9 +189,9 @@ class Companies(commands.Cog):
         """
         Change your company's logo
         """
+        player = await players.get(ctx.author.id)
         await ctx.defer()
         # logo = logo.encode("unicode-escape").decode("ASCII")
-        player = await players.get(ctx.author.id)
         if re.match(
             # did I mention that I love regex?
             # match any emoji

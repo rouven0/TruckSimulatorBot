@@ -26,21 +26,36 @@ endif
 	@sed -i 's|WORKINGDIRECTORY|'$(PWD)'|g' TruckSimulatorBot.service
 	@sed -i 's|USER|'$(USER)'|g' TruckSimulatorBot.service
 	@sudo cp ./TruckSimulatorBot.service /etc/systemd/system
+	@sed -i 's|WORKINGDIRECTORY|'$(PWD)'|g' TruckSimulatorApi.service
+	@sed -i 's|USER|'$(USER)'|g' TruckSimulatorApi.service
+	@sudo cp ./TruckSimulatorApi.service /etc/systemd/system
 	@sudo systemctl daemon-reload
-	@echo Done. The service is ready to be started
+	@echo Done. The services are ready to be started
 
 uninstall:
-	@echo Removing systemd service...
+	@echo Removing systemd services...
 	@sed -i 's|'$(PWD)'|WORKINGDIRECTORY|g' TruckSimulatorBot.service
 	@sed -i 's|'$(USER)'|USER|g' TruckSimulatorBot.service
 	@sudo rm /etc/systemd/system/TruckSimulatorBot.service
+	@sed -i 's|'$(PWD)'|WORKINGDIRECTORY|g' TruckSimulatorApi.service
+	@sed -i 's|'$(USER)'|USER|g' TruckSimulatorApi.service
+	@sudo rm /etc/systemd/system/TruckSimulatorApi.service
 	@sudo systemctl daemon-reload
 	@echo Done.
 
-start:
+start-bot:
 	@sudo systemctl start TruckSimulatorBot.service
-	@echo Service started
+	@echo Bot Service started
 
-stop:
+stop-bot:
 	@sudo systemctl stop TruckSimulatorBot.service
-	@echo Service stopped
+	@echo Bot Service stopped
+
+start-api:
+	@sudo systemctl start TruckSimulatorApi.service
+	@echo Api Service started
+
+stop-api:
+	@sudo systemctl stop TruckSimulatorApi.service
+	@echo Api Service stopped
+
