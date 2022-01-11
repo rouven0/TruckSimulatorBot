@@ -4,7 +4,7 @@ Description=Truck Simulator Api
 [Service]
 User=USER
 WorkingDirectory=WORKINGDIRECTORY
-ExecStart=WORKINGDIRECTORY/venv/bin/python -m gunicorn server:app -b 0.0.0.0 --access-logfile -
+ExecStart=WORKINGDIRECTORY/venv/bin/python -m gunicorn server:app --access-logfile -
 
 [Install]
 WantedBy=multi-user.target
