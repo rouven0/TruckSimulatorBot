@@ -1,47 +1,46 @@
+from dotenv import load_dotenv
 from os import getenv
 import sys
-import asyncio
+
+from flask import Flask
+from flask_discord_interactions import DiscordInteractions
+
 import logging
-import discord
-from discord.ext import commands
-from discord_slash import SlashCommand
-
-from dotenv import load_dotenv
-import resources.database as database
-
 import config
 
 load_dotenv("./.env")
-BOT_TOKEN = getenv("BOT_TOKEN", default="")
+
+app = Flask(__name__)
+discord = DiscordInteractions(app)
+
+app.config["DISCORD_CLIENT_ID"] = getenv("DISCORD_CLIENT_ID", default="")
+app.config["DISCORD_PUBLIC_KEY"] = getenv("DISCORD_PUBLIC_KEY", default="")
+app.config["DISCORD_CLIENT_SECRET"] = getenv("DISCORD_CLIENT_SECRET", default="")
+
+if "--debug" in sys.argv:
+    app.config["DONT_VALIDATE_SIGNATURE"]
 
 
-def main():
-    intents = discord.Intents.none()
-    intents.guilds = True
-    bot = commands.Bot(command_prefix="", help_command=None, case_insensitive=True, intents=intents)
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
+logger.addHandler(console_handler)
 
-    if "--full" in sys.argv:
-        logger.setLevel(logging.DEBUG)
 
-    if "--debug" in sys.argv:
-        SlashCommand(bot, sync_commands=True, debug_guild=830928381100556338, sync_on_cog_reload=True)
-    else:
-        SlashCommand(bot, sync_commands=True, delete_from_unused_guilds=True)
-    logging.getLogger("discord.gateway").setLevel(logging.WARNING)
+# @discord.command()
+# def ping(ctx):
+# "Respond with a friendly 'pong'!"
+# TODO stuff goes here
 
-    console_handler = logging.StreamHandler()
-    console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
-    logger.addHandler(console_handler)
 
-    for extension in config.EXTENSIONS:
-        bot.load_extension(extension)
-    asyncio.run(database.init())
-    bot.run(BOT_TOKEN)
-    asyncio.run(database.close())
+if "--update" in sys.argv:
+    discord.update_commands(guild_id=830928381100556338)
+    sys.exit()
+
+discord.set_route(getenv("ROUTE", default=""))
 
 
 if __name__ == "__main__":
-    main()
+    app.run(port=9001)
