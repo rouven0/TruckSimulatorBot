@@ -1,4 +1,7 @@
 from dotenv import load_dotenv
+
+load_dotenv("./.env")
+
 from os import getenv
 import sys
 
@@ -6,9 +9,9 @@ from flask import Flask
 from flask_discord_interactions import DiscordInteractions
 
 import logging
+import resources.players as players
 import config
 
-load_dotenv("./.env")
 
 app = Flask(__name__)
 discord = DiscordInteractions(app)

@@ -1,16 +1,13 @@
 """
 This module contains the database connection
 """
-import aiosqlite
-import logging
+from os import getenv
+import mysql.connector
 
-
-async def init():
-    global con
-    con = await aiosqlite.connect("./resources/players.db")
-    logging.info("Initialized player database")
-
-
-async def close():
-    await con.close()
-    logging.info("Closed player database connection")
+con = mysql.connector.connect(
+    host=getenv("MYSQL_HOST"),
+    user=getenv("MYSQL_USER"),
+    passwd=getenv("MYSQL_PASSWORD"),
+    database=getenv("MYSQL_DATABASE"),
+)
+cur = con.cursor()
