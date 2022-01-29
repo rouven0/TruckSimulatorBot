@@ -35,15 +35,17 @@ class Company:
         net_worth: money the company holds
     """
 
-    def __init__(self, name: str, logo: str, hq_position: Union[str, list], founder: int, net_worth: int) -> None:
+    def __init__(self, name: str, hq_position: Union[list, str], founder: int, **kwargs) -> None:
         self.name = name
-        self.logo = logo
+        self.hq_position = hq_position
+
         if isinstance(hq_position, str):
             self.hq_position = _get_position(hq_position)
         else:
             self.hq_position = hq_position
         self.founder = founder
-        self.net_worth = net_worth
+        self.logo = kwargs.pop("logo", f":regional_indicator_{str.lower(name[0])}:")
+        self.net_worth = kwargs.pop("net_worth", 0)
 
     def __iter__(self):
         self._n = 0
@@ -63,81 +65,78 @@ class Company:
     def __str__(self) -> str:
         return f"{self.name} founded by {self.founder}"
 
-    async def add_net_worth(self, amount: int):
-        await database.con.execute(
-            "UPDATE companies SET net_worth=? WHERE name=?", (self.net_worth + amount, self.name)
-        )
+    def add_net_worth(self, amount: int):
+        database.cur.execute("UPDATE companies SET net_worth=%s WHERE name=%s", (self.net_worth + amount, self.name))
         self.net_worth += amount
 
-    async def remove_net_worth(self, amount: int):
-        await database.con.execute(
-            "UPDATE companies SET net_worth=? WHERE name=?", (self.net_worth - amount, self.name)
-        )
+    def remove_net_worth(self, amount: int):
+        database.cur.execute("UPDATE companies SET net_worth=%s WHERE name=%s", (self.net_worth - amount, self.name))
         self.net_worth -= amount
 
-    async def get_members(self) -> list[Player]:
+    def get_members(self) -> list[Player]:
         members = []
-        cur = await database.con.execute("SELECT * FROM players WHERE company=:name", {"name": self.name})
-        member_tuple = await cur.fetchall()
-        await cur.close()
-        for member in member_tuple:
-            members.append(Player(*member))
+        database.cur.execute("SELECT * FROM players WHERE company=%s", (self.name,))
+        members = database.cur.fetchall()
+        for member in members:
+            members.append(Player(**member))
         return members
 
 
-async def get(name: str) -> Company:
-    cur = await database.con.execute("SELECT * FROM companies WHERE name=:name", {"name": name})
-    company_tuple: tuple = await cur.fetchone()
-    await cur.close()
+def get(name: str) -> Company:
+    database.cur.execute("SELECT * FROM companies WHERE name=%s", (name,))
+    record = database.cur.fetchone()
+
     try:
-        company = Company(*company_tuple)
+        company = Company(**record))
         return company
     except TypeError:
         raise CompanyNotFound()
 
 
-async def get_all() -> list[Company]:
-    cur = await database.con.execute("SELECT * from companies")
+def get_all() -> list[Company]:
+    cur = database.cur.execute("SELECT * from companies")
     companies = []
-    for data_tuple in await cur.fetchall():
-        companies.append(Company(*data_tuple))
-    await cur.close()
+    for record in cur.fetchall():
+        companies.append(Company(**record))
     return companies
 
 
-async def insert(company: Company) -> None:
-    await database.con.execute("INSERT INTO companies VALUES (?,?,?,?,?)", tuple(company))
-    await database.con.commit()
+def insert(company: Company) -> None:
+    placeholders = ", ".join(["%s"] * len(vars(company)))
+    columns = ", ".join(vars(company).keys())
+    sql = "INSERT INTO companies (%s) VALUES (%s)" % (columns, placeholders)
+    database.cur.execute(sql, tuple(company))
+    database.con.commit()
     logging.info("%s created the company %s", company.founder, company.name)
 
 
-async def remove(company: Company) -> None:
-    await database.con.execute("DELETE FROM companies WHERE name=:name", {"name": company.name})
-    await database.con.commit()
+def remove(company: Company) -> None:
+    database.cur.execute("DELETE FROM companies WHERE name=%s", (company.name,))
+    database.con.commit()
     logging.info("Company %s got deleted", company.name)
 
 
-async def update(
+def update(
     company: Company, logo: str = None, hq_position: list = None, founder: int = None, net_worth: int = None
 ) -> None:
     """
     Updates a company in the database
     """
     if logo is not None:
-        await database.con.execute("UPDATE companies SET logo=? WHERE name=?", (logo, company.name))
+        database.cur.execute("UPDATE companies SET logo=%s WHERE name=%s", (logo, company.name))
         company.logo = logo
     if hq_position is not None:
-        await database.con.execute(
-            "UPDATE companies SET hq_position=? WHERE name=?", (_format_pos_to_db(hq_position), company.name)
+        database.cur.execute(
+            "UPDATE companies SET hq_position=%s WHERE name=%s", (_format_pos_to_db(hq_position), company.name)
         )
         company.hq_position = hq_position
     if founder is not None:
-        await database.con.execute("UPDATE companies SET founder=? WHERE name=?", (founder, company.name))
+        database.cur.execute("UPDATE companies SET founder=%s WHERE name=%s", (founder, company.name))
         company.founder = founder
     if net_worth is not None:
-        await database.con.execute("UPDATE companies SET net_worth=? WHERE name=?", (net_worth, company.name))
+        database.cur.execute("UPDATE companies SET net_worth=%s WHERE name=%s", (net_worth, company.name))
         company.net_worth = net_worth
-    await database.con.commit()
+    database.con.commit()
     logging.debug("Updated company %s to %s", company.name, tuple(company))
 
 

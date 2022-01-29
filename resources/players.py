@@ -152,8 +152,6 @@ class Player:
         sql = "INSERT INTO jobs (%s) VALUES (%s)" % (columns, placeholders)
         database.cur.execute(sql, tuple(job))
         database.con.commit()
-        database.cur.execute("INSERT INTO jobs VALUES (%s,%s,%s,%s,%s)", tuple(job))
-        database.con.commit()
 
     def update_job(self, job: Job, state: int) -> None:
         """
@@ -166,14 +164,14 @@ class Player:
         """
         Removes a job from the player database
         """
-        database.cur.execute("DELETE FROM jobs WHERE player_id=:id", {"id": job.player_id})
+        database.cur.execute("DELETE FROM jobs WHERE player_id=%s", (job.player_id,))
         database.con.commit()
 
     def get_job(self) -> Optional[Job]:
         """
         Get the Players current job
         """
-        database.cur.execute("SELECT * FROM jobs WHERE player_id=:id", {"id": self.id})
+        database.cur.execute("SELECT * FROM jobs WHERE player_id=%s", (self.id,))
         job_tuple = database.cur.fetchall()
         if len(job_tuple) > 0:
             return Job(*(job_tuple[0]))
@@ -195,7 +193,6 @@ def insert(player: Player) -> None:
     placeholders = ", ".join(["%s"] * len(vars(player)))
     columns = ", ".join(vars(player).keys())
     sql = "INSERT INTO players (%s) VALUES (%s)" % (columns, placeholders)
-    print(sql)
     database.cur.execute(sql, tuple(player))
     database.con.commit()
     logging.info("Inserted %s into the database as %s", player.name, tuple(player))
@@ -301,8 +298,7 @@ def get_count(table: str) -> int:
     """
     Returns the player count
     """
-    # i know it's bad, but I have to do it
-    database.cur.execute(f"SELECT COUNT(*) FROM {table}")
+    database.cur.execute("SELECT COUNT(*) FROM %s", (table,))
     number_tuple = database.cur.fetchall()
     return number_tuple[0][0]
 
@@ -329,7 +325,7 @@ class DrivingPlayer(Player):
         logging.info("%s started driving", self.name)
 
     def stop_drive(self) -> None:
-        database.cur.execute("DELETE FROM driving_players WHERE id=:id", {"id": self.id})
+        database.cur.execute("DELETE FROM driving_players WHERE id=%s", (self.id,))
         database.con.commit()
         logging.info("%s stopped driving", self.name)
 
@@ -342,7 +338,7 @@ def is_driving(id: int) -> bool:
     """
     Checks whether a specific user is driving
     """
-    database.cur.execute("SELECT * FROM driving_players WHERE id=:id", {"id": id})
+    database.cur.execute("SELECT * FROM driving_players WHERE id=%s", (id,))
     if len(database.cur.fetchall()) == 1:
         return True
     return False
@@ -352,10 +348,7 @@ def is_active_drive(id: int, message_id: int) -> bool:
     """
     Checks whether an interaction is done by a driving player
     """
-    database.cur.execute(
-        "SELECT * FROM driving_players WHERE id=:id AND message_id=:message_id",
-        {"id": id, "message_id": message_id},
-    )
+    database.cur.execute("SELECT * FROM driving_players WHERE id=%s AND message_id=%s", (id, message_id))
     if len(database.cur.fetchall()) == 1:
         return True
     return False
@@ -364,29 +357,30 @@ def is_active_drive(id: int, message_id: int) -> bool:
 def get_driving_player(id: int, message_id: int = None) -> DrivingPlayer:
     if message_id is not None:
         if is_active_drive(id, message_id):
-            database.cur.execute(
-                "SELECT * FROM driving_players WHERE id=:id AND message_id=:message_id",
-                {"id": id, "message_id": message_id},
-            )
-            data_tuple: tuple = database.cur.fetchone()
-            last_action_time = data_tuple[2]
+            database.cur.execute("SELECT * FROM driving_players WHERE id=%s AND message_id=%s", (id, message_id))
+            record = database.cur.fetchone()
+            last_action_time = record["last_action_time"]
             return DrivingPlayer(*tuple(get(id)), message_id=message_id, last_action_time=last_action_time)
         else:
             raise NotDriving()
     else:
         # get drive by user id only
-        database.cur.execute("SELECT * FROM driving_players WHERE id=:id", {"id": id})
-        data_tuple: tuple = database.cur.fetchone()
-        last_action_time = data_tuple[2]
+        database.cur.execute("SELECT * FROM driving_players WHERE id=%s", (id,))
+        record = database.cur.fetchone()
+        last_action_time = record["last_action_time"]
         return DrivingPlayer(*tuple(get(id)), message_id=message_id, last_action_time=last_action_time)
 
 
 def get_all_driving_players() -> list:
     database.cur.execute("SELECT * from driving_players")
     driving_players = []
-    for data_tuple in database.cur.fetchall():
+    for record in database.cur.fetchall():
         driving_players.append(
-            DrivingPlayer(*tuple(get(data_tuple[0])), message_id=data_tuple[1], last_action_time=data_tuple[2])
+            DrivingPlayer(
+                *tuple(get(record["user_id"])),
+                message_id=record["message_id"],
+                last_action_time=record["last_action_time"],
+            )
         )
     return driving_players
 
