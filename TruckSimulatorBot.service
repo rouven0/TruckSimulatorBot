@@ -4,7 +4,7 @@ Description=Truck Simulator Discord bot
 [Service]
 User=USER
 WorkingDirectory=WORKINGDIRECTORY
-ExecStart=WORKINGDIRECTORY/venv/bin/python3 bot.py
+ExecStart=WORKINGDIRECTORY/venv/bin/python3 -m gunicorn bot:app -b 127.0.0.1:9000
 
 [Install]
 WantedBy=multi-user.target
