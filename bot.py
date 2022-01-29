@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from flask_discord_interactions.models.embed import Embed
+import traceback
 from werkzeug.exceptions import HTTPException
 
 load_dotenv("./.env")
@@ -14,8 +14,10 @@ import logging
 import resources.players as players
 import config
 
+from admin import admin_bp
 from stats import profile_bp
 from misc import misc_bp
+from gambling import gambling_bp
 
 app = Flask(__name__)
 discord = DiscordInteractions(app)
@@ -36,6 +38,13 @@ console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
 logger.addHandler(console_handler)
 
 
+@app.errorhandler(players.NotEnoughMoney)
+def not_enough_money(error):
+    return Message(
+        content="You don't have enough money to do this.",
+    ).dump()
+
+
 @app.errorhandler(players.PlayerNotRegistered)
 def not_registered(error):
     return Message(
@@ -53,10 +62,10 @@ def blacklisted(error: players.PlayerBlacklisted):
 
 @app.errorhandler(Exception)
 def general_error(error):
+    logging.error(error)
+    traceback.print_tb(error.__traceback__)
     return Message(
-        embed=Embed(
-            title="Whoops, Looks like we got an error here", description=f"**{error.__class__.__name__}** ```{error}```"
-        )
+        content=f"Looks like we got an error here. ```{error.__class__.__name__}: {error}``` If this occurs multiple times feel free to report it in the support server"
     ).dump()
 
 
@@ -77,8 +86,14 @@ def handle_exception(error):
     return response
 
 
+if "--admin" in sys.argv:
+    discord.register_blueprint(admin_bp)
+    discord.update_commands(guild_id=839580174282260510)
+    sys.exit()
+
 discord.register_blueprint(profile_bp)
 discord.register_blueprint(misc_bp)
+discord.register_blueprint(gambling_bp)
 
 if "--update" in sys.argv:
     discord.update_commands(guild_id=830928381100556338)
@@ -88,6 +103,7 @@ if "--deploy" in sys.argv:
     discord.update_commands()
     sys.exit()
 
+discord.register_blueprint(admin_bp)
 
 discord.set_route(getenv("ROUTE", default=""))
 
