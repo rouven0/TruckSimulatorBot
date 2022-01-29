@@ -195,6 +195,7 @@ def insert(player: Player) -> None:
     placeholders = ", ".join(["%s"] * len(vars(player)))
     columns = ", ".join(vars(player).keys())
     sql = "INSERT INTO players (%s) VALUES (%s)" % (columns, placeholders)
+    print(sql)
     database.cur.execute(sql, tuple(player))
     database.con.commit()
     logging.info("Inserted %s into the database as %s", player.name, tuple(player))
@@ -258,9 +259,9 @@ def get(id: int) -> Player:
     """
     if not registered(id):
         raise PlayerNotRegistered(id)
-    database.cur.execute("SELECT * FROM players WHERE id=:id", {"id": id})
-    player_tuple: tuple = database.cur.fetchone()
-    player = Player(*player_tuple)
+    database.cur.execute("SELECT * FROM players WHERE id=%s", (id,))
+    record = database.cur.fetchone()
+    player = Player(**record)
     if player.xp == -1:
         raise PlayerBlacklisted(player.id, player.name)
     return player
@@ -279,10 +280,10 @@ def get_top(key) -> tuple:
     else:
         database.cur.execute("SELECT * FROM players ORDER BY level DESC, xp DESC")
         suffix = ""
-    top_tuples = database.cur.fetchmany(15)
+    top_records = database.cur.fetchmany(15)
     top_players = []
-    for tup in top_tuples:
-        top_players.append(Player(*tup))
+    for record in top_records:
+        top_players.append(Player(**record))
     return top_players, suffix
 
 
@@ -290,7 +291,7 @@ def registered(id: int) -> bool:
     """
     Checks whether a specific user is registered or not
     """
-    database.cur.execute("SELECT * FROM players WHERE id=:id", {"id": id})
+    database.cur.execute("SELECT * FROM players WHERE id=%s", (id,))
     if len(database.cur.fetchall()) == 1:
         return True
     return False

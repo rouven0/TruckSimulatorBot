@@ -10,4 +10,4 @@ con = mysql.connector.connect(
     passwd=getenv("MYSQL_PASSWORD"),
     database=getenv("MYSQL_DATABASE"),
 )
-cur = con.cursor()
+cur = con.cursor(dictionary=True)
