@@ -298,9 +298,9 @@ def get_count(table: str) -> int:
     """
     Returns the player count
     """
-    database.cur.execute("SELECT COUNT(*) FROM %s", (table,))
-    number_tuple = database.cur.fetchall()
-    return number_tuple[0][0]
+    database.cur.execute("SELECT COUNT(*) FROM " + table)
+    record = database.cur.fetchone()
+    return record[f"COUNT(*)"]
 
 
 class DrivingPlayer(Player):
@@ -338,7 +338,7 @@ def is_driving(id: int) -> bool:
     """
     Checks whether a specific user is driving
     """
-    database.cur.execute("SELECT * FROM driving_players WHERE id=%s", (id,))
+    database.cur.execute("SELECT * FROM driving_players WHERE user_id=%s", (id,))
     if len(database.cur.fetchall()) == 1:
         return True
     return False

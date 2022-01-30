@@ -3,7 +3,7 @@ from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Em
 from flask_discord_interactions.models.command import CommandOptionType
 from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles
 from flask_discord_interactions.models.user import User
-from flask_discord_interactions.models.embed import Author, Field, Footer, Media
+from flask_discord_interactions.models.embed import Author, Field
 
 import resources.players as players
 import resources.items as items
@@ -79,18 +79,6 @@ def slots_handler(ctx, author_id: int, amount: int) -> Message:
         return Message(deferred=True, update=True)
     return Message(
         embed=get_slots_embed(ctx.author, amount),
-        components=[
-            ActionRow(
-                components=[
-                    Button(
-                        label="Spin again!",
-                        custom_id=[slots_handler, ctx.author.id, amount],
-                        style=ButtonStyles.SUCCESS,
-                        emoji={"name": "🎰"},
-                    )
-                ]
-            )
-        ],
         update=True,
     )
 

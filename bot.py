@@ -15,9 +15,12 @@ import resources.players as players
 import config
 
 from admin import admin_bp
+from system import system_bp
 from stats import profile_bp
 from misc import misc_bp
 from gambling import gambling_bp
+from guide import guide_bp
+from truck import truck_bp
 
 app = Flask(__name__)
 discord = DiscordInteractions(app)
@@ -91,9 +94,12 @@ if "--admin" in sys.argv:
     discord.update_commands(guild_id=839580174282260510)
     sys.exit()
 
+discord.register_blueprint(system_bp)
 discord.register_blueprint(profile_bp)
 discord.register_blueprint(misc_bp)
 discord.register_blueprint(gambling_bp)
+discord.register_blueprint(guide_bp)
+discord.register_blueprint(truck_bp)
 
 if "--update" in sys.argv:
     discord.update_commands(guild_id=830928381100556338)

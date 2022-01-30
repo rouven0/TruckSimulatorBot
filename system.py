@@ -1,82 +1,78 @@
-from resources.companies import CompanyNotFound
-import traceback
+from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
+from flask_discord_interactions.models.embed import Field, Footer, Media
+from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles
+
 from datetime import datetime
 from math import floor
-import logging
-
-import discord
-from discord.ext import commands
-from discord_slash import cog_ext
-from discord_slash.utils.manage_commands import create_option, create_permission
-from discord_slash.utils.manage_components import (
-    create_button,
-    create_actionrow,
-)
 
 import config
-import resources.database as database
 import resources.players as players
-from resources.trucks import TruckNotFound
 
 
-class System(commands.Cog):
-    def __init__(self, bot: commands.Bot) -> None:
-        self.bot = bot
-        self.start_time = datetime.now()
-        self.owner_avatar = ""
-        super().__init__()
+start_time = datetime.now()
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        self.owner_avatar = (await self.bot.fetch_user(692796548282712074)).avatar_url
+system_bp = DiscordInteractionsBlueprint()
 
-    async def get_info_embed(self) -> discord.Embed:
-        info_embed = discord.Embed(title="Truck Simulator info", colour=discord.Colour.lighter_grey())
-        info_embed.set_footer(
-            text="Developer: r5#2253",
-            icon_url=self.owner_avatar,
-        )
-        info_embed.set_thumbnail(url=self.bot.user.avatar_url)
 
-        uptime = datetime.now() - self.start_time
-        days = uptime.days
-        hours = floor(uptime.seconds / 3600)
-        minutes = floor(uptime.seconds / 60) - hours * 60
-        seconds = uptime.seconds - hours * 3600 - minutes * 60
-        player_count = await players.get_count("players")
-        driving_player_count = await players.get_count("driving_players")
-        system_info = (
-            f"```Uptime: {days}d {hours}h {minutes}m {seconds}s\n"
-            f"Latency: {str(round(self.bot.latency * 1000))} ms\n"
-            f"Registered Players: {player_count}\n"
-            f"Driving Trucks: {driving_player_count}```"
-        )
-        info_embed.add_field(name="System information", value=system_info, inline=False)
+def get_info_embed() -> Embed:
+    info_embed = Embed(
+        title="Truck Simulator info",
+        color=config.EMBED_COLOR,
+        footer=Footer(text="Developer: r5#2253"),
+        thumbnail=Media(url=config.SELF_AVATAR_URL),
+    )
 
-        credits = (
-            "<:lebogo:897861933418565652> LeBogo#3073 - _Testing helper_ - Contributed 2 lines of code\n"
-            "<:panda:897860673898426462> FlyingPanda#0328 - _EPIC Artist_ - Drew almost all of the images you see (and had the idea of this bot)\n"
-            "<:miri:897860673546117122> Miriel#0001 - _The brain_ - Gave a lot of great tips and constructive feedback"
-        )
-        info_embed.add_field(name="Credits", value=credits, inline=False)
-        return info_embed
+    uptime = datetime.now() - start_time
+    days = uptime.days
+    hours = floor(uptime.seconds / 3600)
+    minutes = floor(uptime.seconds / 60) - hours * 60
+    seconds = uptime.seconds - hours * 3600 - minutes * 60
+    player_count = players.get_count("players")
+    driving_player_count = players.get_count("driving_players")
+    job_count = players.get_count("jobs")
+    company_count = players.get_count("companies")
+    system_info = (
+        f"```Uptime: {days}d {hours}h {minutes}m {seconds}s\n"
+        f"Registered Players: {player_count}\n"
+        f"Running Jobs: {job_count}\n"
+        f"Registered Companies: {company_count}\n"
+        f"Driving Trucks: {driving_player_count}```"
+    )
 
-    @cog_ext.cog_slash()
-    async def info(self, ctx) -> None:
-        """
-        System information and credits
-        """
-        await ctx.send(
-            embed=await self.get_info_embed(),
-            components=[
-                create_actionrow(
-                    create_button(
-                        style=2, label="Refresh data", custom_id="refresh", emoji=self.bot.get_emoji(903581225149665290)
+    credits = (
+        "<:lebogo:897861933418565652> LeBogo#3073 - _Testing helper_ - Contributed 2 lines of code\n"
+        "<:panda:897860673898426462> FlyingPanda#0328 - _EPIC Artist_ - Drew almost all of the images you see (and had the idea of this bot)\n"
+        "<:miri:897860673546117122> Miriel#0001 - _The brain_ - Gave a lot of great tips and constructive feedback"
+    )
+    info_embed.fields = [
+        Field(name="System information", value=system_info, inline=False),
+        Field(name="Cretits", value=credits, inline=False),
+    ]
+    return info_embed
+
+
+@system_bp.command()
+def info(ctx) -> Message:
+    """
+    System information and credits
+    """
+    return Message(
+        embed=get_info_embed(),
+        components=[
+            ActionRow(
+                components=[
+                    Button(
+                        style=ButtonStyles.SECONDARY,
+                        label="Refresh data",
+                        custom_id=refresh,
+                        emoji={"name": "reload", "id": 903581225149665290},
                     )
-                )
-            ],
-        )
+                ]
+            )
+        ],
+    )
 
-    @cog_ext.cog_component()
-    async def refresh(self, ctx):
-        await ctx.edit_origin(embed=await self.get_info_embed())
+
+@system_bp.custom_handler(custom_id="refresh_system_info")
+def refresh(ctx):
+    return Message(embed=get_info_embed(), update=True)
