@@ -46,7 +46,7 @@ def get_info_embed() -> Embed:
     )
     info_embed.fields = [
         Field(name="System information", value=system_info, inline=False),
-        Field(name="Cretits", value=credits, inline=False),
+        Field(name="Credits", value=credits, inline=False),
     ]
     return info_embed
 

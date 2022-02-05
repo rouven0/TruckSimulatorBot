@@ -172,9 +172,9 @@ class Player:
         Get the Players current job
         """
         database.cur.execute("SELECT * FROM jobs WHERE player_id=%s", (self.id,))
-        job_tuple = database.cur.fetchall()
-        if len(job_tuple) > 0:
-            return Job(*(job_tuple[0]))
+        records = database.cur.fetchall()
+        if len(records) > 0:
+            return Job(**records[0])
         else:
             return None
 
@@ -254,6 +254,7 @@ def get(id: int) -> Player:
     """
     Get one player from the database
     """
+    id = int(id)
     if not registered(id):
         raise PlayerNotRegistered(id)
     database.cur.execute("SELECT * FROM players WHERE id=%s", (id,))
@@ -311,15 +312,15 @@ class DrivingPlayer(Player):
         last_action_time: Time used to keep the list clean and time out drives
     """
 
-    def __init__(self, *args, message_id=0, last_action_time=0) -> None:
-        super().__init__(*args)
-        self.message_id = message_id
+    def __init__(self, followup_url="", last_action_time=0, **kwargs) -> None:
+        self.followup_url = followup_url
         self.last_action_time = last_action_time
+        super().__init__(**kwargs)
 
     def start_drive(self) -> None:
         database.cur.execute(
-            "INSERT INTO driving_players(user_id, message_id, last_action_time) VALUES (%s,%s,%s)",
-            (self.id, self.message_id, self.last_action_time),
+            "INSERT INTO driving_players(id, followup_url, last_action_time) VALUES (%s,%s,%s)",
+            (self.id, self.followup_url, self.last_action_time),
         )
         database.con.commit()
         logging.info("%s started driving", self.name)
@@ -329,8 +330,12 @@ class DrivingPlayer(Player):
         database.con.commit()
         logging.info("%s stopped driving", self.name)
 
-    def set_last_action_time(self, time) -> None:
+    def update(self, time, followup_url) -> None:
+        """
+        Update the player on every interaction
+        """
         database.cur.execute("UPDATE driving_players SET last_action_time=%s WHERE id=%s", (time, self.id))
+        database.cur.execute("UPDATE driving_players SET followup_url=%s WHERE id=%s", (followup_url, self.id))
         database.con.commit()
 
 
@@ -338,47 +343,34 @@ def is_driving(id: int) -> bool:
     """
     Checks whether a specific user is driving
     """
-    database.cur.execute("SELECT * FROM driving_players WHERE user_id=%s", (id,))
+    database.cur.execute("SELECT * FROM driving_players WHERE id=%s", (id,))
     if len(database.cur.fetchall()) == 1:
         return True
     return False
 
 
-def is_active_drive(id: int, message_id: int) -> bool:
-    """
-    Checks whether an interaction is done by a driving player
-    """
-    database.cur.execute("SELECT * FROM driving_players WHERE id=%s AND message_id=%s", (id, message_id))
-    if len(database.cur.fetchall()) == 1:
-        return True
-    return False
-
-
-def get_driving_player(id: int, message_id: int = None) -> DrivingPlayer:
-    if message_id is not None:
-        if is_active_drive(id, message_id):
-            database.cur.execute("SELECT * FROM driving_players WHERE id=%s AND message_id=%s", (id, message_id))
-            record = database.cur.fetchone()
-            last_action_time = record["last_action_time"]
-            return DrivingPlayer(*tuple(get(id)), message_id=message_id, last_action_time=last_action_time)
-        else:
-            raise NotDriving()
-    else:
-        # get drive by user id only
+def get_driving_player(id: int, check: int = None) -> DrivingPlayer:
+    id = int(id)
+    if check and id != check:
+        raise NotDriving()
+    if is_driving(id):
         database.cur.execute("SELECT * FROM driving_players WHERE id=%s", (id,))
         record = database.cur.fetchone()
+        followup_url = record["followup_url"]
         last_action_time = record["last_action_time"]
-        return DrivingPlayer(*tuple(get(id)), message_id=message_id, last_action_time=last_action_time)
+        return DrivingPlayer(**vars(get(id)), followup_url=followup_url, last_action_time=last_action_time)
+    else:
+        raise NotDriving()
 
 
-def get_all_driving_players() -> list:
+def get_all_driving_players() -> list[DrivingPlayer]:
     database.cur.execute("SELECT * from driving_players")
     driving_players = []
     for record in database.cur.fetchall():
         driving_players.append(
             DrivingPlayer(
-                *tuple(get(record["user_id"])),
-                message_id=record["message_id"],
+                **vars(get(record["id"])),
+                followup_url=record["followup_url"],
                 last_action_time=record["last_action_time"],
             )
         )

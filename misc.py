@@ -19,13 +19,13 @@ def invite(ctx) -> Message:
     """
     Invite the truck simulator to your servers
     """
-    support_embed = Embed(
+    invite_embed = Embed(
         title="Click here to add the bot to your servers",
         description="Go spread the word of the Truck Simulator",
-        url="https://misc_bp.com/api/oauth2/authorize?client_id=831052837353816066&scope=applications.commands",
+        url="https://discord.com/api/oauth2/authorize?client_id=831052837353816066&scope=applications.commands",
         color=config.EMBED_COLOR,
     )
-    return Message(embed=support_embed)
+    return Message(embed=invite_embed)
 
 
 @misc_bp.command()

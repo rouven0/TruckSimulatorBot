@@ -87,7 +87,7 @@ def get(name: str) -> Company:
     record = database.cur.fetchone()
 
     try:
-        company = Company(**record))
+        company = Company(**record)
         return company
     except TypeError:
         raise CompanyNotFound()

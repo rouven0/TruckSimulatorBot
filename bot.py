@@ -17,6 +17,7 @@ import config
 from admin import admin_bp
 from system import system_bp
 from stats import profile_bp
+from driving import driving_bp
 from misc import misc_bp
 from gambling import gambling_bp
 from guide import guide_bp
@@ -46,6 +47,12 @@ def not_enough_money(error):
     return Message(
         content="You don't have enough money to do this.",
     ).dump()
+
+
+# TODO uncomment in once the drive system works
+# @app.errorhandler(players.NotDriving)
+# def not_driving(error):
+# return {"type": 6}
 
 
 @app.errorhandler(players.PlayerNotRegistered)
@@ -89,6 +96,10 @@ def handle_exception(error):
     return response
 
 
+if "--remove-global" in sys.argv:
+    discord.update_commands()
+    sys.exit()
+
 if "--admin" in sys.argv:
     discord.register_blueprint(admin_bp)
     discord.update_commands(guild_id=839580174282260510)
@@ -96,6 +107,7 @@ if "--admin" in sys.argv:
 
 discord.register_blueprint(system_bp)
 discord.register_blueprint(profile_bp)
+discord.register_blueprint(driving_bp)
 discord.register_blueprint(misc_bp)
 discord.register_blueprint(gambling_bp)
 discord.register_blueprint(guide_bp)
@@ -114,4 +126,4 @@ discord.register_blueprint(admin_bp)
 discord.set_route(getenv("ROUTE", default=""))
 
 if __name__ == "__main__":
-    app.run(port=9001)
+    app.run(port=9001, debug=True)
