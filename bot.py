@@ -18,6 +18,7 @@ from admin import admin_bp
 from system import system_bp
 from stats import profile_bp
 from driving import driving_bp
+from economy import economy_bp
 from misc import misc_bp
 from gambling import gambling_bp
 from guide import guide_bp
@@ -49,10 +50,9 @@ def not_enough_money(error):
     ).dump()
 
 
-# TODO uncomment in once the drive system works
-# @app.errorhandler(players.NotDriving)
-# def not_driving(error):
-# return {"type": 6}
+@app.errorhandler(players.NotDriving)
+def not_driving(error):
+    return {"type": 6}
 
 
 @app.errorhandler(players.PlayerNotRegistered)
@@ -108,6 +108,7 @@ if "--admin" in sys.argv:
 discord.register_blueprint(system_bp)
 discord.register_blueprint(profile_bp)
 discord.register_blueprint(driving_bp)
+discord.register_blueprint(economy_bp)
 discord.register_blueprint(misc_bp)
 discord.register_blueprint(gambling_bp)
 discord.register_blueprint(guide_bp)
