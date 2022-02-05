@@ -3,6 +3,11 @@ from flask_discord_interactions.models.component import ActionRow, Button
 from flask_discord_interactions.models.user import User
 from flask_discord_interactions.models.embed import Author, Field, Footer
 
+import threading
+from os import getenv
+import mysql.connector
+from time import time, sleep
+
 import resources.players as players
 import resources.places as places
 import resources.items as items
@@ -11,6 +16,33 @@ import resources.symbols as symbols
 import resources.trucks as trucks
 
 import config
+import logging
+
+
+def check_jobs() -> None:
+    """
+    Drives that are inactive for more than 15 minutes get stopped
+    """
+    con: mysql.connector.CMySQLConnection = mysql.connector.connect(
+        host=getenv("MYSQL_HOST"),
+        user=getenv("MYSQL_USER"),
+        passwd=getenv("MYSQL_PASSWORD"),
+        database=getenv("MYSQL_DATABASE"),
+    )
+    cur = con.cursor(dictionary=True)
+    while True:
+        cur.execute("SELECT * from jobs")
+        jobs = cur.fetchall()
+        con.commit()
+        for job in jobs:
+            if time() - job["create_time"] > 604800:
+                logging.info("Deleted a job by player with id %s", job["player_id"])
+                cur.execute("DELETE FROM jobs WHERE player_id=%s", (job["player_id"],))
+                con.commit()
+        sleep(5)
+
+
+threading.Thread(target=check_jobs, daemon=True).start()
 
 economy_bp = DiscordInteractionsBlueprint()
 

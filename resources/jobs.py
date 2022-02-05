@@ -3,6 +3,7 @@ This module provides the Job class and all the methods to operate with jobs in t
 """
 from random import randint
 from math import sqrt
+from time import time
 import resources.places as places
 
 STATE_CLAIMED = 0
@@ -26,10 +27,17 @@ class Job:
         place_to: Place the player has to drive to when the truck is loaded
         state: current state, see get_state() for more information about the states
         reward: Amount of money the player gets for this job
+        create_time: timestamp this job was created
     """
 
     def __init__(
-        self, player_id: int, place_from: places.Place, place_to: places.Place, state: int, reward: int
+        self,
+        player_id: int,
+        place_from: places.Place,
+        place_to: places.Place,
+        state: int,
+        reward: int,
+        create_time: int,
     ) -> None:
         self.player_id = player_id
         if isinstance(place_from, str):
@@ -40,6 +48,7 @@ class Job:
             self.place_to = place_to
         self.state = state
         self.reward = reward
+        self.create_time = create_time
 
     def __iter__(self):
         self._n = 0
@@ -73,7 +82,7 @@ def generate(player) -> Job:
     job_miles_y = abs(place_from.position[1] - place_to.position[1])
     job_reward = round(sqrt(job_miles_x ** 2 + job_miles_y ** 2) * 79)
     reward = round((job_reward + arrival_reward) * (player.level + 1))
-    new_job = Job(player.id, place_from, place_to, 0, reward)
+    new_job = Job(player.id, place_from, place_to, 0, reward, int(time()))
     return new_job
 
 

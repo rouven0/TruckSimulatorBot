@@ -3,9 +3,13 @@ from flask_discord_interactions.context import Context
 from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
 
+import threading
+from os import getenv
+import mysql.connector
 import requests
+import logging
 from datetime import datetime
-from time import time
+from time import time, sleep
 
 import config
 import resources.players as players
@@ -17,6 +21,33 @@ import resources.symbols as symbols
 import resources.assets as assets
 import resources.jobs as jobs
 import resources.trucks as trucks
+
+
+def check_drives() -> None:
+    """
+    Drives that are inactive for more than 15 minutes get stopped
+    """
+    con: mysql.connector.CMySQLConnection = mysql.connector.connect(
+        host=getenv("MYSQL_HOST"),
+        user=getenv("MYSQL_USER"),
+        passwd=getenv("MYSQL_PASSWORD"),
+        database=getenv("MYSQL_DATABASE"),
+    )
+    cur = con.cursor(dictionary=True)
+    while True:
+        cur.execute("SELECT * from driving_players")
+        players = cur.fetchall()
+        con.commit()
+        for player in players:
+            if time() - player["last_action_time"] > 840:
+                logging.info("Driving of %s timed out", player["id"])
+                requests.patch(url=player["followup_url"] + "/messages/@original", json={"components": []})
+                cur.execute("DELETE FROM driving_players WHERE id=%s", (player["id"],))
+                con.commit()
+        sleep(5)
+
+
+threading.Thread(target=check_drives, daemon=True).start()
 
 driving_bp = DiscordInteractionsBlueprint()
 
@@ -196,6 +227,7 @@ def stop(ctx, player_id: int):
 @driving_bp.custom_handler(custom_id="load")
 def load(ctx, player_id: int):
     player = players.get_driving_player(ctx.author.id, check=player_id)
+    player.update(int(time()), ctx.followup_url())
 
     item = items.get(places.get(player.position).produced_item)
     player.load_item(item)
@@ -226,11 +258,11 @@ def load(ctx, player_id: int):
 @driving_bp.custom_handler(custom_id="unload")
 def unload(ctx, player_id: int):
     player = players.get_driving_player(ctx.author.id, check=player_id)
+    player.update(int(time()), ctx.followup_url())
 
     drive_embed = get_drive_embed(player, ctx.author.avatar_url)
     item_options: list[SelectMenuOption] = []
     for item in player.loaded_items:
-        # add the item if it doesn't already is in the list
         if item.name not in [o.value for o in item_options]:
             item_options.append(
                 SelectMenuOption(
@@ -444,14 +476,3 @@ def addressbook(ctx) -> Message:
         places_embed.fields.append(Field(name=place.name, value=str(place.position)))
     print(places_embed)
     return Message(embed=places_embed)
-
-
-# TODO find a solution
-# def check_drives(self) -> None:
-# """
-# Drives that are inactive for more than 1 hour get stopped
-# """
-# for player in players.get_all_driving_players():
-# if time() - player.last_action_time > 3600:
-# logging.info("Driving of %s timed out", player.name)
-# player.stop_drive()

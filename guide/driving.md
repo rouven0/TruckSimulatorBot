@@ -18,3 +18,6 @@ In the following table I will explain you, what each button does to your truck
 
 **Special buttons**
 <:ts_gas:859857979619541022> will refill your truck
+
+**Notice:**
+When you are inactive for more than 15 minutes your truck will be stopped.

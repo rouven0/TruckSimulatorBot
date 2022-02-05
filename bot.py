@@ -126,7 +126,7 @@ if "--deploy" in sys.argv:
 
 discord.register_blueprint(admin_bp)
 
-discord.set_route(getenv("ROUTE", default=""))
+discord.set_route("/interactions")
 
 if __name__ == "__main__":
     app.run(port=9001, debug=True)
