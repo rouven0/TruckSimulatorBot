@@ -7,6 +7,7 @@ import config
 import resources.players as players
 import resources.trucks as trucks
 import resources.levels as levels
+import resources.companies as companies
 
 profile_bp = DiscordInteractionsBlueprint()
 
@@ -62,7 +63,6 @@ def get_profile_embed(user: User) -> Embed:
         fields=[],
         image=Media(url=truck.image_url),
     )
-    # TODO add companies
     xp = "{:,}".format(player.xp)
     next_xp = "{:,}".format(levels.get_next_xp(player.level))
     money = "{:,}".format(player.money)
@@ -75,11 +75,12 @@ def get_profile_embed(user: User) -> Embed:
     )
     profile_embed.fields.append(Field(name="Gas left", value=f"{player.gas} l", inline=False))
     profile_embed.fields.append(Field(name="Current truck", value=truck.name))
-    # try:
-    # company = await companies.get(player.company)
-    # profile_embed.fields.append(Field(name="Company", value=f"{company.logo} {company.name}")
-    # except companies.CompanyNotFound:
-    # pass
+
+    try:
+        company = companies.get(player.company)
+        profile_embed.fields.append(Field(name="Company", value=f"{company.logo} {company.name}"))
+    except companies.CompanyNotFound:
+        pass
     return profile_embed
 
 

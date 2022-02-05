@@ -3,7 +3,7 @@ This module contains the company class
 """
 
 import logging
-from typing import Union
+from typing import Optional, Union
 import resources.database as database
 from resources.players import Player
 
@@ -45,7 +45,7 @@ class Company:
             self.hq_position = hq_position
         self.founder = founder
         self.logo = kwargs.pop("logo", f":regional_indicator_{str.lower(name[0])}:")
-        self.net_worth = kwargs.pop("net_worth", 0)
+        self.net_worth = kwargs.pop("net_worth", 3000)
 
     def __iter__(self):
         self._n = 0
@@ -76,27 +76,32 @@ class Company:
     def get_members(self) -> list[Player]:
         members = []
         database.cur.execute("SELECT * FROM players WHERE company=%s", (self.name,))
-        members = database.cur.fetchall()
-        for member in members:
+        record = database.cur.fetchall()
+        for member in record:
             members.append(Player(**member))
         return members
 
 
-def get(name: str) -> Company:
+def exists(name: Optional[str]) -> bool:
+    database.cur.execute("SELECT * FROM companies WHERE name=%s", (name,))
+    if len(database.cur.fetchall()) == 1:
+        return True
+    return False
+
+
+def get(name: Optional[str]) -> Company:
+    if not exists(name):
+        raise CompanyNotFound()
     database.cur.execute("SELECT * FROM companies WHERE name=%s", (name,))
     record = database.cur.fetchone()
-
-    try:
-        company = Company(**record)
-        return company
-    except TypeError:
-        raise CompanyNotFound()
+    company = Company(**record)
+    return company
 
 
 def get_all() -> list[Company]:
-    cur = database.cur.execute("SELECT * from companies")
+    database.cur.execute("SELECT * from companies")
     companies = []
-    for record in cur.fetchall():
+    for record in database.cur.fetchall():
         companies.append(Company(**record))
     return companies
 

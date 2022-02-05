@@ -69,7 +69,7 @@ class Player:
                     self.loaded_items.append(items.get(item_name))
         else:
             self.loaded_items: list = loaded_items
-        self.company = kwargs.pop("position", None)
+        self.company = kwargs.pop("company", None)
 
     def __iter__(self):
         self._n = 0

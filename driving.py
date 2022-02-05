@@ -26,7 +26,7 @@ def get_drive_embed(player: players.Player, avatar_url: str) -> Embed:
     Returns the drive embed that includes all the information about the current position and gas
     """
     place = places.get(player.position)
-    # all_companies = companies.get_all()
+    all_companies = companies.get_all()
     drive_embed = Embed(
         description="Even more stable now",
         color=config.EMBED_COLOR,
@@ -36,7 +36,7 @@ def get_drive_embed(player: players.Player, avatar_url: str) -> Embed:
         fields=[],
     )
 
-    drive_embed.fields.append(Field(name="Minimap", value=generate_minimap(player, []), inline=False))
+    drive_embed.fields.append(Field(name="Minimap", value=generate_minimap(player, all_companies), inline=False))
     drive_embed.fields.append(Field(name="Position", value=str(player.position)))
     drive_embed.fields.append(Field(name="Gas left", value=f"{player.gas} l"))
 
@@ -61,16 +61,16 @@ def get_drive_embed(player: players.Player, avatar_url: str) -> Embed:
         drive_embed.image = Media(url=assets.get_place_image(player, place))
     else:
         drive_embed.image = Media(url=assets.get_default(player))
-    # if player.position in [c.hq_position for c in all_companies]:
-    # for company in all_companies:
-    # if company.hq_position == player.position:
-    # drive_embed.fields.append(
-    # Field(
-    # name="What is here?",
-    # value=f"A company called **{company.name}**",
-    # inline=False,
-    # )
-    # )
+    if player.position in [c.hq_position for c in all_companies]:
+        for company in all_companies:
+            if company.hq_position == player.position:
+                drive_embed.fields.append(
+                    Field(
+                        name="What is here?",
+                        value=f"A company called **{company.name}**",
+                        inline=False,
+                    )
+                )
     return drive_embed
 
 

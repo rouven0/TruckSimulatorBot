@@ -23,6 +23,7 @@ from misc import misc_bp
 from gambling import gambling_bp
 from guide import guide_bp
 from truck import truck_bp
+from companies import company_bp
 
 app = Flask(__name__)
 discord = DiscordInteractions(app)
@@ -113,6 +114,7 @@ discord.register_blueprint(misc_bp)
 discord.register_blueprint(gambling_bp)
 discord.register_blueprint(guide_bp)
 discord.register_blueprint(truck_bp)
+discord.register_blueprint(company_bp)
 
 if "--update" in sys.argv:
     discord.update_commands(guild_id=830928381100556338)
