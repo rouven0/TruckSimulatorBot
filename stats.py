@@ -29,7 +29,7 @@ def register_profile(ctx) -> Message:
     )
     welcome_file.close()
     if not players.registered(ctx.author.id):
-        players.insert(players.Player(int(ctx.author.id), ctx.author.username, money=1000))
+        players.insert(players.Player(int(ctx.author.id), ctx.author.username, money=1000, gas=600))
         welcome_embed.footer = Footer(text="Your profile has been created")
     return Message(embed=welcome_embed)
 

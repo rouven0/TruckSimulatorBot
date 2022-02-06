@@ -83,6 +83,7 @@ class Player:
                 return _format_pos_to_db(self.__getattribute__(attr))
             elif attr == "loaded_items":
                 return _format_items_to_db(self.__getattribute__(attr))
+
             else:
                 return self.__getattribute__(attr)
         else:
