@@ -309,7 +309,7 @@ def unload_items(ctx, player_id: int):
         Field(name="Unloading successful", value=f"You removed {item_string} from your truck", inline=False)
     )
 
-    message = Message(embed=drive_embed, components=get_buttons(player))
+    message = Message(embed=drive_embed, components=get_buttons(player), update=True)
 
     # add a notification embed if a job is done
     if (
@@ -349,10 +349,7 @@ def unload_items(ctx, player_id: int):
 @driving_bp.custom_handler(custom_id="cancel")
 def cancel(ctx, player_id: int):
     player = players.get_driving_player(ctx.author.id, check=player_id)
-    return Message(
-        embed=get_drive_embed(player, ctx.author.avatar_url),
-        components=get_buttons(player),
-    )
+    return Message(embed=get_drive_embed(player, ctx.author.avatar_url), components=get_buttons(player), update=True)
 
 
 @driving_bp.custom_handler(custom_id=str(symbols.LEFT))

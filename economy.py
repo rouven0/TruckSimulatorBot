@@ -154,7 +154,7 @@ def refill(ctx, player_id: int):
         for c in actionRow["components"]:
             c.pop("hash")
         components.append(ActionRow(components=[Button(**c) for c in actionRow["components"]]))
-    return Message(embeds=[drive_embed, refill_embed], components=components)
+    return Message(embeds=[drive_embed, refill_embed], components=components, update=True)
 
 
 @economy_bp.command()
