@@ -300,6 +300,8 @@ def get_count(table: str) -> int:
     """
     Returns the player count
     """
+    # update the connection in case of the timeout-thread doing something
+    database.con.commit()
     database.cur.execute("SELECT COUNT(*) FROM " + table)
     record = database.cur.fetchone()
     return record[f"COUNT(*)"]
@@ -344,6 +346,8 @@ def is_driving(id: int) -> bool:
     """
     Checks whether a specific user is driving
     """
+    # update the connection in case of the timeout-thread doing something
+    database.con.commit()
     database.cur.execute("SELECT * FROM driving_players WHERE id=%s", (id,))
     if len(database.cur.fetchall()) == 1:
         return True
@@ -365,6 +369,8 @@ def get_driving_player(id: int, check: int = None) -> DrivingPlayer:
 
 
 def get_all_driving_players() -> list[DrivingPlayer]:
+    # update the connection in case of the timeout-thread doing something
+    database.con.commit()
     database.cur.execute("SELECT * from driving_players")
     driving_players = []
     for record in database.cur.fetchall():
