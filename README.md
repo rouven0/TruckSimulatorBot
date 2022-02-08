@@ -1,15 +1,26 @@
 # TruckSimulatorBot
-Small Truck Simulator bot using the discord py lib
+Small Truck Simulator app using the [flask-discord-interactions](https://github.com/Breq16/flask-discord-interactions) library
 
-## Install
-Simply install and set up this bot using `make`
+## Self-host this bot
+### Install
+Simply install and set up this bot using `make`.
+Before, please provide a .env file containing the following variables:
+```env
+DISCORD_CLIENT_ID
+DISCORD_PUBLIC_KEY
+DISCORD_CLIENT_SECRET
+MYSQL_HOST
+MYSQL_USER
+MYSQL_PASSWORD
+MYSQL_DATABASE
+```
 
 Superuser permissions are required to set up the bot's systemd service
 
-## Remove the bot
+### Remove the bot
 Use `make uninstall` to remove the bot's systemd service before you delete the bot directory.
 
-## Projekt Description (copied from top.gg)
+## Projekt Description
 
 ### Basic controls
 The virtual map is the heart of the Truck Simulator. Everything is a place that you can drive to. Some commands are bound to specific places, some are available everywhere.
