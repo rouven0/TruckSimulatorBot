@@ -4,6 +4,7 @@ This module provides the Job class and all the methods to operate with jobs in t
 from random import randint
 from math import sqrt
 from time import time
+import resources.database as database
 import resources.places as places
 
 STATE_CLAIMED = 0
@@ -97,3 +98,14 @@ def get_state(job: Job) -> str:
     if job.state == 2:
         return "Your job is done and you got ${:,}.".format(job.reward)
     return "Something went wrong"
+
+
+def get_all() -> list[Job]:
+    # update the connection in case of the timeout-thread doing something
+    database.con.commit()
+    database.cur.execute("SELECT * FROM jobs")
+    all_jobs = []
+    record = database.cur.fetchall()
+    for job in record:
+        all_jobs.append(Job(**job))
+    return all_jobs

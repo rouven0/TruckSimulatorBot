@@ -3,13 +3,9 @@ from flask_discord_interactions.context import Context
 from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
 
-import threading
-from os import getenv
-import mysql.connector
 import requests
-import logging
 from datetime import datetime
-from time import time, sleep
+from time import time
 
 import config
 import resources.players as players
@@ -21,33 +17,6 @@ import resources.symbols as symbols
 import resources.assets as assets
 import resources.jobs as jobs
 import resources.trucks as trucks
-
-
-def check_drives() -> None:
-    """
-    Drives that are inactive for more than 15 minutes get stopped
-    """
-    con: mysql.connector.CMySQLConnection = mysql.connector.connect(
-        host=getenv("MYSQL_HOST"),
-        user=getenv("MYSQL_USER"),
-        passwd=getenv("MYSQL_PASSWORD"),
-        database=getenv("MYSQL_DATABASE"),
-    )
-    cur = con.cursor(dictionary=True)
-    while True:
-        cur.execute("SELECT * from driving_players")
-        players = cur.fetchall()
-        con.commit()
-        for player in players:
-            if time() - player["last_action_time"] > 840:
-                logging.info("Driving of %s timed out", player["id"])
-                requests.patch(url=player["followup_url"] + "/messages/@original", json={"components": []})
-                cur.execute("DELETE FROM driving_players WHERE id=%s", (player["id"],))
-                con.commit()
-        sleep(5)
-
-
-threading.Thread(target=check_drives, daemon=True).start()
 
 driving_bp = DiscordInteractionsBlueprint()
 

@@ -1,0 +1,10 @@
+[Unit]
+Description=Truck Simulator Discord bot
+
+[Service]
+User=USER
+WorkingDirectory=WORKINGDIRECTORY
+ExecStart=WORKINGDIRECTORY/venv/bin/python3 timeouts.py
+
+[Install]
+WantedBy=multi-user.target
