@@ -230,7 +230,8 @@ def load(ctx, player_id: int):
     player.update(int(time()), ctx.followup_url())
 
     item = items.get(places.get(player.position).produced_item)
-    player.load_item(item)
+    if item.name not in [i.name for i in player.loaded_items]:
+        player.load_item(item)
     job_message = None
 
     current_job = player.get_job()
