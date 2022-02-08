@@ -197,25 +197,33 @@ def confirm_leave(ctx, player_id: int):
     return Message(f"<@{player.id}> You left **{player.company}**", components=[], update=True)
 
 
-@company_group.command(annotations={"logo": "Any emoji"})
-def update(ctx, logo: str):
+@company_group.command(annotations={"name": "The new name", "logo": "Any emoji"})
+def update(ctx, name: str = None, logo: str = None):
     """
     Change your company's logo
     """
     player = players.get(int(ctx.author.id))
-    if re.match(
-        # did I mention that I love regex?
-        # match any emoji
-        r"^([\u2600-\u26ff]|[\U0001f000-\U0001faff])|<a*:\w*:\d+>$",
-        logo,
-    ):
-        company = companies.get(player.company)
-        if int(ctx.author.id) != company.founder:
-            return "You are not the company founder!"
-        companies.update(company, logo=logo)
-        return f"Done. Your company logo was set to {logo} Please note that your logo can be reset at any time if it is found not working or inappropriate"
-    else:
-        return "That's not an emoji"
+    company = companies.get(player.company)
+    if int(ctx.author.id) != company.founder:
+        return "You are not the company founder!"
+    if name:
+        if companies.exists(name):
+            return "A company with this make already exists, please choose another name"
+        else:
+            companies.update(company, name=name)
+            return f"Done. Your company was renamed to {name}"
+
+    if logo:
+        if re.match(
+            # did I mention that I love regex?
+            # match any emoji
+            r"^([\u2600-\u26ff]|[\U0001f000-\U0001faff])|<a*:\w*:\d+>$",
+            logo,
+        ):
+            companies.update(company, logo=logo)
+            return f"Done. Your company logo was set to {logo} Please note that your logo can be reset at any time if it is found not working or inappropriate"
+        else:
+            return "That's not an emoji"
 
 
 def get_company_embed(user, player, company) -> Embed:

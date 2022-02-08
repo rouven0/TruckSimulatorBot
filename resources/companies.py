@@ -122,11 +122,20 @@ def remove(company: Company) -> None:
 
 
 def update(
-    company: Company, logo: str = None, hq_position: list = None, founder: int = None, net_worth: int = None
+    company: Company,
+    name: str = None,
+    logo: str = None,
+    hq_position: list = None,
+    founder: int = None,
+    net_worth: int = None,
 ) -> None:
     """
     Updates a company in the database
     """
+    if name is not None:
+        database.cur.execute("UPDATE companies SET name=%s WHERE name=%s", (name, company.name))
+        database.cur.execute("UPDATE players SET company=%s WHERE company=%s", (name, company.name))
+        company.name = name
     if logo is not None:
         database.cur.execute("UPDATE companies SET logo=%s WHERE name=%s", (logo, company.name))
         company.logo = logo
