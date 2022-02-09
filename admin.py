@@ -1,5 +1,6 @@
 from flask_discord_interactions import DiscordInteractionsBlueprint, Permission
 from flask_discord_interactions.models.message import Message, Embed
+from flask_discord_interactions.models.embed import Field
 
 import resources.database as database
 import resources.players as players
@@ -57,3 +58,34 @@ def remove(ctx, user: str):
                 color=config.EMBED_COLOR,
             )
         )
+
+
+@admin_bp.command()
+def serverrules(ctx) -> Message:
+    """Truck Simulator server rules"""
+    rules_embed = Embed(title="Truck Simulator Server Rules", color=config.EMBED_COLOR)
+    rules_embed.fields.append(
+        Field(
+            name="Be civil and respectful",
+            value="Treat everyone with respect. Absolutely no harassment, witch hunting, sexism, racism, "
+            "or hate speech will be tolerated.",
+            inline=False,
+        )
+    )
+    rules_embed.fields.append(
+        Field(
+            name="No spam or self-promotion",
+            value="No spam or self-promotion (server invites, advertisements, etc) without permission "
+            "from a staff member. This includes DMing fellow members.",
+            inline=False,
+        )
+    )
+    rules_embed.fields.append(
+        Field(
+            name="No NSFW or obscene content",
+            value="This includes text, images, or links featuring nudity, sex, hard violence, "
+            "or other graphically disturbing content.",
+            inline=False,
+        )
+    )
+    return Message(embed=rules_embed)
