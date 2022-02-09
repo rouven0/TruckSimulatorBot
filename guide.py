@@ -24,9 +24,7 @@ guide_bp = DiscordInteractionsBlueprint()
     ]
 )
 def iteminfo(ctx, item: str) -> Message:
-    """
-    Prints some information about a specific item
-    """
+    """Prints some information about a specific item"""
     requested_item = items.get(item)
     item_embed = Embed(
         title=f"Item info for {requested_item.name}",
@@ -53,9 +51,7 @@ def iteminfo(ctx, item: str) -> Message:
     ],
 )
 def guide(ctx, topic: str) -> Message:
-    """
-    A nice little guide that helps you understand this bot
-    """
+    """A nice little guide that helps you understand this bot"""
     topic = str.lower(topic)
     guide_file = open(f"./guide/{topic}.md", "r")
     guide_embed = Embed(

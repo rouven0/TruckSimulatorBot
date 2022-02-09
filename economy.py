@@ -128,9 +128,7 @@ def refill(ctx, player_id: int):
 
 @economy_bp.command()
 def give(ctx, user: User, amount: int) -> Message:
-    """
-    Do I really have to explain this?
-    """
+    """Do I really have to explain this?"""
     amount = abs(int(amount))
     acceptor = players.get(int(user.id))
 
@@ -152,9 +150,7 @@ def give(ctx, user: User, amount: int) -> Message:
 
 @economy_bp.command()
 def minijobs(ctx) -> Message:
-    """
-    Prints out all permanently running minijobs
-    """
+    """Prints out all permanently running minijobs"""
     player = players.get(int(ctx.author.id))
     minijob_list = ""
     for place in places.get_all():

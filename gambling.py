@@ -25,9 +25,7 @@ gambling_bp = DiscordInteractionsBlueprint()
     ]
 )
 def coinflip(ctx, side: str, amount: int) -> str:
-    """
-    Test your luck while throwing a coin
-    """
+    """Test your luck while throwing a coin"""
     player = players.get(ctx.author.id)
     player.debit_money(amount)
     if randint(0, 1) == 0:
@@ -85,9 +83,7 @@ def slots_handler(ctx, author_id: int, amount: int) -> Message:
 
 @gambling_bp.command(annotations={"amount": "The amount you bet"})
 def slots(ctx, amount: int) -> Message:
-    """
-    Simple slot machine
-    """
+    """Simple slot machine"""
     return Message(
         embed=get_slots_embed(ctx.author, amount),
         components=[

@@ -14,9 +14,7 @@ truck_bp = DiscordInteractionsBlueprint()
 
 
 def get_truck_embed(truck: trucks.Truck) -> Embed:
-    """
-    Returns an embed with details about the given Truck
-    """
+    """Returns an embed with details about the given Truck"""
     truck_embed = Embed(
         title=truck.name,
         description=truck.description,
@@ -43,9 +41,7 @@ truck = truck_bp.command_group(name="truck", description="Do stuff with your tru
 
 @truck.command()
 def show(ctx, user: User = None) -> Message:
-    """
-    Get details about your truck and the trucks of your friends
-    """
+    """Get details about your truck and the trucks of your friends"""
     if user is not None:
         player = players.get(int(user.id))
         avatar_url = user.avatar_url
@@ -77,9 +73,7 @@ def show(ctx, user: User = None) -> Message:
     ],
 )
 def buy(ctx, truck: int) -> Union[Message, str]:
-    """
-    Buy a new truck, your old one will be sold and your miles will be reset
-    """
+    """Buy a new truck, your old one will be sold and your miles will be reset"""
     if players.is_driving(int(ctx.author.id)):
         return f"{ctx.author.mention} You can't buy a new truck while you are driving in the old one"
     player = players.get(int(ctx.author.id))
@@ -111,9 +105,7 @@ def buy(ctx, truck: int) -> Union[Message, str]:
     ],
 )
 def view(ctx, truck) -> Message:
-    """
-    View details about a specific truck
-    """
+    """View details about a specific truck"""
     truck_embed = get_truck_embed(trucks.get(truck))
     truck_embed.footer = Footer(
         icon_url=config.SELF_AVATAR_URL,
@@ -124,9 +116,7 @@ def view(ctx, truck) -> Message:
 
 @truck.command()
 def list(ctx) -> Message:
-    """
-    Lists all available Trucks
-    """
+    """Lists all available Trucks"""
     list_embed = Embed(
         title="All available trucks",
         color=config.EMBED_COLOR,
@@ -144,9 +134,7 @@ def list(ctx) -> Message:
 
 @truck_bp.command()
 def load(ctx) -> Message:
-    """
-    Shows what your Truck currently has loaded
-    """
+    """Shows what your Truck currently has loaded"""
     player = players.get(int(ctx.author.id))
     item_list = ""
     if len(player.loaded_items) == 0:

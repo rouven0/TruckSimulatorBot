@@ -21,9 +21,7 @@ company_group = company_bp.command_group(name="company", description="View and m
 
 @company_group.command(annotations={"name": "The name you give your company"})
 def found(ctx, name: str):
-    """
-    Create a company
-    """
+    """Create a company"""
     if not re.match("^[a-zA-Z]", name):
         return "Bad name. Company names must start with a letter"
 
@@ -87,9 +85,7 @@ def confirm_found(ctx, name: str, player_id: int):
 
 @company_group.command(annotations={"user": "The player you want to hire"})
 def hire(ctx, user: User):
-    """
-    Get a new player into your company
-    """
+    """Get a new player into your company"""
     player = players.get(int(ctx.author.id))
     invited_player = players.get(int(user.id))
     company = companies.get(player.company)
@@ -129,9 +125,7 @@ def confirm_hire(ctx, company: str, player_id: int):
 
 @company_group.command(annotations={"user": "The user you want to fire"})
 def fire(ctx, user: User):
-    """
-    Remove a player from your company
-    """
+    """Remove a player from your company"""
     player = players.get(int(ctx.author.id))
     fired_player = players.get(int(user.id))
     company = companies.get(player.company)
@@ -168,9 +162,7 @@ def confirm_fire(ctx, company: str, player_id: int, fired_player_id: int):
 
 @company_group.command()
 def leave(ctx):
-    """
-    Leave your company
-    """
+    """Leave your company"""
     player = players.get(ctx.author.id)
     if player.company is None:
         return "You don't have company to leave!"
@@ -199,9 +191,7 @@ def confirm_leave(ctx, player_id: int):
 
 @company_group.command(annotations={"name": "The new name", "logo": "Any emoji"})
 def update(ctx, name: str = None, logo: str = None):
-    """
-    Change your company's logo
-    """
+    """Change your company's logo"""
     player = players.get(int(ctx.author.id))
     company = companies.get(player.company)
     if int(ctx.author.id) != company.founder:
@@ -248,9 +238,7 @@ def get_company_embed(user, player, company) -> Embed:
 
 @company_group.command()
 def show(ctx, user: User = None):
-    """
-    Show details about your company
-    """
+    """Show details about your company"""
     if user is not None:
         target_user = user
     else:

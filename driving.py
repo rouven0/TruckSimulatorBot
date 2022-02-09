@@ -22,9 +22,7 @@ driving_bp = DiscordInteractionsBlueprint()
 
 
 def get_drive_embed(player: players.Player, avatar_url: str) -> Embed:
-    """
-    Returns the drive embed that includes all the information about the current position and gas
-    """
+    """Returns the drive embed that includes all the information about the current position and gas"""
     place = places.get(player.position)
     all_companies = companies.get_all()
     drive_embed = Embed(
@@ -75,9 +73,7 @@ def get_drive_embed(player: players.Player, avatar_url: str) -> Embed:
 
 
 def generate_minimap(player: players.Player, all_companies: list[companies.Company]) -> str:
-    """
-    Generate the minimap shown in /drive
-    """
+    """Generate the minimap shown in /drive"""
     minimap_array = []
     for i in range(0, 7):
         minimap_array.append([])
@@ -123,9 +119,7 @@ def generate_minimap(player: players.Player, all_companies: list[companies.Compa
 
 
 def get_buttons(player: players.Player) -> list:
-    """
-    Returns buttons based on the players position
-    """
+    """Returns buttons based on the players position"""
     buttons = []
     directional_buttons = []
     place = places.get(player.position)
@@ -343,9 +337,7 @@ def right(ctx, player_id: int):
 
 
 def move(ctx: Context, direction, player_id):
-    """
-    Centralized function for all the directional buttons
-    """
+    """Centralized function for all the directional buttons"""
     player = players.get_driving_player(int(ctx.author.id), player_id)
 
     if direction == symbols.LEFT:
@@ -391,9 +383,7 @@ def move(ctx: Context, direction, player_id):
 
 @driving_bp.command()
 def drive(ctx) -> Message:
-    """
-    Start driving your Truck on the map and control it with buttons
-    """
+    """Start driving your Truck on the map and control it with buttons"""
     player = players.get(ctx.author.id)
     # Detect, when the player is renamed
     if player.name != ctx.author.username:
@@ -416,9 +406,7 @@ def drive(ctx) -> Message:
 
 @driving_bp.command()
 def position(ctx) -> Message:
-    """
-    Provides some information about your current position and the things located there
-    """
+    """Provides some information about your current position and the things located there"""
     player = players.get(int(ctx.author.id))
     place = places.get(player.position)
     position_embed = Embed(
@@ -435,9 +423,7 @@ def position(ctx) -> Message:
 
 @driving_bp.command()
 def addressbook(ctx) -> Message:
-    """
-    Lists all public places. Hidden ones are excluded
-    """
+    """Lists all public places. Hidden ones are excluded"""
     places_embed = Embed(title="All public known Places", color=config.EMBED_COLOR, fields=[])
     for place in places.get_public():
         places_embed.fields.append(Field(name=place.name, value=str(place.position)))
