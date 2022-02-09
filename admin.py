@@ -63,7 +63,7 @@ def remove(ctx, user: str):
 @admin_bp.command()
 def serverrules(ctx) -> Message:
     """Truck Simulator server rules"""
-    rules_embed = Embed(title="Truck Simulator Server Rules", color=config.EMBED_COLOR)
+    rules_embed = Embed(title="Truck Simulator Server Rules", color=config.EMBED_COLOR, fields=[])
     rules_embed.fields.append(
         Field(
             name="Be civil and respectful",
