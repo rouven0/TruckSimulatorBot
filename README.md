@@ -38,7 +38,3 @@ The gas prices are refreshed daily and can be seen in the support server.
 ### Trucks
 As soon as you have enough money, you can buy a new Truck. Better ones are expensive, but have better stats when it comes to gas capacity and consumption.
 When you buy a new truck, your old one will be sold; the selling price is based on its original price and the miles you drove with this truck.
-
-### Gambling
-All the gambling commands only work in a place called _Las Vegas_.
-For now, coinflip and slots are available.
