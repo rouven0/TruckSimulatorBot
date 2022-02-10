@@ -46,11 +46,10 @@ def iteminfo(ctx, item: str) -> Message:
             "description": "The topic you want to read about",
             "type": CommandOptionType.STRING,
             "choices": [{"name": f[: f.find(".")], "value": f[: f.find(".")]} for f in listdir("./guide")],
-            "required": True,
         }
     ],
 )
-def guide(ctx, topic: str) -> Message:
+def guide(ctx, topic: str = "introduction") -> Message:
     """A nice little guide that helps you understand this bot"""
     topic = str.lower(topic)
     guide_file = open(f"./guide/{topic}.md", "r")

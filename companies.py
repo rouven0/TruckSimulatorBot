@@ -214,6 +214,7 @@ def update(ctx, name: str = None, logo: str = None):
             return f"Done. Your company logo was set to {logo} Please note that your logo can be reset at any time if it is found not working or inappropriate"
         else:
             return "That's not an emoji"
+    return "Nothing changed. weird"
 
 
 def get_company_embed(user, player, company) -> Embed:
