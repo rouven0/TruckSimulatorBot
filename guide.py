@@ -53,11 +53,16 @@ def guide(ctx, topic: str = "introduction") -> Message:
     """A nice little guide that helps you understand this bot"""
     topic = str.lower(topic)
     guide_file = open(f"./guide/{topic}.md", "r")
+    image_url = guide_file.readline()
     guide_embed = Embed(
         title=f"{str.upper(topic[0])}{topic[1:]}",
         description=guide_file.read(),
         color=config.EMBED_COLOR,
         author=Author(name="Truck Simulator Guide", icon_url=config.SELF_AVATAR_URL),
     )
+    if image_url.startswith("https"):
+        guide_embed.image = Media(url=image_url)
+    else:
+        guide_embed.description = image_url + guide_embed.description
     guide_file.close()
     return Message(embed=guide_embed)

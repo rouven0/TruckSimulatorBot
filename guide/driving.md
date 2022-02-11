@@ -1,3 +1,4 @@
+https://cdn.discordapp.com/attachments/916793752968921158/941707745801932860/unknown.png
 Driving is the core mechanic of this bot and moves your truck around the map.
 You control your truck with the buttons displayed underneath the message after you executed `/drive`
 
@@ -18,6 +19,10 @@ In the following table I will explain you, what each button does to your truck
 
 **Special buttons**
 <:ts_gas:859857979619541022> will refill your truck
+
+**Job buttons**
+_New Job_ will get you a new Job that you will have to do to get payed
+_Show Job_ will show you your current Job if you have one
 
 **Notice:**
 When you are inactive for more than 15 minutes your truck will be stopped.

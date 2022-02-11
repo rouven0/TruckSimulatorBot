@@ -4,7 +4,7 @@ We get jobs from all around the country and distribute them among all registered
 Your level represents your reputation. The higher it is, the more money you receive from jobs. If you make mistakes, your level will be lowered.
 
 Driving is pretty simple. Just press all those fancy buttons and follow the instructions.
-If you have questions, feel free to ask in the [support server](https://discord.gg/BKmtTFbvxv).
+If you have questions, feel free to ask in the [support server](https://discord.gg/FzAxtGTUhN).
 
 Have a lot of fun on the roads.
 
