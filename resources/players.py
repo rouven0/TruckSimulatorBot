@@ -280,6 +280,8 @@ def get_top(key) -> tuple:
         database.cur.execute("SELECT * FROM players ORDER BY level DESC, xp DESC")
         suffix = ""
     top_records = database.cur.fetchmany(15)
+    # clean the cursor to prevent errors
+    database.cur.fetchall()
     top_players = []
     for record in top_records:
         top_players.append(Player(**record))
