@@ -1,3 +1,4 @@
+[![Pylint](https://github.com/therealr5/TruckSimulatorBot/actions/workflows/pylint.yml/badge.svg)](https://github.com/therealr5/TruckSimulatorBot/actions/workflows/pylint.yml)
 # TruckSimulatorBot
 Small Truck Simulator app using the [flask-discord-interactions](https://github.com/Breq16/flask-discord-interactions) library
 
