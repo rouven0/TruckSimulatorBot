@@ -1,9 +1,10 @@
+# pylint: disable=unused-argument,broad-except
 from flask_discord_interactions import DiscordInteractionsBlueprint, Permission
 from flask_discord_interactions.models.message import Message, Embed
 from flask_discord_interactions.models.embed import Field
 
-import resources.database as database
-import resources.players as players
+from resources import database
+from resources import players
 import config
 
 admin_bp = DiscordInteractionsBlueprint()
@@ -11,6 +12,7 @@ admin_bp = DiscordInteractionsBlueprint()
 
 @admin_bp.command(default_permission=False, permissions=[Permission(user=692796548282712074)])
 def sql(ctx, query: str):
+    """DANGER: Execute raw sql"""
     if int(ctx.author.id) != 692796548282712074:
         return "Wait. You shouldn't be able to even read this. Something is messed up"
     try:
@@ -18,10 +20,9 @@ def sql(ctx, query: str):
         if database.cur.rowcount != 0:
             database.con.commit()
             return f"`Done. {database.cur.rowcount} row(s) affected`"
-        else:
-            return f"```\n{database.cur.fetchall()}```"
-    except Exception as e:
-        return "Error: " + str(e)
+        return f"```\n{database.cur.fetchall()}```"
+    except Exception as error:
+        return "Error: " + str(error)
 
 
 blacklist = admin_bp.command_group(
@@ -31,6 +32,7 @@ blacklist = admin_bp.command_group(
 
 @blacklist.command()
 def add(ctx, user: str, reason: str):
+    """Add a user to the blacklist"""
     try:
         player = players.get(int(user))
         players.update(player, name=reason, xp=-1)
@@ -46,6 +48,7 @@ def add(ctx, user: str, reason: str):
 
 @blacklist.command()
 def remove(ctx, user: str):
+    """Remove a user from the blacklist"""
     try:
         players.get(int(user))
         return "Player not on blacklist"

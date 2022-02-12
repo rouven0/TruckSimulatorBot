@@ -4,8 +4,8 @@ This module provides the Job class and all the methods to operate with jobs in t
 from random import randint
 from math import sqrt
 from time import time
-import resources.database as database
-import resources.places as places
+from resources import database
+from resources import places
 
 STATE_CLAIMED = 0
 STATE_LOADED = 1
@@ -50,6 +50,7 @@ class Job:
         self.state = state
         self.reward = reward
         self.create_time = create_time
+        self._n = 0
 
     def __iter__(self):
         self._n = 0
@@ -61,10 +62,8 @@ class Job:
             self._n += 1
             if attr in ["place_from", "place_to"]:
                 return _format_pos_to_db(self.__getattribute__(attr).position)
-            else:
-                return self.__getattribute__(attr)
-        else:
-            raise StopIteration
+            return self.__getattribute__(attr)
+        raise StopIteration
 
 
 def generate(player) -> Job:
@@ -101,6 +100,7 @@ def get_state(job: Job) -> str:
 
 
 def get_all() -> list[Job]:
+    """Get a list of all running jobs"""
     # update the connection in case of the timeout-thread doing something
     database.con.commit()
     database.cur.execute("SELECT * FROM jobs")

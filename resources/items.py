@@ -7,6 +7,8 @@ import sqlite3
 
 @dataclass
 class Item:
+    """Represents an item that can be loaded"""
+
     name: str
     emoji: int
     description: str
@@ -18,6 +20,7 @@ def __generate_list(lst) -> None:
 
 
 def get(name) -> Item:
+    """Get an item by its name"""
     for item in __all_items__:
         if item.name == name:
             return item
@@ -25,6 +28,7 @@ def get(name) -> Item:
 
 
 def get_all() -> list:
+    """Get all items"""
     return __all_items__
 
 

@@ -1,18 +1,14 @@
-from dotenv import load_dotenv
+# pylint: disable=unused-argument,missing-function-docstring
 import traceback
-from werkzeug.exceptions import HTTPException
-
-load_dotenv("./.env")
-
-from os import getenv
 import sys
+from os import getenv
+import logging
+
+from dotenv import load_dotenv
 
 from flask import Flask, json
 from flask_discord_interactions import DiscordInteractions, Message
-
-import logging
-import resources.players as players
-import config
+from werkzeug.exceptions import HTTPException
 
 from admin import admin_bp
 from system import system_bp
@@ -25,6 +21,11 @@ from guide import guide_bp
 from truck import truck_bp
 from companies import company_bp
 
+from resources import players
+import config
+
+
+load_dotenv("./.env")
 app = Flask(__name__)
 discord = DiscordInteractions(app)
 
@@ -76,7 +77,8 @@ def general_error(error):
     logging.error(error)
     traceback.print_tb(error.__traceback__)
     return Message(
-        content=f"Looks like we got an error here. ```{error.__class__.__name__}: {error}``` If this occurs multiple times feel free to report it in the support server"
+        content=f"Looks like we got an error here. ```{error.__class__.__name__}: {error}```"
+        "If this occurs multiple times feel free to report it in the support server"
     ).dump()
 
 

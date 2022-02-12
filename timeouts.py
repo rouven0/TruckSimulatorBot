@@ -1,17 +1,13 @@
+from time import time, sleep
+import logging
+import requests
 from dotenv import load_dotenv
 
-load_dotenv("./.env")
-
-import requests
-
-import resources.players as players
-import resources.jobs as jobs
-import logging
-
-from time import time, sleep
-
 import config
+from resources import players
+from resources import jobs
 
+load_dotenv("./.env")
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 

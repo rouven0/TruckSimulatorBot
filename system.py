@@ -1,12 +1,13 @@
+# pylint: disable=unused-argument, missing-function-docstring
+from datetime import datetime
+from math import floor
+
 from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
 from flask_discord_interactions.models.embed import Field, Footer, Media
 from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles
 
-from datetime import datetime
-from math import floor
-
 import config
-import resources.players as players
+from resources import players
 
 
 start_time = datetime.now()

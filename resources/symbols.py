@@ -35,4 +35,7 @@ def get_drive_position_symbols(position) -> list:
 
 
 def get_all_drive_symbols() -> list:
+    """
+    Returns a list with all arrow symbols
+    """
     return [LEFT, DOWN, UP, RIGHT]

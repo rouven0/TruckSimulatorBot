@@ -1,24 +1,21 @@
-from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed, User, ApplicationCommandType
-from flask_discord_interactions.context import Context
-from flask_discord_interactions.models import embed
-from flask_discord_interactions.models.component import ActionRow, Button, Component, SelectMenu, SelectMenuOption
-from flask_discord_interactions.models.embed import Author, Field, Footer, Media
-
+# pylint: disable=unused-argument, missing-function-docstring
 import re
+
+from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed, User, ApplicationCommandType
+from flask_discord_interactions.models.component import ActionRow, Button, Component
+from flask_discord_interactions.models.embed import Author, Field, Footer, Media
 
 import config
 
-import resources.players as players
-import resources.places as places
-import resources.companies as companies
+from resources import players
+from resources import places
+from resources import companies
 
 company_bp = DiscordInteractionsBlueprint()
 
 company_group = company_bp.command_group(name="company", description="View and manage your company")
 
-# TODO rewrite this using modals and user selects (as soon as they are released)
-
-
+# rewrite this using modals and user selects (as soon as they are released)
 @company_group.command(annotations={"name": "The name you give your company"})
 def found(ctx, name: str):
     """Create a company"""
@@ -199,9 +196,8 @@ def update(ctx, name: str = None, logo: str = None):
     if name:
         if companies.exists(name):
             return "A company with this make already exists, please choose another name"
-        else:
-            companies.update(company, name=name)
-            return f"Done. Your company was renamed to {name}"
+        companies.update(company, name=name)
+        return f"Done. Your company was renamed to {name}"
 
     if logo:
         if re.match(
@@ -211,9 +207,8 @@ def update(ctx, name: str = None, logo: str = None):
             logo,
         ):
             companies.update(company, logo=logo)
-            return f"Done. Your company logo was set to {logo} Please note that your logo can be reset at any time if it is found not working or inappropriate"
-        else:
-            return "That's not an emoji"
+            return f"Done. Your company logo was set to {logo}."
+        return "That's not an emoji"
     return "Nothing changed. weird"
 
 

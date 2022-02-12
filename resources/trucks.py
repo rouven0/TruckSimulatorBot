@@ -44,7 +44,10 @@ def get(truck_id: int) -> Truck:
     raise TruckNotFound
 
 
-def get_all() -> list:
+def get_all() -> list[Truck]:
+    """
+    Return a list with all trucks
+    """
     return __all_trucks__
 
 

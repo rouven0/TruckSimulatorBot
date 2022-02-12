@@ -1,3 +1,4 @@
+# pylint: disable=unused-argument, missing-function-docstring
 from random import randint, sample, choices
 from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
 from flask_discord_interactions.models.command import CommandOptionType
@@ -5,8 +6,8 @@ from flask_discord_interactions.models.component import ActionRow, Button, Butto
 from flask_discord_interactions.models.user import User
 from flask_discord_interactions.models.embed import Author, Field
 
-import resources.players as players
-import resources.items as items
+from resources import players
+from resources import items
 import config
 
 gambling_bp = DiscordInteractionsBlueprint()
@@ -36,8 +37,7 @@ def coinflip(ctx, side: str, amount: int) -> str:
     if result == side:
         player.add_money(amount * 2)
         return "Congratulations, it was {}. You won ${}".format(result, "{:,}".format(amount))
-    else:
-        return "Nope, it was {}. You lost ${}".format(result, "{:,}".format(amount))
+    return "Nope, it was {}. You lost ${}".format(result, "{:,}".format(amount))
 
 
 def get_slots_embed(author: User, amount: int) -> Embed:

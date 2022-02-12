@@ -2,9 +2,9 @@
 This file contains some of the image urls that the bot uses
 The images are hosted on a discord server
 """
+from random import randint
 from resources.places import Place
 from resources.players import Player
-from random import randint
 
 __DEFAULT_DRIVE_IMAGE_LIST = [
     "https://cdn.discordapp.com/attachments/868845783225622559/868846294406418432/default_1-default_truck.png",

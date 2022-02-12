@@ -4,11 +4,10 @@ This module contains the company class
 
 import logging
 from typing import Optional, Union
-import resources.database as database
+from resources import database
 from resources.players import Player
 
 
-# TODO make these funtions global so I don't have to paste them for every class
 def _format_pos_to_db(pos: list) -> str:
     """
     Returns a database-ready string that contains the position in the form x/y
@@ -46,6 +45,7 @@ class Company:
         self.founder = founder
         self.logo = kwargs.pop("logo", f":regional_indicator_{str.lower(name[0])}:")
         self.net_worth = kwargs.pop("net_worth", 3000)
+        self._n = 0
 
     def __iter__(self):
         self._n = 0
@@ -57,23 +57,24 @@ class Company:
             self._n += 1
             if attr == "hq_position":
                 return _format_pos_to_db(self.__getattribute__(attr))
-            else:
-                return self.__getattribute__(attr)
-        else:
-            raise StopIteration
+            return self.__getattribute__(attr)
+        raise StopIteration
 
     def __str__(self) -> str:
         return f"{self.name} founded by {self.founder}"
 
     def add_net_worth(self, amount: int):
+        """Increases a company's net worth"""
         database.cur.execute("UPDATE companies SET net_worth=%s WHERE name=%s", (self.net_worth + amount, self.name))
         self.net_worth += amount
 
     def remove_net_worth(self, amount: int):
+        """Decreases a company's net worth"""
         database.cur.execute("UPDATE companies SET net_worth=%s WHERE name=%s", (self.net_worth - amount, self.name))
         self.net_worth -= amount
 
     def get_members(self) -> list[Player]:
+        """Get all players that belong to a specific company"""
         members = []
         database.cur.execute("SELECT * FROM players WHERE company=%s", (self.name,))
         record = database.cur.fetchall()
@@ -83,6 +84,7 @@ class Company:
 
 
 def exists(name: Optional[str]) -> bool:
+    """Checks if a company is found in the database"""
     database.cur.execute("SELECT * FROM companies WHERE name=%s", (name,))
     if len(database.cur.fetchall()) == 1:
         return True
@@ -90,6 +92,7 @@ def exists(name: Optional[str]) -> bool:
 
 
 def get(name: Optional[str]) -> Company:
+    """Gets a company from the database"""
     if not exists(name):
         raise CompanyNotFound()
     database.cur.execute("SELECT * FROM companies WHERE name=%s", (name,))
@@ -99,6 +102,7 @@ def get(name: Optional[str]) -> Company:
 
 
 def get_all() -> list[Company]:
+    """Get all companies from the database"""
     database.cur.execute("SELECT * from companies")
     companies = []
     for record in database.cur.fetchall():
@@ -107,6 +111,7 @@ def get_all() -> list[Company]:
 
 
 def insert(company: Company) -> None:
+    """Add a new company"""
     placeholders = ", ".join(["%s"] * len(vars(company)))
     columns = ", ".join(vars(company).keys())
     sql = "INSERT INTO companies (%s) VALUES (%s)" % (columns, placeholders)
@@ -116,6 +121,7 @@ def insert(company: Company) -> None:
 
 
 def remove(company: Company) -> None:
+    """Delete a company"""
     database.cur.execute("DELETE FROM companies WHERE name=%s", (company.name,))
     database.con.commit()
     logging.info("Company %s got deleted", company.name)

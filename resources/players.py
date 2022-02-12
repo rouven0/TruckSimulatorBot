@@ -1,12 +1,13 @@
+# pylint: disable=invalid-name,no-self-use
 """
 This module contains the Player class, several methods to operate with players in the database and
 the DrivingPlayer, used to manage driving sessions
 """
 from typing import Optional
 import logging
-import resources.database as database
-import resources.levels as levels
-import resources.items as items
+from resources import database
+from resources import levels
+from resources import items
 from resources.jobs import Job
 
 
@@ -70,6 +71,7 @@ class Player:
         else:
             self.loaded_items: list = loaded_items
         self.company = kwargs.pop("company", None)
+        self._n = 0
 
     def __iter__(self):
         self._n = 0
@@ -81,13 +83,10 @@ class Player:
             self._n += 1
             if attr == "position":
                 return _format_pos_to_db(self.__getattribute__(attr))
-            elif attr == "loaded_items":
+            if attr == "loaded_items":
                 return _format_items_to_db(self.__getattribute__(attr))
-
-            else:
-                return self.__getattribute__(attr)
-        else:
-            raise StopIteration
+            return self.__getattribute__(attr)
+        raise StopIteration
 
     def __str__(self) -> str:
         return f"{self.name} ({self.id})"
@@ -176,8 +175,7 @@ class Player:
         records = database.cur.fetchall()
         if len(records) > 0:
             return Job(**records[0])
-        else:
-            return None
+        return None
 
     def remove_from_company(self):
         """
@@ -306,7 +304,7 @@ def get_count(table: str) -> int:
     database.con.commit()
     database.cur.execute("SELECT COUNT(*) FROM " + table)
     record = database.cur.fetchone()
-    return record[f"COUNT(*)"]
+    return record["COUNT(*)"]
 
 
 class DrivingPlayer(Player):
@@ -323,6 +321,7 @@ class DrivingPlayer(Player):
         super().__init__(**kwargs)
 
     def start_drive(self) -> None:
+        """Inserts a driving player into the database"""
         database.cur.execute(
             "INSERT INTO driving_players(id, followup_url, last_action_time) VALUES (%s,%s,%s)",
             (self.id, self.followup_url, self.last_action_time),
@@ -331,6 +330,7 @@ class DrivingPlayer(Player):
         logging.info("%s started driving", self.name)
 
     def stop_drive(self) -> None:
+        """Removes a driving player from the database"""
         database.cur.execute("DELETE FROM driving_players WHERE id=%s", (self.id,))
         database.con.commit()
         logging.info("%s stopped driving", self.name)
@@ -357,6 +357,9 @@ def is_driving(id: int) -> bool:
 
 
 def get_driving_player(id: int, check: int = None) -> DrivingPlayer:
+    """
+    Get a driving player from the database
+    """
     id = int(id)
     if check and id != check:
         raise NotDriving()
@@ -366,11 +369,11 @@ def get_driving_player(id: int, check: int = None) -> DrivingPlayer:
         followup_url = record["followup_url"]
         last_action_time = record["last_action_time"]
         return DrivingPlayer(**vars(get(id)), followup_url=followup_url, last_action_time=last_action_time)
-    else:
-        raise NotDriving()
+    raise NotDriving()
 
 
 def get_all_driving_players() -> list[DrivingPlayer]:
+    """Get all driving players from the database"""
     # update the connection in case of the timeout-thread doing something
     database.con.commit()
     database.cur.execute("SELECT * from driving_players")

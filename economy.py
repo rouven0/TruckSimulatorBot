@@ -1,14 +1,15 @@
+# pylint: disable=unused-argument,missing-function-docstring
 from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
 from flask_discord_interactions.models.component import ActionRow, Button
 from flask_discord_interactions.models.user import User
 from flask_discord_interactions.models.embed import Author, Field, Footer
 
-import resources.players as players
-import resources.places as places
-import resources.items as items
-import resources.jobs as jobs
-import resources.symbols as symbols
-import resources.trucks as trucks
+from resources import players
+from resources import places
+from resources import items
+from resources import jobs
+from resources import symbols
+from resources import trucks
 
 import config
 
@@ -60,10 +61,10 @@ def new_job(ctx, player_id: int) -> Message:
 
     # parse the components to objects again
     components = []
-    for actionRow in orig_components:
-        for c in actionRow["components"]:
-            c.pop("hash")
-        components.append(ActionRow(components=[Button(**c) for c in actionRow["components"]]))
+    for action_row in orig_components:
+        for comp in action_row["components"]:
+            comp.pop("hash")
+        components.append(ActionRow(components=[Button(**comp) for comp in action_row["components"]]))
 
     item = items.get(job.place_from.produced_item)
     job_message = "{} needs <:placeholder:{}> {} from {}. You get ${:,} for this transport".format(
@@ -98,12 +99,11 @@ def refill(ctx, player_id: int):
                 "I will give you 100 litres of gas, and you lose 2 levels",
                 ephemeral=True,
             )
-        else:
-            return Message(
-                f"{ctx.author.mention} you don't have enough money to do this. "
-                "Do some jobs and come back if you have enough",
-                ephemeral=True,
-            )
+        return Message(
+            f"{ctx.author.mention} you don't have enough money to do this. "
+            "Do some jobs and come back if you have enough",
+            ephemeral=True,
+        )
 
     refill_embed = Embed(
         title="Thank you for visiting our gas station",
@@ -119,10 +119,10 @@ def refill(ctx, player_id: int):
     orig_components = ctx.message.components
     # parse the components to objects again
     components = []
-    for actionRow in orig_components:
-        for c in actionRow["components"]:
-            c.pop("hash")
-        components.append(ActionRow(components=[Button(**c) for c in actionRow["components"]]))
+    for action_row in orig_components:
+        for comp in action_row["components"]:
+            comp.pop("hash")
+        components.append(ActionRow(components=[Button(**comp) for comp in action_row["components"]]))
     return Message(embeds=[drive_embed, refill_embed], components=components, update=True)
 
 

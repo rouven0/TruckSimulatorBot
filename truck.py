@@ -1,14 +1,15 @@
+# pylint: disable=unused-argument
 from typing import Union
+from math import log
 from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed, User
 from flask_discord_interactions.models.command import CommandOptionType
 from flask_discord_interactions.models.embed import Field, Media, Author, Footer
-from math import log
 
 import config
 
-import resources.players as players
-import resources.trucks as trucks
-import resources.symbols as symbols
+from resources import players
+from resources import trucks
+from resources import symbols
 
 truck_bp = DiscordInteractionsBlueprint()
 
@@ -30,6 +31,7 @@ def get_truck_embed(truck: trucks.Truck) -> Embed:
 
 
 def get_truck_choices() -> list[dict]:
+    """Returns choices shown up in several truck commands"""
     choices = []
     for truck in trucks.get_all():
         choices.append({"name": truck.name, "value": truck.truck_id})
@@ -85,7 +87,8 @@ def buy(ctx, truck: int) -> Union[Message, str]:
     player.debit_money(end_price)
     players.update(player, truck_miles=0, gas=new_truck.gas_capacity, truck_id=new_truck.truck_id)
     answer_embed = Embed(
-        description=f"You sold your old {old_truck.name} for ${selling_price} and bought a brand new {new_truck.name} for ${new_truck.price}",
+        description=f"You sold your old {old_truck.name} for ${selling_price} and bought a brand new {new_truck.name} "
+        f"for ${new_truck.price}",
         color=config.EMBED_COLOR,
         author=Author(name="You got a new truck", icon_url=config.SELF_AVATAR_URL),
         footer=Footer(text="Check out your new baby with `/truck show`"),

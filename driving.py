@@ -1,22 +1,23 @@
+# pylint: disable=unused-argument,missing-function-docstring
+from datetime import datetime
+from time import time
+import requests
+
 from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
 from flask_discord_interactions.context import Context
 from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
 
-import requests
-from datetime import datetime
-from time import time
-
 import config
-import resources.players as players
-import resources.companies as companies
-import resources.items as items
-import resources.levels as levels
-import resources.places as places
-import resources.symbols as symbols
-import resources.assets as assets
-import resources.jobs as jobs
-import resources.trucks as trucks
+from resources import players
+from resources import companies
+from resources import items
+from resources import levels
+from resources import places
+from resources import symbols
+from resources import assets
+from resources import jobs
+from resources import trucks
 
 driving_bp = DiscordInteractionsBlueprint()
 
@@ -105,9 +106,9 @@ def generate_minimap(player: players.Player, all_companies: list[companies.Compa
                     minimap_array[i][j] = symbols.MAP_BACKGROUND
             else:
                 minimap_array[i][j] = symbols.MAP_BACKGROUND
-                for p in players.get_all_driving_players():
-                    if p.position == position:
-                        minimap_array[i][j] = trucks.get(p.truck_id).emoji
+                for plr in players.get_all_driving_players():
+                    if plr.position == position:
+                        minimap_array[i][j] = trucks.get(plr.truck_id).emoji
 
     minimap_array[3][3] = trucks.get(player.truck_id).emoji
     minimap = ""
@@ -139,8 +140,8 @@ def get_buttons(player: players.Player) -> list:
 
     current_job = player.get_job()
     action_buttons = []
-    load_disabled = not (len(player.loaded_items) < trucks.get(player.truck_id).loading_capacity)
-    unload_disabled = not (len(player.loaded_items) > 0)
+    load_disabled = not len(player.loaded_items) < trucks.get(player.truck_id).loading_capacity
+    unload_disabled = not len(player.loaded_items) > 0
     if place.name == "Nothing":
         load_disabled = True
         unload_disabled = True

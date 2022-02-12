@@ -1,3 +1,4 @@
+# pylint: disable=unused-argument
 from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
 from flask_discord_interactions.models.embed import Field
 
@@ -59,6 +60,7 @@ def vote(ctx) -> Message:
 
 @misc_bp.command()
 def complain(ctx) -> str:
+    """No description."""
     return (
         "What a crap bot this is! :rage: "
         "Hours of time wasted on this useless procuct of a terrible coder and a lousy artist "

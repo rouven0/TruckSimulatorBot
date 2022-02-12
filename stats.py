@@ -1,13 +1,14 @@
+# pylint: disable=unused-argument, missing-function-docstring
 from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
 from flask_discord_interactions.models.command import ApplicationCommandType, CommandOptionType
 from flask_discord_interactions.models.user import User
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
 
 import config
-import resources.players as players
-import resources.trucks as trucks
-import resources.levels as levels
-import resources.companies as companies
+from resources import players
+from resources import trucks
+from resources import levels
+from resources import companies
 
 profile_bp = DiscordInteractionsBlueprint()
 
@@ -17,17 +18,16 @@ profile = profile_bp.command_group(name="profile", description="Show and manage 
 
 @profile.command(name="register", description="Register yourself to the Truck Simulator")
 def register_profile(ctx) -> Message:
-    welcome_file = open("./messages/welcome.md", "r")
-    welcome_embed = Embed(
-        title="Hey there, fellow Trucker,",
-        description=welcome_file.read(),
-        color=config.EMBED_COLOR,
-        author=Author(
-            name="Welcome to the Truck Simulator",
-            icon_url=config.SELF_AVATAR_URL,
-        ),
-    )
-    welcome_file.close()
+    with open("./messages/welcome.md", "r") as welcome_file:
+        welcome_embed = Embed(
+            title="Hey there, fellow Trucker,",
+            description=welcome_file.read(),
+            color=config.EMBED_COLOR,
+            author=Author(
+                name="Welcome to the Truck Simulator",
+                icon_url=config.SELF_AVATAR_URL,
+            ),
+        )
     if not players.registered(ctx.author.id):
         players.insert(players.Player(int(ctx.author.id), ctx.author.username, money=1000, gas=600))
         welcome_embed.footer = Footer(text="Your profile has been created")

@@ -1,13 +1,13 @@
+# pylint: disable=unused-argument
+from os import listdir
 from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
 from flask_discord_interactions.models.command import CommandOptionType
 from flask_discord_interactions.models.embed import Field, Author, Media
 
 import config
 
-from os import listdir
-
-import resources.items as items
-import resources.places as places
+from resources import items
+from resources import places
 
 guide_bp = DiscordInteractionsBlueprint()
 
@@ -51,18 +51,17 @@ def iteminfo(ctx, item: str) -> Message:
 )
 def guide(ctx, topic: str = "introduction") -> Message:
     """A nice little guide that helps you understand this bot"""
-    topic = str.lower(topic)
-    guide_file = open(f"./guide/{topic}.md", "r")
-    image_url = guide_file.readline()
-    guide_embed = Embed(
-        title=f"{str.upper(topic[0])}{topic[1:]}",
-        description=guide_file.read(),
-        color=config.EMBED_COLOR,
-        author=Author(name="Truck Simulator Guide", icon_url=config.SELF_AVATAR_URL),
-    )
-    if image_url.startswith("https"):
-        guide_embed.image = Media(url=image_url)
-    else:
-        guide_embed.description = image_url + guide_embed.description
-    guide_file.close()
+    with open(f"./guide/{topic}.md", "r") as guide_file:
+        topic = str.lower(topic)
+        image_url = guide_file.readline()
+        guide_embed = Embed(
+            title=f"{str.upper(topic[0])}{topic[1:]}",
+            description=guide_file.read(),
+            color=config.EMBED_COLOR,
+            author=Author(name="Truck Simulator Guide", icon_url=config.SELF_AVATAR_URL),
+        )
+        if image_url.startswith("https"):
+            guide_embed.image = Media(url=image_url)
+        else:
+            guide_embed.description = image_url + guide_embed.description
     return Message(embed=guide_embed)
