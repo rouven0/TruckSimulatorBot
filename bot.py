@@ -10,6 +10,7 @@ from flask import Flask, json
 from flask_discord_interactions import DiscordInteractions, Message
 from werkzeug.exceptions import HTTPException
 
+load_dotenv("./.env")
 from admin import admin_bp
 from system import system_bp
 from stats import profile_bp
@@ -25,7 +26,6 @@ from resources import players
 import config
 
 
-load_dotenv("./.env")
 app = Flask(__name__)
 discord = DiscordInteractions(app)
 
