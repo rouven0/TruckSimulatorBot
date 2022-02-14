@@ -1,4 +1,8 @@
 [![Pylint](https://github.com/therealr5/TruckSimulatorBot/actions/workflows/pylint.yml/badge.svg)](https://github.com/therealr5/TruckSimulatorBot/actions/workflows/pylint.yml)
+![License](https://img.shields.io/github/license/therealr5/TrucksimulatorBot)
+[![Black](https://img.shields.io/badge/codestyle-black-000000)](https://github.com/psf/black)
+[![Discord](https://img.shields.io/discord/839580174282260510)](https://discord.gg/FzAxtGTUhN)
+
 # TruckSimulatorBot
 Small Truck Simulator app using the [flask-discord-interactions](https://github.com/Breq16/flask-discord-interactions) library
 
