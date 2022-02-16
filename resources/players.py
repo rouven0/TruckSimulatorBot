@@ -1,4 +1,4 @@
-# pylint: disable=invalid-name,no-self-use
+# pylint: disable=invalid-name,no-self-use,attribute-defined-outside-init
 """
 This module contains the Player class, several methods to operate with players in the database and
 the DrivingPlayer, used to manage driving sessions
@@ -71,7 +71,6 @@ class Player:
         else:
             self.loaded_items: list = loaded_items
         self.company = kwargs.pop("company", None)
-        self._n = 0
 
     def __iter__(self):
         self._n = 0

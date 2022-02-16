@@ -1,3 +1,4 @@
+# pylint: disable=attribute-defined-outside-init
 """
 This module contains the company class
 """
@@ -45,7 +46,6 @@ class Company:
         self.founder = founder
         self.logo = kwargs.pop("logo", f":regional_indicator_{str.lower(name[0])}:")
         self.net_worth = kwargs.pop("net_worth", 3000)
-        self._n = 0
 
     def __iter__(self):
         self._n = 0

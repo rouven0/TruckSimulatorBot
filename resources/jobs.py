@@ -1,3 +1,4 @@
+# pylint: disable=attribute-defined-outside-init
 """
 This module provides the Job class and all the methods to operate with jobs in the database
 """
@@ -50,7 +51,6 @@ class Job:
         self.state = state
         self.reward = reward
         self.create_time = create_time
-        self._n = 0
 
     def __iter__(self):
         self._n = 0
