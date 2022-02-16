@@ -62,8 +62,6 @@ def new_job(ctx, player_id: int) -> Message:
     # parse the components to objects again
     components = []
     for action_row in orig_components:
-        for comp in action_row["components"]:
-            comp.pop("hash")
         components.append(ActionRow(components=[Button(**comp) for comp in action_row["components"]]))
 
     item = items.get(job.place_from.produced_item)
@@ -116,14 +114,8 @@ def refill(ctx, player_id: int):
     drive_embed: Embed = ctx.message.embeds[0]
     drive_embed.fields[2]["value"] = str(player.gas)
 
-    orig_components = ctx.message.components
-    # parse the components to objects again
-    components = []
-    for action_row in orig_components:
-        for comp in action_row["components"]:
-            comp.pop("hash")
-        components.append(ActionRow(components=[Button(**comp) for comp in action_row["components"]]))
-    return Message(embeds=[drive_embed, refill_embed], components=components, update=True)
+    
+    return Message(embeds=[drive_embed, refill_embed], components=None, update=True)
 
 
 @economy_bp.command()
