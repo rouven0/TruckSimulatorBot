@@ -51,7 +51,7 @@ def iteminfo(ctx, item: str) -> Message:
 )
 def guide(ctx, topic: str = "introduction") -> Message:
     """A nice little guide that helps you understand this bot"""
-    with open(f"./guide/{topic}.md", "r") as guide_file:
+    with open(f"./guide/{topic}.md", "r", encoding="utf8") as guide_file:
         topic = str.lower(topic)
         image_url = guide_file.readline()
         guide_embed = Embed(

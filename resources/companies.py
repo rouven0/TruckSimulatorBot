@@ -13,7 +13,7 @@ def _format_pos_to_db(pos: list) -> str:
     """
     Returns a database-ready string that contains the position in the form x/y
     """
-    return "{}/{}".format(pos[0], pos[1])
+    return f"{pos[0]}/{pos[1]}"
 
 
 def _get_position(db_pos) -> list:
@@ -114,7 +114,7 @@ def insert(company: Company) -> None:
     """Add a new company"""
     placeholders = ", ".join(["%s"] * len(vars(company)))
     columns = ", ".join(vars(company).keys())
-    sql = "INSERT INTO companies (%s) VALUES (%s)" % (columns, placeholders)
+    sql = f"INSERT INTO companies {columns} VALUES {placeholders}"
     database.cur.execute(sql, tuple(company))
     database.con.commit()
     logging.info("%s created the company %s", company.founder, company.name)

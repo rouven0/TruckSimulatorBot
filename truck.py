@@ -55,7 +55,7 @@ def show(ctx, user: User = None) -> Message:
         players.update(player, name=ctx.author.username)
     truck = trucks.get(player.truck_id)
     truck_embed = get_truck_embed(truck)
-    truck_embed.author = Author(name="{}'s truck".format(player.name), icon_url=avatar_url)
+    truck_embed.author = Author(name=f"{player.name}'s truck", icon_url=avatar_url)
     truck_embed.footer = Footer(
         icon_url=config.SELF_AVATAR_URL,
         text="See all trucks with `/truck list` and change your truck with `/truck buy`",
@@ -130,7 +130,7 @@ def list(ctx) -> Message:
     )
     for truck in trucks.get_all():
         list_embed.fields.append(
-            Field(name=truck.name, value="Id: {} \n Price: ${:,}".format(truck.truck_id, truck.price), inline=False)
+            Field(name=truck.name, value=f"Id: {truck.truck_id} \n Price: ${truck.price:,}", inline=False)
         )
     return Message(embed=list_embed)
 

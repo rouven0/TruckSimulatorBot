@@ -17,7 +17,7 @@ def _format_pos_to_db(pos) -> str:
     """
     Returns a database-ready string that contains the position in the form x/y
     """
-    return "{}/{}".format(pos[0], pos[1])
+    return f"{pos[0]}/{pos[1]}"
 
 
 class Job:
@@ -91,11 +91,11 @@ def get_state(job: Job) -> str:
     Returns the next instructions based on the current jobs state
     """
     if job.state == 0:
-        return "You claimed this job. Drive to {} and load your truck".format(job.place_from.name)
+        return f"You claimed this job. Drive to {job.place_from.name} and load your truck"
     if job.state == 1:
-        return "You loaded your truck with the needed items. Now drive to {} and unload them".format(job.place_to.name)
+        return f"You loaded your truck with the needed items. Now drive to {job.place_to.name} and unload them"
     if job.state == 2:
-        return "Your job is done and you got ${:,}.".format(job.reward)
+        return f"Your job is done and you got ${job.reward:,}."
     return "Something went wrong"
 
 

@@ -36,8 +36,8 @@ def coinflip(ctx, side: str, amount: int) -> str:
 
     if result == side:
         player.add_money(amount * 2)
-        return "Congratulations, it was {}. You won ${}".format(result, "{:,}".format(amount))
-    return "Nope, it was {}. You lost ${}".format(result, "{:,}".format(amount))
+        return f"Congratulations, it was {result}. You won ${amount:,}"
+    return f"Nope, it was {result}. You lost ${amount:,}"
 
 
 def get_slots_embed(author: User, amount: int) -> Embed:
@@ -60,14 +60,14 @@ def get_slots_embed(author: User, amount: int) -> Embed:
 
     if chosen_items.count(chosen_items[0]) == 3:
         slots_embed.fields.append(
-            Field(name="Result", value=":tada: Congratulations, you won ${:,} :tada:".format(amount * 10))
+            Field(name="Result", value=f":tada: Congratulations, you won ${amount * 10:,} :tada:")
         )
         player.add_money(amount * 11)
     elif chosen_items.count(chosen_items[0]) == 2 or chosen_items.count(chosen_items[1]) == 2:
-        slots_embed.fields.append(Field(name="Result", value="You won ${:,}".format(amount)))
+        slots_embed.fields.append(Field(name="Result", value=f"You won ${amount:,}"))
         player.add_money(amount * 2)
     else:
-        slots_embed.fields.append(Field(name="Result", value="You lost ${:,}".format(amount)))
+        slots_embed.fields.append(Field(name="Result", value=f"You lost ${amount:,}"))
     return slots_embed
 
 

@@ -46,7 +46,7 @@ def get_drive_embed(player: players.Player, avatar_url: str) -> Embed:
         else:
             navigation_place = current_job.place_to
         drive_embed.fields.append(
-            Field(name="Navigation: Drive to {}".format(navigation_place.name), value=str(navigation_place.position))
+            Field(name=f"Navigation: Drive to {navigation_place.name}", value=str(navigation_place.position))
         )
 
     if place.image_url_default is not None:
@@ -303,7 +303,10 @@ def unload_items(ctx, player_id: int):
         message.embeds.append(
             Embed(
                 title="Minijob Notification",
-                description=f"{place.name} gave you ${place.item_reward * (player.level + 1):,} for bringing them {place.accepted_item}",
+                description=(
+                    f"{place.name} gave you ${place.item_reward * (player.level + 1):,} for bringing them "
+                    f"{place.accepted_item}"
+                ),
                 color=config.EMBED_COLOR,
             )
         )
@@ -365,7 +368,10 @@ def move(ctx: Context, direction, player_id):
         players.update(player, gas=trucks.get(player.truck_id).gas_capacity, position=[7, 7])
         player.stop_drive()
         return Message(
-            content="You messed up and ran out of gas. Your company had to have your truck towed away. You will pay $3000 for this incident!",
+            content=(
+                "You messed up and ran out of gas. Your company had to have your truck towed away. "
+                "You will pay $3000 for this incident!"
+            ),
             components=[],
             update=True,
         )
@@ -411,9 +417,9 @@ def position(ctx) -> Message:
     player = players.get(int(ctx.author.id))
     place = places.get(player.position)
     position_embed = Embed(
-        description="You are at {}".format(player.position),
+        description=f"You are at {player.position}",
         color=config.EMBED_COLOR,
-        author=Author(name="{}'s Position".format(player.name), icon_url=ctx.author.avatar_url),
+        author=Author(name=f"{player.name}'s Position", icon_url=ctx.author.avatar_url),
         fields=[],
     )
     position_embed.fields.append(Field(name="What is here?", value=symbols.LIST_ITEM + place.name, inline=False))

@@ -15,7 +15,7 @@ def _format_pos_to_db(pos: list) -> str:
     """
     Returns a database-ready string that contains the position in the form x/y
     """
-    return "{}/{}".format(pos[0], pos[1])
+    return f"{pos[0]}/{pos[1]}"
 
 
 def _format_items_to_db(item_list: list) -> str:
@@ -94,7 +94,7 @@ class Player:
         """
         Add xp to the player and performs a level up if needed
         """
-        answer = "\nYou got {:,} xp".format(amount)
+        answer = f"\nYou got {amount:,} xp"
         update(self, xp=int(self.xp) + amount)
         while int(self.xp) >= levels.get_next_xp(self.level):
             update(self, level=self.level + 1, xp=self.xp - levels.get_next_xp(self.level))
@@ -148,7 +148,7 @@ class Player:
         """
         placeholders = ", ".join(["%s"] * len(vars(job)))
         columns = ", ".join(vars(job).keys())
-        sql = "INSERT INTO jobs(%s) VALUES (%s)" % (columns, placeholders)
+        sql = f"INSERT INTO jobs{columns} VALUES {placeholders}"
         database.cur.execute(sql, tuple(job))
         database.con.commit()
 
@@ -190,7 +190,7 @@ def insert(player: Player) -> None:
     """
     placeholders = ", ".join(["%s"] * len(vars(player)))
     columns = ", ".join(vars(player).keys())
-    sql = "INSERT INTO players (%s) VALUES (%s)" % (columns, placeholders)
+    sql = f"INSERT INTO players{columns} VALUES {placeholders}"
     database.cur.execute(sql, tuple(player))
     database.con.commit()
     logging.info("Inserted %s into the database as %s", player.name, tuple(player))

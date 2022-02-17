@@ -1,4 +1,4 @@
-# pylint: disable=unused-argument,missing-function-docstring
+# pylint: disable=unused-argument,wrong-import-position
 import traceback
 import sys
 from os import getenv
@@ -6,11 +6,15 @@ import logging
 
 from dotenv import load_dotenv
 
+load_dotenv("./.env")
+
 from flask import Flask, json
 from flask_discord_interactions import DiscordInteractions, Message
 from werkzeug.exceptions import HTTPException
 
-load_dotenv("./.env")
+from resources import players
+import config
+
 from admin import admin_bp
 from system import system_bp
 from stats import profile_bp
@@ -21,9 +25,6 @@ from gambling import gambling_bp
 from guide import guide_bp
 from truck import truck_bp
 from companies import company_bp
-
-from resources import players
-import config
 
 
 app = Flask(__name__)
@@ -47,6 +48,7 @@ logger.addHandler(console_handler)
 
 @app.errorhandler(players.NotEnoughMoney)
 def not_enough_money(error):
+    """Error handler in case a player doesn't have enough money"""
     return Message(
         content="You don't have enough money to do this.",
     ).dump()
@@ -54,11 +56,13 @@ def not_enough_money(error):
 
 @app.errorhandler(players.NotDriving)
 def not_driving(error):
+    """Defer buttons if the wrong player clicked them"""
     return {"type": 6}
 
 
 @app.errorhandler(players.PlayerNotRegistered)
 def not_registered(error):
+    """Error handler in case a player isn't found in the database"""
     return Message(
         content=f"<@{error.requested_id}> You are not registered yet. Try `/profile register` to get started",
         ephemeral=True,
@@ -67,6 +71,7 @@ def not_registered(error):
 
 @app.errorhandler(players.PlayerBlacklisted)
 def blacklisted(error: players.PlayerBlacklisted):
+    """Error handler in case a player is on the blalist"""
     return Message(
         content=f"<@{error.requested_id}> You are blacklisted for the following reason: {error.reason}", ephemeral=True
     ).dump()
@@ -74,6 +79,7 @@ def blacklisted(error: players.PlayerBlacklisted):
 
 @app.errorhandler(Exception)
 def general_error(error):
+    """Log any error to journal and to discord"""
     logging.error(error)
     traceback.print_tb(error.__traceback__)
     return Message(

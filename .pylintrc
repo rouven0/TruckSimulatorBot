@@ -77,7 +77,7 @@ confidence=
 disable=print-statement,
         parameter-unpacking,
         unpacking-in-except,
-		old-raise-syntax,
+        old-raise-syntax,
         backtick,
         long-suffix,
         old-ne-operator,
@@ -153,11 +153,11 @@ disable=print-statement,
         deprecated-sys-function,
         exception-escape,
         comprehension-escape,
-		missing-module-docstring,
-		redefined-outer-name,
-		redefined-builtin,
-		import-error,
-		duplicate-code
+        missing-module-docstring,
+        redefined-outer-name,
+        redefined-builtin,
+        import-error,
+        duplicate-code
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -275,6 +275,10 @@ good-names=i,
            k,
            ex,
            Run,
+           left,
+           down,
+           up,
+           right
            _
 
 # Good variable names regexes, separated by a comma. If names match any regex,

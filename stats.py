@@ -18,7 +18,7 @@ profile = profile_bp.command_group(name="profile", description="Show and manage 
 
 @profile.command(name="register", description="Register yourself to the Truck Simulator")
 def register_profile(ctx) -> Message:
-    with open("./messages/welcome.md", "r") as welcome_file:
+    with open("./messages/welcome.md", "r", encoding="utf8") as welcome_file:
         welcome_embed = Embed(
             title="Hey there, fellow Trucker,",
             description=welcome_file.read(),
@@ -63,15 +63,14 @@ def get_profile_embed(user: User) -> Embed:
         fields=[],
         image=Media(url=truck.image_url),
     )
-    xp = "{:,}".format(player.xp)
-    next_xp = "{:,}".format(levels.get_next_xp(player.level))
-    money = "{:,}".format(player.money)
-    miles = "{:,}".format(player.miles)
-    truck_miles = "{:,}".format(player.truck_miles)
-    profile_embed.fields.append(Field(name="Level", value=f"{player.level} ({xp}/{next_xp} xp)", inline=False))
-    profile_embed.fields.append(Field(name="Money", value=f"${money}"))
     profile_embed.fields.append(
-        Field(name="Miles driven", value=f"{miles}\n({truck_miles} with current truck)", inline=False)
+        Field(
+            name="Level", value=f"{player.level} ({player.xp:,}/{levels.get_next_xp(player.level):,} xp)", inline=False
+        )
+    )
+    profile_embed.fields.append(Field(name="Money", value=f"${player.money}"))
+    profile_embed.fields.append(
+        Field(name="Miles driven", value=f"{player.miles:,}\n({player.truck_miles:,} with current truck)", inline=False)
     )
     profile_embed.fields.append(Field(name="Gas left", value=f"{player.gas} l", inline=False))
     profile_embed.fields.append(Field(name="Current truck", value=truck.name))
@@ -109,13 +108,13 @@ def top(ctx, key) -> Message:
 
     for player in top_players[0]:
         if key == "money":
-            val = "{:,}".format(player.money)
+            val = f"{player.money:,}"
         elif key == "miles":
-            val = "{:,}".format(player.miles)
+            val = f"{player.miles:,}"
         else:
-            val = "{:,} ({}/{} xp)".format(player.level, player.xp, levels.get_next_xp(player.level))
+            val = f"{player.level:,} ({player.xp:,}/{levels.get_next_xp(player.level):,} xp)"
             top_embed.footer = Footer(text="You can also sort by money and miles", icon_url=config.SELF_AVATAR_URL)
         count += 1
-        top_body += "**{}**. {} ~ {}{}\n".format(count, player.name, val, top_players[1])
+        top_body += f"**{count}**. {player.name} ~ {val}{top_players[1]}\n"
     top_embed.fields.append(Field(name=f"Top {key}", value=top_body))
     return Message(embed=top_embed)
