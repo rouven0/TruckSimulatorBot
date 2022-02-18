@@ -114,7 +114,7 @@ def insert(company: Company) -> None:
     """Add a new company"""
     placeholders = ", ".join(["%s"] * len(vars(company)))
     columns = ", ".join(vars(company).keys())
-    sql = f"INSERT INTO companies {columns} VALUES {placeholders}"
+    sql = f"INSERT INTO companies ({columns}) VALUES ({placeholders})"
     database.cur.execute(sql, tuple(company))
     database.con.commit()
     logging.info("%s created the company %s", company.founder, company.name)

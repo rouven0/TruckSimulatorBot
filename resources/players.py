@@ -149,7 +149,8 @@ class Player:
         """
         placeholders = ", ".join(["%s"] * len(vars(job)))
         columns = ", ".join(vars(job).keys())
-        sql = f"INSERT INTO jobs{columns} VALUES {placeholders}"
+        sql = f"INSERT INTO jobs({columns}) VALUES ({placeholders})"
+        print(sql)
         database.cur.execute(sql, tuple(job))
         database.con.commit()
 
@@ -191,7 +192,7 @@ def insert(player: Player) -> None:
     """
     placeholders = ", ".join(["%s"] * len(vars(player)))
     columns = ", ".join(vars(player).keys())
-    sql = f"INSERT INTO players{columns} VALUES {placeholders}"
+    sql = f"INSERT INTO players({columns}) VALUES ({placeholders})"
     database.cur.execute(sql, tuple(player))
     database.con.commit()
     logging.info("Inserted %s into the database as %s", player.name, tuple(player))
