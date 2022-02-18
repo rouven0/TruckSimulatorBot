@@ -2,7 +2,14 @@
 from typing import Union
 from math import log
 from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
-from flask_discord_interactions.models.component import ActionRow, Button, Component, SelectMenu, SelectMenuOption
+from flask_discord_interactions.models.component import (
+    ActionRow,
+    Button,
+    ButtonStyles,
+    Component,
+    SelectMenu,
+    SelectMenuOption,
+)
 from flask_discord_interactions.models.embed import Field, Media, Author, Footer
 
 import config
@@ -66,7 +73,20 @@ def get_truck_components(player: players.Player) -> list[Component]:
                 ),
             ]
         ),
+        ActionRow(
+            components=[
+                Button(custom_id=["discard", player.id], label="Close Menu", style=ButtonStyles.SECONDARY),
+            ]
+        ),
     ]
+
+
+@truck_bp.custom_handler(custom_id="discard")
+def discard(ctx, player_id: int):
+    """Remove all components"""
+    if int(ctx.author.id) != player_id:
+        return Message(deferred=True, update=True)
+    return Message(embeds=ctx.message.embeds, components=[], update=True)
 
 
 @truck_bp.custom_handler(custom_id="back")
@@ -122,7 +142,9 @@ def buy(ctx, player_id: int) -> Union[Message, str]:
             ActionRow(
                 components=[
                     Button(
-                        label="Check it out", custom_id=["back", player.id], emoji=symbols.parse_emoji(new_truck.emoji)
+                        label="Check it out",
+                        custom_id=["back", player.id],
+                        emoji=symbols.parse_emoji(new_truck.emoji),
                     )
                 ]
             )
@@ -139,7 +161,9 @@ def view(ctx, player_id: int) -> Message:
     truck_embed = get_truck_embed(trucks.get(int(ctx.values[0])))
     return Message(
         embed=truck_embed,
-        components=[ActionRow(components=[Button(label="Back", custom_id=["back", player_id])])],
+        components=[
+            ActionRow(components=[Button(label="Back", custom_id=["back", player_id], style=ButtonStyles.SECONDARY)])
+        ],
         update=True,
     )
 
