@@ -26,7 +26,7 @@ def show_job(ctx, player_id: int) -> Message:
         return Message(deferred=True, update=True)
     job_embed = Embed(
         color=config.EMBED_COLOR,
-        author=Author(name=f"{player.name}'s Job".format(player.name)),
+        author=Author(name=f"{player.name}'s Job"),
         fields=[],
     )
     place_from = current_job.place_from

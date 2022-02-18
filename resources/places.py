@@ -10,17 +10,18 @@ from typing import Optional
 class Place:
     """
     Attributes:
+    -----------
         name: The name of the place
         position: the Place's position in the 2 dimensional array that I call Map
         available_actions: all local available commands stored as strings in a list
         image_url: Every place has an image that is shown while driving
-                   Images are hosted on a ressource discord server and displayed in embeds via URL
+                   Images are hosted on a resource discord server and displayed in embeds via URL
         image_url_better: image with the better truck
         image_url_tropical: image with the tropical truck
         image_url_ultimate: image with the ultimate truck
         produced_item: Item this place produces in jobs.
         accepted_item: Item this place rewards
-        item_reward: money payed when the accepted_item is unloaded
+        item_reward: money paid when the accepted_item is unloaded
     """
 
     name: str

@@ -10,7 +10,6 @@ import config
 from resources import players
 from resources import jobs
 
-
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 

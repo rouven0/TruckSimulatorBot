@@ -32,11 +32,12 @@ def _format_items_to_db(item_list: list) -> str:
 class Player:
     """
     Attributes:
+    ----------
         id: Unique discord user id to identify the player
         name: Displayed name in discord, NOT the Nickname
         level: players level
         xp: xp for current level
-        money: Amount of ingame currency the player has
+        money: Amount of in-game currency the player has
         position: Position on the 2 dimensional array that I call map
         miles: Amount of miles the Player has driven
         gas: amount of gas the player has

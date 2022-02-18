@@ -1,8 +1,8 @@
 # pylint: disable=unused-argument
 from typing import Union
 from math import log
-from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed, User
-from flask_discord_interactions.models.command import CommandOptionType
+from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
+from flask_discord_interactions.models.component import ActionRow, Button, Component, SelectMenu, SelectMenuOption
 from flask_discord_interactions.models.embed import Field, Media, Author, Footer
 
 import config
@@ -30,57 +30,81 @@ def get_truck_embed(truck: trucks.Truck) -> Embed:
     return truck_embed
 
 
-def get_truck_choices() -> list[dict]:
+def get_truck_options() -> list[SelectMenuOption]:
     """Returns choices shown up in several truck commands"""
     choices = []
     for truck in trucks.get_all():
-        choices.append({"name": truck.name, "value": truck.truck_id})
+        choices.append(
+            SelectMenuOption(
+                label=truck.name,
+                description=truck.description,
+                value=str(truck.truck_id),
+                emoji=symbols.parse_emoji(truck.emoji),
+            )
+        )
     return choices
 
 
-truck = truck_bp.command_group(name="truck", description="Do stuff with your truck")
+def get_truck_components(player: players.Player) -> list[Component]:
+    """Returns button and selects appearing underneath a truck embed"""
+    return [
+        ActionRow(
+            components=[
+                SelectMenu(
+                    custom_id=["truck_view", player.id],
+                    options=get_truck_options(),
+                    placeholder="View details about a truck",
+                )
+            ]
+        ),
+        ActionRow(
+            components=[
+                SelectMenu(
+                    custom_id=["truck_buy", player.id],
+                    options=get_truck_options(),
+                    placeholder="Buy a new truck",
+                ),
+            ]
+        ),
+    ]
 
 
-@truck.command()
-def show(ctx, user: User = None) -> Message:
-    """Get details about your truck and the trucks of your friends"""
-    if user is not None:
-        player = players.get(int(user.id))
-        avatar_url = user.avatar_url
-    else:
-        player = players.get(ctx.author.id)
-        avatar_url = ctx.author.avatar_url
+@truck_bp.custom_handler(custom_id="back")
+def show_truck_button(ctx, player_id: int):
+    """Back-button"""
+    if int(ctx.author.id) != player_id:
+        return Message(deferred=True, update=True)
+    return show_truck(ctx, update=True)
+
+
+@truck_bp.command()
+def truck(ctx) -> Message:
+    """View and manage your Truck"""
+    return show_truck(ctx)
+
+
+def show_truck(ctx, update: bool = False) -> Message:
+    """Shows the main truck page"""
+    player = players.get(ctx.author.id)
     # Detect, when the player is renamed
     if player.name != ctx.author.username:
         players.update(player, name=ctx.author.username)
     truck = trucks.get(player.truck_id)
     truck_embed = get_truck_embed(truck)
-    truck_embed.author = Author(name=f"{player.name}'s truck", icon_url=avatar_url)
-    truck_embed.footer = Footer(
-        icon_url=config.SELF_AVATAR_URL,
-        text="See all trucks with `/truck list` and change your truck with `/truck buy`",
-    )
-    return Message(embed=truck_embed)
+    truck_embed.author = Author(name=f"{player.name}'s truck", icon_url=ctx.author.avatar_url)
+    return Message(embed=truck_embed, components=get_truck_components(player), update=update)
 
 
-@truck.command(
-    options=[
-        {
-            "name": "truck",
-            "description": "The truck you want to buy",
-            "type": CommandOptionType.INTEGER,
-            "required": True,
-            "choices": get_truck_choices(),
-        }
-    ],
-)
-def buy(ctx, truck: int) -> Union[Message, str]:
-    """Buy a new truck, your old one will be sold and your miles will be reset"""
+@truck_bp.custom_handler(custom_id="truck_buy")
+def buy(ctx, player_id: int) -> Union[Message, str]:
+    """Select handler to buy a new truck"""
+    if int(ctx.author.id) != player_id:
+        return Message(deferred=True, update=True)
     if players.is_driving(int(ctx.author.id)):
         return f"{ctx.author.mention} You can't buy a new truck while you are driving in the old one"
     player = players.get(int(ctx.author.id))
     old_truck = trucks.get(player.truck_id)
-    new_truck = trucks.get(truck)
+    new_truck = trucks.get(int(ctx.values[0]))
     selling_price = round(old_truck.price - (old_truck.price / 10) * log(player.truck_miles + 1))
     end_price = new_truck.price - selling_price
     # this also adds money if the end price is negative
@@ -91,48 +115,33 @@ def buy(ctx, truck: int) -> Union[Message, str]:
         f"for ${new_truck.price}",
         color=config.EMBED_COLOR,
         author=Author(name="You got a new truck", icon_url=config.SELF_AVATAR_URL),
-        footer=Footer(text="Check out your new baby with `/truck show`"),
     )
-    return Message(embed=answer_embed)
+    return Message(
+        embed=answer_embed,
+        components=[
+            ActionRow(
+                components=[
+                    Button(
+                        label="Check it out", custom_id=["back", player.id], emoji=symbols.parse_emoji(new_truck.emoji)
+                    )
+                ]
+            )
+        ],
+        update=True,
+    )
 
 
-@truck.command(
-    options=[
-        {
-            "name": "truck",
-            "description": "The truck you want to view",
-            "type": CommandOptionType.INTEGER,
-            "required": True,
-            "choices": get_truck_choices(),
-        }
-    ],
-)
-def view(ctx, truck) -> Message:
+@truck_bp.custom_handler(custom_id="truck_view")
+def view(ctx, player_id: int) -> Message:
     """View details about a specific truck"""
-    truck_embed = get_truck_embed(trucks.get(truck))
-    truck_embed.footer = Footer(
-        icon_url=config.SELF_AVATAR_URL,
-        text="See all trucks with `/truck list` and change your truck with `/truck buy`",
+    if int(ctx.author.id) != player_id:
+        return Message(deferred=True, update=True)
+    truck_embed = get_truck_embed(trucks.get(int(ctx.values[0])))
+    return Message(
+        embed=truck_embed,
+        components=[ActionRow(components=[Button(label="Back", custom_id=["back", player_id])])],
+        update=True,
     )
-    return Message(embed=truck_embed)
-
-
-@truck.command()
-def list(ctx) -> Message:
-    """Lists all available Trucks"""
-    list_embed = Embed(
-        title="All available trucks",
-        color=config.EMBED_COLOR,
-        footer=Footer(
-            text="Get more information about a truck with `/truck view <id>`", icon_url=config.SELF_AVATAR_URL
-        ),
-        fields=[],
-    )
-    for truck in trucks.get_all():
-        list_embed.fields.append(
-            Field(name=truck.name, value=f"Id: {truck.truck_id} \n Price: ${truck.price:,}", inline=False)
-        )
-    return Message(embed=list_embed)
 
 
 @truck_bp.command()

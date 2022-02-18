@@ -1,6 +1,7 @@
 """
 This module provides all symbols and emojis the bots operates with
 """
+import re
 import config
 
 LEFT = 853353650491752459
@@ -39,3 +40,11 @@ def get_all_drive_symbols() -> list:
     Returns a list with all arrow symbols
     """
     return [LEFT, DOWN, UP, RIGHT]
+
+
+def parse_emoji(emoji: str) -> dict:
+    """Parses an emoji dict out of an emoji string with the format <a:name:id>"""
+    match = re.match(r"<a*:(\w*):(\d+)>", emoji)
+    if match:
+        return {"name": match.groups()[0], "id": match.groups()[1]}
+    raise ValueError()
