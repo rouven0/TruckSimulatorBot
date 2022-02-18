@@ -121,7 +121,7 @@ def buy(ctx, player_id: int) -> Union[Message, str]:
     if int(ctx.author.id) != player_id:
         return Message(deferred=True, update=True)
     if players.is_driving(int(ctx.author.id)):
-        return f"{ctx.author.mention} You can't buy a new truck while you are driving in the old one"
+        return "You can't buy a new truck while you are driving in the old one"
     player = players.get(int(ctx.author.id))
     old_truck = trucks.get(player.truck_id)
     new_truck = trucks.get(int(ctx.values[0]))
