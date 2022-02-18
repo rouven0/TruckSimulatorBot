@@ -150,7 +150,6 @@ class Player:
         placeholders = ", ".join(["%s"] * len(vars(job)))
         columns = ", ".join(vars(job).keys())
         sql = f"INSERT INTO jobs({columns}) VALUES ({placeholders})"
-        print(sql)
         database.cur.execute(sql, tuple(job))
         database.con.commit()
 
