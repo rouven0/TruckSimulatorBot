@@ -91,6 +91,14 @@ def get(position) -> Place:
     return Place("Nothing", position, [], None, None, None, None, None, None, None)
 
 
+def get_matching_options(name: str) -> list[dict]:
+    return [
+        {"name": place.name, "value": f"{place.position[0]}/{place.position[1]}"}
+        for place in __all_places__
+        if name in str.lower(place.name)
+    ]
+
+
 def get_all() -> list:
     """
     Returns all places that are currently loaded

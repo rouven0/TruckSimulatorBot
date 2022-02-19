@@ -1,12 +1,14 @@
 # pylint: disable=unused-argument,missing-function-docstring
 from datetime import datetime
 from time import time
+
 import requests
 
 from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
 from flask_discord_interactions.context import Context
 from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
+from flask_discord_interactions.models.autocomplete import Autocomplete
 
 import config
 from resources import players
@@ -411,28 +413,29 @@ def drive(ctx) -> Message:
     )
 
 
-@driving_bp.command()
-def position(ctx) -> Message:
+@driving_bp.command(annotations={"place": "The place you want to view"})
+def placeinfo(ctx, place: Autocomplete(str)) -> Message:
     """Provides some information about your current position and the things located there"""
-    player = players.get(int(ctx.author.id))
-    place = places.get(player.position)
+    player = players.get(ctx.author.id)
+    try:
+        queried_place = places.get(place)
+    except ValueError:
+        return Message("Place not found")
     position_embed = Embed(
-        description=f"You are at {player.position}",
+        title="What is here?",
+        description=queried_place.name,
         color=config.EMBED_COLOR,
-        author=Author(name=f"{player.name}'s Position", icon_url=ctx.author.avatar_url),
-        fields=[],
+        fields=[Field(name="Position", value=str(queried_place.position))]
     )
-    position_embed.fields.append(Field(name="What is here?", value=symbols.LIST_ITEM + place.name, inline=False))
-    if place.image_url_default is not None:
-        position_embed.image = Media(url=assets.get_place_image(player, place))
+    if queried_place.image_url_default is not None:
+        position_embed.fields.append(Field(name="Produced item", value=str(items.get(queried_place.produced_item))))
+        position_embed.image = Media(url=assets.get_place_image(player, queried_place))
+    if queried_place.accepted_item:
+        position_embed.fields.append(Field(name="Accepted item", value=str(items.get(queried_place.accepted_item))))
+
     return Message(embed=position_embed)
 
 
-@driving_bp.command()
-def addressbook(ctx) -> Message:
-    """Lists all public places. Hidden ones are excluded"""
-    places_embed = Embed(title="All public known Places", color=config.EMBED_COLOR, fields=[])
-    for place in places.get_public():
-        places_embed.fields.append(Field(name=place.name, value=str(place.position)))
-    print(places_embed)
-    return Message(embed=places_embed)
+@placeinfo.autocomplete()
+def place_autocomplete(ctx, place):
+    return places.get_matching_options(place.value)
