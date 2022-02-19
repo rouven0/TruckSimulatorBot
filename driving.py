@@ -415,7 +415,7 @@ def drive(ctx) -> Message:
 
 @driving_bp.command(annotations={"place": "The place you want to view"})
 def placeinfo(ctx, place: Autocomplete(str)) -> Message:
-    """Provides some information about your current position and the things located there"""
+    """Prints some information about a specific place"""
     player = players.get(ctx.author.id)
     try:
         queried_place = places.get(place)
