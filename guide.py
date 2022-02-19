@@ -1,7 +1,7 @@
 # pylint: disable=unused-argument
 from os import listdir
 from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
-from flask_discord_interactions.models.command import CommandOptionType
+from flask_discord_interactions.models.option import CommandOptionType
 from flask_discord_interactions.models.embed import Field, Author, Media
 
 import config

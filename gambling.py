@@ -1,7 +1,7 @@
 # pylint: disable=unused-argument, missing-function-docstring
 from random import randint, sample, choices
 from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
-from flask_discord_interactions.models.command import CommandOptionType
+from flask_discord_interactions.models.option import CommandOptionType
 from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles
 from flask_discord_interactions.models.user import User
 from flask_discord_interactions.models.embed import Author, Field
