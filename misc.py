@@ -15,7 +15,7 @@ def support(ctx) -> str:
 
 @misc_bp.command()
 def invite(ctx) -> Message:
-    """Invite the truck simulator to your servers"""
+    """Invite the Truck Simulator to your servers"""
     invite_embed = Embed(
         title="Click here to add the bot to your servers",
         description="Go spread the word of the Truck Simulator",

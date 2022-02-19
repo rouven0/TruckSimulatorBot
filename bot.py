@@ -5,6 +5,8 @@ from os import getenv
 import logging
 
 from dotenv import load_dotenv
+from flask_discord_interactions.models.component import ActionRow, Button
+from flask_discord_interactions.models.embed import Embed, Footer
 
 load_dotenv("./.env")
 
@@ -83,8 +85,18 @@ def general_error(error):
     logging.error(error)
     traceback.print_tb(error.__traceback__)
     return Message(
-        content=f"Looks like we got an error here. ```{error.__class__.__name__}: {error}```"
-        "If this occurs multiple times feel free to report it in the support server"
+        embed=Embed(
+            title="Looks like we got an error here.",
+            description=f" ```py\n {error.__class__.__name__}: {error}```",
+            footer=Footer(
+                text="If this occurs multiple times feel free to report it.",
+                icon_url=config.SELF_AVATAR_URL,
+            ),
+            color=int("ff0000", 16),
+        ),
+        components=[
+            ActionRow(components=[Button(style=5, label="Support Server", url="https://discord.gg/FzAxtGTUhN")])
+        ],
     ).dump()
 
 
