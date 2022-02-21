@@ -81,12 +81,13 @@ def votes():
         added_money = (player.level + 1) * 100
         player.add_money(added_money)
         vote_message_content = (
-            f"**{player.name}** just voted for the Truck Simulator. As a reward he received ${added_money}"
+            f"**{player.name}** just voted for the Truck Simulator. As a reward he received ${added_money}."
         )
     vote_message = Message(
         embed=Embed(
             title="Thank you for voting for the Truck Simulator",
-            description=vote_message_content,
+            description=vote_message_content
+            + "\n\n You can vote [here](https://top.gg/bot/831052837353816066/vote) every 12 hours.",
             color=config.EMBED_COLOR,
         )
     )
