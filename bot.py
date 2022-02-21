@@ -72,7 +72,6 @@ def votes():
     if request.headers.get("Authorization") != getenv("VOTE_AUTHORIZATION"):
         abort(401)
     voter_id = int(request.json.get("user"))
-    vote_message_content = "Hmm"
     if not players.registered(voter_id):
         vote_message_content = (
             f"Hmm, somebody voted that isn't even registered <:cat:892088956253011989> (id: {voter_id})"
@@ -84,7 +83,7 @@ def votes():
         added_money = (player.level + 1) * 100
         player.add_money(added_money)
         vote_message_content = (
-            f"**{player.name}** just voted for the Truck Simulator. As a reward he received ${added_money}."
+            f"**{player.name}** just voted for the Truck Simulator. As a reward they received ${added_money}."
         )
     vote_message = Message(
         embed=Embed(
