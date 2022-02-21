@@ -39,7 +39,7 @@ def vote(ctx) -> Message:
     """Support the bot by voting for it on top.gg"""
     vote_embed = Embed(
         title="Click here to vote for the Truck Simulator",
-        description="If you are a member of the official server, you will get a special color role",
+        description="You will receive some money as reward for your vote",
         url="https://top.gg/bot/831052837353816066/vote",
         color=config.EMBED_COLOR,
     )

@@ -11,7 +11,8 @@ from flask_discord_interactions import DiscordInteractions, Message
 
 load_dotenv("./.env")
 
-from flask import Flask, json
+from flask import Flask, json, request, abort
+import requests
 from werkzeug.exceptions import HTTPException
 
 from resources import players
@@ -46,6 +47,51 @@ logger.setLevel(logging.INFO)
 console_handler = logging.StreamHandler()
 console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
 logger.addHandler(console_handler)
+
+
+# not made for public use, only for myself to get some webhooks and literally just copied from the discord docs
+# @app.route("/webhooks")
+# def webhook():
+# data = {
+# "client_id": getenv("DISCORD_CLIENT_ID", default=""),
+# "client_secret": getenv("DISCORD_CLIENT_SECRET", default=""),
+# "grant_type": "authorization_code",
+# "code": request.args.get("code"),
+# "redirect_uri": "https://trucksimulatorbot.rfive.de/api/beta/webhooks",
+# }
+# headers = {"Content-Type": "application/x-www-form-urlencoded"}
+# r = requests.post("https://discord.com/api/v10/oauth2/token", data=data, headers=headers)
+# r.raise_for_status()
+# return r.json()
+
+
+@app.route("/votes", methods=["POST"])
+def votes():
+    """Handle vote webhooks from top.gg"""
+    if request.headers.get("Authorization") != getenv("VOTE_AUTHORIZATION"):
+        abort(401)
+    voter_id = int(request.json.get("user"))
+    vote_message_content = "Hmm"
+    if not players.registered(voter_id):
+        vote_message_content = (
+            f"Hmm, somebody voted that isn't even registered <:cat:892088956253011989> (id: {voter_id})"
+        )
+    else:
+        player = players.get(voter_id)
+        added_money = (player.level + 1) * 100
+        player.add_money(added_money)
+        vote_message_content = (
+            f"**{player.name}** just voted for the Truck Simulator. As a reward he received ${added_money}"
+        )
+    vote_message = Message(
+        embed=Embed(
+            title="Thank you for voting for the Truck Simulator",
+            description=vote_message_content,
+            color=config.EMBED_COLOR,
+        )
+    )
+    requests.post(url=getenv("VOTE_WEBHOOK", ""), json=vote_message.dump()["data"])
+    return "", 204
 
 
 @app.errorhandler(players.NotEnoughMoney)
