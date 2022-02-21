@@ -16,6 +16,7 @@ import requests
 from werkzeug.exceptions import HTTPException
 
 from resources import players
+from resources import items
 import config
 
 from admin import admin_bp
@@ -78,10 +79,12 @@ def votes():
         )
     else:
         player = players.get(voter_id)
+        if player.id == 619879176316649482:
+            player.load_item(items.get("cheese"))
         added_money = (player.level + 1) * 100
         player.add_money(added_money)
         vote_message_content = (
-            f"**{player.name}** just voted for the Truck Simulator. As a reward they received ${added_money}."
+            f"**{player.name}** just voted for the Truck Simulator. As a reward he received ${added_money}."
         )
     vote_message = Message(
         embed=Embed(
