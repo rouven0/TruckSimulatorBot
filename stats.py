@@ -14,11 +14,16 @@ from resources import companies
 profile_bp = DiscordInteractionsBlueprint()
 
 
-profile = profile_bp.command_group(name="profile", description="Show and manage your profile")
+@profile_bp.command(name="Check Profile", type=ApplicationCommandType.USER)
+def show_profile_context(ctx, user: User) -> Message:
+    return Message(embed=get_profile_embed(user))
 
 
-@profile.command(name="register", description="Register yourself to the Truck Simulator")
-def register_profile(ctx) -> Message:
+@profile_bp.command(annotations={"user": "A user you want to view"})
+def profile(ctx, user: User = None):
+    """View your profile"""
+    if user or players.registered(ctx.author.id):
+        return Message(embed=get_profile_embed(user if user is not None else ctx.author))
     with open("./messages/welcome.md", "r", encoding="utf8") as welcome_file:
         welcome_embed = Embed(
             title="Hey there, fellow Trucker,",
@@ -28,27 +33,10 @@ def register_profile(ctx) -> Message:
                 name="Welcome to the Truck Simulator",
                 icon_url=config.SELF_AVATAR_URL,
             ),
+            footer=Footer(text="Your profile has been created"),
         )
-    if not players.registered(ctx.author.id):
-        players.insert(players.Player(int(ctx.author.id), ctx.author.username, money=1000, gas=600))
-        welcome_embed.footer = Footer(text="Your profile has been created")
+    players.insert(players.Player(int(ctx.author.id), ctx.author.username, money=1000, gas=600))
     return Message(embed=welcome_embed)
-
-
-@profile_bp.command(name="Check Profile", type=ApplicationCommandType.USER)
-def show_profile_context(ctx, user: User) -> Message:
-    return Message(embed=get_profile_embed(user))
-
-
-@profile.command(
-    name="show",
-    description="Look at your profile",
-    options=[
-        {"name": "user", "description": "The user whose profile you want to look at", "type": CommandOptionType.USER}
-    ],
-)
-def show_profile(ctx, user: User = None):
-    return Message(embed=get_profile_embed(user if user is not None else ctx.author))
 
 
 def get_profile_embed(user: User) -> Embed:

@@ -10,7 +10,7 @@ from flask_discord_interactions.models.component import (
     SelectMenu,
     SelectMenuOption,
 )
-from flask_discord_interactions.models.embed import Field, Media, Author, Footer
+from flask_discord_interactions.models.embed import Field, Media, Author
 
 import config
 
@@ -166,22 +166,3 @@ def view(ctx, player_id: int) -> Message:
         ],
         update=True,
     )
-
-
-@truck_bp.command()
-def load(ctx) -> Message:
-    """Shows what your Truck currently has loaded"""
-    player = players.get(int(ctx.author.id))
-    item_list = ""
-    if len(player.loaded_items) == 0:
-        item_list = "Your truck is empty"
-    else:
-        for item in player.loaded_items:
-            item_list += f"{symbols.LIST_ITEM} <:placeholder:{item.emoji}> {item.name}\n"
-    load_embed = Embed(
-        title="Your currently loaded items",
-        description=item_list,
-        color=config.EMBED_COLOR,
-        footer=Footer(text=f"Loaded items: {len(player.loaded_items)}/{trucks.get(player.truck_id).loading_capacity}"),
-    )
-    return Message(embed=load_embed)

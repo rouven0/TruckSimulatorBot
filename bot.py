@@ -7,11 +7,11 @@ import logging
 from dotenv import load_dotenv
 from flask_discord_interactions.models.component import ActionRow, Button
 from flask_discord_interactions.models.embed import Embed, Footer
+from flask_discord_interactions import DiscordInteractions, Message
 
 load_dotenv("./.env")
 
 from flask import Flask, json
-from flask_discord_interactions import DiscordInteractions, Message
 from werkzeug.exceptions import HTTPException
 
 from resources import players
@@ -66,7 +66,7 @@ def not_driving(error):
 def not_registered(error):
     """Error handler in case a player isn't found in the database"""
     return Message(
-        content=f"<@{error.requested_id}> You are not registered yet. Try `/profile register` to get started",
+        content=f"<@{error.requested_id}> You are not registered yet. Try `/profile` to get started",
         ephemeral=True,
     ).dump()
 

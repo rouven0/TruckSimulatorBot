@@ -8,7 +8,6 @@ from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Em
 from flask_discord_interactions.context import Context
 from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
-from flask_discord_interactions.models.autocomplete import Autocomplete
 
 import config
 from resources import players
@@ -141,26 +140,31 @@ def get_buttons(player: players.Player) -> list:
     buttons.append(ActionRow(components=directional_buttons))
 
     current_job = player.get_job()
-    action_buttons = []
     load_disabled = not len(player.loaded_items) < trucks.get(player.truck_id).loading_capacity
     unload_disabled = not len(player.loaded_items) > 0
     if place.name == "Nothing":
         load_disabled = True
         unload_disabled = True
 
-    action_buttons.append(
+    action_buttons = [
         Button(
-            style=1, emoji={"name": "load", "id": symbols.LOAD}, custom_id=["load", player.id], disabled=load_disabled
-        )
-    )
-    action_buttons.append(
+            style=1,
+            emoji={"name": "load", "id": symbols.LOAD},
+            custom_id=["load", player.id],
+            disabled=load_disabled,
+        ),
         Button(
             style=1,
             emoji={"name": "unload", "id": symbols.UNLOAD},
             custom_id=["unload", player.id],
             disabled=unload_disabled,
-        )
-    )
+        ),
+        Button(
+            style=2,
+            label="Show loaded items",
+            custom_id=["show_load", player.id],
+        ),
+    ]
 
     if "refill" in place.available_actions:
         action_buttons.append(
@@ -392,7 +396,7 @@ def move(ctx: Context, direction, player_id):
 
 @driving_bp.command()
 def drive(ctx) -> Message:
-    """Start driving your Truck on the map and control it with buttons"""
+    """Start driving your Truck"""
     player = players.get(ctx.author.id)
     # Detect, when the player is renamed
     if player.name != ctx.author.username:
@@ -413,29 +417,20 @@ def drive(ctx) -> Message:
     )
 
 
-@driving_bp.command(annotations={"place": "The place you want to view"})
-def placeinfo(ctx, place: Autocomplete(str)) -> Message:
-    """Prints some information about a specific place"""
-    player = players.get(ctx.author.id)
-    try:
-        queried_place = places.get(place)
-    except ValueError:
-        return Message("Place not found")
-    position_embed = Embed(
-        title="What is here?",
-        description=queried_place.name,
+@driving_bp.custom_handler(custom_id="show_load")
+def load_show(ctx, player_id: int) -> Message:
+    """Shows what your Truck currently has loaded"""
+    player = players.get_driving_player(int(ctx.author.id), check=player_id)
+    item_list = ""
+    if len(player.loaded_items) == 0:
+        item_list = "Your truck is empty"
+    else:
+        for item in player.loaded_items:
+            item_list += f"{symbols.LIST_ITEM} <:placeholder:{item.emoji}> {item.name}\n"
+    load_embed = Embed(
+        title="Your currently loaded items",
+        description=item_list,
         color=config.EMBED_COLOR,
-        fields=[Field(name="Position", value=str(queried_place.position))]
+        footer=Footer(text=f"Loaded items: {len(player.loaded_items)}/{trucks.get(player.truck_id).loading_capacity}"),
     )
-    if queried_place.image_url_default is not None:
-        position_embed.fields.append(Field(name="Produced item", value=str(items.get(queried_place.produced_item))))
-        position_embed.image = Media(url=assets.get_place_image(player, queried_place))
-    if queried_place.accepted_item:
-        position_embed.fields.append(Field(name="Accepted item", value=str(items.get(queried_place.accepted_item))))
-
-    return Message(embed=position_embed)
-
-
-@placeinfo.autocomplete()
-def place_autocomplete(ctx, place):
-    return places.get_matching_options(place.value)
+    return Message(embed=load_embed, ephemeral=True)

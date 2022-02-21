@@ -3,10 +3,13 @@ from os import listdir
 from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
 from flask_discord_interactions.models.option import CommandOptionType
 from flask_discord_interactions.models.embed import Field, Author, Media
+from flask_discord_interactions.models.autocomplete import Autocomplete
 
 import config
 
 from resources import items
+from resources import players
+from resources import assets
 from resources import places
 
 guide_bp = DiscordInteractionsBlueprint()
@@ -37,6 +40,35 @@ def iteminfo(ctx, item: str) -> Message:
         if place.produced_item == item:
             item_embed.fields.append(Field(name="Found at", value=place.name))
     return Message(embed=item_embed)
+
+
+@guide_bp.command(annotations={"place": "The place you want to view"})
+def placeinfo(ctx, place: Autocomplete(str)) -> Message:
+    """Prints some information about a specific place"""
+    player = players.get(ctx.author.id)
+    try:
+        queried_place = places.get(place)
+    except ValueError:
+        return Message("Place not found")
+    position_embed = Embed(
+        title="What is here?",
+        description=queried_place.name,
+        color=config.EMBED_COLOR,
+        fields=[Field(name="Position", value=str(queried_place.position))],
+    )
+    if queried_place.image_url_default is not None:
+        position_embed.fields.append(Field(name="Produced item", value=str(items.get(queried_place.produced_item))))
+        position_embed.image = Media(url=assets.get_place_image(player, queried_place))
+    if queried_place.accepted_item:
+        position_embed.fields.append(Field(name="Accepted item", value=str(items.get(queried_place.accepted_item))))
+
+    return Message(embed=position_embed)
+
+
+@placeinfo.autocomplete()
+def place_autocomplete(ctx, place):
+    """Returns matching choices for a place name"""
+    return places.get_matching_options(place.value)
 
 
 @guide_bp.command(

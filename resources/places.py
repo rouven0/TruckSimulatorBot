@@ -92,6 +92,7 @@ def get(position) -> Place:
 
 
 def get_matching_options(name: str) -> list[dict]:
+    """Returns autocomplete choices for the placeinfo command"""
     return [
         {"name": place.name, "value": f"{place.position[0]}/{place.position[1]}"}
         for place in __all_places__

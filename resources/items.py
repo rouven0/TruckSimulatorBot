@@ -12,9 +12,10 @@ class Item:
     name: str
     emoji: int
     description: str
-    
+
     def __str__(self) -> str:
         return f"<:placeholder:{self.emoji}> {self.name}"
+
 
 def __generate_list(lst) -> None:
     for i in __cur__.fetchall():
