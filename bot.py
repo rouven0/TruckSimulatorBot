@@ -81,7 +81,7 @@ def votes():
         added_money = (player.level + 1) * 100
         player.add_money(added_money)
         vote_message_content = (
-            f"**{player.name}** just voted for the Truck Simulator. As a reward he received ${added_money}."
+            f"**{player.name}** just voted for the Truck Simulator. As a reward they received ${added_money}."
         )
     vote_message = Message(
         embed=Embed(
