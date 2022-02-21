@@ -21,7 +21,7 @@ def show_profile_context(ctx, user: User) -> Message:
 
 @profile_bp.command(annotations={"user": "A user you want to view"})
 def profile(ctx, user: User = None):
-    """View your profile"""
+    """View and manage your profile"""
     if user or players.registered(ctx.author.id):
         return Message(embed=get_profile_embed(user if user is not None else ctx.author))
     with open("./messages/welcome.md", "r", encoding="utf8") as welcome_file:
