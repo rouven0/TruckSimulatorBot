@@ -9,13 +9,13 @@ misc_bp = DiscordInteractionsBlueprint()
 
 @misc_bp.command()
 def support(ctx) -> str:
-    """Truck Simulator support server"""
+    """Get a link to the support server."""
     return "https://discord.gg/FzAxtGTUhN"
 
 
 @misc_bp.command()
 def rules(ctx) -> Message:
-    """Truck Simulator rules"""
+    """Truck Simulator Rules."""
     rules_embed = Embed(title="Truck Simulator Ingame Rules", color=config.EMBED_COLOR, fields=[])
     rules_embed.fields.append(
         Field(
@@ -36,7 +36,7 @@ def rules(ctx) -> Message:
 
 @misc_bp.command()
 def vote(ctx) -> Message:
-    """Support the bot by voting for it on top.gg"""
+    """Support the bot by voting for it on top.gg."""
     vote_embed = Embed(
         title="Click here to vote for the Truck Simulator",
         description="You will receive some money as reward for your vote",

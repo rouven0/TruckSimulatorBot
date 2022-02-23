@@ -55,7 +55,7 @@ def get_info_embed() -> Embed:
 
 @system_bp.command()
 def info(ctx) -> Message:
-    """System information and credits"""
+    """System information and credits."""
     return Message(
         embed=get_info_embed(),
         components=[

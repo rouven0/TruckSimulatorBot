@@ -27,7 +27,7 @@ guide_bp = DiscordInteractionsBlueprint()
     ]
 )
 def iteminfo(ctx, item: str) -> Message:
-    """Prints some information about a specific item"""
+    """Prints some information about a specific item."""
     requested_item = items.get(item)
     item_embed = Embed(
         title=f"Item info for {requested_item.name}",
@@ -44,7 +44,7 @@ def iteminfo(ctx, item: str) -> Message:
 
 @guide_bp.command(annotations={"place": "The place you want to view"})
 def placeinfo(ctx, place: Autocomplete(str)) -> Message:
-    """Prints some information about a specific place"""
+    """Prints some information about a specific place."""
     player = players.get(ctx.author.id)
     try:
         queried_place = places.get(place)
@@ -67,7 +67,7 @@ def placeinfo(ctx, place: Autocomplete(str)) -> Message:
 
 @placeinfo.autocomplete()
 def place_autocomplete(ctx, place):
-    """Returns matching choices for a place name"""
+    """Returns matching choices for a place name."""
     return places.get_matching_options(place.value)
 
 
@@ -82,7 +82,7 @@ def place_autocomplete(ctx, place):
     ],
 )
 def guide(ctx, topic: str = "introduction") -> Message:
-    """A nice little guide that helps you understand this bot"""
+    """A nice little guide that helps you understand this bot."""
     with open(f"./guide/{topic}.md", "r", encoding="utf8") as guide_file:
         topic = str.lower(topic)
         image_url = guide_file.readline()

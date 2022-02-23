@@ -16,12 +16,12 @@ profile_bp = DiscordInteractionsBlueprint()
 
 @profile_bp.command(name="Check Profile", type=ApplicationCommandType.USER)
 def show_profile_context(ctx, user: User) -> Message:
-    return Message(embed=get_profile_embed(user))
+    return Message(embed=get_profile_embed(user), ephemeral=True)
 
 
 @profile_bp.command(annotations={"user": "A user you want to view"})
 def profile(ctx, user: User = None):
-    """View and manage your profile"""
+    """View and manage your profile."""
     if user or players.registered(ctx.author.id):
         return Message(embed=get_profile_embed(user if user is not None else ctx.author))
     with open("./messages/welcome.md", "r", encoding="utf8") as welcome_file:
@@ -74,7 +74,7 @@ def get_profile_embed(user: User) -> Embed:
 
 @profile_bp.command(
     name="top",
-    description="Have a look at several toplists",
+    description="Have a look at several toplists.",
     options=[
         {
             "name": "key",

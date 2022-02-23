@@ -32,7 +32,7 @@ blacklist = admin_bp.command_group(
 
 @blacklist.command()
 def add(ctx, user: str, reason: str):
-    """Add a user to the blacklist"""
+    """Add a user to the blacklist."""
     try:
         player = players.get(int(user))
         players.update(player, name=reason, xp=-1)
@@ -48,10 +48,10 @@ def add(ctx, user: str, reason: str):
 
 @blacklist.command()
 def remove(ctx, user: str):
-    """Remove a user from the blacklist"""
+    """Remove a user from the blacklist."""
     try:
         players.get(int(user))
-        return "Player not on blacklist"
+        return "That Player is not on the blacklist"
     except players.PlayerBlacklisted:
         player = players.Player(user, "Unknown")
         players.update(player, xp=0, name="Unknown player")
@@ -65,7 +65,7 @@ def remove(ctx, user: str):
 
 @admin_bp.command()
 def serverrules(ctx) -> Message:
-    """Truck Simulator server rules"""
+    """Truck Simulator server Rules."""
     rules_embed = Embed(title="Truck Simulator Server Rules", color=config.EMBED_COLOR, fields=[])
     rules_embed.fields.append(
         Field(

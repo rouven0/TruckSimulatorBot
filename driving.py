@@ -396,7 +396,7 @@ def move(ctx: Context, direction, player_id):
 
 @driving_bp.command()
 def drive(ctx) -> Message:
-    """Start driving your Truck"""
+    """Start driving your Truck."""
     player = players.get(ctx.author.id)
     # Detect, when the player is renamed
     if player.name != ctx.author.username:

@@ -16,6 +16,7 @@ import requests
 from werkzeug.exceptions import HTTPException
 
 from resources import players
+from resources import companies
 from resources import items
 import config
 
@@ -116,6 +117,15 @@ def not_registered(error):
     """Error handler in case a player isn't found in the database"""
     return Message(
         content=f"<@{error.requested_id}> You are not registered yet. Try `/profile` to get started",
+        ephemeral=True,
+    ).dump()
+
+
+@app.errorhandler(companies.CompanyNotFound)
+def company_not_found(error):
+    """Error handler in case a player's company isn't found in the database"""
+    return Message(
+        content=f"You don't have a company at the moment. Get hired or found one.",
         ephemeral=True,
     ).dump()
 
