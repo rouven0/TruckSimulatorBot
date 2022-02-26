@@ -8,12 +8,6 @@ misc_bp = DiscordInteractionsBlueprint()
 
 
 @misc_bp.command()
-def support(ctx) -> str:
-    """Get a link to the support server."""
-    return "https://discord.gg/FzAxtGTUhN"
-
-
-@misc_bp.command()
 def rules(ctx) -> Message:
     """Truck Simulator Rules."""
     rules_embed = Embed(title="Truck Simulator Ingame Rules", color=config.EMBED_COLOR, fields=[])

@@ -46,8 +46,16 @@ def get_info_embed() -> Embed:
         "(and had the idea of this bot)\n"
         "<:miri:897860673546117122> Miriel#0001 - _The brain_ - Gave a lot of great tips and constructive feedback"
     )
+
+    links = (
+        "**[Support server](https://discord.gg/FzAxtGTUhN)**\n"
+        "**[Invite link](https://discord.com/api/oauth2/authorize?client_id=831052837353816066&scope=applications.commands)**\n"
+        "**[Privacy Policy](https://trucksimulatorbot.rfive.de/privacypolicy.html)**\n"
+        "**[Github repository](https://github.com/therealr5/TruckSimulatorBot)**"
+    )
     info_embed.fields = [
         Field(name="System information", value=system_info, inline=False),
+        Field(name="Some useful links", value=links),
         Field(name="Credits", value=credits, inline=False),
     ]
     return info_embed
@@ -76,3 +84,11 @@ def info(ctx) -> Message:
 @system_bp.custom_handler(custom_id="refresh_system_info")
 def refresh(ctx):
     return Message(embed=get_info_embed(), update=True)
+
+
+@system_bp.custom_handler(custom_id="discard")
+def discard(ctx, player_id: int):
+    """General handler to remove all components"""
+    if int(ctx.author.id) != player_id:
+        return Message(deferred=True, update=True)
+    return Message(embeds=ctx.message.embeds, components=[], update=True)
