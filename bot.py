@@ -125,7 +125,7 @@ def not_registered(error):
 def company_not_found(error):
     """Error handler in case a player's company isn't found in the database"""
     return Message(
-        content=f"You don't have a company at the moment. Get hired or found one.",
+        content="You don't have a company at the moment. Get hired or found one.",
         ephemeral=True,
     ).dump()
 

@@ -14,7 +14,7 @@ from resources import companies
 profile_bp = DiscordInteractionsBlueprint()
 
 
-@profile_bp.command(name="Check Profile", type=ApplicationCommandType.USER)
+@profile_bp.command(name="Check profile", type=ApplicationCommandType.USER)
 def show_profile_context(ctx, user: User) -> Message:
     return Message(embed=get_profile_embed(user), ephemeral=True)
 

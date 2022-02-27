@@ -78,7 +78,7 @@ def place_autocomplete(ctx, place):
             "name": "topic",
             "description": "The topic you want to read about",
             "type": CommandOptionType.STRING,
-            "choices": [{"name": f[: f.find(".")], "value": f[: f.find(".")]} for f in listdir("./guide")],
+            "choices": [{"name": f[: f.find(".")].replace("_"," "), "value": f[: f.find(".")]} for f in sorted(listdir("./guide"))],
         }
     ],
 )
@@ -99,7 +99,7 @@ def get_guide_embed(topic: str) -> Embed:
         topic = str.lower(topic)
         image_url = guide_file.readline()
         guide_embed = Embed(
-            title=f"{str.upper(topic[0])}{topic[1:]}",
+            title=f"{str.upper(topic[0])}{topic[1:]}".replace("_", " "),
             description=guide_file.read(),
             color=config.EMBED_COLOR,
             author=Author(name="Truck Simulator Guide", icon_url=config.SELF_AVATAR_URL),
@@ -118,8 +118,8 @@ def get_guide_select() -> ActionRow:
             SelectMenu(
                 custom_id="guide_topic",
                 options=[
-                    SelectMenuOption(label=str.upper(f[:1]) + f[1 : f.find(".")], value=f[: f.find(".")])
-                    for f in listdir("./guide")
+                    SelectMenuOption(label=str.upper(f[:1]) + f[1 : f.find(".")].replace("_"," "), value=f[: f.find(".")])
+                    for f in sorted(listdir("./guide"))
                 ],
                 placeholder="Select a topic",
             )

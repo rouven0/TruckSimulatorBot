@@ -1,8 +1,14 @@
-# pylint: disable=unused-argument, missing-function-docstring
+# pylint: disable=unused-argument
 import re
 
-from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed, User, ApplicationCommandType
-from flask_discord_interactions.models.component import ActionRow, Button, Component
+from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed, User, ApplicationCommandType, Modal
+from flask_discord_interactions.models.component import (
+    ActionRow,
+    Button,
+    ButtonStyles,
+    Component,
+    TextInput,
+)
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
 
 import config
@@ -13,76 +19,152 @@ from resources import companies
 
 company_bp = DiscordInteractionsBlueprint()
 
-company_group = company_bp.command_group(name="company", description="View and manage your company")
 
-# rewrite this using modals and user selects (as soon as they are released)
-@company_group.command(annotations={"name": "The name you give your company"})
-def found(ctx, name: str):
-    """Create a company"""
-    if not re.match("^[a-zA-Z]", name):
-        return "Bad name. Company names must start with a letter"
-
-    player = players.get(ctx.author.id)
-    if player.company is not None:
-        return "You already have a company. You can't found another one!"
-    if player.position in [p.position for p in places.get_all()] or player.position in [
-        c.hq_position for c in companies.get_all()
-    ]:
-        return "You can't found a company on this position, please drive to an empty field."
-
-    if companies.exists(name):
-        return "A company with this make already exists, please choose another name"
-
-    confirm_embed = Embed(
-        title="Confirm your company creation",
-        description=f"Please confirm that you want to found the company **{name}** as position {player.position}. "
-        "This position is final, can not be changed and "
-        "your company's logo will appear on this position on the map everyone can see.",
+def get_company_embed(user, player, company) -> Embed:
+    """Returns an embed with the company details"""
+    founder = players.get(company.founder)
+    company_embed = Embed(
+        title=company.name,
         color=config.EMBED_COLOR,
+        description=company.description,
+        author=Author(name=f"{player.name}'s company", icon_url=user.avatar_url),
+        footer=Footer(text=f"Founded by {founder.name}"),
+        fields=[],
     )
-    confirm_buttons: list[Component] = [
+    logo_is_discord_emoji = re.match(r"<(a{0,1}):\w*:(\d+)>", company.logo)
+    if logo_is_discord_emoji:
+        logo_animated = logo_is_discord_emoji.groups()[0] == "a"
+        logo_id = logo_is_discord_emoji.groups()[1]
+        company_embed.thumbnail = Media(
+            url=f"https://cdn.discordapp.com/emojis/{logo_id}.{'gif' if logo_animated else 'png'}"
+        )
+
+    company_embed.fields.append(Field(name="Headquarters position", value=str(company.hq_position)))
+    company_embed.fields.append(Field(name="Net worth", value=f"${company.net_worth}", inline=False))
+    members = ""
+    for member in company.get_members():
+        members += f"{member.name} \n"
+    company_embed.fields.append(Field(name="Members", value=members, inline=False))
+    return company_embed
+
+
+def get_company_components(player, company) -> list[Component]:
+    """Returns the buttons to manage a company"""
+    return [
         ActionRow(
             components=[
-                Button(style=3, label="Confirm", custom_id=["confirm_company_found", name, ctx.author.id]),
-                Button(style=4, label="Cancel", custom_id=["cancel_company_action", ctx.author.id]),
+                Button(
+                    label="Manage",
+                    custom_id=["company_update", player.id],
+                    style=ButtonStyles.PRIMARY,
+                    disabled=(player.id != company.founder),
+                ),
+                Button(
+                    label="Leave",
+                    custom_id=["company_leave", player.id],
+                    style=ButtonStyles.DANGER,
+                    disabled=(player.id == company.founder),
+                ),
+                Button(custom_id=["discard", player.id], label="Close Menu", style=ButtonStyles.SECONDARY),
             ]
         )
     ]
 
-    return Message(embed=confirm_embed, components=confirm_buttons)
-
 
 @company_bp.custom_handler(custom_id="cancel_company_action")
 def cancel(ctx, player_id: int):
+    """Cancel hire and fire"""
     if int(ctx.author.id) != player_id:
         return Message(deferred=True, update=True)
     return Message(content=ctx.message.content, embeds=ctx.message.embeds, components=[], update=True)
 
 
-@company_bp.custom_handler(custom_id="confirm_company_found")
-def confirm_found(ctx, name: str, player_id: int):
+@company_bp.custom_handler(custom_id="company_main")
+def back(ctx, player_id: int):
+    """Shows the main buttons again"""
     if int(ctx.author.id) != player_id:
         return Message(deferred=True, update=True)
+    player = players.get(int(ctx.author.id))
+    company = companies.get(player.company)
+    return Message(
+        embed=get_company_embed(ctx.author, player, company),
+        components=get_company_components(player, company),
+        update=True,
+    )
+
+
+@company_bp.custom_handler(custom_id="company_found")
+def found(ctx, player_id: int):
+    """Returns a modal to found a company"""
+    if int(ctx.author.id) != player_id:
+        return Message(deferred=True, update=True)
+
     player = players.get(ctx.author.id)
-    company = companies.Company(name, player.position, ctx.author.id)
+    if player.company is not None:
+        return Message("You already have a company. You can't found another one!", ephemeral=True)
+    if player.position in [p.position for p in places.get_all()] or player.position in [
+        c.hq_position for c in companies.get_all()
+    ]:
+        return Message("You can't found a company on this position, please drive to an empty field.", ephemeral=True)
+
+    return Modal(
+        custom_id="modal_company_found",
+        title="Found a company",
+        components=[
+            ActionRow(
+                [
+                    TextInput(
+                        custom_id="modal_company_found_name",
+                        label="Name",
+                        placeholder="Your company's name.",
+                        min_length=3,
+                        max_length=256,
+                    )
+                ]
+            ),
+            ActionRow(
+                [
+                    TextInput(
+                        custom_id="modal_company_found_description",
+                        label="Description",
+                        placeholder="Describe your company",
+                        style=2,
+                        required=False,
+                        max_length=1000,
+                    )
+                ]
+            ),
+        ],
+    )
+
+
+@company_bp.custom_handler(custom_id="modal_company_found")
+def confirm_found(ctx):
+    """Modal handler for the company founding"""
+    name = ctx.get_component("modal_company_found_name").value
+    description = ctx.get_component("modal_company_found_description").value
+
+    if companies.exists(name):
+        return Message("A company with this make already exists, please choose another name", ephemeral=True)
+    player = players.get(ctx.author.id)
+    company = companies.Company(name, player.position, ctx.author.id, description=description)
     companies.insert(company)
     players.update(player, company=name)
     return Message(
         embed=Embed(
             title="Company creation successful",
             description=f"{company.logo} **{company.name}** has been created and placed in the market. "
-            f"Your company's headquarters have been built at {company.hq_position}.\n"
-            "To change your logo run `/company update`",
+            f"Your company's headquarters have been built at {company.hq_position}.",
             color=config.EMBED_COLOR,
         ),
-        components=[],
+        components=[ActionRow(components=[Button(label="Check it out", custom_id=["company_main", player.id])])],
         update=True,
     )
 
 
-@company_group.command(annotations={"user": "The player you want to hire"})
+@company_bp.command(name="Hire", type=ApplicationCommandType.USER)
 def hire(ctx, user: User):
-    """Get a new player into your company"""
+    """Context menu command to hire a player"""
     player = players.get(int(ctx.author.id))
     invited_player = players.get(int(user.id))
     company = companies.get(player.company)
@@ -108,6 +190,7 @@ def hire(ctx, user: User):
 
 @company_bp.custom_handler(custom_id="confirm_company_hire")
 def confirm_hire(ctx, company: str, player_id: int):
+    """Confirm button the hired player has to click"""
     if int(ctx.author.id) != player_id:
         return Message(deferred=True, update=True)
     invited_player = players.get(int(player_id))
@@ -120,9 +203,9 @@ def confirm_hire(ctx, company: str, player_id: int):
     )
 
 
-@company_group.command(annotations={"user": "The user you want to fire"})
+@company_bp.command(name="Fire", type=ApplicationCommandType.USER)
 def fire(ctx, user: User):
-    """Remove a player from your company"""
+    """Context menu command to fire a player"""
     player = players.get(int(ctx.author.id))
     fired_player = players.get(int(user.id))
     company = companies.get(player.company)
@@ -150,22 +233,19 @@ def fire(ctx, user: User):
 
 @company_bp.custom_handler(custom_id="confirm_company_fire")
 def confirm_fire(ctx, company: str, player_id: int, fired_player_id: int):
+    """Confirm button for the company owner"""
     if int(ctx.author.id) != player_id:
         return Message(deferred=True, update=True)
     fired_player = players.get(int(fired_player_id))
     fired_player.remove_from_company()
-    return f"**{fired_player.name}** was removed from **{company}**"
+    return Message(content=f"**{fired_player.name}** was removed from **{company}**", update=True, components=[])
 
 
-@company_group.command()
-def leave(ctx):
+@company_bp.custom_handler(custom_id="company_leave")
+def leave(ctx, player_id: int):
     """Leave your company"""
-    player = players.get(ctx.author.id)
-    if player.company is None:
-        return "You don't have company to leave!"
-    company = companies.get(player.company)
-    if ctx.author.id == company.founder:
-        return "You can't leave the company you founded!"
+    if int(ctx.author.id) != player_id:
+        return Message(deferred=True, update=True)
     confirm_buttons: list[Component] = [
         ActionRow(
             components=[
@@ -179,6 +259,7 @@ def leave(ctx):
 
 @company_bp.custom_handler(custom_id="confirm_company_leave")
 def confirm_leave(ctx, player_id: int):
+    """Confirm button to leave a company"""
     if int(ctx.author.id) != player_id:
         return Message(deferred=True, update=True)
     player = players.get(player_id)
@@ -186,73 +267,123 @@ def confirm_leave(ctx, player_id: int):
     return Message(f"<@{player.id}> You left **{player.company}**", components=[], update=True)
 
 
-@company_group.command(annotations={"name": "The new name", "logo": "Any emoji"})
-def update(ctx, name: str = None, logo: str = None):
-    """Change your company's logo"""
+@company_bp.custom_handler(custom_id="company_update")
+def company_update(ctx, player_id: int):
+    """A button handler that promts a select to select the options than should be changed"""
+    if int(ctx.author.id) != player_id:
+        return Message(deferred=True, update=True)
     player = players.get(int(ctx.author.id))
     company = companies.get(player.company)
     if int(ctx.author.id) != company.founder:
         return "You are not the company founder!"
-    if name:
-        if companies.exists(name):
-            return "A company with this make already exists, please choose another name"
-        companies.update(company, name=name)
-        return f"Done. Your company was renamed to {name}"
 
-    if logo:
-        if re.match(
-            # did I mention that I love regex?
-            # match any emoji
-            r"^([\u2600-\u26ff]|[\U0001f000-\U0001faff])|<a*:\w*:\d+>$",
-            logo,
-        ):
-            companies.update(company, logo=logo)
-            return f"Done. Your company logo was set to {logo}."
-        return "That's not an emoji"
-    return "Nothing changed. weird"
-
-
-def get_company_embed(user, player, company) -> Embed:
-    founder = players.get(company.founder)
-    logo_id = company.logo[company.logo.find(":", 2) + 1 : company.logo.find(">")]
-    company_embed = Embed(
-        title=company.name,
-        color=config.EMBED_COLOR,
-        author=Author(name=f"{player.name}'s company", icon_url=user.avatar_url),
-        footer=Footer(text=f"Founded by {founder.name}"),
-        thumbnail=Media(url=f"https://cdn.discordapp.com/emojis/{logo_id}.png"),
-        fields=[],
+    return Modal(
+        custom_id="modal_company_update",
+        title="Update your company",
+        components=[
+            ActionRow(
+                [
+                    TextInput(
+                        custom_id="modal_company_update_name",
+                        label="Name",
+                        placeholder="Your company's name, must start with a letter",
+                        min_length=3,
+                        max_length=256,
+                        value=company.name,
+                    )
+                ]
+            ),
+            ActionRow(
+                [
+                    TextInput(
+                        custom_id="modal_company_update_description",
+                        label="Description",
+                        placeholder="Describe your company",
+                        style=2,
+                        required=False,
+                        value=company.description,
+                        max_length=1000,
+                    )
+                ]
+            ),
+            ActionRow(
+                [
+                    TextInput(
+                        custom_id="modal_company_update_logo",
+                        label="Logo (empty to reset)",
+                        placeholder="Your company's logo, must be an emoji",
+                        min_length=1,
+                        max_length=256,
+                        value=company.logo,
+                        required=False,
+                    )
+                ]
+            ),
+        ],
     )
-    company_embed.fields.append(Field(name="Headquarters position", value=str(company.hq_position)))
-    company_embed.fields.append(Field(name="Net worth", value=f"${company.net_worth}", inline=False))
-    members = ""
-    for member in company.get_members():
-        members += f"{member.name} \n"
-    company_embed.fields.append(Field(name="Members", value=members, inline=False))
-    return company_embed
 
 
-@company_group.command()
-def show(ctx, user: User = None):
-    """Show details about your company"""
+@company_bp.custom_handler(custom_id="modal_company_update")
+def update(ctx):
+    """Update a company's attributes"""
+    player = players.get(int(ctx.author.id))
+    company = companies.get(player.company)
+    name: str = ctx.get_component("modal_company_update_name").value
+    description: str = ctx.get_component("modal_company_update_description").value
+    logo: str = ctx.get_component("modal_company_update_logo").value
+    if name != company.name and companies.exists(name):
+        return Message("A company with this make already exists, please choose another name", ephemeral=True)
+    companies.update(company, name=name, description=description)
+    if logo == "":
+        logo = "🏛️"
+    if not re.match(
+        # did I mention that I love regex?
+        # match any emoji
+        r"^([\u2600-\u26ff]|[\U0001f000-\U0001faff])|<a*:\w*:\d+>$",
+        logo,
+    ):
+        return Message("The provided logo couldn't be matched as an emoji", ephemeral=True)
+    companies.update(company, logo=logo)
+    return Message(
+        embed=get_company_embed(ctx.author, player, company),
+        components=get_company_components(player, company),
+        update=True,
+    )
+
+
+@company_bp.command(name="company", annotations={"user": "A user whose company you want to view"})
+def company_show(ctx, user: User = None):
+    """View and manage your company."""
     if user is not None:
         target_user = user
     else:
         target_user = ctx.author
+
     player = players.get(int(target_user.id))
     try:
         company = companies.get(player.company)
     except companies.CompanyNotFound:
         begin = "You are " if user is None else f"**{user.username}** is "
-        return begin + "not member of a company at the moment"
-    return Message(embed=get_company_embed(target_user, player, company))
+        return Message(
+            begin + "not member of a company at the moment",
+            components=(
+                [ActionRow(components=[Button(label="Found one", custom_id=["company_found", player.id])])]
+                if player.truck_id > 0
+                else []
+            ),
+        )
+    return Message(
+        embed=get_company_embed(target_user, player, company),
+        components=(get_company_components(player, company) if not user else []),
+    )
 
 
 @company_bp.command(name="Show company", type=ApplicationCommandType.USER)
 def show_company(ctx, user: User):
+    """Context menu command to view a user's company"""
     player = players.get(int(user.id))
     try:
         company = companies.get(player.company)
     except companies.CompanyNotFound:
-        return f"**{user.username}** is not member of a company at the moment"
-    return Message(embed=get_company_embed(user, player, company))
+        return Message(content=f"**{user.username}** is not member of a company at the moment", ephemeral=True)
+    return Message(embed=get_company_embed(user, player, company), ephemeral=True)

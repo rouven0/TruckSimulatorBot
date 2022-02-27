@@ -30,6 +30,7 @@ class Company:
     Attributes:
         name: Name of the company
         logo: emoji displayed as logo on the map
+        description: A description for that company
         hq_position: position of the company's headquarters
         founder: founder of the company, has control over it
         net_worth: money the company holds
@@ -44,7 +45,8 @@ class Company:
         else:
             self.hq_position = hq_position
         self.founder = founder
-        self.logo = kwargs.pop("logo", f":regional_indicator_{str.lower(name[0])}:")
+        self.logo = kwargs.pop("logo", "🏛️")
+        self.description = kwargs.pop("description", "")
         self.net_worth = kwargs.pop("net_worth", 3000)
 
     def __iter__(self):
@@ -131,6 +133,7 @@ def update(
     company: Company,
     name: str = None,
     logo: str = None,
+    description: str = None,
     hq_position: list = None,
     founder: int = None,
     net_worth: int = None,
@@ -145,6 +148,9 @@ def update(
     if logo is not None:
         database.cur.execute("UPDATE companies SET logo=%s WHERE name=%s", (logo, company.name))
         company.logo = logo
+    if description is not None:
+        database.cur.execute("UPDATE companies SET description=%s WHERE name=%s", (description, company.name))
+        company.description = description
     if hq_position is not None:
         database.cur.execute(
             "UPDATE companies SET hq_position=%s WHERE name=%s", (_format_pos_to_db(hq_position), company.name)
