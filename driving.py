@@ -127,11 +127,11 @@ def get_buttons(player: players.Player) -> list:
     for symbol in symbols.get_all_drive_symbols():
         if symbol in symbols.get_drive_position_symbols(player.position):
             directional_buttons.append(
-                Button(style=1, emoji={"name": "placeholder", "id": symbol}, custom_id=[str(symbol), player.id])
+                Button(style=2, emoji={"name": "placeholder", "id": symbol}, custom_id=[str(symbol), player.id])
             )
         else:
             directional_buttons.append(
-                Button(style=1, emoji={"name": "placeholder", "id": symbol}, custom_id=str(symbol), disabled=True)
+                Button(style=2, emoji={"name": "placeholder", "id": symbol}, custom_id=str(symbol), disabled=True)
             )
     directional_buttons.append(
         Button(style=4, emoji={"name": "stop", "id": symbols.STOP}, custom_id=["stop", player.id])
@@ -167,14 +167,16 @@ def get_buttons(player: players.Player) -> list:
 
     if "refill" in place.available_actions:
         action_buttons.append(
-            Button(style=2, emoji={"name": "refill", "id": symbols.REFILL}, custom_id=["refill", player.id])
+            Button(
+                style=2, label="Refill", emoji={"name": "refill", "id": symbols.REFILL}, custom_id=["refill", player.id]
+            )
         )
 
     buttons.append(ActionRow(components=action_buttons))
     buttons.append(
         ActionRow(
             components=[
-                Button(style=3, label="New Job", custom_id=["job_new", player.id], disabled=(current_job is not None)),
+                Button(style=1, label="New Job", custom_id=["job_new", player.id], disabled=(current_job is not None)),
                 Button(style=2, label="Show Job", custom_id=["job_show", player.id], disabled=(current_job is None)),
             ]
         )

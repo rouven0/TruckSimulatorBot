@@ -5,7 +5,6 @@ from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Em
 from flask_discord_interactions.models.component import (
     ActionRow,
     Button,
-    ButtonStyles,
     Component,
     TextInput,
 )
@@ -56,16 +55,16 @@ def get_company_components(player, company) -> list[Component]:
                 Button(
                     label="Manage",
                     custom_id=["company_update", player.id],
-                    style=ButtonStyles.PRIMARY,
+                    style=1,
                     disabled=(player.id != company.founder),
                 ),
                 Button(
                     label="Leave",
                     custom_id=["company_leave", player.id],
-                    style=ButtonStyles.DANGER,
+                    style=4,
                     disabled=(player.id == company.founder),
                 ),
-                Button(custom_id=["discard", player.id], label="Close Menu", style=ButtonStyles.SECONDARY),
+                Button(custom_id=["discard", player.id], label="Close Menu", style=2),
             ]
         )
     ]
@@ -177,7 +176,7 @@ def hire(ctx, user: User):
         ActionRow(
             components=[
                 Button(style=3, label="Confirm", custom_id=["confirm_company_hire", company.name, invited_player.id]),
-                Button(style=4, label="Cancel", custom_id=["cancel_company_action", invited_player.id]),
+                Button(style=2, label="Cancel", custom_id=["cancel_company_action", invited_player.id]),
             ]
         )
     ]
@@ -220,11 +219,11 @@ def fire(ctx, user: User):
         ActionRow(
             components=[
                 Button(
-                    style=3,
+                    style=4,
                     label="Confirm",
                     custom_id=["confirm_company_fire", company.name, player.id, fired_player.id],
                 ),
-                Button(style=4, label="Cancel", custom_id=["cancel_company_action", player.id]),
+                Button(style=2, label="Cancel", custom_id=["cancel_company_action", player.id]),
             ]
         )
     ]
@@ -249,8 +248,8 @@ def leave(ctx, player_id: int):
     confirm_buttons: list[Component] = [
         ActionRow(
             components=[
-                Button(style=3, label="Confirm", custom_id=["confirm_company_leave", ctx.author.id]),
-                Button(style=4, label="Cancel", custom_id=["cancel_company_action", ctx.author.id]),
+                Button(style=4, label="Confirm", custom_id=["confirm_company_leave", ctx.author.id]),
+                Button(style=2, label="Cancel", custom_id=["cancel_company_action", ctx.author.id]),
             ]
         )
     ]
