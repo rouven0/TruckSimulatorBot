@@ -32,7 +32,7 @@ def show_job(ctx, player_id: int) -> Message:
     place_from = current_job.place_from
     place_to = current_job.place_to
     item = items.get(place_from.produced_item)
-    job_message = f"{item} from {place_from.name} to {place_to.name}."
+    job_message = f"Bring {item} from {place_from.name} to {place_to.name}."
     job_embed.fields.append(Field(name="Current job", value=job_message, inline=False))
     job_embed.fields.append(Field(name="Current state", value=jobs.get_state(current_job)))
     return Message(embed=job_embed, ephemeral=True)
