@@ -352,20 +352,15 @@ def update(ctx):
 
 
 @company_bp.command(name="company", annotations={"user": "A user whose company you want to view"})
-def company_show(ctx, user: User = None):
+def company_show(ctx):
     """View and manage your company."""
-    if user is not None:
-        target_user = user
-    else:
-        target_user = ctx.author
 
-    player = players.get(int(target_user.id))
+    player = players.get(int(ctx.author.id))
     try:
         company = companies.get(player.company)
     except companies.CompanyNotFound:
-        begin = "You are " if user is None else f"**{user.username}** is "
         return Message(
-            begin + "not member of a company at the moment",
+            "You are not member of a company at the moment",
             components=(
                 [ActionRow(components=[Button(label="Found one", custom_id=["company_found", player.id])])]
                 if player.truck_id > 0
@@ -373,8 +368,8 @@ def company_show(ctx, user: User = None):
             ),
         )
     return Message(
-        embed=get_company_embed(target_user, player, company),
-        components=(get_company_components(player, company) if not user else []),
+        embed=get_company_embed(ctx.author, player, company),
+        components=get_company_components(player, company),
     )
 
 
