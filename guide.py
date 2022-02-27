@@ -20,7 +20,7 @@ guide_bp = DiscordInteractionsBlueprint()
     options=[
         {
             "name": "item",
-            "description": "The item you want to view",
+            "description": "The item you want to view.",
             "type": CommandOptionType.STRING,
             "choices": [{"name": i.name, "value": i.name} for i in items.get_all()],
             "required": True,
@@ -43,7 +43,7 @@ def iteminfo(ctx, item: str) -> Message:
     return Message(embed=item_embed)
 
 
-@guide_bp.command(annotations={"place": "The place you want to view"})
+@guide_bp.command(annotations={"place": "The place you want to view."})
 def placeinfo(ctx, place: Autocomplete(str)) -> Message:
     """Prints some information about a specific place."""
     player = players.get(ctx.author.id)
@@ -76,9 +76,12 @@ def place_autocomplete(ctx, place):
     options=[
         {
             "name": "topic",
-            "description": "The topic you want to read about",
+            "description": "The topic you want to read about.",
             "type": CommandOptionType.STRING,
-            "choices": [{"name": f[: f.find(".")].replace("_"," "), "value": f[: f.find(".")]} for f in sorted(listdir("./guide"))],
+            "choices": [
+                {"name": f[: f.find(".")].replace("_", " "), "value": f[: f.find(".")]}
+                for f in sorted(listdir("./guide"))
+            ],
         }
     ],
 )
@@ -118,7 +121,9 @@ def get_guide_select() -> ActionRow:
             SelectMenu(
                 custom_id="guide_topic",
                 options=[
-                    SelectMenuOption(label=str.upper(f[:1]) + f[1 : f.find(".")].replace("_"," "), value=f[: f.find(".")])
+                    SelectMenuOption(
+                        label=str.upper(f[:1]) + f[1 : f.find(".")].replace("_", " "), value=f[: f.find(".")]
+                    )
                     for f in sorted(listdir("./guide"))
                 ],
                 placeholder="Select a topic",

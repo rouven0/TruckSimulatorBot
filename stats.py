@@ -19,7 +19,7 @@ def show_profile_context(ctx, user: User) -> Message:
     return Message(embed=get_profile_embed(user), ephemeral=True)
 
 
-@profile_bp.command(annotations={"user": "A user you want to view"})
+@profile_bp.command(annotations={"user": "A user you want to view."})
 def profile(ctx, user: User = None):
     """View and manage your profile."""
     if user or players.registered(ctx.author.id):
@@ -78,7 +78,7 @@ def get_profile_embed(user: User) -> Embed:
     options=[
         {
             "name": "key",
-            "description": "The list you desire to view",
+            "description": "The list you desire to view.",
             "type": CommandOptionType.STRING,
             "required": True,
             "choices": [

@@ -53,7 +53,7 @@ def get_drive_embed(player: players.Player, avatar_url: str) -> Embed:
         drive_embed.fields.append(
             Field(
                 name="What is here?",
-                value=f"{items.get(place.produced_item)} {place}",
+                value=f"<:i:{items.get(place.produced_item).emoji}> {place}",
                 inline=False,
             )
         )

@@ -17,12 +17,12 @@ gambling_bp = DiscordInteractionsBlueprint()
     options=[
         {
             "name": "side",
-            "description": "The side you bet on",
+            "description": "The side you bet on.",
             "type": CommandOptionType.STRING,
             "choices": [{"name": "heads", "value": "heads"}, {"name": "tails", "value": "tails"}],
             "required": True,
         },
-        {"name": "amount", "description": "The amount you bet", "type": CommandOptionType.INTEGER, "required": True},
+        {"name": "amount", "description": "The amount you bet.", "type": CommandOptionType.INTEGER, "required": True},
     ]
 )
 def coinflip(ctx, side: str, amount: int) -> str:
@@ -81,7 +81,7 @@ def slots_handler(ctx, author_id: int, amount: int) -> Message:
     )
 
 
-@gambling_bp.command(annotations={"amount": "The amount you bet"})
+@gambling_bp.command(annotations={"amount": "The amount you bet."})
 def slots(ctx, amount: int) -> Message:
     """Simple slot machine."""
     return Message(

@@ -111,7 +111,7 @@ def refill(ctx, player_id: int):
     return Message(embeds=[drive_embed, refill_embed], components=None, update=True)
 
 
-@economy_bp.command(annotations={"user": "User you want to give money to", "amount": "The amount you give"})
+@economy_bp.command(annotations={"user": "The user you want to give money to.", "amount": "The amount you give."})
 def give(ctx, user: User, amount: int) -> Message:
     """Give money to a user."""
     amount = abs(int(amount))
