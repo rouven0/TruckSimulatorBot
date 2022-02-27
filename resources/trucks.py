@@ -33,6 +33,9 @@ class Truck:
     image_url: str
     emoji: str
 
+    def __str__(self) -> str:
+        return self.emoji + " " + self.name
+
 
 def get(truck_id: int) -> Truck:
     """

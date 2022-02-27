@@ -46,7 +46,7 @@ def get_profile_embed(user: User) -> Embed:
     if player.name != user.username:
         players.update(player, name=user.username)
     profile_embed = Embed(
-        author=Author(name=f"{player.name}'s profile"),
+        author=Author(name=f"{player}'s profile"),
         thumbnail=Media(url=user.avatar_url),
         color=config.EMBED_COLOR,
         fields=[],

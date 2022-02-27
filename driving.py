@@ -28,10 +28,9 @@ def get_drive_embed(player: players.Player, avatar_url: str) -> Embed:
     place = places.get(player.position)
     all_companies = companies.get_all()
     drive_embed = Embed(
-        description="Even more stable now",
         color=config.EMBED_COLOR,
         timestamp=datetime.utcnow().replace(microsecond=0).isoformat(),
-        author=Author(name=f"{player.name} is driving", icon_url=avatar_url),
+        author=Author(name=f"{player} is driving", icon_url=avatar_url),
         footer=Footer(text=f"Loaded items: {len(player.loaded_items)}/{trucks.get(player.truck_id).loading_capacity}"),
         fields=[],
     )
@@ -47,14 +46,14 @@ def get_drive_embed(player: players.Player, avatar_url: str) -> Embed:
         else:
             navigation_place = current_job.place_to
         drive_embed.fields.append(
-            Field(name=f"Navigation: Drive to {navigation_place.name}", value=str(navigation_place.position))
+            Field(name=f"Navigation: Drive to {navigation_place}", value=str(navigation_place.position))
         )
 
     if place.image_url_default is not None:
         drive_embed.fields.append(
             Field(
                 name="What is here?",
-                value=f"<:placeholder:{items.get(place.produced_item).emoji}> {place.name}",
+                value=f"{items.get(place.produced_item)} {place}",
                 inline=False,
             )
         )
@@ -67,7 +66,7 @@ def get_drive_embed(player: players.Player, avatar_url: str) -> Embed:
                 drive_embed.fields.append(
                     Field(
                         name="What is here?",
-                        value=f"A company called **{company.name}**",
+                        value=f"A company called **{company}**",
                         inline=False,
                     )
                 )
@@ -89,7 +88,7 @@ def generate_minimap(player: players.Player, all_companies: list[companies.Compa
             except items.ItemNotFound:
                 item = None
             if item is not None:
-                minimap_array[i][j] = f"<:placeholder:{items.get(map_place.produced_item).emoji}>"
+                minimap_array[i][j] = f"<:i:{items.get(map_place.produced_item).emoji}>"
             elif position in [c.hq_position for c in all_companies]:
                 for company in all_companies:
                     if company.hq_position == position:
@@ -214,7 +213,7 @@ def load(ctx, player_id: int):
     drive_embed.fields.append(
         Field(
             name="Loading successful",
-            value=f"You loaded <:placeholder:{item.emoji}> {item.name} into your truck",
+            value=f"You loaded {item} into your truck",
             inline=False,
         )
     )
@@ -266,11 +265,11 @@ def unload_items(ctx, player_id: int):
         item = items.get(name)
         player.unload_item(item)
         if name == ctx.values[0]:
-            item_string += f"<:placeholder:{item.emoji}> {item.name}"
+            item_string += str(item)
         elif name == ctx.values[-1]:
-            item_string += f" and <:placeholder:{item.emoji}> {item.name}"
+            item_string += "and" + str(item)
         else:
-            item_string += f", <:placeholder:{item.emoji}> {item.name}"
+            item_string += ", " + str(item)
 
     place = places.get(player.position)
     current_job = player.get_job()
@@ -298,6 +297,9 @@ def unload_items(ctx, player_id: int):
             job_message += f"\nYour company's net worth was increased by ${int(current_job.reward/10):,}"
         # get the drive embed egain to fit the job update
         drive_embed = get_drive_embed(player, ctx.author.avatar_url)
+        drive_embed.fields.append(
+            Field(name="Unloading successful", value=f"You removed {item_string} from your truck", inline=False)
+        )
         message.embeds = [
             drive_embed,
             Embed(title="Job Notification", description=job_message, color=config.EMBED_COLOR),
@@ -310,7 +312,7 @@ def unload_items(ctx, player_id: int):
             Embed(
                 title="Minijob Notification",
                 description=(
-                    f"{place.name} gave you ${place.item_reward * (player.level + 1):,} for bringing them "
+                    f"{place} gave you ${place.item_reward * (player.level + 1):,} for bringing them "
                     f"{place.accepted_item}"
                 ),
                 color=config.EMBED_COLOR,
@@ -426,7 +428,7 @@ def load_show(ctx, player_id: int) -> Message:
         item_list = "Your truck is empty"
     else:
         for item in player.loaded_items:
-            item_list += f"{symbols.LIST_ITEM} <:placeholder:{item.emoji}> {item.name}\n"
+            item_list += f"{symbols.LIST_ITEM} {item}\n"
     load_embed = Embed(
         title="Your currently loaded items",
         description=item_list,

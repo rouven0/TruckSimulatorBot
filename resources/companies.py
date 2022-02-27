@@ -63,7 +63,7 @@ class Company:
         raise StopIteration
 
     def __str__(self) -> str:
-        return f"{self.name} founded by {self.founder}"
+        return self.name
 
     def add_net_worth(self, amount: int):
         """Increases a company's net worth"""

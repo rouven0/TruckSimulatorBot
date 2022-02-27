@@ -26,13 +26,13 @@ def show_job(ctx, player_id: int) -> Message:
         return Message(deferred=True, update=True)
     job_embed = Embed(
         color=config.EMBED_COLOR,
-        author=Author(name=f"{player.name}'s Job"),
+        author=Author(name=f"{player}'s Job"),
         fields=[],
     )
     place_from = current_job.place_from
     place_to = current_job.place_to
     item = items.get(place_from.produced_item)
-    job_message = f"Bring <:placeholder:{item.emoji}> {item.name} from {place_from.name} to {place_to.name}."
+    job_message = f"{item} from {place_from.name} to {place_to.name}."
     job_embed.fields.append(Field(name="Current job", value=job_message, inline=False))
     job_embed.fields.append(Field(name="Current state", value=jobs.get_state(current_job)))
     return Message(embed=job_embed, ephemeral=True)
@@ -43,7 +43,7 @@ def new_job(ctx, player_id: int) -> Message:
     player = players.get_driving_player(ctx.author.id, check=player_id)
     job_embed = Embed(
         color=config.EMBED_COLOR,
-        author=Author(name=f"{player.name}'s Job", icon_url=ctx.author.avatar_url),
+        author=Author(name=f"{player}'s Job", icon_url=ctx.author.avatar_url),
         fields=[],
     )
     job = jobs.generate(player)
@@ -51,9 +51,7 @@ def new_job(ctx, player_id: int) -> Message:
 
     drive_embed: Embed = ctx.message.embeds[0]
     orig_components = ctx.message.components
-    drive_embed.fields.append(
-        Field(name=f"Navigation: Drive to {job.place_from.name}", value=str(job.place_from.position))
-    )
+    drive_embed.fields.append(Field(name=f"Navigation: Drive to {job.place_from}", value=str(job.place_from.position)))
     orig_components[2]["components"][0]["disabled"] = True
     orig_components[2]["components"][1]["disabled"] = False
 
@@ -63,10 +61,7 @@ def new_job(ctx, player_id: int) -> Message:
         components.append(ActionRow(components=[Button(**comp) for comp in action_row["components"]]))
 
     item = items.get(job.place_from.produced_item)
-    job_message = (
-        f"{job.place_to.name} needs <:placeholder:{item.emoji}> {item.name} from {job.place_from.name}. "
-        f"You get ${job.reward:,} for this transport"
-    )
+    job_message = f"{job.place_to} needs {item} from {job.place_from}. You get ${job.reward:,} for this transport"
     job_embed.fields.append(Field(name="You got a new Job", value=job_message, inline=False))
     job_embed.fields.append(Field(name="Current state", value=jobs.get_state(job)))
     return Message(embeds=[drive_embed, job_embed], components=components, update=True)
@@ -133,9 +128,7 @@ def give(ctx, user: User, amount: int) -> Message:
         )
     donator.debit_money(amount)
     acceptor.add_money(amount)
-    return Message(
-        embed=Embed(description=f"{donator.name} gave ${amount} to {acceptor.name}", color=config.EMBED_COLOR)
-    )
+    return Message(embed=Embed(description=f"{donator} gave ${amount} to {acceptor}", color=config.EMBED_COLOR))
 
 
 @economy_bp.command()
@@ -146,7 +139,7 @@ def minijobs(ctx) -> Message:
     for place in places.get_all():
         if place.accepted_item is not None:
             minijob_list += (
-                f"\n{symbols.LIST_ITEM}**{place.name}** will give you "
+                f"\n{symbols.LIST_ITEM}**{place}** will give you "
                 f"${place.item_reward*(player.level+1):,} if you bring them *{place.accepted_item}*."
             )
     return Message(embed=Embed(title="All available minijobs", description=minijob_list, color=config.EMBED_COLOR))

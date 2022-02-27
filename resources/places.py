@@ -35,6 +35,9 @@ class Place:
     accepted_item: Optional[str]
     item_reward: Optional[int]
 
+    def __str__(self) -> str:
+        return self.name
+
 
 def __get_position(db_pos) -> list:
     """

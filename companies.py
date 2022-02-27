@@ -169,9 +169,9 @@ def hire(ctx, user: User):
     invited_player = players.get(int(user.id))
     company = companies.get(player.company)
     if int(ctx.author.id) != company.founder:
-        return "You are not the company founder!"
+        return Message("You are not the company founder!", ephemeral=True)
     if invited_player.company is not None:
-        return f"**{invited_player.name}** already is member of a company."
+        return Message(f"**{invited_player.name}** already is member of a company.", ephemeral=True)
 
     confirm_buttons: list[Component] = [
         ActionRow(
@@ -210,11 +210,11 @@ def fire(ctx, user: User):
     fired_player = players.get(int(user.id))
     company = companies.get(player.company)
     if ctx.author.id == user.id:
-        return "You can't fire yourself!"
+        return Message("You can't fire yourself!", ephemeral=True)
     if int(ctx.author.id) != company.founder:
-        return "You are not the company founder!"
+        return Message("You are not the company founder!", ephemeral=True)
     if fired_player.company != company.name:
-        return f"**{fired_player.name}** is not a member of your company."
+        return Message(f"**{fired_player.name}** is not a member of your company.", ephemeral=True)
 
     confirm_buttons: list[Component] = [
         ActionRow(

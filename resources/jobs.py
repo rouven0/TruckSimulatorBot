@@ -91,9 +91,9 @@ def get_state(job: Job) -> str:
     Returns the next instructions based on the current jobs state
     """
     if job.state == 0:
-        return f"You claimed this job. Drive to {job.place_from.name} and load your truck"
+        return f"You claimed this job. Drive to {job.place_from} and load your truck"
     if job.state == 1:
-        return f"You loaded your truck with the needed items. Now drive to {job.place_to.name} and unload them"
+        return f"You loaded your truck with the needed items. Now drive to {job.place_to} and unload them"
     if job.state == 2:
         return f"Your job is done and you got ${job.reward:,}."
     return "Something went wrong"
