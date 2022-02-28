@@ -175,8 +175,8 @@ def hire(ctx, user: User):
     confirm_buttons: list[Component] = [
         ActionRow(
             components=[
-                Button(style=3, label="Confirm", custom_id=["confirm_company_hire", company.name, invited_player.id]),
                 Button(style=2, label="Cancel", custom_id=["cancel_company_action", invited_player.id]),
+                Button(style=3, label="Confirm", custom_id=["confirm_company_hire", company.name, invited_player.id]),
             ]
         )
     ]
@@ -218,12 +218,12 @@ def fire(ctx, user: User):
     confirm_buttons: list[Component] = [
         ActionRow(
             components=[
+                Button(style=2, label="Cancel", custom_id=["cancel_company_action", player.id]),
                 Button(
                     style=4,
                     label="Confirm",
                     custom_id=["confirm_company_fire", company.name, player.id, fired_player.id],
                 ),
-                Button(style=2, label="Cancel", custom_id=["cancel_company_action", player.id]),
             ]
         )
     ]
@@ -248,8 +248,8 @@ def leave(ctx, player_id: int):
     confirm_buttons: list[Component] = [
         ActionRow(
             components=[
-                Button(style=4, label="Confirm", custom_id=["confirm_company_leave", ctx.author.id]),
                 Button(style=2, label="Cancel", custom_id=["cancel_company_action", ctx.author.id]),
+                Button(style=4, label="Confirm", custom_id=["confirm_company_leave", ctx.author.id]),
             ]
         )
     ]
