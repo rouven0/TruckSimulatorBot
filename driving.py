@@ -269,7 +269,7 @@ def unload_items(ctx, player_id: int):
         if name == ctx.values[0]:
             item_string += str(item)
         elif name == ctx.values[-1]:
-            item_string += "and" + str(item)
+            item_string += "and " + str(item)
         else:
             item_string += ", " + str(item)
 
