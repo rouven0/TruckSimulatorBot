@@ -101,9 +101,7 @@ def votes():
 @app.errorhandler(players.NotEnoughMoney)
 def not_enough_money(error):
     """Error handler in case a player doesn't have enough money"""
-    return Message(
-        content="You don't have enough money to do this.",
-    ).dump()
+    return Message(content="You don't have enough money to do this.", ephemeral=True).dump()
 
 
 @app.errorhandler(players.NotDriving)
