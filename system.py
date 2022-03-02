@@ -49,7 +49,8 @@ def get_info_embed() -> Embed:
 
     links = (
         "**[Support server](https://discord.gg/FzAxtGTUhN)**\n"
-        "**[Invite link](https://discord.com/api/oauth2/authorize?client_id=831052837353816066&scope=applications.commands)**\n"
+        "**[Invite link](https://discord.com/api/oauth2/authorize?"
+        "client_id=831052837353816066&scope=applications.commands)**\n"
         "**[Privacy Policy](https://trucksimulatorbot.rfive.de/privacypolicy.html)**\n"
         "**[Github repository](https://github.com/therealr5/TruckSimulatorBot)**"
     )

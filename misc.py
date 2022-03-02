@@ -3,6 +3,7 @@ from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Em
 from flask_discord_interactions.models.embed import Field
 
 import config
+from resources import players
 
 misc_bp = DiscordInteractionsBlueprint()
 
@@ -31,11 +32,13 @@ def rules(ctx) -> Message:
 @misc_bp.command()
 def vote(ctx) -> Message:
     """Support the bot by voting for it on top.gg."""
+    player = players.get(ctx.author.id)
     vote_embed = Embed(
         title="Click here to vote for the Truck Simulator",
-        description="You will receive some money as reward for your vote",
+        description="As a reward, you will get double xp for 30 minutes.",
         url="https://top.gg/bot/831052837353816066/vote",
         color=config.EMBED_COLOR,
+        fields=[Field(name="Your last vote", value=f"<t:{player.last_vote}:R>")],
     )
     return Message(embed=vote_embed)
 

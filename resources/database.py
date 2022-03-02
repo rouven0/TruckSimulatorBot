@@ -3,6 +3,9 @@ This module contains the database connection
 """
 from os import getenv
 import mysql.connector
+from dotenv import load_dotenv
+
+load_dotenv("./.env")
 
 con: mysql.connector.CMySQLConnection = mysql.connector.connect(
     host=getenv("MYSQL_HOST"),

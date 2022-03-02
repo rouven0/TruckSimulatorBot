@@ -1,15 +1,15 @@
-# pylint: disable=unused-argument,wrong-import-position
+# pylint: disable=unused-argument
 import traceback
 import sys
 from os import getenv
 import logging
+from time import time
 
 from dotenv import load_dotenv
 from flask_discord_interactions.models.component import ActionRow, Button
 from flask_discord_interactions.models.embed import Embed, Footer
 from flask_discord_interactions import DiscordInteractions, Message
 
-load_dotenv("./.env")
 
 from flask import Flask, json, request, abort
 import requests
@@ -17,7 +17,6 @@ from werkzeug.exceptions import HTTPException
 
 from resources import players
 from resources import companies
-from resources import items
 import config
 
 from admin import admin_bp
@@ -31,6 +30,7 @@ from guide import guide_bp
 from truck import truck_bp
 from companies import company_bp
 
+load_dotenv("./.env")
 
 app = Flask(__name__)
 discord = DiscordInteractions(app)
@@ -79,12 +79,10 @@ def votes():
         )
     else:
         player = players.get(voter_id)
-        if player.id == 619879176316649482:
-            player.load_item(items.get("cheese"))
-        added_money = (player.level + 1) * 100
-        player.add_money(added_money)
+        players.update(player, last_vote=round(time()))
         vote_message_content = (
-            f"**{player.name}** just voted for the Truck Simulator. As a reward they received ${added_money}."
+            f"**{player.name}** just voted for the Truck Simulator. "
+            "As a reward they now get double xp for the next 30 minutes."
         )
     vote_message = Message(
         embed=Embed(

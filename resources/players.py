@@ -3,6 +3,7 @@
 This module contains the Player class, several methods to operate with players in the database and
 the DrivingPlayer, used to manage driving sessions
 """
+from time import time
 from typing import Optional
 import logging
 from resources import database
@@ -44,6 +45,7 @@ class Player:
         truck_id: id of the player's truck
         loaded_items: a list of items the player has loaded
         company: the player's company
+        last_vote: timestamp that contains the last vote as a unix timestamp
     """
 
     def __init__(self, id, name, **kwargs) -> None:
@@ -72,6 +74,7 @@ class Player:
         else:
             self.loaded_items: list = loaded_items
         self.company = kwargs.pop("company", None)
+        self.last_vote = kwargs.pop("last_vote", 0)
 
     def __iter__(self):
         self._n = 0
@@ -96,6 +99,8 @@ class Player:
         Add xp to the player and performs a level up if needed
         """
         answer = f"\nYou got {amount:,} xp"
+        if round(time()) - self.last_vote < 1800:
+            amount = amount * 2
         update(self, xp=int(self.xp) + amount)
         while int(self.xp) >= levels.get_next_xp(self.level):
             update(self, level=self.level + 1, xp=self.xp - levels.get_next_xp(self.level))
@@ -209,6 +214,7 @@ def update(
     truck_id: int = None,
     loaded_items: list = None,
     company: str = None,
+    last_vote: int = None,
 ) -> None:
     """
     Updates a player in the database
@@ -245,6 +251,9 @@ def update(
     if company is not None:
         database.cur.execute("UPDATE players SET company=%s WHERE id=%s", (company, player.id))
         player.company = company
+    if last_vote is not None:
+        database.cur.execute("UPDATE players SET last_vote=%s WHERE id=%s", (last_vote, player.id))
+        player.last_vote = last_vote
     database.con.commit()
     logging.debug("Updated player %s to %s", player.name, tuple(player))
 
