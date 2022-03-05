@@ -95,3 +95,15 @@ def serverrules(ctx) -> Message:
         )
     )
     return Message(embed=rules_embed)
+
+
+@admin_bp.command()
+def complain(ctx) -> str:
+    """No description."""
+    return (
+        "What a crap bot this is! :rage: "
+        "Hours of time wasted on this useless procuct of a terrible coder and a lousy artist "
+        ":rage: :rage: Is this bot even TESTED before the updates are published... "
+        "Horrible, just HORRIBLE this spawn of incopetence. Who tf made this? A 12 year old child? "
+        "This child would probably have made it better than THAT :rage: "
+    )
