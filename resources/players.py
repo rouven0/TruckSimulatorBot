@@ -1,4 +1,4 @@
-# pylint: disable=invalid-name,no-self-use,attribute-defined-outside-init
+# pylint: disable=invalid-name,attribute-defined-outside-init
 """
 This module contains the Player class, several methods to operate with players in the database and
 the DrivingPlayer, used to manage driving sessions
@@ -15,6 +15,7 @@ from resources.jobs import Job
 def _format_pos_to_db(pos: list) -> str:
     """
     Returns a database-ready string that contains the position in the form x/y
+    :
     """
     return f"{pos[0]}/{pos[1]}"
 
@@ -22,6 +23,8 @@ def _format_pos_to_db(pos: list) -> str:
 def _format_items_to_db(item_list: list) -> str:
     """
     Returns a database-ready string containing all the items
+    :param list item_list: A list of items to format
+    :return str: Database ready string
     """
     db_items = ""
     for item in item_list:
@@ -32,20 +35,20 @@ def _format_items_to_db(item_list: list) -> str:
 
 class Player:
     """
-    Attributes:
-    ----------
-        id: Unique discord user id to identify the player
-        name: Displayed name in discord, NOT the Nickname
-        level: players level
-        xp: xp for current level
-        money: Amount of in-game currency the player has
-        position: Position on the 2 dimensional array that I call map
-        miles: Amount of miles the Player has driven
-        gas: amount of gas the player has
-        truck_id: id of the player's truck
-        loaded_items: a list of items the player has loaded
-        company: the player's company
-        last_vote: timestamp that contains the last vote as a unix timestamp
+    A class representing a Player in the database
+
+    :ivar int id: Unique discord user id to identify the player
+    :ivar str name: Displayed name in discord, NOT the Nickname
+    :ivar int level: The player's level
+    :ivar int xp: Xp for current level
+    :ivar int money: Amount of in-game currency the player has
+    :ivar list position: Position on the 2 dimensional array that I call map
+    :ivar int miles: Amount of miles the Player has driven
+    :ivar int gas: Amount of gas the player has
+    :ivar int truck_id: Id of the player's truck
+    :ivar list loaded_items: A list of items the player has loaded
+    :ivar str company: The name of the player's company
+    :ivar int last_vote: The last vote as a unix timestamp
     """
 
     def __init__(self, id, name, **kwargs) -> None:
@@ -97,6 +100,9 @@ class Player:
     def add_xp(self, amount: int) -> str:
         """
         Add xp to the player and performs a level up if needed
+
+        :param int amount: Amount of xp that should be added
+        :return: A string containing a message reflecting the xp increase, displayed in some embeds
         """
         answer = f"\nYou got {amount:,} xp"
         if round(time()) - self.last_vote < 1800:
@@ -110,6 +116,8 @@ class Player:
     def add_money(self, amount) -> None:
         """
         Add money to the players account
+
+        :param int amount: Amount of money that should be added
         """
         database.cur.execute("UPDATE players SET money=%s WHERE id=%s", (self.money + amount, self.id))
         database.con.commit()
@@ -118,6 +126,9 @@ class Player:
     def debit_money(self, amount) -> None:
         """
         Debit money from the players account
+
+        :param int amount: Amount of money that should be removed
+        :raises NotEnoughMoney: In case the amount in too high
         """
         if amount > self.money:
             raise NotEnoughMoney()
@@ -128,6 +139,8 @@ class Player:
     def load_item(self, item: items.Item) -> None:
         """
         Add an item to the list of loaded items
+
+        :param items.Item item: Item that should be added
         """
         new_items = self.loaded_items
         new_items.append(item)
@@ -136,6 +149,8 @@ class Player:
     def unload_item(self, item: items.Item) -> None:
         """
         Remove an items from the list of loaded items
+
+        :param items.Item item: Item that should be removed
         """
         new_items = self.loaded_items
         items_to_remove = []
@@ -148,9 +163,12 @@ class Player:
 
         update(self, loaded_items=new_items)
 
-    def add_job(self, job: Job) -> None:
+    @staticmethod
+    def add_job(job: Job) -> None:
         """
         Inserts a Job object into the players database
+
+        :param jobs.Job job: Job that should be inserted
         """
         placeholders = ", ".join(["%s"] * len(vars(job)))
         columns = ", ".join(vars(job).keys())
@@ -158,16 +176,23 @@ class Player:
         database.cur.execute(sql, tuple(job))
         database.con.commit()
 
-    def update_job(self, job: Job, state: int) -> None:
+    @staticmethod
+    def update_job(job: Job, state: int) -> None:
         """
         Updates a job's state
+
+        :param jobs.Job job: The Job that should be updated
+        :param int state: The new state of the job
         """
         database.cur.execute("UPDATE jobs SET state=%s WHERE player_id=%s", (state, job.player_id))
         database.con.commit()
 
-    def remove_job(self, job: Job) -> None:
+    @staticmethod
+    def remove_job(job: Job) -> None:
         """
         Removes a job from the player database
+
+        :param jobs.Job job: The Job that should be removed
         """
         database.cur.execute("DELETE FROM jobs WHERE player_id=%s", (job.player_id,))
         database.con.commit()
@@ -175,6 +200,8 @@ class Player:
     def get_job(self) -> Optional[Job]:
         """
         Get the Players current job
+
+        :return: A job if the player currently has a running job
         """
         database.cur.execute("SELECT * FROM jobs WHERE player_id=%s", (self.id,))
         records = database.cur.fetchall()
@@ -182,7 +209,7 @@ class Player:
             return Job(**records[0])
         return None
 
-    def remove_from_company(self):
+    def remove_from_company(self) -> None:
         """
         Method I had to make to set a player's company to None
         """
@@ -193,6 +220,8 @@ class Player:
 def insert(player: Player) -> None:
     """
     Inserts a player into the database
+
+    :param Player player: Player that should be inserted
     """
     placeholders = ", ".join(["%s"] * len(vars(player)))
     columns = ", ".join(vars(player).keys())
@@ -218,6 +247,8 @@ def update(
 ) -> None:
     """
     Updates a player in the database
+
+    Not going to document this clusterfuck until this is properly done
     """
     if name is not None:
         database.cur.execute("UPDATE players SET name=%s WHERE id=%s", (name, player.id))
@@ -261,6 +292,11 @@ def update(
 def get(id: int) -> Player:
     """
     Get one player from the database
+
+    :param int id: The requested player's id
+    :return: The corresponding player
+    :raises PlayerNotRegistered: in case a player is not found in the database
+    :raises PlayerBlacklisted: in case a player is on the blacklist
     """
     id = int(id)
     if not registered(id):
@@ -273,9 +309,14 @@ def get(id: int) -> Player:
     return player
 
 
-def get_top(key) -> tuple:
+def get_top(key: str) -> tuple:
     """
     Get the top 10 players from the database
+
+    :param str key: Key to sort the player list by
+    :return:
+        - :top_players: A list of the top players
+        - :suffix: A suffix to be shown in the list
     """
     if key == "money":
         database.cur.execute("SELECT * FROM players ORDER BY money DESC")
@@ -298,6 +339,9 @@ def get_top(key) -> tuple:
 def registered(id: int) -> bool:
     """
     Checks whether a specific user is registered or not
+
+    :param int id: User id to check
+    :return: A boolean indicating the registered state
     """
     database.cur.execute("SELECT * FROM players WHERE id=%s", (id,))
     if len(database.cur.fetchall()) == 1:
@@ -307,7 +351,10 @@ def registered(id: int) -> bool:
 
 def get_count(table: str) -> int:
     """
-    Returns the player count
+    Returns a table's  rowcount
+
+    :param str table: Table to look at
+    :return: The row count of the table
     """
     # update the connection in case of the timeout-thread doing something
     database.con.commit()
@@ -319,9 +366,9 @@ def get_count(table: str) -> int:
 class DrivingPlayer(Player):
     """
     Object to manage current driving session and prevent duplicate driving
-    Attributes:
-        message: Discord message where the drive is displayed and where the reactions are
-        last_action_time: Time used to keep the list clean and time out drives
+
+    :ivar str followup_url: Url granting access to the drive message
+    :ivar int last_action_time: Time used to keep the list clean and time out drives
     """
 
     def __init__(self, followup_url="", last_action_time=0, **kwargs) -> None:
@@ -344,9 +391,12 @@ class DrivingPlayer(Player):
         database.con.commit()
         logging.info("%s stopped driving", self.name)
 
-    def update(self, time, followup_url) -> None:
+    def update(self, time: int, followup_url: str) -> None:
         """
         Update the player on every interaction
+
+        :param int time: Unix timestamp telling the last action
+        :param str followup_url: Url giving access to the drive message
         """
         database.cur.execute("UPDATE driving_players SET last_action_time=%s WHERE id=%s", (time, self.id))
         database.cur.execute("UPDATE driving_players SET followup_url=%s WHERE id=%s", (followup_url, self.id))
@@ -356,6 +406,9 @@ class DrivingPlayer(Player):
 def is_driving(id: int) -> bool:
     """
     Checks whether a specific user is driving
+
+    :param int id: The id to check
+    :return: A boolean indicating whether user is driving
     """
     # update the connection in case of the timeout-thread doing something
     database.con.commit()
@@ -368,6 +421,11 @@ def is_driving(id: int) -> bool:
 def get_driving_player(id: int, check: int = None) -> DrivingPlayer:
     """
     Get a driving player from the database
+
+    :param int id: The id to search for
+    :param int check: When given, this method will compare id and check, this is used to verify component and message "owners"
+    :raises NotDriving: When id and check mismatch
+    :return: The corresponding driving player
     """
     id = int(id)
     if check and id != check:
@@ -382,7 +440,11 @@ def get_driving_player(id: int, check: int = None) -> DrivingPlayer:
 
 
 def get_all_driving_players() -> list[DrivingPlayer]:
-    """Get all driving players from the database"""
+    """
+    Get all driving players from the database
+
+    :return: A list of all driving players
+    """
     # update the connection in case of the timeout-thread doing something
     database.con.commit()
     database.cur.execute("SELECT * from driving_players")
@@ -401,6 +463,8 @@ def get_all_driving_players() -> list[DrivingPlayer]:
 class PlayerNotRegistered(Exception):
     """
     Exception raised when a player that is not registered is requested
+
+    :ivar int requested_id: Id of the requested player
     """
 
     def __init__(self, requested_id, *args: object) -> None:
@@ -414,9 +478,12 @@ class PlayerNotRegistered(Exception):
 class PlayerBlacklisted(Exception):
     """
     Exception raised when a player is blacklisted
+
+    :ivar int requested_id: Id of the blacklisted player
+    :ivar str reason: Reason of the ban
     """
 
-    def __init__(self, requested_id, reason, *args: object) -> None:
+    def __init__(self, requested_id: int, reason: str, *args: object) -> None:
         self.requested_id = requested_id
         self.reason = reason
         super().__init__(*args)

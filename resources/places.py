@@ -1,27 +1,25 @@
 """
-This module provides the Place class and several lists of places easy to access
+Places are spread all over the map. They accept and produce certain items, used in jobs and minijobs
 """
 from dataclasses import dataclass
 import sqlite3
-from typing import Optional
+from typing import Optional, Union
 
 
 @dataclass
 class Place:
     """
-    Attributes:
-    -----------
-        name: The name of the place
-        position: the Place's position in the 2 dimensional array that I call Map
-        available_actions: all local available commands stored as strings in a list
-        image_url: Every place has an image that is shown while driving
-                   Images are hosted on a resource discord server and displayed in embeds via URL
-        image_url_better: image with the better truck
-        image_url_tropical: image with the tropical truck
-        image_url_ultimate: image with the ultimate truck
-        produced_item: Item this place produces in jobs.
-        accepted_item: Item this place rewards
-        item_reward: money paid when the accepted_item is unloaded
+    :ivar str name: The name of the place
+    :ivar list position: the Place's position in the 2 dimensional array that I call Map
+    :ivar list available_actions: all local available commands stored as strings in a list
+    :ivar str image_url: Every place has an image that is shown while driving.
+        Images are hosted on a resource discord server and displayed in embeds via URL
+    :ivar str image_url_better: image with the better truck
+    :ivar str image_url_tropical: image with the tropical truck
+    :ivar str image_url_ultimate: image with the ultimate truck
+    :ivar str produced_item: Item this place produces in jobs.
+    :ivar str accepted_item: Item this place rewards
+    :ivar int item_reward: money paid when the accepted_item is unloaded
     """
 
     name: str
@@ -81,10 +79,13 @@ def __generate_list(lst) -> None:
         )
 
 
-def get(position) -> Place:
+def get(position: Union[list, str]) -> Place:
     """
     Returns a place object on a specific position
     If no places is registered there, None is returned
+
+    :param list/str position: Postion of the place
+    :return: The corresponding place
     """
     if isinstance(position, str):
         position = __get_position(position)
@@ -95,7 +96,12 @@ def get(position) -> Place:
 
 
 def get_matching_options(name: str) -> list[dict]:
-    """Returns autocomplete choices for the placeinfo command"""
+    """
+    Returns autocomplete choices for the placeinfo command
+
+    :param str name: Partial name of the place
+    :return: A list of choice dicts with all the matching place names and positions
+    """
     return [
         {"name": place.name, "value": f"{place.position[0]}/{place.position[1]}"}
         for place in __all_places__
@@ -105,23 +111,9 @@ def get_matching_options(name: str) -> list[dict]:
 
 def get_all() -> list:
     """
-    Returns all places that are currently loaded
+    :return: All places in a list
     """
     return __all_places__
-
-
-def get_public() -> list:
-    """
-    Returns places that should be shown in the addressbook
-    """
-    return __public_places__
-
-
-def get_hidden() -> list:
-    """
-    Returns places that should NOT be shown in the addressbook
-    """
-    return __hidden_places__
 
 
 __con__ = sqlite3.connect("./resources/objects.db")
@@ -130,13 +122,3 @@ __cur__ = __con__.cursor()
 __all_places__ = []
 __cur__.execute("SELECT * FROM places")
 __generate_list(__all_places__)
-
-__public_places__ = []
-__cur__.execute("SELECT * FROM places WHERE visibility=0")
-__generate_list(__public_places__)
-
-__hidden_places__ = []
-__cur__.execute("SELECT * FROM places WHERE visibility=1")
-__generate_list(__hidden_places__)
-
-__con__.close()

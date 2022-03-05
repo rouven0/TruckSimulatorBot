@@ -1,6 +1,7 @@
 # pylint: disable=attribute-defined-outside-init
 """
-This module contains the company class
+Companies are a group of players that collect money together. Every company's logo will appear on the map as emoji.
+Every time a player completes a job. The companies net worth is increased.
 """
 
 import logging
@@ -27,13 +28,12 @@ def _get_position(db_pos) -> list:
 
 class Company:
     """
-    Attributes:
-        name: Name of the company
-        logo: emoji displayed as logo on the map
-        description: A description for that company
-        hq_position: position of the company's headquarters
-        founder: founder of the company, has control over it
-        net_worth: money the company holds
+    :ivar str name: Name of the company
+    :ivar str logo: Emoji displayed as logo on the map
+    :ivar str description: A description for that company
+    :ivar list hq_position: Position of the company's headquarters
+    :ivar int founder: Id of the founder of the company, who has control over it
+    :ivar int net_worth: Money the company holds
     """
 
     def __init__(self, name: str, hq_position: Union[list, str], founder: int, **kwargs) -> None:
@@ -65,18 +65,29 @@ class Company:
     def __str__(self) -> str:
         return self.name
 
-    def add_net_worth(self, amount: int):
-        """Increases a company's net worth"""
+    def add_net_worth(self, amount: int) -> None:
+        """
+        Increases a company's net worth
+
+        :param int amount: Amount to be added
+        """
         database.cur.execute("UPDATE companies SET net_worth=%s WHERE name=%s", (self.net_worth + amount, self.name))
         self.net_worth += amount
 
-    def remove_net_worth(self, amount: int):
-        """Decreases a company's net worth"""
+    def remove_net_worth(self, amount: int) -> None:
+        """
+        Decreases a company's net worth
+
+        :param int amount: Amount to be removed
+        """
         database.cur.execute("UPDATE companies SET net_worth=%s WHERE name=%s", (self.net_worth - amount, self.name))
         self.net_worth -= amount
 
     def get_members(self) -> list[Player]:
-        """Get all players that belong to a specific company"""
+        """
+        :return: A list of all players that belong to the company
+        """
+        # Maybe make this a property at some point
         members = []
         database.cur.execute("SELECT * FROM players WHERE company=%s", (self.name,))
         record = database.cur.fetchall()
@@ -85,8 +96,13 @@ class Company:
         return members
 
 
-def exists(name: Optional[str]) -> bool:
-    """Checks if a company is found in the database"""
+def exists(name: str) -> bool:
+    """
+    Checks if a company is found in the database
+
+    :param str name: A name to check
+    :return: A bool defining whether that company exists
+    """
     database.cur.execute("SELECT * FROM companies WHERE name=%s", (name,))
     if len(database.cur.fetchall()) == 1:
         return True
@@ -94,8 +110,14 @@ def exists(name: Optional[str]) -> bool:
 
 
 def get(name: Optional[str]) -> Company:
-    """Gets a company from the database"""
-    if not exists(name):
+    """
+    Gets a company from the database
+
+    :param str name: The desired company's name, can be None
+    :raises CompanyNotFound: In case a company with this name doesn't exist
+    :return: The desired company
+    """
+    if name is None or not exists(name):
         raise CompanyNotFound()
     database.cur.execute("SELECT * FROM companies WHERE name=%s", (name,))
     record = database.cur.fetchone()
@@ -104,7 +126,9 @@ def get(name: Optional[str]) -> Company:
 
 
 def get_all() -> list[Company]:
-    """Get all companies from the database"""
+    """
+    :return: A list of all registered companies
+    """
     database.cur.execute("SELECT * from companies")
     companies = []
     for record in database.cur.fetchall():
@@ -113,7 +137,11 @@ def get_all() -> list[Company]:
 
 
 def insert(company: Company) -> None:
-    """Add a new company"""
+    """
+    Add a new company
+
+    :param Company company: The company to insert
+    """
     placeholders = ", ".join(["%s"] * len(vars(company)))
     columns = ", ".join(vars(company).keys())
     sql = f"INSERT INTO companies ({columns}) VALUES ({placeholders})"
@@ -123,7 +151,11 @@ def insert(company: Company) -> None:
 
 
 def remove(company: Company) -> None:
-    """Delete a company"""
+    """
+    Delete a company
+
+    :param Company company: The company to remove
+    """
     database.cur.execute("DELETE FROM companies WHERE name=%s", (company.name,))
     database.con.commit()
     logging.info("Company %s got deleted", company.name)
@@ -140,6 +172,8 @@ def update(
 ) -> None:
     """
     Updates a company in the database
+
+    Same as in players, not documented until fixed
     """
     if name is not None:
         database.cur.execute("UPDATE companies SET name=%s WHERE name=%s", (name, company.name))

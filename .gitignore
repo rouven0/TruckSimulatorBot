@@ -10,5 +10,7 @@ players.db
 
 # virtual environment
 venv/
-
 deployTest.sh
+docs.sh
+
+docs/_build

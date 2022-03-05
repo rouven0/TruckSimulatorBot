@@ -1,6 +1,7 @@
 # pylint: disable=attribute-defined-outside-init
 """
-This module provides the Job class and all the methods to operate with jobs in the database
+Jobs are the main way to get money. For every job, the player has to bring items from one place to another.
+After the job is done, the reward is payed out.
 """
 from random import randint
 from math import sqrt
@@ -22,14 +23,12 @@ def _format_pos_to_db(pos) -> str:
 
 class Job:
     """
-    Attributes:
-        player_id: Player id that this jobs belongs to
-                   Used as primary key in the database
-        place_from: Place from which the player has to take the items
-        place_to: Place the player has to drive to when the truck is loaded
-        state: current state, see get_state() for more information about the states
-        reward: Amount of money the player gets for this job
-        create_time: timestamp this job was created
+    :ivar player_id: Player id that this jobs belongs to used as primary key in the database
+    :ivar places.Place place_from: Place from which the player has to take the items
+    :ivar places.Place place_to: Place the player has to drive to when the truck is loaded
+    :ivar int state: current state, see get_state() for more information about the states
+    :ivar int reward: Amount of money the player gets for this job
+    :ivar int create_time: timestamp this job was created
     """
 
     def __init__(
@@ -70,6 +69,9 @@ def generate(player) -> Job:
     """
     This takes two random places from the list, calculates its reward based on the miles the player
     has to drive and returns the Job object and the job as a string in human readable format.
+
+    :param players.Player player: Player that this job belongs to
+    :return: The full job
     """
     available_places = places.get_public().copy()
     place_from = available_places[randint(0, len(available_places) - 1)]
@@ -89,6 +91,9 @@ def generate(player) -> Job:
 def get_state(job: Job) -> str:
     """
     Returns the next instructions based on the current jobs state
+
+    :param Job job: The job to be looked ot
+    :return: The message containing the instructions
     """
     if job.state == 0:
         return f"You claimed this job. Drive to {job.place_from} and load your truck"
@@ -100,7 +105,9 @@ def get_state(job: Job) -> str:
 
 
 def get_all() -> list[Job]:
-    """Get a list of all running jobs"""
+    """
+    :return: A list of all running jobs
+    """
     # update the connection in case of the timeout-thread doing something
     database.con.commit()
     database.cur.execute("SELECT * FROM jobs")

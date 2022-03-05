@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 load_dotenv("./.env")
 
-con: mysql.connector.CMySQLConnection = mysql.connector.connect(
+con = mysql.connector.connect(
     host=getenv("MYSQL_HOST"),
     user=getenv("MYSQL_USER"),
     passwd=getenv("MYSQL_PASSWORD"),

@@ -34,3 +34,7 @@ stop:
 	@sudo systemctl stop TruckSimulatorBot.service
 	@sudo systemctl stop TruckSimulatorTimeouts.service
 	@echo Bot Service stopped
+
+documentation:
+	@sphinx-build -M html docs/ docs/_build/
+
