@@ -26,7 +26,10 @@ def sql(ctx, query: str):
 
 
 blacklist = admin_bp.command_group(
-    name="blacklist", default_permission=False, permissions=[Permission(user=692796548282712074)]
+    name="blacklist",
+    description="Manage blacklisted users.",
+    default_permission=False,
+    permissions=[Permission(user=692796548282712074)],
 )
 
 
