@@ -35,8 +35,23 @@ def profile(ctx, user: User = None):
             ),
             footer=Footer(text="Your profile has been created"),
         )
+    rules_embed = Embed(title="Rules", color=config.EMBED_COLOR, fields=[])
+    rules_embed.fields.append(
+        Field(
+            name="Trading ingame currency for real money",
+            value="Not only that it is pretty stupid to trade real world's money in exchange of a number "
+            "somewhere in a random database it will also get you banned from this bot.",
+            inline=False,
+        )
+    )
+    rules_embed.fields.append(
+        Field(
+            name="Autotypers",
+            value="Don't even try, it's just wasted work only to get you blacklisted.",
+        )
+    )
     players.insert(players.Player(int(ctx.author.id), ctx.author.username, money=1000, gas=600))
-    return Message(embed=welcome_embed)
+    return Message(embeds=[welcome_embed, rules_embed])
 
 
 def get_profile_embed(user: User) -> Embed:

@@ -16,7 +16,7 @@ admin_bp = DiscordInteractionsBlueprint()
     annotations={"query": "The query to execute."},
 )
 def sql(ctx, query: str):
-    """DANGER: Execute raw sql"""
+    """Executes a sql query."""
     if int(ctx.author.id) != 692796548282712074:
         return "Wait. You shouldn't be able to even read this. Something is messed up"
     try:
@@ -39,7 +39,7 @@ blacklist = admin_bp.command_group(
 
 @blacklist.command(annotations={"user": "The user to ban.", "reason": "The reason for this ban."})
 def add(ctx, user: str, reason: str):
-    """Add a user to the blacklist."""
+    """Adds a user to the blacklist."""
     try:
         player = players.get(int(user))
         players.update(player, name=reason, xp=-1)
@@ -50,12 +50,12 @@ def add(ctx, user: str, reason: str):
             )
         )
     except players.PlayerBlacklisted:
-        return "Player already blacklisted"
+        return "Player already blacklisted."
 
 
 @blacklist.command(annotations={"user": "The user to unban."})
 def remove(ctx, user: str):
-    """Remove a user from the blacklist."""
+    """Removes a user from the blacklist."""
     try:
         players.get(int(user))
         return "That Player is not on the blacklist"
@@ -71,9 +71,30 @@ def remove(ctx, user: str):
 
 
 @admin_bp.command()
+def rules(ctx) -> Message:
+    """Shows the rules for this bot."""
+    rules_embed = Embed(title="Truck Simulator ingame rules", color=config.EMBED_COLOR, fields=[])
+    rules_embed.fields.append(
+        Field(
+            name="Trading ingame currency for real money",
+            value="Not only that it is pretty stupid to trade real world's money in exchange of a number "
+            "somewhere in a random database it will also get you banned from this bot.",
+            inline=False,
+        )
+    )
+    rules_embed.fields.append(
+        Field(
+            name="Autotypers",
+            value="Don't even try, it's just wasted work only to get you blacklisted.",
+        )
+    )
+    return Message(embed=rules_embed)
+
+
+@admin_bp.command()
 def serverrules(ctx) -> Message:
     """Shows the rules for this server."""
-    rules_embed = Embed(title="Truck Simulator Server Rules", color=config.EMBED_COLOR, fields=[])
+    rules_embed = Embed(title="Truck Simulator server rules", color=config.EMBED_COLOR, fields=[])
     rules_embed.fields.append(
         Field(
             name="Be civil and respectful",

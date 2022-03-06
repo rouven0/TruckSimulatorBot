@@ -93,3 +93,17 @@ def discard(ctx, player_id: int):
     if int(ctx.author.id) != player_id:
         return Message(deferred=True, update=True)
     return Message(embeds=ctx.message.embeds, components=[], update=True)
+
+
+@system_bp.command()
+def vote(ctx) -> Message:
+    """Support the bot by voting for it on top.gg."""
+    player = players.get(ctx.author.id)
+    vote_embed = Embed(
+        title="Click here to vote for the Truck Simulator",
+        description="As a reward, you will get double xp for 30 minutes.",
+        url="https://top.gg/bot/831052837353816066/vote",
+        color=config.EMBED_COLOR,
+        fields=[Field(name="Your last vote", value=f"<t:{player.last_vote}:R>")],
+    )
+    return Message(embed=vote_embed)
