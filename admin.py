@@ -10,7 +10,11 @@ import config
 admin_bp = DiscordInteractionsBlueprint()
 
 
-@admin_bp.command(default_permission=False, permissions=[Permission(user=692796548282712074)])
+@admin_bp.command(
+    default_permission=False,
+    permissions=[Permission(user=692796548282712074)],
+    annotations={"query": "The query to execute."},
+)
 def sql(ctx, query: str):
     """DANGER: Execute raw sql"""
     if int(ctx.author.id) != 692796548282712074:
@@ -33,7 +37,7 @@ blacklist = admin_bp.command_group(
 )
 
 
-@blacklist.command()
+@blacklist.command(annotations={"user": "The user to ban.", "reason": "The reason for this ban."})
 def add(ctx, user: str, reason: str):
     """Add a user to the blacklist."""
     try:
@@ -49,7 +53,7 @@ def add(ctx, user: str, reason: str):
         return "Player already blacklisted"
 
 
-@blacklist.command()
+@blacklist.command(annotations={"user": "The user to unban."})
 def remove(ctx, user: str):
     """Remove a user from the blacklist."""
     try:
@@ -68,7 +72,7 @@ def remove(ctx, user: str):
 
 @admin_bp.command()
 def serverrules(ctx) -> Message:
-    """Truck Simulator server Rules."""
+    """Shows the rules for this server."""
     rules_embed = Embed(title="Truck Simulator Server Rules", color=config.EMBED_COLOR, fields=[])
     rules_embed.fields.append(
         Field(

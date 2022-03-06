@@ -10,7 +10,7 @@ misc_bp = DiscordInteractionsBlueprint()
 
 @misc_bp.command()
 def rules(ctx) -> Message:
-    """Truck Simulator Rules."""
+    """Shows the rules for this bot."""
     rules_embed = Embed(title="Truck Simulator Ingame Rules", color=config.EMBED_COLOR, fields=[])
     rules_embed.fields.append(
         Field(
