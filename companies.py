@@ -352,7 +352,7 @@ def update(ctx):
 
 @company_bp.command(name="company", annotations={"user": "A user whose company you want to view"})
 def company_show(ctx):
-    """View and manage your company."""
+    """Manages your company."""
 
     player = players.get(int(ctx.author.id))
     try:

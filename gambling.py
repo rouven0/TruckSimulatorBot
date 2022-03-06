@@ -33,7 +33,7 @@ gambling_bp = DiscordInteractionsBlueprint()
     ]
 )
 def coinflip(ctx, side: str, amount: int) -> str:
-    """Test your luck while throwing a coin."""
+    """Tests your luck while throwing a coin."""
     player = players.get(ctx.author.id)
     player.debit_money(amount)
     if randint(0, 1) == 0:
@@ -111,7 +111,7 @@ def slots_handler(ctx, author_id: int, amount: int) -> Message:
 
 @gambling_bp.command(annotations={"amount": "The amount you bet. Must be a number except you want to bet all or half."})
 def slots(ctx, amount: Autocomplete(int)):
-    """Simple slot machine."""
+    """Spins up a simple slot machine."""
     if amount == 0:
         return "You can't spin the machine with that little money you inserted. At least try to do proper gambling."
     return Message(

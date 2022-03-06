@@ -21,7 +21,7 @@ def show_profile_context(ctx, user: User) -> Message:
 
 @profile_bp.command(annotations={"user": "A user you want to view."})
 def profile(ctx, user: User = None):
-    """View and manage your profile."""
+    """Shows your profile."""
     if user or players.registered(ctx.author.id):
         return Message(embed=get_profile_embed(user if user is not None else ctx.author))
     with open("./messages/welcome.md", "r", encoding="utf8") as welcome_file:
@@ -88,8 +88,6 @@ def get_profile_embed(user: User) -> Embed:
 
 
 @profile_bp.command(
-    name="top",
-    description="Have a look at several toplists.",
     options=[
         {
             "name": "key",
@@ -105,6 +103,7 @@ def get_profile_embed(user: User) -> Embed:
     ],
 )
 def top(ctx, key) -> Message:
+    """Presents the top players."""
     top_players = players.get_top(key)
     top_body = ""
     count = 0

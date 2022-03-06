@@ -99,7 +99,7 @@ def show_truck_button(ctx, player_id: int):
 
 @truck_bp.command()
 def truck(ctx) -> Message:
-    """View and manage your Truck."""
+    """Manages your truck."""
     return show_truck(ctx)
 
 

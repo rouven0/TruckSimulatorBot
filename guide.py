@@ -86,7 +86,7 @@ def place_autocomplete(ctx, place):
     ],
 )
 def guide(ctx, topic: str = "introduction") -> Message:
-    """A nice little guide that helps you understand this bot."""
+    """Shows a nice little guide that helps you understand this bot."""
     return Message(embed=get_guide_embed(topic), components=[get_guide_select()])
 
 

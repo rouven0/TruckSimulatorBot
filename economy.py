@@ -113,7 +113,7 @@ def refill(ctx, player_id: int):
 
 @economy_bp.command(annotations={"user": "The user you want to give money to.", "amount": "The amount you give."})
 def give(ctx, user: User, amount: int) -> Message:
-    """Give money to a user."""
+    """Gives money to a user."""
     amount = abs(int(amount))
     acceptor = players.get(int(user.id))
 

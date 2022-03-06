@@ -64,7 +64,7 @@ def get_info_embed() -> Embed:
 
 @system_bp.command()
 def info(ctx) -> Message:
-    """System information, links and credits."""
+    """Shows system information, links and credits."""
     return Message(
         embed=get_info_embed(),
         components=[
@@ -97,7 +97,7 @@ def discard(ctx, player_id: int):
 
 @system_bp.command()
 def vote(ctx) -> Message:
-    """Support the bot by voting for it on top.gg."""
+    """Gives you a link to vote for this bot on top.gg."""
     player = players.get(ctx.author.id)
     vote_embed = Embed(
         title="Click here to vote for the Truck Simulator",
