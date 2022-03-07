@@ -1,6 +1,7 @@
 # pylint: disable=unused-argument,missing-function-docstring
 from datetime import datetime
 from time import time
+import threading
 
 import requests
 
@@ -396,6 +397,27 @@ def move(ctx: Context, direction, player_id):
     )
 
     return Message(embed=get_drive_embed(player, ctx.author.avatar_url), components=get_buttons(player), update=True)
+
+
+@driving_bp.custom_handler(custom_id="initial_drive")
+def initial_drive(ctx, player_id: str):
+    if ctx.author.id != player_id:
+        return Message(deferred=True, update=True)
+    player = players.DrivingPlayer(
+        **vars(players.get(ctx.author.id)), followup_url=ctx.followup_url(), last_action_time=int(time())
+    )
+    player.start_drive()
+
+    def start_drive():
+        ctx.send(
+            Message(
+                embed=get_drive_embed(player, ctx.author.avatar_url),
+                components=get_buttons(player),
+            )
+        )
+
+    threading.Thread(target=start_drive).start()
+    return Message(embeds=ctx.message.embeds, components=[], update=True)
 
 
 @driving_bp.command()

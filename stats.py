@@ -1,6 +1,7 @@
 # pylint: disable=unused-argument, missing-function-docstring
 from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
 from flask_discord_interactions.models.command import ApplicationCommandType
+from flask_discord_interactions.models.component import ActionRow, Button
 from flask_discord_interactions.models.option import CommandOptionType
 from flask_discord_interactions.models.user import User
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
@@ -19,11 +20,8 @@ def show_profile_context(ctx, user: User) -> Message:
     return Message(embed=get_profile_embed(user), ephemeral=True)
 
 
-@profile_bp.command(annotations={"user": "A user you want to view."})
-def profile(ctx, user: User = None):
-    """Shows your profile."""
-    if user or players.registered(ctx.author.id):
-        return Message(embed=get_profile_embed(user if user is not None else ctx.author))
+@profile_bp.custom_handler(custom_id="profile_register")
+def register(ctx):
     with open("./messages/welcome.md", "r", encoding="utf8") as welcome_file:
         welcome_embed = Embed(
             title="Hey there, fellow Trucker,",
@@ -33,7 +31,7 @@ def profile(ctx, user: User = None):
                 name="Welcome to the Truck Simulator",
                 icon_url=config.SELF_AVATAR_URL,
             ),
-            footer=Footer(text="Your profile has been created"),
+            footer=Footer(text="Your profile has been created", icon_url=ctx.author.avatar_url),
         )
     rules_embed = Embed(title="Rules", color=config.EMBED_COLOR, fields=[])
     rules_embed.fields.append(
@@ -51,7 +49,27 @@ def profile(ctx, user: User = None):
         )
     )
     players.insert(players.Player(int(ctx.author.id), ctx.author.username, money=1000, gas=600))
-    return Message(embeds=[welcome_embed, rules_embed])
+    return Message(
+        embeds=[welcome_embed, rules_embed],
+        components=[
+            ActionRow(
+                components=[
+                    Button(
+                        label="Let's go!",
+                        custom_id=["initial_drive", ctx.author.id],
+                        style=3,
+                        emoji={"name": "default_truck", "id": 861674264737087519},
+                    )
+                ]
+            )
+        ],
+    )
+
+
+@profile_bp.command(annotations={"user": "A user you want to view."})
+def profile(ctx, user: User = None):
+    """Shows your profile."""
+    return Message(embed=get_profile_embed(user if user is not None else ctx.author))
 
 
 def get_profile_embed(user: User) -> Embed:

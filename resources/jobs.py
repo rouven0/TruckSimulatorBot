@@ -73,7 +73,7 @@ def generate(player) -> Job:
     :param players.Player player: Player that this job belongs to
     :return: The full job
     """
-    available_places = places.get_public().copy()
+    available_places = places.get_all().copy()
     place_from = available_places[randint(0, len(available_places) - 1)]
     available_places.remove(place_from)
     place_to = available_places[randint(0, len(available_places) - 1)]

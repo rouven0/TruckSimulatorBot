@@ -110,8 +110,22 @@ def not_driving(error):
 @app.errorhandler(players.PlayerNotRegistered)
 def not_registered(error):
     """Error handler in case a player isn't found in the database"""
+    interaction_data = request.json
+    author = (
+        interaction_data.get("member").get("user").get("id")
+        if interaction_data.get("member", None)
+        else interaction_data.get("user").get("id")
+    )
+    if int(author) == error.requested_id:
+        content = f"<@{error.requested_id}> You are not registered yet. Click the button below to get started."
+        components = [ActionRow(components=[Button(label="Click here to register", custom_id="profile_register")])]
+    else:
+        content = f"<@{error.requested_id}> is not registered yet. Maybe somebody should tell them to do so."
+        components = []
+
     return Message(
-        content=f"<@{error.requested_id}> You are not registered yet. Try `/profile` to get started",
+        content=content,
+        components=components,
         ephemeral=True,
     ).dump()
 
