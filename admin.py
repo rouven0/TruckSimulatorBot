@@ -1,5 +1,5 @@
 # pylint: disable=unused-argument,broad-except
-from flask_discord_interactions import DiscordInteractionsBlueprint, Permission
+from flask_discord_interactions import DiscordInteractionsBlueprint, Permission, User
 from flask_discord_interactions.models.message import Message, Embed
 from flask_discord_interactions.models.embed import Field
 
@@ -38,14 +38,14 @@ blacklist = admin_bp.command_group(
 
 
 @blacklist.command(annotations={"user": "The user to ban.", "reason": "The reason for this ban."})
-def add(ctx, user: str, reason: str):
+def add(ctx, user: User, reason: str = "No reason provided."):
     """Adds a user to the blacklist."""
     try:
-        player = players.get(int(user))
+        player = players.get(int(user.id))
         players.update(player, name=reason, xp=-1)
         return Message(
             embed=Embed(
-                description=f":white_check_mark: **{player.name}** got blacklisted",
+                description=f":white_check_mark: **{user.username}** got blacklisted",
                 color=config.EMBED_COLOR,
             )
         )
@@ -54,17 +54,17 @@ def add(ctx, user: str, reason: str):
 
 
 @blacklist.command(annotations={"user": "The user to unban."})
-def remove(ctx, user: str):
+def remove(ctx, user: User):
     """Removes a user from the blacklist."""
     try:
-        players.get(int(user))
+        players.get(int(user.id))
         return "That Player is not on the blacklist"
     except players.PlayerBlacklisted:
-        player = players.Player(user, "Unknown")
-        players.update(player, xp=0, name="Unknown player")
+        player = players.Player(int(user.id), user.username)
+        players.update(player, xp=0, name=user.username)
         return Message(
             embed=Embed(
-                description=f":white_check_mark: **{player.id}** got removed from the blacklist",
+                description=f":white_check_mark: **{player.name}** got removed from the blacklist",
                 color=config.EMBED_COLOR,
             )
         )
