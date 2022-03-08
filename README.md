@@ -18,6 +18,7 @@ MYSQL_HOST
 MYSQL_USER
 MYSQL_PASSWORD
 MYSQL_DATABASE
+VOTE_WEBHOOK
 ```
 
 Superuser permissions are required to set up the bot's systemd service

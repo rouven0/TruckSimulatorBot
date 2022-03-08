@@ -5,6 +5,7 @@ After the job is done, the reward is payed out.
 """
 from random import randint
 from math import sqrt
+from typing import Union
 from time import time
 from resources import database
 from resources import places
@@ -34,8 +35,8 @@ class Job:
     def __init__(
         self,
         player_id: int,
-        place_from: places.Place,
-        place_to: places.Place,
+        place_from: Union[places.Place,str],
+        place_to: Union[places.Place,str],
         state: int,
         reward: int,
         create_time: int,

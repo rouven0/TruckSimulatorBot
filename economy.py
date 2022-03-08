@@ -108,7 +108,7 @@ def refill(ctx, player_id: int):
     drive_embed: Embed = ctx.message.embeds[0]
     drive_embed.fields[2]["value"] = str(player.gas)
 
-    return Message(embeds=[drive_embed, refill_embed], components=None, update=True)
+    return Message(embeds=[drive_embed, refill_embed], update=True)
 
 
 @economy_bp.command(annotations={"user": "The user you want to give money to.", "amount": "The amount you give."})

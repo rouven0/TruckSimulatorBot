@@ -40,7 +40,7 @@ def get(truck_id: int) -> Truck:
     """
     Get a truck based on its id
 
-    :param int id: Id to look for
+    :param int truck_id: Id to look for
     :raises TruckNotFound: In case a truck with the requested id doesn't exist
     :return: The corresponding truck
     """

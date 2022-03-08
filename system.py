@@ -73,7 +73,7 @@ def info(ctx) -> Message:
                     Button(
                         style=ButtonStyles.SECONDARY,
                         label="Refresh data",
-                        custom_id=refresh,
+                        custom_id=str(refresh),
                         emoji={"name": "reload", "id": 903581225149665290},
                     )
                 ]

@@ -2,9 +2,6 @@
 from time import time, sleep
 import logging
 import requests
-from dotenv import load_dotenv
-
-load_dotenv("./.env")
 
 import config
 from resources import players

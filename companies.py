@@ -30,7 +30,7 @@ def get_company_embed(user, player, company) -> Embed:
         footer=Footer(text=f"Founded by {founder.name}"),
         fields=[],
     )
-    logo_is_discord_emoji = re.match(r"<(a{0,1}):\w*:(\d+)>", company.logo)
+    logo_is_discord_emoji = re.match(r"<(a?):\w*:(\d+)>", company.logo)
     if logo_is_discord_emoji:
         logo_animated = logo_is_discord_emoji.groups()[0] == "a"
         logo_id = logo_is_discord_emoji.groups()[1]
