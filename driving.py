@@ -1,4 +1,4 @@
-# pylint: disable=unused-argument,missing-function-docstring
+# pylint: disable=missing-function-docstring
 from datetime import datetime
 from time import time
 import threading

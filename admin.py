@@ -1,7 +1,6 @@
 # pylint: disable=unused-argument,broad-except
 from flask_discord_interactions import DiscordInteractionsBlueprint, Permission, User
 from flask_discord_interactions.models.message import Message, Embed
-from flask_discord_interactions.models.embed import Field
 
 from resources import database
 from resources import players
@@ -68,58 +67,6 @@ def remove(ctx, user: User):
                 color=config.EMBED_COLOR,
             )
         )
-
-
-@admin_bp.command()
-def rules(ctx) -> Message:
-    """Shows the rules for this bot."""
-    rules_embed = Embed(title="Truck Simulator ingame rules", color=config.EMBED_COLOR, fields=[])
-    rules_embed.fields.append(
-        Field(
-            name="Trading ingame currency for real money",
-            value="Not only that it is pretty stupid to trade real world's money in exchange of a number "
-            "somewhere in a random database it will also get you banned from this bot.",
-            inline=False,
-        )
-    )
-    rules_embed.fields.append(
-        Field(
-            name="Autotypers",
-            value="Don't even try, it's just wasted work only to get you blacklisted.",
-        )
-    )
-    return Message(embed=rules_embed)
-
-
-@admin_bp.command()
-def serverrules(ctx) -> Message:
-    """Shows the rules for this server."""
-    rules_embed = Embed(title="Truck Simulator server rules", color=config.EMBED_COLOR, fields=[])
-    rules_embed.fields.append(
-        Field(
-            name="Be civil and respectful",
-            value="Treat everyone with respect. Absolutely no harassment, witch hunting, sexism, racism, "
-            "or hate speech will be tolerated.",
-            inline=False,
-        )
-    )
-    rules_embed.fields.append(
-        Field(
-            name="No spam or self-promotion",
-            value="No spam or self-promotion (server invites, advertisements, etc) without permission "
-            "from a staff member. This includes DMing fellow members.",
-            inline=False,
-        )
-    )
-    rules_embed.fields.append(
-        Field(
-            name="No NSFW or obscene content",
-            value="This includes text, images, or links featuring nudity, sex, hard violence, "
-            "or other graphically disturbing content.",
-            inline=False,
-        )
-    )
-    return Message(embed=rules_embed)
 
 
 @admin_bp.command()
