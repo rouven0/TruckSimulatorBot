@@ -105,7 +105,7 @@ def get_matching_options(name: str) -> list[dict]:
     return [
         {"name": place.name, "value": f"{place.position[0]}/{place.position[1]}"}
         for place in __all_places__
-        if name in str.lower(place.name)
+        if str.lower(name) in str.lower(place.name)
     ]
 
 
