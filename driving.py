@@ -207,7 +207,7 @@ def stop(ctx, player_id: int):
     player = players.get_driving_player(ctx.author.id, check=player_id)
     player.stop_drive()
     return Message(
-        embeds=ctx.message.embeds,
+        embed=get_drive_embed(player, ctx.author.id),
         components=[],
         update=True,
     )
