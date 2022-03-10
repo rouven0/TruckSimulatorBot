@@ -342,7 +342,7 @@ def unload_items(ctx, player_id: int):
             )
         )
 
-    return Message(embeds=embeds, components=get_buttons(player))
+    return Message(embeds=embeds, components=get_buttons(player), update=True)
 
 
 @driving_bp.custom_handler(custom_id="job_new")
