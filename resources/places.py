@@ -5,6 +5,8 @@ from dataclasses import dataclass
 import sqlite3
 from typing import Optional, Union
 
+from resources import symbols
+
 
 @dataclass
 class Place:
@@ -77,6 +79,25 @@ def __generate_list(lst) -> None:
                 item_reward,
             )
         )
+
+
+def get_direction(player, target: Place) -> int:
+    """
+    A step based path finder
+    :param players.Player player: Player to start with
+    :param Place target: The place to navigate to
+    :return: The emoji id of the direction. Used in buttons and the drive embed
+    """
+    if player.position == target.position:
+        return symbols.SUCCESS
+    possible_directions = {}
+    possible_directions["x"] = symbols.RIGHT if player.position[0] < target.position[0] else symbols.LEFT
+    possible_directions["y"] = symbols.UP if player.position[1] < target.position[1] else symbols.DOWN
+    return (
+        possible_directions["x"]
+        if abs(player.position[0] - target.position[0]) >= abs(player.position[1] - target.position[1])
+        else possible_directions["y"]
+    )
 
 
 def get(position: Union[list, str]) -> Place:

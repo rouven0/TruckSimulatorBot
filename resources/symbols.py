@@ -14,6 +14,7 @@ UNLOAD = 861353156902256680
 REFILL = 859857979619541022
 LIST_ITEM = ":white_small_square:"
 MAP_BACKGROUND = "⬛"
+SUCCESS = 951506357817860176
 
 
 def get_drive_position_symbols(position) -> list:

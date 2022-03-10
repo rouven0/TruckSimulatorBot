@@ -42,12 +42,12 @@ def get_drive_embed(player: players.Player, avatar_url: str) -> Embed:
 
     current_job = player.get_job()
     if current_job is not None:
-        if current_job.state == 0:
-            navigation_place = current_job.place_from
-        else:
-            navigation_place = current_job.place_to
+        navigation_place = current_job.target_place
         drive_embed.fields.append(
-            Field(name=f"Navigation: Drive to {navigation_place}", value=str(navigation_place.position))
+            Field(
+                name=f"Navigation: Drive to {navigation_place}",
+                value=f"<:n:{places.get_direction(player, navigation_place)}>",
+            )
         )
 
     if place.image_url_default is not None:
@@ -125,10 +125,17 @@ def get_buttons(player: players.Player) -> list:
     buttons = []
     directional_buttons = []
     place = places.get(player.position)
+    current_job = player.get_job()
     for symbol in symbols.get_all_drive_symbols():
         if symbol in symbols.get_drive_position_symbols(player.position):
             directional_buttons.append(
-                Button(style=2, emoji={"name": "placeholder", "id": symbol}, custom_id=[str(symbol), player.id])
+                Button(
+                    style=1
+                    if current_job is not None and places.get_direction(player, current_job.target_place) == symbol
+                    else 2,
+                    emoji={"name": "placeholder", "id": symbol},
+                    custom_id=[str(symbol), player.id],
+                )
             )
         else:
             directional_buttons.append(
@@ -139,7 +146,6 @@ def get_buttons(player: players.Player) -> list:
     )
     buttons.append(ActionRow(components=directional_buttons))
 
-    current_job = player.get_job()
     load_disabled = not len(player.loaded_items) < trucks.get(player.truck_id).loading_capacity
     unload_disabled = not len(player.loaded_items) > 0
     if place.name == "Nothing":
@@ -148,13 +154,17 @@ def get_buttons(player: players.Player) -> list:
 
     action_buttons = [
         Button(
-            style=1,
+            style=1
+            if current_job is not None and current_job.state == 0 and place.position == current_job.place_from.position
+            else 2,
             emoji={"name": "load", "id": symbols.LOAD},
             custom_id=["load", player.id],
             disabled=load_disabled,
         ),
         Button(
-            style=1,
+            style=1
+            if current_job is not None and current_job.state == 1 and place.position == current_job.place_to.position
+            else 2,
             emoji={"name": "unload", "id": symbols.UNLOAD},
             custom_id=["unload", player.id],
             disabled=unload_disabled,
@@ -177,7 +187,12 @@ def get_buttons(player: players.Player) -> list:
     buttons.append(
         ActionRow(
             components=[
-                Button(style=1, label="New Job", custom_id=["job_new", player.id], disabled=(current_job is not None)),
+                Button(
+                    style=1 if current_job is None else 2,
+                    label="New Job",
+                    custom_id=["job_new", player.id],
+                    disabled=(current_job is not None),
+                ),
                 Button(style=2, label="Show Job", custom_id=["job_show", player.id], disabled=(current_job is None)),
             ]
         )
@@ -223,6 +238,7 @@ def load(ctx, player_id: int):
     if job_message is not None:
         return Message(
             embeds=[drive_embed, Embed(title="Job Notification", description=job_message, color=config.EMBED_COLOR)],
+            components=get_buttons(player),
             update=True,
         )
     return Message(embed=drive_embed, components=get_buttons(player), update=True)
@@ -232,6 +248,7 @@ def load(ctx, player_id: int):
 def unload(ctx, player_id: int):
     player = players.get_driving_player(ctx.author.id, check=player_id)
     player.update(int(time()), ctx.followup_url())
+    current_job = player.get_job()
 
     drive_embed = get_drive_embed(player, ctx.author.avatar_url)
     item_options: list[SelectMenuOption] = []
@@ -239,7 +256,9 @@ def unload(ctx, player_id: int):
         if item.name not in [o.value for o in item_options]:
             item_options.append(
                 SelectMenuOption(
-                    label=item.name,
+                    label=f"{item.name} (Required for your job)"
+                    if current_job is not None and item.name == current_job.place_from.produced_item
+                    else item.name,
                     value=item.name,
                     emoji={"name": item.name, "id": item.emoji},
                 )
@@ -281,8 +300,7 @@ def unload_items(ctx, player_id: int):
     drive_embed.fields.append(
         Field(name="Unloading successful", value=f"You removed {item_string} from your truck", inline=False)
     )
-
-    message = Message(embed=drive_embed, components=get_buttons(player), update=True)
+    embeds = [drive_embed]
 
     # add a notification embed if a job is done
     if (
@@ -303,7 +321,7 @@ def unload_items(ctx, player_id: int):
         drive_embed.fields.append(
             Field(name="Unloading successful", value=f"You removed {item_string} from your truck", inline=False)
         )
-        message.embeds = [
+        embeds = [
             drive_embed,
             Embed(title="Job Notification", description=job_message, color=config.EMBED_COLOR),
         ]
@@ -311,7 +329,7 @@ def unload_items(ctx, player_id: int):
     # add a notification embed if a minijob is done
     if place.accepted_item in ctx.values and place.item_reward:
         player.add_money(place.item_reward)
-        message.embeds.append(
+        embeds.append(
             Embed(
                 title="Minijob Notification",
                 description=(
@@ -322,7 +340,27 @@ def unload_items(ctx, player_id: int):
             )
         )
 
-    return message
+    return Message(embeds=embeds, components=get_buttons(player))
+
+
+@driving_bp.custom_handler(custom_id="job_new")
+def new_job(ctx, player_id: int) -> Message:
+    player = players.get_driving_player(ctx.author.id, check=player_id)
+    job_embed = Embed(
+        color=config.EMBED_COLOR,
+        author=Author(name=f"{player}'s Job", icon_url=ctx.author.avatar_url),
+        fields=[],
+    )
+    job = jobs.generate(player)
+    player.add_job(job)
+
+    item = items.get(job.place_from.produced_item)
+    job_message = f"{job.place_to} needs {item} from {job.place_from}. You get ${job.reward:,} for this transport"
+    job_embed.fields.append(Field(name="You got a new Job", value=job_message, inline=False))
+    job_embed.fields.append(Field(name="Current state", value=jobs.get_state(job)))
+    return Message(
+        embeds=[get_drive_embed(player, ctx.author.avatar_url), job_embed], components=get_buttons(player), update=True
+    )
 
 
 @driving_bp.custom_handler(custom_id="cancel")

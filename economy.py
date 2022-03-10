@@ -38,35 +38,6 @@ def show_job(ctx, player_id: int) -> Message:
     return Message(embed=job_embed, ephemeral=True)
 
 
-@economy_bp.custom_handler(custom_id="job_new")
-def new_job(ctx, player_id: int) -> Message:
-    player = players.get_driving_player(ctx.author.id, check=player_id)
-    job_embed = Embed(
-        color=config.EMBED_COLOR,
-        author=Author(name=f"{player}'s Job", icon_url=ctx.author.avatar_url),
-        fields=[],
-    )
-    job = jobs.generate(player)
-    player.add_job(job)
-
-    drive_embed: Embed = ctx.message.embeds[0]
-    orig_components = ctx.message.components
-    drive_embed.fields.append(Field(name=f"Navigation: Drive to {job.place_from}", value=str(job.place_from.position)))
-    orig_components[2]["components"][0]["disabled"] = True
-    orig_components[2]["components"][1]["disabled"] = False
-
-    # parse the components to objects again
-    components = []
-    for action_row in orig_components:
-        components.append(ActionRow(components=[Button(**comp) for comp in action_row["components"]]))
-
-    item = items.get(job.place_from.produced_item)
-    job_message = f"{job.place_to} needs {item} from {job.place_from}. You get ${job.reward:,} for this transport"
-    job_embed.fields.append(Field(name="You got a new Job", value=job_message, inline=False))
-    job_embed.fields.append(Field(name="Current state", value=jobs.get_state(job)))
-    return Message(embeds=[drive_embed, job_embed], components=components, update=True)
-
-
 @economy_bp.custom_handler(custom_id="refill")
 def refill(ctx, player_id: int):
     player = players.get_driving_player(ctx.author.id, check=player_id)

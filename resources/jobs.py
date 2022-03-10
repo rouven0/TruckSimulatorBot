@@ -35,8 +35,8 @@ class Job:
     def __init__(
         self,
         player_id: int,
-        place_from: Union[places.Place,str],
-        place_to: Union[places.Place,str],
+        place_from: Union[places.Place, str],
+        place_to: Union[places.Place, str],
         state: int,
         reward: int,
         create_time: int,
@@ -44,9 +44,11 @@ class Job:
         self.player_id = player_id
         if isinstance(place_from, str):
             self.place_from = places.get(place_from)
-            self.place_to = places.get(place_to)
         else:
             self.place_from = place_from
+        if isinstance(place_to, str):
+            self.place_to = places.get(place_to)
+        else:
             self.place_to = place_to
         self.state = state
         self.reward = reward
@@ -55,6 +57,13 @@ class Job:
     def __iter__(self):
         self._n = 0
         return self
+
+    @property
+    def target_place(self) -> places.Place:
+        """
+        :return: The next place the player has to drive to
+        """
+        return self.place_from if self.state == 0 else self.place_to
 
     def __next__(self):
         if self._n < len(vars(self)) - 1:
