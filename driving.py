@@ -38,7 +38,9 @@ def get_drive_embed(player: players.Player, avatar_url: str) -> Embed:
 
     drive_embed.fields.append(Field(name="Minimap", value=generate_minimap(player, all_companies), inline=False))
     drive_embed.fields.append(Field(name="Position", value=str(player.position)))
-    drive_embed.fields.append(Field(name="Gas left", value=f"{player.gas} l"))
+    drive_embed.fields.append(
+        Field(name="Gas left", value=f"{player.gas} l" if player.gas > 100 else f"{player.gas} l :warning:")
+    )
 
     current_job = player.get_job()
     if current_job is not None:
