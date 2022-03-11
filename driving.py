@@ -201,13 +201,12 @@ def get_buttons(player: players.Player) -> list:
     )
     return buttons
 
-
 @driving_bp.custom_handler(custom_id="stop")
 def stop(ctx, player_id: int):
     player = players.get_driving_player(ctx.author.id, check=player_id)
     player.stop_drive()
     return Message(
-        embeds=ctx.message.embeds,
+        embed=get_drive_embed(player, ctx.author.avatar_url),
         components=[],
         update=True,
     )
