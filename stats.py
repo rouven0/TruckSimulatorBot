@@ -90,7 +90,7 @@ def get_profile_embed(user: User) -> Embed:
             name="Level", value=f"{player.level} ({player.xp:,}/{levels.get_next_xp(player.level):,} xp)", inline=False
         )
     )
-    profile_embed.fields.append(Field(name="Money", value=f"${player.money}"))
+    profile_embed.fields.append(Field(name="Money", value=f"${player.money:,}"))
     profile_embed.fields.append(
         Field(name="Miles driven", value=f"{player.miles:,}\n({player.truck_miles:,} with current truck)", inline=False)
     )
