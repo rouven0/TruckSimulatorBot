@@ -1,4 +1,4 @@
-https://cdn.discordapp.com/attachments/916793752968921158/941707745801932860/unknown.png
+https://media.discordapp.net/attachments/916793752968921158/952171351484006440/unknown.png
 Driving is the core mechanic of this bot and moves your truck around the map.
 You control your truck with the buttons displayed underneath the message after you executed `/drive`.
 
