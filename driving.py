@@ -2,6 +2,7 @@
 from datetime import datetime
 from time import time
 import threading
+from random import randint
 
 import requests
 
@@ -200,6 +201,7 @@ def get_buttons(player: players.Player) -> list:
         )
     )
     return buttons
+
 
 @driving_bp.custom_handler(custom_id="stop")
 def stop(ctx, player_id: int):
@@ -411,18 +413,22 @@ def move(ctx: Context, direction, player_id):
     player.gas -= trucks.get(player.truck_id).gas_consumption
 
     if player.gas <= 0:
-        try:
-            player.debit_money(3000)
-        except players.NotEnoughMoney:
-            pass
-        players.update(player, gas=trucks.get(player.truck_id).gas_capacity, position=[7, 7])
-        player.stop_drive()
         return Message(
             content=(
-                "You messed up and ran out of gas. Your company had to have your truck towed away. "
-                "You will pay $3000 for this incident!"
+                "You messed up and ran out of gas. What do you want to do?\n\n"
+                "`Hitchhike` You are trying to hitchhike someone and get to the city.\n"
+                "`Walk` You walk to the gas station. But while doing so, you will lose a level.\n"
+                "`Try to rob some gas` Someone left their car over there. Go steal some gas from them."
             ),
-            components=[],
+            components=[
+                ActionRow(
+                    components=[
+                        Button(label="Hitchhike", custom_id=["event_hitchhike", ctx.author.id], style=2),
+                        Button(label="Walk", custom_id=["event_walk", ctx.author.id], style=2),
+                        Button(label="Rob some gas", custom_id=["event_rob", ctx.author.id], style=2),
+                    ]
+                )
+            ],
             update=True,
         )
 
@@ -436,6 +442,60 @@ def move(ctx: Context, direction, player_id):
     )
 
     return Message(embed=get_drive_embed(player, ctx.author.avatar_url), components=get_buttons(player), update=True)
+
+
+@driving_bp.custom_handler(custom_id="event_hitchhike")
+def event_hitchhike(ctx, player_id: int) -> Message:
+    player = players.get_driving_player(ctx.author.id, check=player_id)
+    try:
+        player.debit_money(3000)
+    except players.NotEnoughMoney:
+        pass
+    player.stop_drive()
+    if randint(0, 1) == 0:
+        players.update(player, position=[7, 7])
+        return Message(
+            (
+                "Someone stopped to take you with them, but.. **OH NO!** It's Mr. Thomas Ruck, the president of this "
+                "country. He had to have your truck towed away and you will pay $3000 for this incident."
+            ),
+            components=[],
+            update=True,
+        )
+    players.update(player, position=[7, 7], gas=140)
+    return Message(
+        "You found someone to go with. They even were so kind to gift you some gas. You should thank them.",
+        components=[],
+        update=True,
+    )
+
+
+@driving_bp.custom_handler(custom_id="event_walk")
+def event_walk(ctx, player_id: int) -> Message:
+    player = players.get_driving_player(ctx.author.id, check=player_id)
+    if player.level > 0:
+        players.update(player, level=player.level - 1, xp=0, position=[7, 7])
+    player.stop_drive()
+    return Message(
+        "You started walking to the gas station. As you arrived, you noticed that you lost a level.",
+        components=[],
+        update=True,
+    )
+
+
+@driving_bp.custom_handler(custom_id="event_rob")
+def event_rob(ctx, player_id: int) -> Message:
+    player = players.get_driving_player(ctx.author.id, check=player_id)
+    player.stop_drive()
+    if randint(0, 1) == 0:
+        players.update(player, gas=player.gas + 250)
+        return Message("Phew. Nobdody looked and you stole some gas. Be careful next time.", components=[], update=True)
+    if player.truck_id > 0:
+        players.update(player, truck_id=player.truck_id - 1)
+    return Message(
+        "Oh no! You got caught and thrown in the jail. Luckily you could use your truck as deposit to get out.",
+        update=True,
+    )
 
 
 @driving_bp.custom_handler(custom_id="initial_drive")
