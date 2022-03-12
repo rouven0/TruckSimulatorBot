@@ -494,6 +494,7 @@ def event_rob(ctx, player_id: int) -> Message:
         players.update(player, truck_id=player.truck_id - 1)
     return Message(
         "Oh no! You got caught and thrown in the jail. Luckily you could use your truck as deposit to get out.",
+        components=[],
         update=True,
     )
 
