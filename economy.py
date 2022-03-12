@@ -128,17 +128,3 @@ def give(ctx, user: User, amount: int) -> Message:
     donator.debit_money(amount)
     acceptor.add_money(amount)
     return Message(embed=Embed(description=f"{donator} gave ${amount} to {acceptor}", color=config.EMBED_COLOR))
-
-
-@economy_bp.command()
-def minijobs(ctx) -> Message:
-    """Prints out all permanently running minijobs."""
-    player = players.get(int(ctx.author.id))
-    minijob_list = ""
-    for place in places.get_all():
-        if place.accepted_item is not None:
-            minijob_list += (
-                f"\n{symbols.LIST_ITEM}**{place}** will give you "
-                f"${place.item_reward*(player.level+1):,} if you bring them *{place.accepted_item}*."
-            )
-    return Message(embed=Embed(title="All available minijobs", description=minijob_list, color=config.EMBED_COLOR))

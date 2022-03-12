@@ -1,10 +1,9 @@
 # pylint: disable=unused-argument
 from os import listdir
 from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
-from flask_discord_interactions.models.component import ActionRow, SelectMenu, SelectMenuOption
+from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
 from flask_discord_interactions.models.option import CommandOptionType
 from flask_discord_interactions.models.embed import Field, Author, Media
-from flask_discord_interactions.models.autocomplete import Autocomplete
 
 import config
 
@@ -12,24 +11,33 @@ from resources import items
 from resources import players
 from resources import assets
 from resources import places
+from resources import symbols
 
 guide_bp = DiscordInteractionsBlueprint()
 
 
-@guide_bp.command(
-    options=[
-        {
-            "name": "item",
-            "description": "The item you want to view.",
-            "type": CommandOptionType.STRING,
-            "choices": [{"name": i.name, "value": i.name} for i in items.get_all()],
-            "required": True,
-        }
-    ]
-)
-def iteminfo(ctx, item: str) -> Message:
+@guide_bp.custom_handler(custom_id="guide_minijobs")
+def minijobs(ctx) -> Message:
+    """Prints out all permanently running minijobs."""
+    player = players.get(int(ctx.author.id))
+    minijob_list = ""
+    for place in places.get_all():
+        if place.accepted_item is not None:
+            minijob_list += (
+                f"\n{symbols.LIST_ITEM}**{place}** will give you "
+                f"${place.item_reward*(player.level+1):,} if you bring them *{place.accepted_item}*."
+            )
+    return Message(
+        embed=Embed(title="All available minijobs", description=minijob_list, color=config.EMBED_COLOR),
+        update=True,
+        components=get_guide_selects(),
+    )
+
+
+@guide_bp.custom_handler(custom_id="guide_item")
+def iteminfo(ctx) -> Message:
     """Prints some information about a specific item."""
-    requested_item = items.get(item)
+    requested_item = items.get(ctx.values[0])
     item_embed = Embed(
         title=f"Item info for {requested_item.name}",
         description=requested_item.description,
@@ -38,22 +46,22 @@ def iteminfo(ctx, item: str) -> Message:
         fields=[],
     )
     for place in places.get_all():
-        if place.produced_item == item:
+        if place.produced_item == requested_item.name:
             item_embed.fields.append(Field(name="Found at", value=place.name))
-    return Message(embed=item_embed)
+    return Message(embed=item_embed, components=get_guide_selects(topic="items"), update=True)
 
 
-@guide_bp.command(annotations={"place": "The place you want to view."})
-def placeinfo(ctx, place: Autocomplete(str)) -> Message:
+@guide_bp.custom_handler(custom_id="guide_place")
+def placeinfo(ctx) -> Message:
     """Prints some information about a specific place."""
     player = players.get(ctx.author.id)
+    place = ctx.values[0]
     try:
         queried_place = places.get(place)
     except ValueError:
         return Message("Place not found")
     position_embed = Embed(
-        title="What is here?",
-        description=queried_place.name,
+        title=f"Place info for {queried_place.name}",
         color=config.EMBED_COLOR,
         fields=[Field(name="Position", value=str(queried_place.position))],
     )
@@ -63,13 +71,7 @@ def placeinfo(ctx, place: Autocomplete(str)) -> Message:
     if queried_place.accepted_item:
         position_embed.fields.append(Field(name="Accepted item", value=str(items.get(queried_place.accepted_item))))
 
-    return Message(embed=position_embed)
-
-
-@placeinfo.autocomplete()
-def place_autocomplete(ctx, place):
-    """Returns matching choices for a place name."""
-    return places.get_matching_options(place.value)
+    return Message(embed=position_embed, components=get_guide_selects(topic="places"), update=True)
 
 
 @guide_bp.command(
@@ -87,13 +89,13 @@ def place_autocomplete(ctx, place):
 )
 def guide(ctx, topic: str = "introduction") -> Message:
     """Shows a nice little guide that helps you understand this bot."""
-    return Message(embed=get_guide_embed(topic), components=[get_guide_select()])
+    return Message(embed=get_guide_embed(topic), components=get_guide_selects(topic=topic))
 
 
 @guide_bp.custom_handler(custom_id="guide_topic")
 def guide_topic(ctx):
     """Handler for the topic select"""
-    return Message(embed=get_guide_embed(ctx.values[0]), components=[get_guide_select()], update=True)
+    return Message(embed=get_guide_embed(ctx.values[0]), components=get_guide_selects(topic=ctx.values[0]), update=True)
 
 
 def get_guide_embed(topic: str) -> Embed:
@@ -114,19 +116,62 @@ def get_guide_embed(topic: str) -> Embed:
         return guide_embed
 
 
-def get_guide_select() -> ActionRow:
+def get_guide_selects(topic: str = ""):
     """Builder for the topic select"""
-    return ActionRow(
-        components=[
-            SelectMenu(
-                custom_id="guide_topic",
-                options=[
-                    SelectMenuOption(
-                        label=str.upper(f[:1]) + f[1 : f.find(".")].replace("_", " "), value=f[: f.find(".")]
+    selects = [
+        ActionRow(
+            components=[
+                SelectMenu(
+                    custom_id="guide_topic",
+                    options=[
+                        SelectMenuOption(
+                            label=str.upper(f[:1]) + f[1 : f.find(".")].replace("_", " "), value=f[: f.find(".")]
+                        )
+                        for f in sorted(listdir("./guide"))
+                    ],
+                    placeholder="Select a topic",
+                )
+            ]
+        )
+    ]
+    if topic == "places":
+        selects.append(
+            ActionRow(
+                components=[
+                    SelectMenu(
+                        custom_id="guide_place",
+                        options=[
+                            SelectMenuOption(
+                                label=place.name,
+                                value=f"{place.position[0]}/{place.position[1]}",
+                                emoji={"name": "place", "id": items.get(place.produced_item).emoji},
+                            )
+                            for place in places.get_all()
+                        ],
+                        placeholder="Select a place to view",
                     )
-                    for f in sorted(listdir("./guide"))
-                ],
-                placeholder="Select a topic",
+                ]
             )
-        ]
-    )
+        )
+    if topic == "items":
+        selects.append(
+            ActionRow(
+                components=[
+                    SelectMenu(
+                        custom_id="guide_item",
+                        options=[
+                            SelectMenuOption(
+                                label=item.name,
+                                value=item.name,
+                                emoji={"name": "item", "id": item.emoji},
+                            )
+                            for item in items.get_all()
+                        ],
+                        placeholder="Select an item to view",
+                    )
+                ]
+            )
+        )
+    if topic == "minijobs":
+        selects.append(ActionRow(components=[Button(label="View minijobs", custom_id="guide_minijobs", style=2)]))
+    return selects
