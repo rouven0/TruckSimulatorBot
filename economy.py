@@ -93,7 +93,7 @@ def refill(ctx, player_id: int):
         },
         {
             "name": "amount",
-            "description": "The amound you want to give.",
+            "description": "The amount you want to give.",
             "type": CommandOptionType.INTEGER,
             "min_value": 1,
             "max_value": 1000000,
