@@ -102,7 +102,7 @@ def refill(ctx, player_id: int):
     ]
 )
 def give(ctx, user: User, amount: int) -> Message:
-    """Gives money to a user."""
+    """Transfers money to a specific user."""
     acceptor = players.get(int(user.id))
     donator = players.get(ctx.author.id)
 

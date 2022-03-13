@@ -88,7 +88,7 @@ def placeinfo(ctx) -> Message:
     ],
 )
 def guide(ctx, topic: str = "introduction") -> Message:
-    """Shows a nice little guide that helps you understand this bot."""
+    """Opens a guide to help you understand this game."""
     return Message(embed=get_guide_embed(topic), components=get_guide_selects(topic=topic))
 
 

@@ -522,7 +522,7 @@ def initial_drive(ctx, player_id: str):
 
 @driving_bp.command()
 def drive(ctx) -> Message:
-    """Starts driving your Truck."""
+    """Lets you start driving your truck."""
     player = players.get(ctx.author.id)
     # Detect, when the player is renamed
     if player.name != ctx.author.username:
