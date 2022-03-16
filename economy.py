@@ -19,12 +19,12 @@ economy_bp = DiscordInteractionsBlueprint()
 
 
 @economy_bp.custom_handler(custom_id="job_show")
-def show_job(ctx, player_id: int) -> Message:
+def show_job(ctx, player_id: str) -> Message:
     player = players.get(player_id)
 
     current_job = player.get_job()
     if current_job is None:
-        return Message(deferred=True, update=True)
+        raise players.WrongPlayer()
     job_embed = Embed(
         color=config.EMBED_COLOR,
         author=Author(name=f"{player}'s Job"),
@@ -40,7 +40,7 @@ def show_job(ctx, player_id: int) -> Message:
 
 
 @economy_bp.custom_handler(custom_id="refill")
-def refill(ctx, player_id: int):
+def refill(ctx, player_id: str):
     player = players.get_driving_player(ctx.author.id, check=player_id)
     gas_amount = trucks.get(player.truck_id).gas_capacity - player.gas
     price = round(gas_amount * 1.2)
@@ -103,10 +103,10 @@ def refill(ctx, player_id: int):
 )
 def give(ctx, user: User, amount: int) -> Message:
     """Transfers money to a specific user."""
-    acceptor = players.get(int(user.id))
+    acceptor = players.get(user.id)
     donator = players.get(ctx.author.id)
 
-    if int(ctx.author.id) == acceptor.id:
+    if ctx.author.id == acceptor.id:
         return Message(
             embed=Embed(
                 title=f"Hey {ctx.author.username}",

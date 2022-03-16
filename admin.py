@@ -16,7 +16,7 @@ admin_bp = DiscordInteractionsBlueprint()
 )
 def sql(ctx, query: str):
     """Executes a sql query."""
-    if int(ctx.author.id) != 692796548282712074:
+    if ctx.author.id != 692796548282712074:
         return "Wait. You shouldn't be able to even read this. Something is messed up"
     try:
         database.cur.execute(query)
@@ -40,7 +40,7 @@ blacklist = admin_bp.command_group(
 def add(ctx, user: User, reason: str = "No reason provided."):
     """Adds a user to the blacklist."""
     try:
-        player = players.get(int(user.id))
+        player = players.get(user.id)
         players.update(player, name=reason, xp=-1)
         return Message(
             embed=Embed(
@@ -56,10 +56,10 @@ def add(ctx, user: User, reason: str = "No reason provided."):
 def remove(ctx, user: User):
     """Removes a user from the blacklist."""
     try:
-        players.get(int(user.id))
+        players.get(user.id)
         return "That Player is not on the blacklist"
     except players.PlayerBlacklisted:
-        player = players.Player(int(user.id), user.username)
+        player = players.Player(user.id, user.username)
         players.update(player, xp=0, name=user.username)
         return Message(
             embed=Embed(

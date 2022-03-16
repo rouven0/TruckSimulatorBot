@@ -88,9 +88,9 @@ def refresh(ctx):
 
 
 @system_bp.custom_handler(custom_id="discard")
-def discard(ctx, player_id: int):
+def discard(ctx, player_id: str):
     """General handler to remove all components"""
-    if int(ctx.author.id) != player_id:
+    if ctx.author.id != player_id:
         return Message(deferred=True, update=True)
     return Message(embeds=ctx.message.embeds, components=[], update=True)
 

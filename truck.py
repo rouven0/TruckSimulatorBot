@@ -81,19 +81,11 @@ def get_truck_components(player: players.Player) -> list[Component]:
     ]
 
 
-@truck_bp.custom_handler(custom_id="discard")
-def discard(ctx, player_id: int):
-    """Remove all components"""
-    if int(ctx.author.id) != player_id:
-        return Message(deferred=True, update=True)
-    return Message(embeds=ctx.message.embeds, components=[], update=True)
-
-
 @truck_bp.custom_handler(custom_id="back")
-def show_truck_button(ctx, player_id: int):
+def show_truck_button(ctx, player_id: str):
     """Back-button"""
-    if int(ctx.author.id) != player_id:
-        return Message(deferred=True, update=True)
+    if ctx.author.id != player_id:
+        raise players.WrongPlayer()
     return show_truck(ctx, update=True)
 
 
@@ -116,13 +108,11 @@ def show_truck(ctx, update: bool = False) -> Message:
 
 
 @truck_bp.custom_handler(custom_id="truck_buy")
-def buy(ctx, player_id: int) -> Union[Message, str]:
+def buy(ctx, player_id: str) -> Union[Message, str]:
     """Select handler to buy a new truck"""
-    if int(ctx.author.id) != player_id:
-        return Message(deferred=True, update=True)
-    if players.is_driving(int(ctx.author.id)):
+    if players.is_driving(ctx.author.id):
         return "You can't buy a new truck while you are driving in the old one"
-    player = players.get(int(ctx.author.id))
+    player = players.get(ctx.author.id, check=player_id)
     old_truck = trucks.get(player.truck_id)
     new_truck = trucks.get(int(ctx.values[0]))
     selling_price = round(old_truck.price - (old_truck.price / 10) * log(player.truck_miles + 1))
@@ -154,10 +144,10 @@ def buy(ctx, player_id: int) -> Union[Message, str]:
 
 
 @truck_bp.custom_handler(custom_id="truck_view")
-def view(ctx, player_id: int) -> Message:
+def view(ctx, player_id: str) -> Message:
     """View details about a specific truck"""
-    if int(ctx.author.id) != player_id:
-        return Message(deferred=True, update=True)
+    if ctx.author.id != player_id:
+        raise players.WrongPlayer()
     truck_embed = get_truck_embed(trucks.get(int(ctx.values[0])))
     return Message(
         embed=truck_embed,

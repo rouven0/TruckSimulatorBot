@@ -48,7 +48,7 @@ def coinflip(ctx, side: str, amount: int) -> str:
 
 
 def get_slots_embed(author: User, amount: int) -> Embed:
-    player = players.get(int(author.id))
+    player = players.get(author.id)
     player.debit_money(amount)
 
     chosen_items = choices(sample(items.get_all(), 8), k=3)
@@ -100,8 +100,8 @@ def get_slots_components(user: User, amount: int) -> list:
 
 @gambling_bp.custom_handler(custom_id="slots")
 def slots_handler(ctx, author_id: int, amount: int) -> Message:
-    if int(ctx.author.id) != author_id:
-        return Message(deferred=True, update=True)
+    if ctx.author.id != author_id:
+        raise players.WrongPlayer()
     return Message(
         embed=get_slots_embed(ctx.author, amount),
         components=get_slots_components(ctx.author, amount),

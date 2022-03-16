@@ -48,7 +48,7 @@ def register(ctx):
             value="Don't even try, it's just wasted work only to get you blacklisted.",
         )
     )
-    players.insert(players.Player(int(ctx.author.id), ctx.author.username, money=1000, gas=600))
+    players.insert(players.Player(ctx.author.id, ctx.author.username, money=1000, gas=600))
     return Message(
         embeds=[welcome_embed, rules_embed],
         components=[
@@ -73,7 +73,7 @@ def profile(ctx, user: User = None):
 
 
 def get_profile_embed(user: User) -> Embed:
-    player: players.Player = players.get(int(user.id))
+    player: players.Player = players.get(user.id)
     truck: trucks.Truck = trucks.get(player.truck_id)
     # Detect, when the player is renamed
     if player.name != user.username:

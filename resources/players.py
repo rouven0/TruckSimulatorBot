@@ -37,7 +37,7 @@ class Player:
     """
     A class representing a Player in the database
 
-    :ivar int id: Unique discord user id to identify the player
+    :ivar str id: Unique discord user id to identify the player
     :ivar str name: Displayed name in discord, NOT the Nickname
     :ivar int level: The player's level
     :ivar int xp: Xp for current level
@@ -51,7 +51,7 @@ class Player:
     :ivar int last_vote: The last vote as a unix timestamp
     """
 
-    def __init__(self, id, name, **kwargs) -> None:
+    def __init__(self, id: str, name: str, **kwargs) -> None:
         self.id = id
         self.name = name
         self.level = kwargs.pop("level", 0)
@@ -68,7 +68,7 @@ class Player:
         self.gas = kwargs.pop("gas", 0)
         self.truck_id = kwargs.pop("truck_id", 0)
         loaded_items = kwargs.pop("loaded_items", [])
-        if isinstance(position, str):
+        if isinstance(loaded_items, str):
             # split the item string and get the items
             self.loaded_items: list = []
             if loaded_items != "":
@@ -289,18 +289,20 @@ def update(
     logging.debug("Updated player %s to %s", player.name, tuple(player))
 
 
-def get(id: int) -> Player:
+def get(id: str, check: str = None) -> Player:
     """
     Get one player from the database
 
-    :param int id: The requested player's id
+    :param str id: The requested player's id
+    :param str check: When given, this method will compare id and check, this is used to verify component and message "owners"
     :return: The corresponding player
     :raises PlayerNotRegistered: in case a player is not found in the database
     :raises PlayerBlacklisted: in case a player is on the blacklist
     """
-    id = int(id)
     if not registered(id):
         raise PlayerNotRegistered(id)
+    if check and id != check:
+        raise WrongPlayer()
     database.cur.execute("SELECT * FROM players WHERE id=%s", (id,))
     record = database.cur.fetchone()
     player = Player(**record)
@@ -336,7 +338,7 @@ def get_top(key: str) -> tuple:
     return top_players, suffix
 
 
-def registered(id: int) -> bool:
+def registered(id: str) -> bool:
     """
     Checks whether a specific user is registered or not
 
@@ -403,7 +405,7 @@ class DrivingPlayer(Player):
         database.con.commit()
 
 
-def is_driving(id: int) -> bool:
+def is_driving(id: str) -> bool:
     """
     Checks whether a specific user is driving
 
@@ -418,25 +420,24 @@ def is_driving(id: int) -> bool:
     return False
 
 
-def get_driving_player(id: int, check: int = None) -> DrivingPlayer:
+def get_driving_player(id: str, check: str = None) -> DrivingPlayer:
     """
     Get a driving player from the database
 
-    :param int id: The id to search for
-    :param int check: When given, this method will compare id and check, this is used to verify component and message "owners"
+    :param str id: The id to search for
+    :param str check: When given, this method will compare id and check, this is used to verify component and message "owners"
     :raises NotDriving: When id and check mismatch
     :return: The corresponding driving player
     """
-    id = int(id)
     if check and id != check:
-        raise NotDriving()
+        raise WrongPlayer()
     if is_driving(id):
         database.cur.execute("SELECT * FROM driving_players WHERE id=%s", (id,))
         record = database.cur.fetchone()
         followup_url = record["followup_url"]
         last_action_time = record["last_action_time"]
         return DrivingPlayer(**vars(get(id)), followup_url=followup_url, last_action_time=last_action_time)
-    raise NotDriving()
+    raise WrongPlayer()
 
 
 def get_all_driving_players() -> list[DrivingPlayer]:
@@ -464,10 +465,10 @@ class PlayerNotRegistered(Exception):
     """
     Exception raised when a player that is not registered is requested
 
-    :ivar int requested_id: Id of the requested player
+    :ivar str requested_id: Id of the requested player
     """
 
-    def __init__(self, requested_id, *args: object) -> None:
+    def __init__(self, requested_id: str, *args: object) -> None:
         self.requested_id = requested_id
         super().__init__(*args)
 
@@ -479,11 +480,11 @@ class PlayerBlacklisted(Exception):
     """
     Exception raised when a player is blacklisted
 
-    :ivar int requested_id: Id of the blacklisted player
+    :ivar str requested_id: Id of the blacklisted player
     :ivar str reason: Reason of the ban
     """
 
-    def __init__(self, requested_id: int, reason: str, *args: object) -> None:
+    def __init__(self, requested_id: str, reason: str, *args: object) -> None:
         self.requested_id = requested_id
         self.reason = reason
         super().__init__(*args)
@@ -501,7 +502,7 @@ class NotEnoughMoney(Exception):
         return "The requested player doesn't have enough money to perform this action"
 
 
-class NotDriving(Exception):
+class WrongPlayer(Exception):
     """
     Exception raised when a requested driving player is not driving
     """

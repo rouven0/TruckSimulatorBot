@@ -32,11 +32,11 @@ class Company:
     :ivar str logo: Emoji displayed as logo on the map
     :ivar str description: A description for that company
     :ivar list hq_position: Position of the company's headquarters
-    :ivar int founder: Id of the founder of the company, who has control over it
+    :ivar str founder: Id of the founder of the company, who has control over it
     :ivar int net_worth: Money the company holds
     """
 
-    def __init__(self, name: str, hq_position: Union[list, str], founder: int, **kwargs) -> None:
+    def __init__(self, name: str, hq_position: Union[list, str], founder: str, **kwargs) -> None:
         self.name = name
         self.hq_position = hq_position
 
@@ -167,7 +167,7 @@ def update(
     logo: str = None,
     description: str = None,
     hq_position: list = None,
-    founder: int = None,
+    founder: str = None,
     net_worth: int = None,
 ) -> None:
     """

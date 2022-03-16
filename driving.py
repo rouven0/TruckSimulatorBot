@@ -204,7 +204,7 @@ def get_buttons(player: players.Player) -> list:
 
 
 @driving_bp.custom_handler(custom_id="stop")
-def stop(ctx, player_id: int):
+def stop(ctx, player_id: str):
     player = players.get_driving_player(ctx.author.id, check=player_id)
     player.stop_drive()
     return Message(
@@ -215,7 +215,7 @@ def stop(ctx, player_id: int):
 
 
 @driving_bp.custom_handler(custom_id="load")
-def load(ctx, player_id: int):
+def load(ctx, player_id: str):
     player = players.get_driving_player(ctx.author.id, check=player_id)
     player.update(int(time()), ctx.followup_url())
 
@@ -248,7 +248,7 @@ def load(ctx, player_id: int):
 
 
 @driving_bp.custom_handler(custom_id="unload")
-def unload(ctx, player_id: int):
+def unload(ctx, player_id: str):
     player = players.get_driving_player(ctx.author.id, check=player_id)
     player.update(int(time()), ctx.followup_url())
     current_job = player.get_job()
@@ -282,7 +282,7 @@ def unload(ctx, player_id: int):
 
 
 @driving_bp.custom_handler(custom_id="unload_items")
-def unload_items(ctx, player_id: int):
+def unload_items(ctx, player_id: str):
     player = players.get_driving_player(ctx.author.id, check=player_id)
 
     item_string = ""
@@ -347,7 +347,7 @@ def unload_items(ctx, player_id: int):
 
 
 @driving_bp.custom_handler(custom_id="job_new")
-def new_job(ctx, player_id: int) -> Message:
+def new_job(ctx, player_id: str) -> Message:
     player = players.get_driving_player(ctx.author.id, check=player_id)
     job_embed = Embed(
         color=config.EMBED_COLOR,
@@ -367,34 +367,34 @@ def new_job(ctx, player_id: int) -> Message:
 
 
 @driving_bp.custom_handler(custom_id="cancel")
-def cancel(ctx, player_id: int):
+def cancel(ctx, player_id: str):
     player = players.get_driving_player(ctx.author.id, check=player_id)
     return Message(embed=get_drive_embed(player, ctx.author.avatar_url), components=get_buttons(player), update=True)
 
 
 @driving_bp.custom_handler(custom_id=str(symbols.LEFT))
-def left(ctx, player_id: int):
+def left(ctx, player_id: str):
     return move(ctx, symbols.LEFT, player_id)
 
 
 @driving_bp.custom_handler(custom_id=str(symbols.UP))
-def up(ctx, player_id: int):
+def up(ctx, player_id: str):
     return move(ctx, symbols.UP, player_id)
 
 
 @driving_bp.custom_handler(custom_id=str(symbols.DOWN))
-def down(ctx, player_id: int):
+def down(ctx, player_id: str):
     return move(ctx, symbols.DOWN, player_id)
 
 
 @driving_bp.custom_handler(custom_id=str(symbols.RIGHT))
-def right(ctx, player_id: int):
+def right(ctx, player_id: str):
     return move(ctx, symbols.RIGHT, player_id)
 
 
 def move(ctx: Context, direction, player_id):
     """Centralized function for all the directional buttons"""
-    player = players.get_driving_player(int(ctx.author.id), player_id)
+    player = players.get_driving_player(ctx.author.id, check=player_id)
 
     if direction == symbols.LEFT:
         player.position = [player.position[0] - 1, player.position[1]]
@@ -445,7 +445,7 @@ def move(ctx: Context, direction, player_id):
 
 
 @driving_bp.custom_handler(custom_id="event_hitchhike")
-def event_hitchhike(ctx, player_id: int) -> Message:
+def event_hitchhike(ctx, player_id: str) -> Message:
     player = players.get_driving_player(ctx.author.id, check=player_id)
     try:
         player.debit_money(3000)
@@ -471,7 +471,7 @@ def event_hitchhike(ctx, player_id: int) -> Message:
 
 
 @driving_bp.custom_handler(custom_id="event_walk")
-def event_walk(ctx, player_id: int) -> Message:
+def event_walk(ctx, player_id: str) -> Message:
     player = players.get_driving_player(ctx.author.id, check=player_id)
     if player.level > 0:
         players.update(player, level=player.level - 1, xp=0, position=[7, 7])
@@ -484,7 +484,7 @@ def event_walk(ctx, player_id: int) -> Message:
 
 
 @driving_bp.custom_handler(custom_id="event_rob")
-def event_rob(ctx, player_id: int) -> Message:
+def event_rob(ctx, player_id: str) -> Message:
     player = players.get_driving_player(ctx.author.id, check=player_id)
     player.stop_drive()
     if randint(0, 1) == 0:
@@ -502,7 +502,7 @@ def event_rob(ctx, player_id: int) -> Message:
 @driving_bp.custom_handler(custom_id="initial_drive")
 def initial_drive(ctx, player_id: str):
     if ctx.author.id != player_id:
-        return Message(deferred=True, update=True)
+        raise players.WrongPlayer()
     player = players.DrivingPlayer(
         **vars(players.get(ctx.author.id)), followup_url=ctx.followup_url(), last_action_time=int(time())
     )
@@ -544,9 +544,9 @@ def drive(ctx) -> Message:
 
 
 @driving_bp.custom_handler(custom_id="show_load")
-def load_show(ctx, player_id: int) -> Message:
+def load_show(ctx, player_id: str) -> Message:
     """Shows what your Truck currently has loaded"""
-    player = players.get_driving_player(int(ctx.author.id), check=player_id)
+    player = players.get_driving_player(ctx.author.id, check=player_id)
     item_list = ""
     if len(player.loaded_items) == 0:
         item_list = "Your truck is empty"

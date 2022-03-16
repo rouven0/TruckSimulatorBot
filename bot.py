@@ -71,7 +71,7 @@ def votes():
     """Handle vote webhooks from top.gg"""
     if request.headers.get("Authorization") != getenv("VOTE_AUTHORIZATION"):
         abort(401)
-    voter_id = int(request.json.get("user"))
+    voter_id = request.json.get("user")
     if not players.registered(voter_id):
         vote_message_content = (
             f"Hmm, somebody voted that isn't even registered <:cat:892088956253011989> (id: {voter_id})"
@@ -101,7 +101,7 @@ def not_enough_money(error):
     return Message(content="You don't have enough money to do this.", ephemeral=True).dump()
 
 
-@app.errorhandler(players.NotDriving)
+@app.errorhandler(players.WrongPlayer)
 def not_driving(error):
     """Defer buttons if the wrong player clicked them"""
     return {"type": 6}
@@ -116,7 +116,7 @@ def not_registered(error):
         if interaction_data.get("member", None)
         else interaction_data.get("user").get("id")
     )
-    if int(author) == error.requested_id:
+    if author == error.requested_id:
         content = f"<@{error.requested_id}> You are not registered yet. Click the button below to get started."
         components = [ActionRow(components=[Button(label="Click here to register", custom_id="profile_register")])]
     else:

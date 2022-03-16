@@ -34,7 +34,7 @@ class Job:
 
     def __init__(
         self,
-        player_id: int,
+        player_id: str,
         place_from: Union[places.Place, str],
         place_to: Union[places.Place, str],
         state: int,

@@ -19,7 +19,7 @@ guide_bp = DiscordInteractionsBlueprint()
 @guide_bp.custom_handler(custom_id="guide_minijobs")
 def minijobs(ctx) -> Message:
     """Prints out all permanently running minijobs."""
-    player = players.get(int(ctx.author.id))
+    player = players.get(ctx.author.id)
     minijob_list = ""
     for place in places.get_all():
         if place.accepted_item is not None:
