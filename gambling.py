@@ -99,8 +99,8 @@ def get_slots_components(user: User, amount: int) -> list:
 
 
 @gambling_bp.custom_handler(custom_id="slots")
-def slots_handler(ctx, author_id: int, amount: int) -> Message:
-    if ctx.author.id != author_id:
+def slots_handler(ctx, player_id: str, amount: int) -> Message:
+    if ctx.author.id != player_id:
         raise players.WrongPlayer()
     return Message(
         embed=get_slots_embed(ctx.author, amount),
