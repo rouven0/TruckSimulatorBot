@@ -42,7 +42,7 @@ def get_company_embed(user, player, company) -> Embed:
     company_embed.fields.append(Field(name="Net worth", value=f"${company.net_worth}", inline=False))
     members = ""
     for member in company.get_members():
-        members += f"{member.name} \n"
+        members += f"{member} \n"
     company_embed.fields.append(Field(name="Members", value=members, inline=False))
     return company_embed
 

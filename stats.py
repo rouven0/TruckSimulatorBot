@@ -48,7 +48,9 @@ def register(ctx):
             value="Don't even try, it's just wasted work only to get you blacklisted.",
         )
     )
-    players.insert(players.Player(ctx.author.id, ctx.author.username, money=1000, gas=600))
+    players.insert(
+        players.Player(ctx.author.id, ctx.author.username, discriminator=ctx.author.discriminator, money=1000, gas=600)
+    )
     return Message(
         embeds=[welcome_embed, rules_embed],
         components=[
@@ -78,8 +80,10 @@ def get_profile_embed(user: User) -> Embed:
     # Detect, when the player is renamed
     if player.name != user.username:
         players.update(player, name=user.username)
+    if player.discriminator != user.discriminator:
+        players.update(player, discriminator=user.discriminator)
     profile_embed = Embed(
-        author=Author(name=f"{player}'s profile"),
+        author=Author(name=f"{player.name}'s profile"),
         thumbnail=Media(url=user.avatar_url),
         color=config.EMBED_COLOR,
         fields=[],
@@ -136,6 +140,6 @@ def top(ctx, key) -> Message:
             val = f"{player.level:,} ({player.xp:,}/{levels.get_next_xp(player.level):,} xp)"
             top_embed.footer = Footer(text="You can also sort by money and miles", icon_url=config.SELF_AVATAR_URL)
         count += 1
-        top_body += f"**{count}**. {player.name} ~ {val}{top_players[1]}\n"
+        top_body += f"**{count}**. {player} ~ {val}{top_players[1]}\n"
     top_embed.fields.append(Field(name=f"Top {key}", value=top_body))
     return Message(embed=top_embed)

@@ -32,7 +32,7 @@ def get_drive_embed(player: players.Player, avatar_url: str) -> Embed:
     drive_embed = Embed(
         color=config.EMBED_COLOR,
         timestamp=datetime.utcnow().replace(microsecond=0).isoformat(),
-        author=Author(name=f"{player} is driving", icon_url=avatar_url),
+        author=Author(name=f"{player.name} is driving", icon_url=avatar_url),
         footer=Footer(text=f"Loaded items: {len(player.loaded_items)}/{trucks.get(player.truck_id).loading_capacity}"),
         fields=[],
     )
@@ -351,7 +351,7 @@ def new_job(ctx, player_id: str) -> Message:
     player = players.get_driving_player(ctx.author.id, check=player_id)
     job_embed = Embed(
         color=config.EMBED_COLOR,
-        author=Author(name=f"{player}'s Job", icon_url=ctx.author.avatar_url),
+        author=Author(name=f"{player.name}'s Job", icon_url=ctx.author.avatar_url),
         fields=[],
     )
     job = jobs.generate(player)
@@ -527,6 +527,8 @@ def drive(ctx) -> Message:
     # Detect, when the player is renamed
     if player.name != ctx.author.username:
         players.update(player, name=ctx.author.username)
+    if player.discriminator != ctx.author.discriminator:
+        players.update(player, discriminator=ctx.author.discriminator)
 
     if players.is_driving(ctx.author.id):
         driving_player = players.get_driving_player(ctx.author.id)

@@ -27,7 +27,7 @@ def show_job(ctx, player_id: str) -> Message:
         raise players.WrongPlayer()
     job_embed = Embed(
         color=config.EMBED_COLOR,
-        author=Author(name=f"{player}'s Job"),
+        author=Author(name=f"{player.name}'s Job"),
         fields=[],
     )
     place_from = current_job.place_from

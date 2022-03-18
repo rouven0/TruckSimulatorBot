@@ -39,6 +39,7 @@ class Player:
 
     :ivar str id: Unique discord user id to identify the player
     :ivar str name: Displayed name in discord, NOT the Nickname
+    :ivar str discriminator: A user's discriminator. 4 digit number.
     :ivar int level: The player's level
     :ivar int xp: Xp for current level
     :ivar int money: Amount of in-game currency the player has
@@ -52,21 +53,22 @@ class Player:
     """
 
     def __init__(self, id: str, name: str, **kwargs) -> None:
-        self.id = id
-        self.name = name
-        self.level = kwargs.pop("level", 0)
-        self.xp = kwargs.pop("xp", 0)
-        self.money = kwargs.pop("money", 0)
+        self.id: str = id
+        self.name: str = name
+        self.discriminator: str = kwargs.pop("discriminator", 1000)
+        self.level: int = kwargs.pop("level", 0)
+        self.xp: int = kwargs.pop("xp", 0)
+        self.money: int = kwargs.pop("money", 0)
         position = kwargs.pop("position", [0, 0])
         if isinstance(position, str):
             # format the database string into a list
-            self.position = [int(position[: position.find("/")]), int(position[position.find("/") + 1 :])]
+            self.position: list = [int(position[: position.find("/")]), int(position[position.find("/") + 1 :])]
         else:
-            self.position = position
-        self.miles = kwargs.pop("miles", 0)
-        self.truck_miles = kwargs.pop("truck_miles", 0)
-        self.gas = kwargs.pop("gas", 0)
-        self.truck_id = kwargs.pop("truck_id", 0)
+            self.position: list = position
+        self.miles: int = kwargs.pop("miles", 0)
+        self.truck_miles: int = kwargs.pop("truck_miles", 0)
+        self.gas: int = kwargs.pop("gas", 0)
+        self.truck_id: int = kwargs.pop("truck_id", 0)
         loaded_items = kwargs.pop("loaded_items", [])
         if isinstance(loaded_items, str):
             # split the item string and get the items
@@ -76,8 +78,8 @@ class Player:
                     self.loaded_items.append(items.get(item_name))
         else:
             self.loaded_items: list = loaded_items
-        self.company = kwargs.pop("company", None)
-        self.last_vote = kwargs.pop("last_vote", 0)
+        self.company: str = kwargs.pop("company", None)
+        self.last_vote: int = kwargs.pop("last_vote", 0)
 
     def __iter__(self):
         self._n = 0
@@ -95,7 +97,7 @@ class Player:
         raise StopIteration
 
     def __str__(self) -> str:
-        return self.name
+        return f"{self.name}#{self.discriminator}"
 
     def add_xp(self, amount: int) -> str:
         """
@@ -234,6 +236,7 @@ def insert(player: Player) -> None:
 def update(
     player: Player,
     name: str = None,
+    discriminator: str = None,
     level: int = None,
     xp: int = None,
     position: list = None,
@@ -253,6 +256,9 @@ def update(
     if name is not None:
         database.cur.execute("UPDATE players SET name=%s WHERE id=%s", (name, player.id))
         player.name = name
+    if discriminator is not None:
+        database.cur.execute("UPDATE players SET discriminator=%s WHERE id=%s", (discriminator, player.id))
+        player.discriminator = discriminator
     if level is not None:
         database.cur.execute("UPDATE players SET level=%s WHERE id=%s", (level, player.id))
         player.level = level
