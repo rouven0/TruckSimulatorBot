@@ -59,7 +59,7 @@ class Player:
     gas: int = 0
     truck_id: int = 0
     loaded_items: list = field(default_factory=lambda: [])
-    company: Optional[int] = 0
+    company: Optional[int] = None
     last_vote: int = 0
 
     def __post_init__(self) -> None:
@@ -237,7 +237,7 @@ def update(
     gas: int = None,
     truck_id: int = None,
     loaded_items: list = None,
-    company: str = None,
+    company: int = None,
     last_vote: int = None,
 ) -> None:
     """

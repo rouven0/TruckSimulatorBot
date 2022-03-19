@@ -123,18 +123,25 @@ def get_all() -> list[Company]:
     return companies
 
 
-def insert(company: Company) -> None:
+def insert(company: Company) -> int:
     """
     Add a new company
 
     :param Company company: The company to insert
+    :return: The company's id
     """
-    placeholders = ", ".join(["%s"] * len(vars(company)))
-    columns = ", ".join(vars(company).keys())
+    attrs = vars(company)
+    attrs.pop("id")
+    placeholders = ", ".join(["%s"] * len(attrs))
+    columns = ", ".join(attrs.keys())
     sql = f"INSERT INTO companies ({columns}) VALUES ({placeholders})"
+    print(sql)
+    print(tuple(company))
     database.cur.execute(sql, tuple(company))
     database.con.commit()
     logging.info("%s created the company %s", company.founder, company.name)
+    database.cur.execute("Select id from companies where name=%s", (company.name,))
+    return database.cur.fetchone()["id"]
 
 
 def remove(company: Company) -> None:

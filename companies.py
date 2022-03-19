@@ -7,6 +7,8 @@ from flask_discord_interactions.models.component import (
     ActionRow,
     Button,
     Component,
+    SelectMenu,
+    SelectMenuOption,
     TextInput,
 )
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
@@ -40,7 +42,7 @@ def get_company_embed(user, player, company) -> Embed:
         )
 
     company_embed.fields.append(Field(name="Headquarters position", value=str(company.hq_position)))
-    company_embed.fields.append(Field(name="Net worth", value=f"${company.net_worth}", inline=False))
+    company_embed.fields.append(Field(name="Net worth", value=f"${company.net_worth:,}", inline=False))
     company_members = company.get_members()
     members = ""
     for member in company_members:
@@ -51,11 +53,11 @@ def get_company_embed(user, player, company) -> Embed:
 
 def get_company_components(player, company) -> list[Component]:
     """Returns the buttons to manage a company"""
-    return [
+    components = [
         ActionRow(
             components=[
                 Button(
-                    label="Manage",
+                    label="Update",
                     custom_id=["company_update", player.id],
                     style=1,
                     disabled=(player.id != company.founder),
@@ -70,6 +72,25 @@ def get_company_components(player, company) -> list[Component]:
             ]
         )
     ]
+    company_members = company.get_members()
+    if len(company_members) > 1:
+        components.append(
+            ActionRow(
+                components=[
+                    SelectMenu(
+                        placeholder="Select a member to fire",
+                        custom_id=["company_fire", player.id],
+                        options=[
+                            SelectMenuOption(label=str(plr), value=plr.id)
+                            for plr in company.get_members()
+                            if plr.id != player.id
+                        ],
+                        disabled=(player.id != company.founder),
+                    )
+                ]
+            )
+        )
+    return components
 
 
 @company_bp.custom_handler(custom_id="cancel_company_action")
@@ -114,7 +135,7 @@ def found(ctx, player_id: str):
                         label="Name",
                         placeholder="Your company's name.",
                         min_length=3,
-                        max_length=256,
+                        max_length=80,
                     )
                 ]
             ),
@@ -143,14 +164,14 @@ def confirm_found(ctx):
     if companies.exists(name):
         return Message("A company with this make already exists, please choose another name", ephemeral=True)
     player = players.get(ctx.author.id)
-    company = companies.Company(name, player.position, ctx.author.id, description=description)
-    companies.insert(company)
-    players.update(player, company=name)
+    company = companies.Company(0, name, player.position, ctx.author.id, description=description)
+    company_id = companies.insert(company)
+    players.update(player, company=company_id)
     return Message(
         embed=Embed(
             title="Company creation successful",
             description=f"{company.logo} **{company.name}** has been created and placed in the market. "
-            f"Your company's headquarters have been built at {company.hq_position}.",
+            "Your company's headquarters have been built at your current position..",
             color=config.EMBED_COLOR,
         ),
         components=[ActionRow(components=[Button(label="Check it out", custom_id=["company_main", player.id])])],
@@ -175,7 +196,7 @@ def hire(ctx, user: User):
         ActionRow(
             components=[
                 Button(style=2, label="Cancel", custom_id=["cancel_company_action", invited_player.id]),
-                Button(style=3, label="Confirm", custom_id=["confirm_company_hire", company.name, invited_player.id]),
+                Button(style=3, label="Confirm", custom_id=["confirm_company_hire", company.id, invited_player.id]),
             ]
         )
     ]
@@ -187,29 +208,32 @@ def hire(ctx, user: User):
 
 
 @company_bp.custom_handler(custom_id="confirm_company_hire")
-def confirm_hire(ctx, company: str, player_id: str):
+def confirm_hire(ctx, company_id: int, player_id: str):
     """Confirm button the hired player has to click"""
     invited_player = players.get(ctx.author.id, check=player_id)
 
-    players.update(invited_player, company=company)
+    company = companies.get(company_id)
+    players.update(invited_player, company=company.id)
     return Message(
-        f"It's official! **{invited_player.name}** is now a member of **{company}** <:PandaHappy:869202868555624478>",
+        f"It's official! **{invited_player.name}** is now a member of **{company.name}** <:PandaHappy:869202868555624478>",
         components=[],
         update=True,
     )
 
 
 @company_bp.command(name="Fire", type=ApplicationCommandType.USER)
-def fire(ctx, user: User):
+@company_bp.custom_handler("company_fire")
+def fire(ctx, player_id: str):
     """Context menu command to fire a player"""
-    player = players.get(ctx.author.id)
-    fired_player = players.get(user.id)
+    player = players.get(ctx.author.id, check=player_id)
+    fired_player = players.get(ctx.values[0])
     company = companies.get(player.company)
-    if ctx.author.id == user.id:
+    if ctx.author.id == ctx.values[0]:
+        # keeping this one here in case some of the select stuff fails
         return Message("You can't fire yourself!", ephemeral=True)
     if ctx.author.id != company.founder:
         return Message("You are not the company founder!", ephemeral=True)
-    if fired_player.company != company.name:
+    if fired_player.company != company.id:
         return Message(f"**{fired_player.name}** is not a member of your company.", ephemeral=True)
 
     confirm_buttons: list[Component] = [
@@ -228,13 +252,13 @@ def fire(ctx, user: User):
 
 
 @company_bp.custom_handler(custom_id="confirm_company_fire")
-def confirm_fire(ctx, company: str, player_id: str, fired_player_id: str):
+def confirm_fire(ctx, company_name: str, player_id: str, fired_player_id: str):
     """Confirm button for the company owner"""
     if ctx.author.id != player_id:
         raise players.WrongPlayer()
     fired_player = players.get(fired_player_id)
     fired_player.remove_from_company()
-    return Message(content=f"**{fired_player.name}** was removed from **{company}**", update=True, components=[])
+    return Message(content=f"**{fired_player.name}** was removed from **{company_name}**", update=True, components=[])
 
 
 @company_bp.custom_handler(custom_id="company_leave")
@@ -258,7 +282,7 @@ def confirm_leave(ctx, player_id: str):
     """Confirm button to leave a company"""
     player = players.get(ctx.author.id, check=player_id)
     player.remove_from_company()
-    return Message(f"<@{player.id}> You left **{player.company}**", components=[], update=True)
+    return Message(f"<@{player.id}> You left **{companies.get(player.company).name}**", components=[], update=True)
 
 
 @company_bp.custom_handler(custom_id="company_update")
@@ -280,7 +304,7 @@ def company_update(ctx, player_id: str):
                         label="Name",
                         placeholder="Your company's name, must start with a letter",
                         min_length=3,
-                        max_length=256,
+                        max_length=80,
                         value=company.name,
                     )
                 ]
