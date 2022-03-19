@@ -66,13 +66,13 @@ def get_drive_embed(player: players.Player, avatar_url: str) -> Embed:
         drive_embed.image = Media(url=assets.get_place_image(player, place))
     else:
         drive_embed.image = Media(url=assets.get_default(player))
-    if player.position in [c.hq_position for c in all_companies]:
+    if int(player.position) in [int(c.hq_position) for c in all_companies]:
         for company in all_companies:
-            if company.hq_position == player.position:
+            if int(company.hq_position) == int(player.position):
                 drive_embed.fields.append(
                     Field(
                         name="What is here?",
-                        value=f"A company called **{company}**",
+                        value=f"A company called {company.logo} **{company}**",
                         inline=False,
                     )
                 )
@@ -91,9 +91,9 @@ def generate_minimap(player: players.Player, all_companies: list[companies.Compa
             # show other trucks on the map
             if map_place:
                 minimap_array[i][j] = f"<:i:{items.get(map_place.produced_item).emoji}>"
-            elif position in [c.hq_position for c in all_companies]:
+            elif int(position) in [int(c.hq_position) for c in all_companies]:
                 for company in all_companies:
-                    if company.hq_position == position:
+                    if int(company.hq_position) == int(position):
                         minimap_array[i][j] = company.logo
             elif position.x in [-1, config.MAP_BORDER + 1] or position.y in [-1, config.MAP_BORDER + 1]:
                 # Mark the map border with symbols
