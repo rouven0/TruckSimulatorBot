@@ -116,7 +116,6 @@ def get_profile_embed(user: User) -> Embed:
             "name": "key",
             "description": "The list you desire to view.",
             "type": CommandOptionType.STRING,
-            "required": True,
             "choices": [
                 {"name": "level", "value": "level"},
                 {"name": "money", "value": "money"},
@@ -125,7 +124,7 @@ def get_profile_embed(user: User) -> Embed:
         }
     ],
 )
-def top(ctx, key) -> Message:
+def top(ctx, key="level") -> Message:
     """Presents the top players."""
     top_players = players.get_top(key)
     top_body = ""

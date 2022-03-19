@@ -206,7 +206,6 @@ discord.register_blueprint(company_bp)
 
 if "--update" in sys.argv:
     discord.update_commands(guild_id=830928381100556338)
-    discord.update_commands(guild_id=812650049565753355)
     sys.exit()
 
 if "--deploy" in sys.argv:

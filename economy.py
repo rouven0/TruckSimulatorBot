@@ -126,4 +126,4 @@ def give(ctx, user: User, amount: int) -> Message:
 
     donator.debit_money(amount)
     acceptor.add_money(amount)
-    return Message(embed=Embed(description=f"{donator} gave ${amount} to {acceptor}", color=config.EMBED_COLOR))
+    return Message(embed=Embed(description=f"{donator.name} gave ${amount} to {acceptor}", color=config.EMBED_COLOR))
