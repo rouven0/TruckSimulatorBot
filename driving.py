@@ -22,6 +22,7 @@ from resources import symbols
 from resources import assets
 from resources import jobs
 from resources import trucks
+from resources.position import Position
 
 driving_bp = DiscordInteractionsBlueprint()
 
@@ -54,7 +55,7 @@ def get_drive_embed(player: players.Player, avatar_url: str) -> Embed:
             )
         )
 
-    if place.image_url_default is not None:
+    if place is not None:
         drive_embed.fields.append(
             Field(
                 name="What is here?",
@@ -85,28 +86,24 @@ def generate_minimap(player: players.Player, all_companies: list[companies.Compa
         minimap_array.append([])
         for j in range(0, 7):
             minimap_array[i].append("")
-            position = [player.position[0] - 3 + j, player.position[1] + 3 - i]
+            position = Position(player.position.x - 3 + j, player.position.y + 3 - i)
             map_place = places.get(position)
             # show other trucks on the map
-            try:
-                item = items.get(map_place.produced_item)
-            except items.ItemNotFound:
-                item = None
-            if item is not None:
+            if map_place:
                 minimap_array[i][j] = f"<:i:{items.get(map_place.produced_item).emoji}>"
             elif position in [c.hq_position for c in all_companies]:
                 for company in all_companies:
                     if company.hq_position == position:
                         minimap_array[i][j] = company.logo
-            elif position[0] in [-1, config.MAP_BORDER + 1] or position[1] in [-1, config.MAP_BORDER + 1]:
+            elif position.x in [-1, config.MAP_BORDER + 1] or position.y in [-1, config.MAP_BORDER + 1]:
                 # Mark the map border with symbols
                 minimap_array[i][j] = ":small_orange_diamond:"
                 if (
                     # Small correction mechanism to prevent the lines from going beyond the border
-                    position[0] < -1
-                    or position[0] > config.MAP_BORDER + 1
-                    or position[1] < -1
-                    or position[1] > config.MAP_BORDER + 1
+                    position.x < -1
+                    or position.x > config.MAP_BORDER + 1
+                    or position.y < -1
+                    or position.y > config.MAP_BORDER + 1
                 ):
                     minimap_array[i][j] = symbols.MAP_BACKGROUND
             else:
@@ -152,14 +149,17 @@ def get_buttons(player: players.Player) -> list:
 
     load_disabled = not len(player.loaded_items) < trucks.get(player.truck_id).loading_capacity
     unload_disabled = not len(player.loaded_items) > 0
-    if place.name == "Nothing":
+    if not place:
         load_disabled = True
         unload_disabled = True
 
     action_buttons = [
         Button(
             style=1
-            if current_job is not None and current_job.state == 0 and place.position == current_job.place_from.position
+            if current_job
+            and place
+            and current_job.state == 0
+            and int(place.position) == int(current_job.place_from.position)
             else 2,
             emoji={"name": "load", "id": symbols.LOAD},
             custom_id=["load", player.id],
@@ -167,7 +167,10 @@ def get_buttons(player: players.Player) -> list:
         ),
         Button(
             style=1
-            if current_job is not None and current_job.state == 1 and place.position == current_job.place_to.position
+            if current_job
+            and place
+            and current_job.state == 1
+            and int(place.position) == int(current_job.place_to.position)
             else 2,
             emoji={"name": "unload", "id": symbols.UNLOAD},
             custom_id=["unload", player.id],
@@ -180,7 +183,7 @@ def get_buttons(player: players.Player) -> list:
         ),
     ]
 
-    if "refill" in place.available_actions:
+    if place and "refill" in place.available_actions:
         action_buttons.append(
             Button(
                 style=2, label="Refill", emoji={"name": "refill", "id": symbols.REFILL}, custom_id=["refill", player.id]
@@ -310,7 +313,7 @@ def unload_items(ctx, player_id: str):
     if (
         current_job is not None
         and current_job.place_from.produced_item in ctx.values
-        and player.position == current_job.place_to.position
+        and int(player.position) == int(current_job.place_to.position)
     ):
         current_job.state = jobs.STATE_DONE
         player.add_money(current_job.reward)
@@ -398,16 +401,16 @@ def move(ctx: Context, direction, player_id):
     player = players.get_driving_player(ctx.author.id, check=player_id)
 
     if direction == symbols.LEFT:
-        player.position = [player.position[0] - 1, player.position[1]]
+        player.position.x -= 1
 
     if direction == symbols.UP:
-        player.position = [player.position[0], player.position[1] + 1]
+        player.position.y += 1
 
     if direction == symbols.DOWN:
-        player.position = [player.position[0], player.position[1] - 1]
+        player.position.y -= 1
 
     if direction == symbols.RIGHT:
-        player.position = [player.position[0] + 1, player.position[1]]
+        player.position.x += 1
 
     player.miles += 1
     player.truck_miles += 1
@@ -454,7 +457,7 @@ def event_hitchhike(ctx, player_id: str) -> Message:
         pass
     player.stop_drive()
     if randint(0, 1) == 0:
-        players.update(player, position=[7, 7])
+        players.update(player, position=458759)
         return Message(
             (
                 "Someone stopped to take you with them, but.. **OH NO!** It's Mr. Thomas Ruck, the president of this "
@@ -463,7 +466,7 @@ def event_hitchhike(ctx, player_id: str) -> Message:
             components=[],
             update=True,
         )
-    players.update(player, position=[7, 7], gas=140)
+    players.update(player, position=458759, gas=140)
     return Message(
         "You found someone to go with. They even were so kind to gift you some gas. You should thank them.",
         components=[],
@@ -475,7 +478,7 @@ def event_hitchhike(ctx, player_id: str) -> Message:
 def event_walk(ctx, player_id: str) -> Message:
     player = players.get_driving_player(ctx.author.id, check=player_id)
     if player.level > 0:
-        players.update(player, level=player.level - 1, xp=0, position=[7, 7])
+        players.update(player, level=player.level - 1, xp=0, position=458759)
     player.stop_drive()
     return Message(
         "You started walking to the gas station. As you arrived, you noticed that you lost a level.",
@@ -491,10 +494,8 @@ def event_rob(ctx, player_id: str) -> Message:
     if randint(0, 1) == 0:
         players.update(player, gas=player.gas + 250)
         return Message("Phew. Nobdody looked and you stole some gas. Be careful next time.", components=[], update=True)
-    if player.truck_id > 0:
-        players.update(player, truck_id=player.truck_id - 1)
     return Message(
-        "Oh no! You got caught and thrown in the jail. Luckily you could use your truck as deposit to get out.",
+        "Oh no! You got caught. Nothing happened but the car owner drove away angrily.",
         components=[],
         update=True,
     )

@@ -4,30 +4,18 @@ Companies are a group of players that collect money together. Every company's lo
 Every time a player completes a job. The companies net worth is increased.
 """
 
+from dataclasses import dataclass
 import logging
 from typing import Optional, Union
 from resources import database
+from resources import position as pos
 from resources.players import Player
 
 
-def _format_pos_to_db(pos: list) -> str:
-    """
-    Returns a database-ready string that contains the position in the form x/y
-    """
-    return f"{pos[0]}/{pos[1]}"
-
-
-def _get_position(db_pos) -> list:
-    """
-    Formats the position string from the database into a list what we can operate with
-    """
-    pos_x = db_pos[: db_pos.find("/")]
-    pos_y = db_pos[db_pos.find("/") + 1 :]
-    return [int(pos_x), int(pos_y)]
-
-
+@dataclass
 class Company:
     """
+    :ivar int id: Internal company id
     :ivar str name: Name of the company
     :ivar str logo: Emoji displayed as logo on the map
     :ivar str description: A description for that company
@@ -36,18 +24,17 @@ class Company:
     :ivar int net_worth: Money the company holds
     """
 
-    def __init__(self, name: str, hq_position: Union[list, str], founder: str, **kwargs) -> None:
-        self.name = name
-        self.hq_position = hq_position
+    id: int
+    name: str
+    hq_position: pos.Position
+    founder: str
+    description: str = ""
+    logo: str = "🏛️"
+    net_worth: int = 3000
 
-        if isinstance(hq_position, str):
-            self.hq_position = _get_position(hq_position)
-        else:
-            self.hq_position = hq_position
-        self.founder = founder
-        self.logo = kwargs.pop("logo", "🏛️")
-        self.description = kwargs.pop("description", "")
-        self.net_worth = kwargs.pop("net_worth", 3000)
+    def __post_init__(self) -> None:
+        if isinstance(self.hq_position, int):
+            self.hq_position = pos.Position.from_int(self.hq_position)
 
     def __iter__(self):
         self._n = 0
@@ -58,7 +45,7 @@ class Company:
             attr = list(vars(self).keys())[self._n]
             self._n += 1
             if attr == "hq_position":
-                return _format_pos_to_db(self.__getattribute__(attr))
+                return int(self.__getattribute__(attr))
             return self.__getattribute__(attr)
         raise StopIteration
 
@@ -71,7 +58,7 @@ class Company:
 
         :param int amount: Amount to be added
         """
-        database.cur.execute("UPDATE companies SET net_worth=%s WHERE name=%s", (self.net_worth + amount, self.name))
+        database.cur.execute("UPDATE companies SET net_worth=%s WHERE id=%s", (self.net_worth + amount, self.id))
         self.net_worth += amount
 
     def remove_net_worth(self, amount: int) -> None:
@@ -80,7 +67,7 @@ class Company:
 
         :param int amount: Amount to be removed
         """
-        database.cur.execute("UPDATE companies SET net_worth=%s WHERE name=%s", (self.net_worth - amount, self.name))
+        database.cur.execute("UPDATE companies SET net_worth=%s WHERE id=%s", (self.net_worth - amount, self.id))
         self.net_worth -= amount
 
     def get_members(self) -> list[Player]:
@@ -89,7 +76,7 @@ class Company:
         """
         # Maybe make this a property at some point
         members = []
-        database.cur.execute("SELECT * FROM players WHERE company=%s", (self.name,))
+        database.cur.execute("SELECT * FROM players WHERE company=%s", (self.id,))
         record = database.cur.fetchall()
         for member in record:
             members.append(Player(**member))
@@ -109,17 +96,17 @@ def exists(name: str) -> bool:
     return False
 
 
-def get(name: Optional[str]) -> Company:
+def get(id: Optional[int]) -> Company:
     """
     Gets a company from the database
 
-    :param str name: The desired company's name, can be None
+    :param int id: The desired company's id, can be None
     :raises CompanyNotFound: In case a company with this name doesn't exist
     :return: The desired company
     """
-    if name is None or not exists(name):
+    if not id:
         raise CompanyNotFound()
-    database.cur.execute("SELECT * FROM companies WHERE name=%s", (name,))
+    database.cur.execute("SELECT * FROM companies WHERE id=%s", (id,))
     record = database.cur.fetchone()
     company = Company(**record)
     return company
@@ -156,7 +143,7 @@ def remove(company: Company) -> None:
 
     :param Company company: The company to remove
     """
-    database.cur.execute("DELETE FROM companies WHERE name=%s", (company.name,))
+    database.cur.execute("DELETE FROM companies WHERE id=%s", (company.id,))
     database.con.commit()
     logging.info("Company %s got deleted", company.name)
 
@@ -166,7 +153,7 @@ def update(
     name: str = None,
     logo: str = None,
     description: str = None,
-    hq_position: list = None,
+    hq_position: Union[pos.Position, int] = None,
     founder: str = None,
     net_worth: int = None,
 ) -> None:
@@ -176,25 +163,24 @@ def update(
     Same as in players, not documented until fixed
     """
     if name is not None:
-        database.cur.execute("UPDATE companies SET name=%s WHERE name=%s", (name, company.name))
-        database.cur.execute("UPDATE players SET company=%s WHERE company=%s", (name, company.name))
+        database.cur.execute("UPDATE companies SET name=%s WHERE id=%s", (name, company.id))
         company.name = name
     if logo is not None:
-        database.cur.execute("UPDATE companies SET logo=%s WHERE name=%s", (logo, company.name))
+        database.cur.execute("UPDATE companies SET logo=%s WHERE id=%s", (logo, company.id))
         company.logo = logo
     if description is not None:
-        database.cur.execute("UPDATE companies SET description=%s WHERE name=%s", (description, company.name))
+        database.cur.execute("UPDATE companies SET description=%s WHERE id=%s", (description, company.id))
         company.description = description
     if hq_position is not None:
-        database.cur.execute(
-            "UPDATE companies SET hq_position=%s WHERE name=%s", (_format_pos_to_db(hq_position), company.name)
-        )
+        if isinstance(hq_position, int):
+            hq_position = pos.Position.from_int(hq_position)
+        database.cur.execute("UPDATE companies SET hq_position=%s WHERE id=%s", (int(hq_position), company.id))
         company.hq_position = hq_position
     if founder is not None:
-        database.cur.execute("UPDATE companies SET founder=%s WHERE name=%s", (founder, company.name))
+        database.cur.execute("UPDATE companies SET founder=%s WHERE id=%s", (founder, company.id))
         company.founder = founder
     if net_worth is not None:
-        database.cur.execute("UPDATE companies SET net_worth=%s WHERE name=%s", (net_worth, company.name))
+        database.cur.execute("UPDATE companies SET net_worth=%s WHERE id=%s", (net_worth, company.id))
         company.net_worth = net_worth
     database.con.commit()
     logging.debug("Updated company %s to %s", company.name, tuple(company))

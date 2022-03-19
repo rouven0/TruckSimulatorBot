@@ -17,6 +17,7 @@ Welcome to TruckSimulatorBot's documentation!
     items.rst
     trucks.rst
     levels.rst
+    position.rst
 
 
 

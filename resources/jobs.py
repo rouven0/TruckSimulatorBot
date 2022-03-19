@@ -3,6 +3,7 @@
 Jobs are the main way to get money. For every job, the player has to bring items from one place to another.
 After the job is done, the reward is payed out.
 """
+from dataclasses import dataclass
 from random import randint
 from math import sqrt
 from typing import Union
@@ -15,13 +16,7 @@ STATE_LOADED = 1
 STATE_DONE = 2
 
 
-def _format_pos_to_db(pos) -> str:
-    """
-    Returns a database-ready string that contains the position in the form x/y
-    """
-    return f"{pos[0]}/{pos[1]}"
-
-
+@dataclass
 class Job:
     """
     :ivar str player_id: Player id that this jobs belongs to used as primary key in the database
@@ -32,27 +27,18 @@ class Job:
     :ivar int create_time: timestamp this job was created
     """
 
-    def __init__(
-        self,
-        player_id: str,
-        place_from: Union[places.Place, str],
-        place_to: Union[places.Place, str],
-        state: int,
-        reward: int,
-        create_time: int,
-    ) -> None:
-        self.player_id = player_id
-        if isinstance(place_from, str):
-            self.place_from = places.get(place_from)
-        else:
-            self.place_from = place_from
-        if isinstance(place_to, str):
-            self.place_to = places.get(place_to)
-        else:
-            self.place_to = place_to
-        self.state = state
-        self.reward = reward
-        self.create_time = create_time
+    player_id: str
+    place_from: places.Place
+    place_to: places.Place
+    state: int
+    reward: int
+    create_time: int
+
+    def __post_init__(self) -> None:
+        if isinstance(self.place_from, int):
+            self.place_from = places.get(self.place_from)
+        if isinstance(self.place_to, int):
+            self.place_to = places.get(self.place_to)
 
     def __iter__(self):
         self._n = 0
@@ -70,7 +56,7 @@ class Job:
             attr = list(vars(self).keys())[self._n]
             self._n += 1
             if attr in ["place_from", "place_to"]:
-                return _format_pos_to_db(self.__getattribute__(attr).position)
+                return int(self.__getattribute__(attr).position)
             return self.__getattribute__(attr)
         raise StopIteration
 
@@ -87,11 +73,11 @@ def generate(player) -> Job:
     place_from = available_places[randint(0, len(available_places) - 1)]
     available_places.remove(place_from)
     place_to = available_places[randint(0, len(available_places) - 1)]
-    arrival_miles_x = abs(player.position[0] - place_from.position[0])
-    arrival_miles_y = abs(player.position[1] - place_from.position[1])
+    arrival_miles_x = abs(player.position.x - place_from.position.x)
+    arrival_miles_y = abs(player.position.y - place_from.position.y)
     arrival_reward = round(sqrt(arrival_miles_x ** 2 + arrival_miles_y ** 2) * 14)
-    job_miles_x = abs(place_from.position[0] - place_to.position[0])
-    job_miles_y = abs(place_from.position[1] - place_to.position[1])
+    job_miles_x = abs(place_from.position.x - place_to.position.x)
+    job_miles_y = abs(place_from.position.y - place_to.position.y)
     job_reward = round(sqrt(job_miles_x ** 2 + job_miles_y ** 2) * 79)
     reward = round((job_reward + arrival_reward) * (player.level + 1))
     new_job = Job(player.id, place_from, place_to, 0, reward, int(time()))

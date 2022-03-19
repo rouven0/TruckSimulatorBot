@@ -22,8 +22,8 @@ def get_drive_position_symbols(position) -> list:
     Returns a list of emojis that the bot will react with to the drive message
     Corresponding arrow symbols will be removed when the map border is reached
     """
-    pos_x = position[0]
-    pos_y = position[1]
+    pos_x = position.x
+    pos_y = position.y
     symbols = []
     if pos_x > 0:
         symbols.append(LEFT)

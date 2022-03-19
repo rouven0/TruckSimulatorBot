@@ -6,13 +6,14 @@ import sqlite3
 from typing import Optional, Union
 
 from resources import symbols
+from resources import position as pos
 
 
 @dataclass
 class Place:
     """
     :ivar str name: The name of the place
-    :ivar list position: the Place's position in the 2 dimensional array that I call Map
+    :ivar position.Postion position: the Place's position as int
     :ivar list available_actions: all local available commands stored as strings in a list
     :ivar str image_url: Every place has an image that is shown while driving.
         Images are hosted on a resource discord server and displayed in embeds via URL
@@ -25,7 +26,7 @@ class Place:
     """
 
     name: str
-    position: list
+    position: pos.Position
     available_actions: list
     image_url_default: Optional[str]
     image_url_jungle: Optional[str]
@@ -35,50 +36,14 @@ class Place:
     accepted_item: Optional[str]
     item_reward: Optional[int]
 
+    def __post_init__(self) -> None:
+        if isinstance(self.position, int):
+            self.position = pos.Position.from_int(self.position)
+        if isinstance(self.available_actions, str):
+            self.available_actions = self.available_actions.split(";")
+
     def __str__(self) -> str:
         return self.name
-
-
-def __get_position(db_pos) -> list:
-    """
-    Formats the position string from the database into a list what we can operate with
-    """
-    pos_x = db_pos[: db_pos.find("/")]
-    pos_y = db_pos[db_pos.find("/") + 1 :]
-    return [int(pos_x), int(pos_y)]
-
-
-def __generate_list(lst) -> None:
-    """
-    Populates a list with Place objects created from database tuples
-    """
-    for tup in __cur__.fetchall():
-        name = tup[0]
-        position = __get_position(tup[1])
-        available_actions = []
-        if tup[2] is not None:
-            available_actions = tup[2].split(";")
-        image_url = tup[3]
-        image_url_better = tup[4]
-        image_url_tropical = tup[5]
-        image_url_ultimate = tup[6]
-        produced_item = tup[7]
-        accepted_item = tup[8]
-        item_reward = tup[9]
-        lst.append(
-            Place(
-                name,
-                position,
-                available_actions,
-                image_url,
-                image_url_better,
-                image_url_tropical,
-                image_url_ultimate,
-                produced_item,
-                accepted_item,
-                item_reward,
-            )
-        )
 
 
 def get_direction(player, target: Place) -> int:
@@ -88,19 +53,19 @@ def get_direction(player, target: Place) -> int:
     :param Place target: The place to navigate to
     :return: The emoji id of the direction. Used in buttons and the drive embed
     """
-    if player.position == target.position:
+    if int(player.position) == int(target.position):
         return symbols.SUCCESS
     possible_directions = {}
-    possible_directions["x"] = symbols.RIGHT if player.position[0] < target.position[0] else symbols.LEFT
-    possible_directions["y"] = symbols.UP if player.position[1] < target.position[1] else symbols.DOWN
+    possible_directions["x"] = symbols.RIGHT if player.position.x < target.position.x else symbols.LEFT
+    possible_directions["y"] = symbols.UP if player.position.y < target.position.y else symbols.DOWN
     return (
         possible_directions["x"]
-        if abs(player.position[0] - target.position[0]) >= abs(player.position[1] - target.position[1])
+        if abs(player.position.x - target.position.x) >= abs(player.position.y - target.position.y)
         else possible_directions["y"]
     )
 
 
-def get(position: Union[list, str]) -> Place:
+def get(position: Union[int, pos.Position]) -> Place:
     """
     Returns a place object on a specific position
     If no places is registered there, None is returned
@@ -108,26 +73,11 @@ def get(position: Union[list, str]) -> Place:
     :param list/str position: Postion of the place
     :return: The corresponding place
     """
-    if isinstance(position, str):
-        position = __get_position(position)
     for place in get_all():
-        if place.position == position:
+        if int(place.position) == int(position):
             return place
-    return Place("Nothing", position, [], None, None, None, None, None, None, None)
-
-
-def get_matching_options(name: str) -> list[dict]:
-    """
-    Returns autocomplete choices for the placeinfo command
-
-    :param str name: Partial name of the place
-    :return: A list of choice dicts with all the matching place names and positions
-    """
-    return [
-        {"name": place.name, "value": f"{place.position[0]}/{place.position[1]}"}
-        for place in __all_places__
-        if str.lower(name) in str.lower(place.name)
-    ]
+    # fix this
+    return None
 
 
 def get_all() -> list:
@@ -142,4 +92,12 @@ __cur__ = __con__.cursor()
 
 __all_places__ = []
 __cur__.execute("SELECT * FROM places")
-__generate_list(__all_places__)
+for tup in __cur__.fetchall():
+    __all_places__.append(Place(*tup))
+
+
+class PlaceNotFound(Exception):
+    """Exception raised when requested place is not found"""
+
+    def __str__(self) -> str:
+        return "Requested place not found"

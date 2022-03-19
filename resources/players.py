@@ -3,21 +3,15 @@
 This module contains the Player class, several methods to operate with players in the database and
 the DrivingPlayer, used to manage driving sessions
 """
+from dataclasses import field, dataclass
 from time import time
-from typing import Optional
+from typing import Optional, Union
 import logging
 from resources import database
 from resources import levels
 from resources import items
 from resources.jobs import Job
-
-
-def _format_pos_to_db(pos: list) -> str:
-    """
-    Returns a database-ready string that contains the position in the form x/y
-    :
-    """
-    return f"{pos[0]}/{pos[1]}"
+from resources import position as pos
 
 
 def _format_items_to_db(item_list: list) -> str:
@@ -33,6 +27,7 @@ def _format_items_to_db(item_list: list) -> str:
     return db_items[: len(db_items) - 1]
 
 
+@dataclass
 class Player:
     """
     A class representing a Player in the database
@@ -43,43 +38,40 @@ class Player:
     :ivar int level: The player's level
     :ivar int xp: Xp for current level
     :ivar int money: Amount of in-game currency the player has
-    :ivar list position: Position on the 2 dimensional array that I call map
+    :ivar position.Position position: Position on the 2 dimensional array that I call map
     :ivar int miles: Amount of miles the Player has driven
     :ivar int gas: Amount of gas the player has
     :ivar int truck_id: Id of the player's truck
     :ivar list loaded_items: A list of items the player has loaded
-    :ivar str company: The name of the player's company
+    :ivar int company: The name of the player's company
     :ivar int last_vote: The last vote as a unix timestamp
     """
 
-    def __init__(self, id: str, name: str, **kwargs) -> None:
-        self.id: str = id
-        self.name: str = name
-        self.discriminator: str = kwargs.pop("discriminator", 1000)
-        self.level: int = kwargs.pop("level", 0)
-        self.xp: int = kwargs.pop("xp", 0)
-        self.money: int = kwargs.pop("money", 0)
-        position = kwargs.pop("position", [0, 0])
-        if isinstance(position, str):
-            # format the database string into a list
-            self.position: list = [int(position[: position.find("/")]), int(position[position.find("/") + 1 :])]
-        else:
-            self.position: list = position
-        self.miles: int = kwargs.pop("miles", 0)
-        self.truck_miles: int = kwargs.pop("truck_miles", 0)
-        self.gas: int = kwargs.pop("gas", 0)
-        self.truck_id: int = kwargs.pop("truck_id", 0)
-        loaded_items = kwargs.pop("loaded_items", [])
-        if isinstance(loaded_items, str):
+    id: str
+    name: str
+    discriminator: str
+    level: int = 0
+    xp: int = 0
+    money: int = 0
+    position: pos.Position = pos.Position(0, 0)
+    miles: int = 0
+    truck_miles: int = 0
+    gas: int = 0
+    truck_id: int = 0
+    loaded_items: list = field(default_factory=lambda: [])
+    company: Optional[int] = 0
+    last_vote: int = 0
+
+    def __post_init__(self) -> None:
+        if isinstance(self.position, int):
+            self.position = pos.Position.from_int(self.position)
+        if isinstance(self.loaded_items, str):
             # split the item string and get the items
-            self.loaded_items: list = []
-            if loaded_items != "":
-                for item_name in loaded_items.split(";"):
-                    self.loaded_items.append(items.get(item_name))
-        else:
-            self.loaded_items: list = loaded_items
-        self.company: str = kwargs.pop("company", None)
-        self.last_vote: int = kwargs.pop("last_vote", 0)
+            loaded_items: list = []
+            if self.loaded_items != "":
+                for item_name in self.loaded_items.split(";"):
+                    loaded_items.append(items.get(item_name))
+            self.loaded_items = loaded_items
 
     def __iter__(self):
         self._n = 0
@@ -90,7 +82,7 @@ class Player:
             attr = list(vars(self).keys())[self._n]
             self._n += 1
             if attr == "position":
-                return _format_pos_to_db(self.__getattribute__(attr))
+                return int(self.__getattribute__(attr))
             if attr == "loaded_items":
                 return _format_items_to_db(self.__getattribute__(attr))
             return self.__getattribute__(attr)
@@ -239,7 +231,7 @@ def update(
     discriminator: str = None,
     level: int = None,
     xp: int = None,
-    position: list = None,
+    position: Union[pos.Position, int] = None,
     miles: int = None,
     truck_miles: int = None,
     gas: int = None,
@@ -266,7 +258,9 @@ def update(
         database.cur.execute("UPDATE players SET xp=%s WHERE id=%s", (xp, player.id))
         player.xp = xp
     if position is not None:
-        database.cur.execute("UPDATE players SET position=%s WHERE id=%s", (_format_pos_to_db(position), player.id))
+        if isinstance(position, int):
+            position = pos.Position.from_int(position)
+        database.cur.execute("UPDATE players SET position=%s WHERE id=%s", (int(position), player.id))
         player.position = position
     if miles is not None:
         database.cur.execute("UPDATE players SET miles=%s WHERE id=%s", (miles, player.id))

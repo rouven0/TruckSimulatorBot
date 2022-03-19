@@ -144,7 +144,7 @@ def get_guide_selects(topic: str = ""):
                         options=[
                             SelectMenuOption(
                                 label=place.name,
-                                value=f"{place.position[0]}/{place.position[1]}",
+                                value=str(int(place.position)),
                                 emoji={"name": "place", "id": items.get(place.produced_item).emoji},
                             )
                             for place in places.get_all()
