@@ -1,3 +1,4 @@
+"Blueprint file containing the info command and some general button handlers for abort and back buttons"
 # pylint: disable=unused-argument, missing-function-docstring
 from datetime import datetime
 from math import floor

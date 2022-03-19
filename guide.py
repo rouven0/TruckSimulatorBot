@@ -1,3 +1,4 @@
+"Blueprint file containing the guide command and its component handlers"
 # pylint: disable=unused-argument
 from os import listdir
 from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed

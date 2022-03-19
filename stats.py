@@ -1,3 +1,4 @@
+"Blueprint file containing all stat-related commands and handlers"
 # pylint: disable=unused-argument, missing-function-docstring
 from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
 from flask_discord_interactions.models.command import ApplicationCommandType

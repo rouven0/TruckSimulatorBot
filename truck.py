@@ -1,3 +1,4 @@
+"Blueprint file containing all truck-related commands and handlers"
 # pylint: disable=unused-argument
 from typing import Union
 from math import log

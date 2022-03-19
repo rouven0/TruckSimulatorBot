@@ -1,3 +1,4 @@
+"Blueprint file containing all driving-related commands and handlers"
 # pylint: disable=missing-function-docstring
 from datetime import datetime
 from time import time

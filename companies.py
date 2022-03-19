@@ -1,3 +1,4 @@
+"Blueprint file containing all company-related commands and handlers"
 # pylint: disable=unused-argument
 import re
 

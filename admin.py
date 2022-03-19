@@ -1,3 +1,4 @@
+"Blueprint file containing commands locked to the bot owners"
 # pylint: disable=unused-argument,broad-except
 from flask_discord_interactions import DiscordInteractionsBlueprint, Permission, User
 from flask_discord_interactions.models.message import Message, Embed

@@ -24,7 +24,7 @@ def _format_pos_to_db(pos) -> str:
 
 class Job:
     """
-    :ivar player_id: Player id that this jobs belongs to used as primary key in the database
+    :ivar str player_id: Player id that this jobs belongs to used as primary key in the database
     :ivar places.Place place_from: Place from which the player has to take the items
     :ivar places.Place place_to: Place the player has to drive to when the truck is loaded
     :ivar int state: current state, see get_state() for more information about the states
