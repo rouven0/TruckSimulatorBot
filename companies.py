@@ -221,7 +221,6 @@ def confirm_hire(ctx, company_id: int, player_id: str):
     )
 
 
-@company_bp.command(name="Fire", type=ApplicationCommandType.USER)
 @company_bp.custom_handler("company_fire")
 def fire(ctx, player_id: str):
     """Context menu command to fire a player"""
