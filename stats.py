@@ -2,7 +2,7 @@
 # pylint: disable=unused-argument, missing-function-docstring
 from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
 from flask_discord_interactions.models.command import ApplicationCommandType
-from flask_discord_interactions.models.component import ActionRow, Button
+from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
 from flask_discord_interactions.models.option import CommandOptionType
 from flask_discord_interactions.models.user import User
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
@@ -110,26 +110,24 @@ def get_profile_embed(user: User) -> Embed:
     return profile_embed
 
 
-@profile_bp.command(
-    options=[
-        {
-            "name": "key",
-            "description": "The list you desire to view.",
-            "type": CommandOptionType.STRING,
-            "choices": [
-                {"name": "level", "value": "level"},
-                {"name": "money", "value": "money"},
-                {"name": "miles", "value": "miles"},
-            ],
-        }
-    ],
-)
-def top(ctx, key="level") -> Message:
-    """Presents the top players."""
+@profile_bp.command()
+def top(ctx) -> Message:
+    "Presents the top players."
+    return Message(embed=get_top_embed(), components=get_top_select())
+
+
+@profile_bp.custom_handler(custom_id="top_select")
+def top_select(ctx) -> Message:
+    "Handler for the toplist select"
+    return Message(embed=get_top_embed(ctx.values[0]), update=True)
+
+
+def get_top_embed(key="level") -> Embed:
+    "Returns the top embed"
     top_players = players.get_top(key)
     top_body = ""
     count = 0
-    top_embed = Embed(title="Truck Simulator top list", color=config.EMBED_COLOR, fields=[])
+    top_embed = Embed(title="Truck Simulator top list 🎉", color=config.EMBED_COLOR, fields=[])
 
     for player in top_players[0]:
         if key == "money":
@@ -138,8 +136,31 @@ def top(ctx, key="level") -> Message:
             val = f"{player.miles:,}"
         else:
             val = f"{player.level:,} ({player.xp:,}/{levels.get_next_xp(player.level):,} xp)"
-            top_embed.footer = Footer(text="You can also sort by money and miles", icon_url=config.SELF_AVATAR_URL)
         count += 1
         top_body += f"**{count}**. {player} ~ {val}{top_players[1]}\n"
-    top_embed.fields.append(Field(name=f"Top {key}", value=top_body))
-    return Message(embed=top_embed)
+    top_embed.fields.append(Field(name=f"Top players sorted by {key}", value=top_body))
+    top_embed.footer = Footer(text="Congratulations if you see yourself in that list!", icon_url=config.SELF_AVATAR_URL)
+    return top_embed
+
+
+def get_top_select():
+    "Returns the select appearing below /top"
+    return [
+        ActionRow(
+            components=[
+                SelectMenu(
+                    custom_id="top_select",
+                    placeholder="View another toplist",
+                    options=[
+                        SelectMenuOption(label="Level", value="level", emoji={"name": "🎉", "id": None}),
+                        SelectMenuOption(
+                            label="Money", value="money", emoji={"name": "ts_money", "id": "868480873157242930"}
+                        ),
+                        SelectMenuOption(
+                            label="Miles", value="miles", emoji={"name": "default_truck", "id": "861674264737087519"}
+                        ),
+                    ],
+                )
+            ]
+        )
+    ]
