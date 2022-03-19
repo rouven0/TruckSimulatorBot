@@ -41,10 +41,11 @@ def get_company_embed(user, player, company) -> Embed:
 
     company_embed.fields.append(Field(name="Headquarters position", value=str(company.hq_position)))
     company_embed.fields.append(Field(name="Net worth", value=f"${company.net_worth}", inline=False))
+    company_members = company.get_members()
     members = ""
-    for member in company.get_members():
+    for member in company_members:
         members += f"{member} \n"
-    company_embed.fields.append(Field(name="Members", value=members, inline=False))
+    company_embed.fields.append(Field(name=f"Members ({len(company_members)}/25)", value=members, inline=False))
     return company_embed
 
 
@@ -163,6 +164,8 @@ def hire(ctx, user: User):
     player = players.get(ctx.author.id)
     invited_player = players.get(user.id)
     company = companies.get(player.company)
+    if len(company.get_members()) > 24:
+        return Message("Your company can't have more than 25 members!", ephemeral=True)
     if ctx.author.id != company.founder:
         return Message("You are not the company founder!", ephemeral=True)
     if invited_player.company is not None:
