@@ -1,6 +1,6 @@
 https://media.discordapp.net/attachments/916793752968921158/952171351484006440/unknown.png
 Driving is the core mechanic of this bot and moves your truck around the map.
-You control your truck with the buttons displayed underneath the message after you executed `/drive`.
+You control your truck with the buttons displayed underneath the message after you executed <:logo_round:955233759278559273>**`/drive`**.
 
 **__All buttons explained__**
 Below I will explain you, what each button does to your truck.
@@ -13,9 +13,10 @@ Let's assume you're at position [8, 9].
 <:right:853352377255854090> will move your truck one field to the right (your new position will be [9, 9]).
 
 **Truck operations**
-<:load:861353140476706877> will load the current place's item into your truck. Check your loaded items with `/load`.
+<:load:861353140476706877> will load the current place's item into your truck. You can check your loaded items at any time as you drive.
 <:unload:861353156902256680> will ask your for the items you want to unload and then unloads the items you specified.
 <:stop:853362422298968104> removes all the buttons and stops your truck.
+_Show loaded items_ Shows all the items you currently have loaded into your truck.
 
 **Special buttons**
 <:ts_gas:859857979619541022> will refill your truck.
