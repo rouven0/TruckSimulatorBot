@@ -30,7 +30,7 @@ def get_company_embed(user, player, company) -> Embed:
         color=config.EMBED_COLOR,
         description=company.description,
         author=Author(name=f"{player.name}'s company", icon_url=user.avatar_url),
-        footer=Footer(text=f"Founded by {founder.name}"),
+        footer=Footer(text=f"Founded by {founder}"),
         fields=[],
     )
     logo_is_discord_emoji = re.match(r"<(a?):\w*:(\d+)>", company.logo)
