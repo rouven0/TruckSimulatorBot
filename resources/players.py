@@ -89,7 +89,7 @@ class Player:
         raise StopIteration
 
     def __str__(self) -> str:
-        return f"{self.name}#{self.discriminator}"
+        return f"**{self.name}**#{self.discriminator}"
 
     def add_xp(self, amount: int) -> str:
         """
