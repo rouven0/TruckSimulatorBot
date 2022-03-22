@@ -45,7 +45,7 @@ def get_info_embed() -> Embed:
     )
 
     credits = (
-        "<:lebogo:897861933418565652> **LeBogo#3073** - _Testing helper_ - Contributed 2 lines of code\n"
+        "<:lebogo:897861933418565652> **LeBogo**#3073 - _Testing helper_ - Contributed 2 lines of code\n"
         "<:panda:897860673898426462> **FlyingPanda**#0328 - _EPIC Artist_ - Drew almost all of the images you see "
         "(and had the idea of this bot)\n"
         "<:miri:897860673546117122> **Miriel**#0001 - _The brain_ - Gave a lot of great tips and constructive feedback"
