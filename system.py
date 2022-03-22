@@ -20,7 +20,10 @@ def get_info_embed() -> Embed:
     info_embed = Embed(
         title="Truck Simulator info",
         color=config.EMBED_COLOR,
-        footer=Footer(text="Developer: r5#2253"),
+        footer=Footer(
+            text="Developer: r5#2253",
+            icon_url="https://cdn.discordapp.com/avatars/692796548282712074/f298d263d8418edb25df0680a3371784.png",
+        ),
         thumbnail=Media(url=config.SELF_AVATAR_URL),
     )
 
@@ -42,10 +45,10 @@ def get_info_embed() -> Embed:
     )
 
     credits = (
-        "<:lebogo:897861933418565652> LeBogo#3073 - _Testing helper_ - Contributed 2 lines of code\n"
-        "<:panda:897860673898426462> FlyingPanda#0328 - _EPIC Artist_ - Drew almost all of the images you see "
+        "<:lebogo:897861933418565652> **LeBogo#3073** - _Testing helper_ - Contributed 2 lines of code\n"
+        "<:panda:897860673898426462> **FlyingPanda**#0328 - _EPIC Artist_ - Drew almost all of the images you see "
         "(and had the idea of this bot)\n"
-        "<:miri:897860673546117122> Miriel#0001 - _The brain_ - Gave a lot of great tips and constructive feedback"
+        "<:miri:897860673546117122> **Miriel**#0001 - _The brain_ - Gave a lot of great tips and constructive feedback"
     )
 
     links = (
