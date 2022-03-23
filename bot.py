@@ -214,7 +214,38 @@ if "--deploy" in sys.argv:
 
 discord.register_blueprint(admin_bp)
 
+
+@discord.command()
+def complain(ctx) -> str:
+    complain_localizations = {
+        "en-US": (
+            "What a crap bot this is! :rage: "
+            "Hours of time wasted on this useless procuct of a terrible coder and a lousy artist "
+            ":rage: :rage: Is this bot even TESTED before the updates are published... "
+            "Horrible, just HORRIBLE this spawn of incopetence. Who tf made this? A 12 year old child? "
+            "This child would probably have made it better than THAT :rage:"
+        ),
+        "fr": (
+            "Mais quel bot de merde ! J'arrive pas à croire que j'ai perdu mon temps sur ce truc ridicule. "
+            "Le développeur est pourrave, l'artiste est nulle :rage: :rage:  Est-ce que quelqu'un TESTE les mises à "
+            "jour avant leur sortie ? Horrible, juste HORRIBLE, pur concentré d'incompétence. Qui a créé cette daube ? "
+            "Un gamin de 12 ans ? Franchement un gamin aurait fait MIEUX que cette CHOSE :rage:"
+        ),
+        "de": (
+            "Junge WAS IST DENN DAS FÜR EIN SCHMUTZ :rage:. Und mit damit hab ich jetzt mehrere Tage verbracht :rage:. "
+            "Wird das zeugt überhaupt getestet bevor es unter die Leute geworfen wird? :rage:. Einfach nur schrecklich"
+            "diese Ausgeburt der Inkompetenz; Die Spielmechanik macht keinen Sinn, der dev macht kaum etwas und über"
+            "den Zeichner der Bilder wollen wir am besten gar nicht erst reden..."
+        ),
+    }
+    locale = request.get_json().get("locale")
+    return (
+        complain_localizations[locale] if locale in complain_localizations.keys() else complain_localizations["en-US"]
+    )
+
+
 discord.set_route("/interactions")
+
 
 if __name__ == "__main__":
     app.run(port=9001, debug=True)
