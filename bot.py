@@ -232,9 +232,9 @@ def complain(ctx) -> str:
             "Un gamin de 12 ans ? Franchement un gamin aurait fait MIEUX que cette CHOSE :rage:"
         ),
         "de": (
-            "Junge WAS IST DENN DAS FÜR EIN SCHMUTZ :rage:. Und mit damit hab ich jetzt mehrere Tage verbracht :rage:. "
-            "Wird das zeugt überhaupt getestet bevor es unter die Leute geworfen wird? :rage:. Einfach nur schrecklich"
-            "diese Ausgeburt der Inkompetenz; Die Spielmechanik macht keinen Sinn, der dev macht kaum etwas und über"
+            "Junge WAS IST DENN DAS FÜR EIN SCHMUTZ :rage:. Und damit hab ich jetzt mehrere Tage verbracht :rage:. "
+            "Wird das Zeug überhaupt getestet bevor es unter die Leute geworfen wird? :rage: Einfach nur schrecklich "
+            "diese Ausgeburt der Inkompetenz; Die Spielmechanik macht keinen Sinn, der Dev macht kaum etwas und über "
             "den Zeichner der Bilder wollen wir am besten gar nicht erst reden..."
         ),
     }
