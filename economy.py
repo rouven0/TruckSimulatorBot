@@ -4,12 +4,14 @@ from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Em
 from flask_discord_interactions.models.option import CommandOptionType
 from flask_discord_interactions.models.user import User
 from flask_discord_interactions.models.embed import Author, Field, Footer
+from flask_discord_interactions.models.autocomplete import Autocomplete
 
 from resources import players
 from resources import items
 from resources import jobs
 from resources import trucks
 from resources import levels
+from resources.autocompletes import amount_all
 
 import config
 
@@ -97,6 +99,7 @@ def refill(ctx, player_id: str):
             "min_value": 1,
             "max_value": 1000000,
             "required": True,
+            "autocomplete": True,
         },
     ]
 )
@@ -127,3 +130,6 @@ def give(ctx, user: User, amount: int) -> Message:
     donator.debit_money(amount)
     acceptor.add_money(amount)
     return Message(embed=Embed(description=f"{donator.name} gave ${amount} to {acceptor}", color=config.EMBED_COLOR))
+
+
+economy_bp.add_autocomplete_handler(amount_all, "give")

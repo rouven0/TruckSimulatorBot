@@ -10,6 +10,7 @@ from flask_discord_interactions.models.autocomplete import Autocomplete
 
 from resources import players
 from resources import items
+from resources.autocompletes import amount_all
 import config
 
 gambling_bp = DiscordInteractionsBlueprint()
@@ -18,23 +19,24 @@ gambling_bp = DiscordInteractionsBlueprint()
 @gambling_bp.command(
     options=[
         {
-            "name": "amount",
-            "description": "The amount you bet. Must be a number except you bet all or half.",
-            "type": CommandOptionType.INTEGER,
-            "required": True,
-            "autocomplete": True,
-        },
-        {
             "name": "side",
             "description": "The side you bet on.",
             "type": CommandOptionType.STRING,
             "choices": [{"name": "heads", "value": "heads"}, {"name": "tails", "value": "tails"}],
             "required": True,
         },
+        {
+            "name": "amount",
+            "description": "The amount you bet. Must be a number except you bet all or half.",
+            "type": CommandOptionType.INTEGER,
+            "required": True,
+            "autocomplete": True,
+        },
     ]
 )
-def coinflip(ctx, side: str, amount: int) -> str:
+def coinflip(ctx, amount: int, side: str) -> str:
     """Tests your luck while throwing a coin."""
+    amount = int(amount)
     player = players.get(ctx.author.id)
     player.debit_money(amount)
     if randint(0, 1) == 0:
@@ -113,20 +115,12 @@ def slots_handler(ctx, player_id: str, amount: int) -> Message:
 @gambling_bp.command(annotations={"amount": "The amount you bet. Must be a number except you want to bet all or half."})
 def slots(ctx, amount: Autocomplete(int)):
     """Spins up a simple slot machine."""
-    if amount == 0:
+    if amount <= 0:
         return "You can't spin the machine with that little money you inserted. At least try to do proper gambling."
     return Message(
         embed=get_slots_embed(ctx.author, amount),
         components=get_slots_components(ctx.author, amount),
     )
-
-
-def amount_all(ctx, amount, side=None):
-    """Let 'all' be an int option"""
-    player = players.get(ctx.author.id)
-    if len(amount.value) == 0:
-        return [{"name": "all", "value": player.money}, {"name": "half", "value": round(player.money / 2)}]
-    return []
 
 
 gambling_bp.add_autocomplete_handler(amount_all, "slots")
