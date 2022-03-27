@@ -1,8 +1,8 @@
 "Blueprint file containing all gambling-related commands and handlers"
 # pylint: disable=unused-argument, missing-function-docstring
+import enum
 from random import randint, sample, choices
 from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
-from flask_discord_interactions.models.option import CommandOptionType
 from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles
 from flask_discord_interactions.models.user import User
 from flask_discord_interactions.models.embed import Author, Field
@@ -15,26 +15,12 @@ import config
 
 gambling_bp = DiscordInteractionsBlueprint()
 
+class CoinflipChoice(enum.Enum):
+    heads = "heads"
+    tails = "tails"
 
-@gambling_bp.command(
-    options=[
-        {
-            "name": "side",
-            "description": "The side you bet on.",
-            "type": CommandOptionType.STRING,
-            "choices": [{"name": "heads", "value": "heads"}, {"name": "tails", "value": "tails"}],
-            "required": True,
-        },
-        {
-            "name": "amount",
-            "description": "The amount you bet. Must be a number except you bet all or half.",
-            "type": CommandOptionType.INTEGER,
-            "required": True,
-            "autocomplete": True,
-        },
-    ]
-)
-def coinflip(ctx, amount: int, side: str) -> str:
+@gambling_bp.command(annotations={"side": "The side you bet on.", "amount": "The amount you bet."})
+def coinflip(ctx, side: CoinflipChoice,amount: Autocomplete(int)) -> str:
     """Tests your luck while throwing a coin."""
     amount = int(amount)
     player = players.get(ctx.author.id)
