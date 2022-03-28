@@ -25,6 +25,7 @@ def get_info_embed() -> Embed:
             icon_url="https://cdn.discordapp.com/avatars/692796548282712074/f298d263d8418edb25df0680a3371784.png",
         ),
         thumbnail=Media(url=config.SELF_AVATAR_URL),
+        timestamp=datetime.utcnow().replace(microsecond=0).isoformat(),
     )
 
     uptime = datetime.now() - start_time
