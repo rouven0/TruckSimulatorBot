@@ -8,7 +8,7 @@ Oh, you want to know the probabilities? It's 50% that you win and 50% that you d
 Example command to copy: `/coinflip side: heads amount: 3`
 
 **Watch 'em spinnin'**
-A beautifully designed <:logo_round:955233759278559273>**`/slots`** command is awaiting your attention. 3 items will spin before your eyes and 3 items will decide over your fate. While 2 identical items will just double your bet, 3 identical items will give you your betted money multiplied by 10. :tada:
+A beautifully designed <:logo_round:955233759278559273>**`/slots`** command is awaiting your attention. 3 items will spin before your eyes and 3 items will decide over your fate. While 2 identical items will just double your bet, 3 identical items will give you your bet money multiplied by 10. :tada:
 
 Example command to copy: `/slots amount: 3`
 

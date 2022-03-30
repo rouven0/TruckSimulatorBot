@@ -67,6 +67,7 @@ logger.addHandler(console_handler)
 # return r.json()
 
 
+
 @app.route("/votes", methods=["POST"])
 def votes():
     """Handle vote webhooks from top.gg"""

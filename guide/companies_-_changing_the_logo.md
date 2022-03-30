@@ -1,9 +1,9 @@
 https://media.discordapp.net/attachments/916793752968921158/947463853191594044/unknown.png
-Changing a logo is a bit tricky since modals don't come with a emoji selector.
+Changing a logo is a bit tricky since modals don't come with an emoji selector.
 There are 2 ways to set a logo.
 
 **I. Use a unicode emoji**
-This is rather easy, just use the emoji selector you OS provides and you're done. Select an emoji and paste it.
+This is rather easy, just use the emoji selector you OS provides, and you're done. Select an emoji and paste it.
 
 **II. Use a discord emoji**
 This is where the fun begins. You have to paste the raw emoji to set it as logo. See the image down below for an example and follow these steps:

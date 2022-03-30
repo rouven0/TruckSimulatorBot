@@ -22,12 +22,12 @@ VOTE_WEBHOOK
 VOTE_AUTHORIZATION
 ```
 
-Superuser permissions are required to set up the bot's systemd service
+Superuser permissions are required to set up the bots systemd service
 
 ### Remove the bot
-Use `make uninstall` to remove the bot's systemd service before you delete the bot directory.
+Use `make uninstall` to remove the bots systemd service before you delete the bot directory.
 
-## Projekt Description
+## Project Description
 
 ### Basic controls
 The virtual map is the heart of the Truck Simulator. Everything is a place that you can drive to. Some commands are bound to specific places, some are available everywhere.
@@ -36,7 +36,7 @@ After you are registered, simply start a drive by hitting `/drive`. You will see
 
 ### Jobs
 After you claimed a Job, you have to bring an item from one place to another.
-Drive to the first place, load your Truck, drive to the second place and you're done. The reward depends on your current level.
+Drive to the first place, load your Truck, drive to the second place, and you're done. The reward depends on your current level.
 
 ### Gas system
 Always keep an eye on your gas, it will be pretty expensive if you don't. If you are low on gas, simply drive to the gas station in the middle of the map and refill you truck.

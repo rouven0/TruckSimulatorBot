@@ -12,8 +12,8 @@ If you fulfill this requirement, just follow these simple steps:
 5. Hit the **Submit** button and you're done. You founded your own company <:PandaHappy:869202868555624478>.
 
 **Becoming member of a company**
-To get into a company, you need to get hired by its founder. Therefore the founder just needs to right-click you in the discord app and run the <:logo_round:955233759278559273>**`Hire`** command (See the picture below).
-Accept that you want to work for this company and you are done. Have fun in your new workspace.
+To get into a company, you need to get hired by its founder. Therefore, the founder just needs to right-click you in the discord app and run the <:logo_round:955233759278559273>**`Hire`** command (See the picture below).
+Accept that you want to work for this company, and you are done. Have fun in your new workspace.
 
 **Updating a company**
 If you are the company founder, follow these steps:
