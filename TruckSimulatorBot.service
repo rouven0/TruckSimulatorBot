@@ -4,9 +4,9 @@ After=network-online.target
 After=mariadb.service
 
 [Service]
-User=rouven
-WorkingDirectory=/home/rouven/PythonProjects/TruckSimulatorBot
-ExecStart=/home/rouven/PythonProjects/TruckSimulatorBot/venv/bin/python3 -m gunicorn bot:app -b 127.0.0.1:9000
+User=USER
+WorkingDirectory=WORKINGDIRECTORY
+ExecStart=WORKINGDIRECTORY/venv/bin/python3 -m gunicorn bot:app -b 127.0.0.1:9000
 
 [Install]
 WantedBy=network-online.target
