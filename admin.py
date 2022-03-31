@@ -1,5 +1,7 @@
-"Blueprint file containing commands locked to the bot owners"
+"Blueprint file containing commands locked to the bot admins"
 # pylint: disable=unused-argument,broad-except
+import json
+
 from flask_discord_interactions import DiscordInteractionsBlueprint, Permission, User
 from flask_discord_interactions.models.message import Message, Embed
 
@@ -18,13 +20,13 @@ admin_bp = DiscordInteractionsBlueprint()
 def sql(ctx, query: str):
     """Executes a sql query."""
     if ctx.author.id != "692796548282712074":
-        return "Wait. You shouldn't be able to even read this. Something is messed up"
+        return "Wait. You shouldn't be able to even read this. Something is messed up."
     try:
         database.cur.execute(query)
         if database.cur.rowcount != 0:
             database.con.commit()
             return f"`Done. {database.cur.rowcount} row(s) affected`"
-        return f"```\n{database.cur.fetchall()}```"
+        return f"```\n{json.dumps(database.cur.fetchall(), indent=2)}```"
     except Exception as error:
         return "Error: " + str(error)
 
