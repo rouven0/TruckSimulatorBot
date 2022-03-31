@@ -1,10 +1,11 @@
 [Unit]
-Description=Truck Simulator Discord bot
+Description=Timeout service for theTruck Simulator Discord bot
+After=network-online.target
 
 [Service]
-User=USER
-WorkingDirectory=WORKINGDIRECTORY
-ExecStart=WORKINGDIRECTORY/venv/bin/python3 timeouts.py
+User=rouven
+WorkingDirectory=/home/rouven/PythonProjects/TruckSimulatorBot
+ExecStart=/home/rouven/PythonProjects/TruckSimulatorBot/venv/bin/python3 timeouts.py
 
 [Install]
 WantedBy=multi-user.target
