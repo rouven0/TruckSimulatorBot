@@ -4,9 +4,9 @@ import enum
 from random import randint, sample, choices
 from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
 from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles
+from flask_discord_interactions.models.option import CommandOptionType
 from flask_discord_interactions.models.user import User
 from flask_discord_interactions.models.embed import Author, Field
-from flask_discord_interactions.models.autocomplete import Autocomplete
 
 from resources import players
 from resources import items
@@ -15,14 +15,31 @@ import config
 
 gambling_bp = DiscordInteractionsBlueprint()
 
-class CoinflipChoice(enum.Enum):
-    heads = "heads"
-    tails = "tails"
 
-@gambling_bp.command(annotations={"side": "The side you bet on.", "amount": "The amount you bet."})
-def coinflip(ctx, side: CoinflipChoice,amount: Autocomplete(int)) -> str:
+@gambling_bp.command(
+    options=[
+        {
+            "name": "side",
+            "description": "The side you bet on.",
+            "type": CommandOptionType.STRING,
+            "required": True,
+            "choices": [
+                {"name": "heads", "value": "heads"},
+                {"name": "tails", "value": "tails"},
+            ],
+        },
+        {
+            "name": "amount",
+            "description": "The amount you bet.",
+            "type": CommandOptionType.INTEGER,
+            "required": True,
+            "autocomplete": True,
+            "min_value": 1,
+        },
+    ]
+)
+def coinflip(ctx, side: str, amount: int) -> str:
     """Tests your luck while throwing a coin."""
-    amount = int(amount)
     player = players.get(ctx.author.id)
     player.debit_money(amount)
     if randint(0, 1) == 0:
@@ -98,11 +115,20 @@ def slots_handler(ctx, player_id: str, amount: int) -> Message:
     )
 
 
-@gambling_bp.command(annotations={"amount": "The amount you bet. Must be a number except you want to bet all or half."})
-def slots(ctx, amount: Autocomplete(int)):
+@gambling_bp.command(
+    options=[
+        {
+            "name": "amount",
+            "description": "The amount you bet.",
+            "type": CommandOptionType.INTEGER,
+            "autocomplete": True,
+            "required": True,
+            "min_value": 1,
+        }
+    ]
+)
+def slots(ctx, amount: int):
     """Spins up a simple slot machine."""
-    if amount <= 0:
-        return "You can't spin the machine with that little money you inserted. At least try to do proper gambling."
     return Message(
         embed=get_slots_embed(ctx.author, amount),
         components=get_slots_components(ctx.author, amount),

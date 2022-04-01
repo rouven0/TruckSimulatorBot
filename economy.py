@@ -4,7 +4,6 @@ from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Em
 from flask_discord_interactions.models.option import CommandOptionType
 from flask_discord_interactions.models.user import User
 from flask_discord_interactions.models.embed import Author, Field, Footer
-from flask_discord_interactions.models.autocomplete import Autocomplete
 
 from resources import players
 from resources import items
