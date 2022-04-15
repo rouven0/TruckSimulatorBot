@@ -191,7 +191,11 @@ if "--remove-global" in sys.argv:
     sys.exit()
 
 if "--clear-charivari" in sys.argv:
-    discord.update_commands()
+    discord.update_commands(guild_id=812650049565753355)
+    sys.exit()
+
+if "--clear-admin" in sys.argv:
+    discord.update_commands(guild_id=839580174282260510)
     sys.exit()
 
 if "--admin" in sys.argv:
