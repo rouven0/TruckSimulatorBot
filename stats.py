@@ -21,6 +21,12 @@ def show_profile_context(ctx, user: User) -> Message:
     return Message(embed=get_profile_embed(user))
 
 
+@profile_bp.command()
+def profile(ctx) -> Message:
+    "Shows your profile."
+    return Message(embed=get_profile_embed(ctx.author))
+
+
 @profile_bp.custom_handler(custom_id="profile_register")
 def register(ctx):
     with open("./messages/welcome.md", "r", encoding="utf8") as welcome_file:
@@ -70,7 +76,7 @@ def register(ctx):
 
 
 @profile_bp.custom_handler(custom_id="home")
-def profile(ctx, player_id):
+def profile_home(ctx, player_id):
     """Shows your profile."""
     player = players.get(ctx.author.id, check=player_id)
     return Message(embed=get_profile_embed(ctx.author), components=components.get_home_buttons(player), update=True)
