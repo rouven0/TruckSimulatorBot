@@ -195,7 +195,7 @@ def fire(ctx, player_id: str):
     confirm_buttons: list[Component] = [
         ActionRow(
             components=[
-                Button(style=2, label="Cancel", custom_id=["cancel_company_action", player.id]),
+                Button(style=2, label="Cancel", custom_id=["company_main", player.id]),
                 Button(
                     style=4,
                     label="Confirm",
@@ -204,7 +204,7 @@ def fire(ctx, player_id: str):
             ]
         )
     ]
-    return Message(f"Are you sure you want to fire {fired_player}?", components=confirm_buttons)
+    return Message(f"Are you sure you want to fire {fired_player}?", components=confirm_buttons, update=True)
 
 
 @company_bp.custom_handler(custom_id="confirm_company_fire")
@@ -214,7 +214,11 @@ def confirm_fire(ctx, company_name: str, player_id: str, fired_player_id: str):
         raise players.WrongPlayer()
     fired_player = players.get(fired_player_id)
     fired_player.remove_from_company()
-    return Message(content=f"{fired_player} was removed from **{company_name}**", update=True, components=[])
+    return Message(
+        content=f"{fired_player} was removed from **{company_name}**",
+        update=True,
+        components=[ActionRow(components=[Button(label="Back", style=2, custom_id=["company_main", ctx.author.id])])],
+    )
 
 
 @company_bp.custom_handler(custom_id="company_leave")
@@ -225,12 +229,12 @@ def leave(ctx, player_id: str):
     confirm_buttons: list[Component] = [
         ActionRow(
             components=[
-                Button(style=2, label="Cancel", custom_id=["cancel_company_action", ctx.author.id]),
+                Button(style=2, label="Cancel", custom_id=["company_main", ctx.author.id]),
                 Button(style=4, label="Confirm", custom_id=["confirm_company_leave", ctx.author.id]),
             ]
         )
     ]
-    return Message("Are you sure that you want to leave your company?", components=confirm_buttons)
+    return Message("Are you sure that you want to leave your company?", components=confirm_buttons, update=True)
 
 
 @company_bp.custom_handler(custom_id="confirm_company_leave")
@@ -238,7 +242,11 @@ def confirm_leave(ctx, player_id: str):
     """Confirm button to leave a company"""
     player = players.get(ctx.author.id, check=player_id)
     player.remove_from_company()
-    return Message(f"<@{player.id}> You left **{companies.get(player.company).name}**", components=[], update=True)
+    return Message(
+        f"<@{player.id}> You left **{companies.get(player.company).name}**",
+        components=[ActionRow(components=[Button(label="Back", style=2, custom_id=["home", player.id])])],
+        update=True,
+    )
 
 
 @company_bp.custom_handler(custom_id="company_update")
@@ -331,13 +339,13 @@ def company_show(ctx, player_id):
     try:
         company = companies.get(player.company)
     except companies.CompanyNotFound:
+        buttons = [ActionRow(components=[Button(style=2, label="Nevermind", custom_id=["home", player.id])])]
+        if player.truck_id > 0:
+            buttons[0].components.insert(0, Button(label="Found one", custom_id=["company_found", player.id]))
+
         return Message(
             "You are not member of a company at the moment",
-            components=(
-                [ActionRow(components=[Button(label="Found one", custom_id=["company_found", player.id])])]
-                if player.truck_id > 0
-                else []
-            ),
+            components=buttons,
             update=True,
         )
     return Message(
