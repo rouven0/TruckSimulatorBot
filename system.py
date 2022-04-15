@@ -91,11 +91,3 @@ def info(ctx) -> Message:
 @system_bp.custom_handler(custom_id="refresh_system_info")
 def refresh(ctx):
     return Message(embed=get_info_embed(), update=True)
-
-
-@system_bp.custom_handler(custom_id="discard")
-def discard(ctx, player_id: str):
-    """General handler to remove all components"""
-    if ctx.author.id != player_id:
-        return Message(deferred=True, update=True)
-    return Message(embeds=ctx.message.embeds, components=[], update=True)

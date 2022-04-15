@@ -18,6 +18,7 @@ import config
 from resources import players
 from resources import trucks
 from resources import symbols
+from resources import components
 
 truck_bp = DiscordInteractionsBlueprint()
 
@@ -38,74 +39,17 @@ def get_truck_embed(truck: trucks.Truck) -> Embed:
     return truck_embed
 
 
-def get_truck_options() -> list[SelectMenuOption]:
-    """Returns choices shown up in several truck commands"""
-    choices = []
-    for truck in trucks.get_all():
-        choices.append(
-            SelectMenuOption(
-                label=truck.name,
-                description=truck.description,
-                value=str(truck.truck_id),
-                emoji=symbols.parse_emoji(truck.emoji),
-            )
-        )
-    return choices
-
-
-def get_truck_components(player: players.Player) -> list[Component]:
-    """Returns button and selects appearing underneath a truck embed"""
-    return [
-        ActionRow(
-            components=[
-                SelectMenu(
-                    custom_id=["truck_view", player.id],
-                    options=get_truck_options(),
-                    placeholder="View details about a truck",
-                )
-            ]
-        ),
-        ActionRow(
-            components=[
-                SelectMenu(
-                    custom_id=["truck_buy", player.id],
-                    options=get_truck_options(),
-                    placeholder="Buy a new truck",
-                ),
-            ]
-        ),
-        ActionRow(
-            components=[
-                Button(custom_id=["discard", player.id], label="Close Menu", style=ButtonStyles.SECONDARY),
-            ]
-        ),
-    ]
-
-
-@truck_bp.custom_handler(custom_id="back")
+@truck_bp.custom_handler(custom_id="manage_truck")
 def show_truck_button(ctx, player_id: str):
-    """Back-button"""
-    if ctx.author.id != player_id:
-        raise players.WrongPlayer()
-    return show_truck(ctx, update=True)
-
-
-@truck_bp.command()
-def truck(ctx) -> Message:
-    """Manages your truck."""
-    return show_truck(ctx)
-
-
-def show_truck(ctx, update: bool = False) -> Message:
     """Shows the main truck page"""
-    player = players.get(ctx.author.id)
+    player = players.get(ctx.author.id, check=player_id)
     # Detect, when the player is renamed
     if player.name != ctx.author.username:
         players.update(player, name=ctx.author.username)
     truck = trucks.get(player.truck_id)
     truck_embed = get_truck_embed(truck)
     truck_embed.author = Author(name=f"{player.name}'s truck", icon_url=ctx.author.avatar_url)
-    return Message(embed=truck_embed, components=get_truck_components(player), update=update)
+    return Message(embed=truck_embed, components=components.get_truck_components(player), update=True)
 
 
 @truck_bp.custom_handler(custom_id="truck_buy")
@@ -134,7 +78,7 @@ def buy(ctx, player_id: str) -> Union[Message, str]:
                 components=[
                     Button(
                         label="Check it out",
-                        custom_id=["back", player.id],
+                        custom_id=["manage_truck", player.id],
                         emoji=symbols.parse_emoji(new_truck.emoji),
                     )
                 ]
@@ -153,7 +97,9 @@ def view(ctx, player_id: str) -> Message:
     return Message(
         embed=truck_embed,
         components=[
-            ActionRow(components=[Button(label="Back", custom_id=["back", player_id], style=ButtonStyles.SECONDARY)])
+            ActionRow(
+                components=[Button(label="Back", custom_id=["manage_truck", player_id], style=ButtonStyles.SECONDARY)]
+            )
         ],
         update=True,
     )

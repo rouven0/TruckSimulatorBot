@@ -3,7 +3,6 @@
 from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
 from flask_discord_interactions.models.command import ApplicationCommandType
 from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
-from flask_discord_interactions.models.option import CommandOptionType
 from flask_discord_interactions.models.user import User
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
 
@@ -12,13 +11,14 @@ from resources import players
 from resources import trucks
 from resources import levels
 from resources import companies
+from resources import components
 
 profile_bp = DiscordInteractionsBlueprint()
 
 
 @profile_bp.command(name="Check profile", type=ApplicationCommandType.USER)
 def show_profile_context(ctx, user: User) -> Message:
-    return Message(embed=get_profile_embed(user), ephemeral=True)
+    return Message(embed=get_profile_embed(user))
 
 
 @profile_bp.custom_handler(custom_id="profile_register")
@@ -69,10 +69,11 @@ def register(ctx):
     )
 
 
-@profile_bp.command(annotations={"user": "A user you want to view."})
-def profile(ctx, user: User = None):
+@profile_bp.custom_handler(custom_id="home")
+def profile(ctx, player_id):
     """Shows your profile."""
-    return Message(embed=get_profile_embed(user if user is not None else ctx.author))
+    player = players.get(ctx.author.id, check=player_id)
+    return Message(embed=get_profile_embed(ctx.author), components=components.get_home_buttons(player), update=True)
 
 
 def get_profile_embed(user: User) -> Embed:

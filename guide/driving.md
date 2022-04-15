@@ -20,6 +20,7 @@ _Show loaded items_ Shows all the items you currently have loaded into your truc
 
 **Special buttons**
 <:ts_gas:859857979619541022> will refill your truck.
+*Home* will show your profile and prompts you if you want to manage your truck or your company.
 
 **Job buttons**
 _New Job_ will provide you a with a new job that you will have to complete to get paid.

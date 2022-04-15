@@ -67,7 +67,6 @@ logger.addHandler(console_handler)
 # return r.json()
 
 
-
 @app.route("/votes", methods=["POST"])
 def votes():
     """Handle vote webhooks from top.gg"""
@@ -191,6 +190,10 @@ if "--remove-global" in sys.argv:
     discord.update_commands()
     sys.exit()
 
+if "--clear-charivari" in sys.argv:
+    discord.update_commands()
+    sys.exit()
+
 if "--admin" in sys.argv:
     discord.register_blueprint(admin_bp)
     discord.update_commands(guild_id=839580174282260510)
@@ -207,6 +210,10 @@ discord.register_blueprint(company_bp)
 
 if "--update" in sys.argv:
     discord.update_commands(guild_id=830928381100556338)
+    sys.exit()
+
+if "--update-charivari" in sys.argv:
+    discord.update_commands(guild_id=812650049565753355)
     sys.exit()
 
 if "--deploy" in sys.argv:

@@ -48,4 +48,4 @@ def parse_emoji(emoji: str) -> dict:
     match = re.match(r"<a*:(\w*):(\d+)>", emoji)
     if match:
         return {"name": match.groups()[0], "id": match.groups()[1]}
-    raise ValueError()
+    return {"name": emoji, "id": None}
