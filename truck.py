@@ -7,9 +7,6 @@ from flask_discord_interactions.models.component import (
     ActionRow,
     Button,
     ButtonStyles,
-    Component,
-    SelectMenu,
-    SelectMenuOption,
 )
 from flask_discord_interactions.models.embed import Field, Media, Author
 
@@ -55,8 +52,6 @@ def show_truck_button(ctx, player_id: str):
 @truck_bp.custom_handler(custom_id="truck_buy")
 def buy(ctx, player_id: str) -> Union[Message, str]:
     """Select handler to buy a new truck"""
-    if players.is_driving(ctx.author.id):
-        return "You can't buy a new truck while you are driving in the old one"
     player = players.get(ctx.author.id, check=player_id)
     old_truck = trucks.get(player.truck_id)
     new_truck = trucks.get(int(ctx.values[0]))
