@@ -214,7 +214,7 @@ def get_truck_components(player: Player) -> list:
             components=[
                 SelectMenu(
                     custom_id=["truck_view", player.id],
-                    options=get_truck_options(),
+                    options=get_truck_options(player),
                     placeholder="View details about a truck",
                 )
             ]
@@ -223,7 +223,7 @@ def get_truck_components(player: Player) -> list:
             components=[
                 SelectMenu(
                     custom_id=["truck_buy", player.id],
-                    options=get_truck_options(),
+                    options=get_truck_options(player, check_money=True),
                     placeholder="Buy a new truck",
                 ),
             ]
@@ -236,10 +236,13 @@ def get_truck_components(player: Player) -> list:
     ]
 
 
-def get_truck_options() -> list[SelectMenuOption]:
+def get_truck_options(player, check_money=False) -> list[SelectMenuOption]:
     """Returns choices shown up in several truck commands"""
     choices = []
     for truck in trucks.get_all():
+        if check_money:
+            if player.money < truck.price:
+                continue
         choices.append(
             SelectMenuOption(
                 label=truck.name,
