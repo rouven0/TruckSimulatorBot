@@ -126,6 +126,12 @@ def get_home_buttons(player: Player) -> list:
                     if player.company
                     else {"name": "🏛️", "id": None},
                 ),
+                Button(
+                    custom_id=["top", player.id],
+                    style=2,
+                    label="View the leaderboard",
+                    emoji={"name": "🏆", "id": None},
+                ),
             ]
         ),
         ActionRow(

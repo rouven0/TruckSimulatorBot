@@ -117,15 +117,19 @@ def get_profile_embed(user: User) -> Embed:
     return profile_embed
 
 
-@profile_bp.command()
-def top(ctx) -> Message:
+@profile_bp.custom_handler(custom_id="top")
+def top(ctx, player_id) -> Message:
     "Presents the top players."
-    return Message(embed=get_top_embed(), components=get_top_select())
+    return Message(
+        embed=get_top_embed(), components=get_top_select(players.get(ctx.author.id, check=player_id)), update=True
+    )
 
 
 @profile_bp.custom_handler(custom_id="top_select")
-def top_select(ctx) -> Message:
+def top_select(ctx, player_id) -> Message:
     "Handler for the toplist select"
+    if ctx.author.id != player_id:
+        raise players.WrongPlayer()
     return Message(embed=get_top_embed(ctx.values[0]), update=True)
 
 
@@ -150,13 +154,13 @@ def get_top_embed(key="level") -> Embed:
     return top_embed
 
 
-def get_top_select():
+def get_top_select(player):
     "Returns the select appearing below /top"
     return [
         ActionRow(
             components=[
                 SelectMenu(
-                    custom_id="top_select",
+                    custom_id=["top_select", player.id],
                     placeholder="View another toplist",
                     options=[
                         SelectMenuOption(label="Level", value="level", emoji={"name": "🎉", "id": None}),
@@ -169,5 +173,14 @@ def get_top_select():
                     ],
                 )
             ]
-        )
+        ),
+        ActionRow(
+            components=[
+                Button(
+                    label="Back",
+                    custom_id=["home", player.id],
+                    style=2,
+                )
+            ]
+        ),
     ]
