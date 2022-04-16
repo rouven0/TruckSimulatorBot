@@ -16,15 +16,10 @@ from resources import components
 profile_bp = DiscordInteractionsBlueprint()
 
 
-@profile_bp.command(name="Check profile", type=ApplicationCommandType.USER)
-def show_profile_context(ctx, user: User) -> Message:
-    return Message(embed=get_profile_embed(user))
-
-
-@profile_bp.command()
-def profile(ctx) -> Message:
+@profile_bp.command(annotations={"user": "A user you want to view."})
+def profile(ctx, user: User = None) -> Message:
     "Shows your profile."
-    return Message(embed=get_profile_embed(ctx.author))
+    return Message(embed=get_profile_embed(user if user else ctx.author))
 
 
 @profile_bp.custom_handler(custom_id="profile_register")
