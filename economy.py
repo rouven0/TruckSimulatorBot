@@ -77,10 +77,10 @@ def refill(ctx, player_id: str):
     )
 
     players.update(player, gas=trucks.get(player.truck_id).gas_capacity)
-    drive_embed: Embed = ctx.message.embeds[0]
+    drive_embed = ctx.message.embeds[1]
     drive_embed.fields[2]["value"] = str(player.gas)
 
-    return Message(embeds=[drive_embed, refill_embed], update=True)
+    return Message(embeds=[ctx.message.embeds[0], drive_embed, refill_embed], update=True)
 
 
 @economy_bp.command(

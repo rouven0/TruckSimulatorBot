@@ -28,10 +28,11 @@ from resources import components
 driving_bp = DiscordInteractionsBlueprint()
 
 
-def get_drive_embed(player: players.Player, avatar_url: str) -> Embed:
+def get_drive_embeds(player: players.Player, avatar_url: str) -> list:
     """Returns the drive embed that includes all the information about the current position and gas"""
     place = places.get(player.position)
     all_companies = companies.get_all()
+    image_embed = Embed(color=config.EMBED_COLOR)
     drive_embed = Embed(
         color=config.EMBED_COLOR,
         timestamp=datetime.utcnow().replace(microsecond=0).isoformat(),
@@ -64,9 +65,12 @@ def get_drive_embed(player: players.Player, avatar_url: str) -> Embed:
                 inline=False,
             )
         )
-        drive_embed.image = Media(url=assets.get_place_image(player, place))
+        image_embed.image = Media(url=assets.get_place_image(player, place))
     else:
-        drive_embed.image = Media(url=assets.get_default(player))
+        image_embed.image = Media(url=assets.get_default(player))
+    drive_embed.image = Media(
+        url="https://cdn.discordapp.com/attachments/965229095447306240/965229146873675786/transparent.png"
+    )
     if int(player.position) in [int(c.hq_position) for c in all_companies]:
         for company in all_companies:
             if int(company.hq_position) == int(player.position):
@@ -77,7 +81,7 @@ def get_drive_embed(player: players.Player, avatar_url: str) -> Embed:
                         inline=False,
                     )
                 )
-    return drive_embed
+    return [image_embed, drive_embed]
 
 
 def generate_minimap(player: players.Player, all_companies: list[companies.Company]) -> str:
@@ -127,7 +131,7 @@ def stop(ctx, player_id: str):
     player = players.get_driving_player(ctx.author.id, check=player_id)
     player.stop_drive()
     return Message(
-        embed=get_drive_embed(player, ctx.author.avatar_url),
+        embeds=get_drive_embeds(player, ctx.author.avatar_url),
         components=[],
         update=True,
     )
@@ -149,8 +153,8 @@ def load(ctx, player_id: str):
         job_message = jobs.get_state(current_job)
         player.update_job(current_job, state=current_job.state)
 
-    drive_embed = get_drive_embed(player, ctx.author.avatar_url)
-    drive_embed.fields.append(
+    drive_embeds = get_drive_embeds(player, ctx.author.avatar_url)
+    drive_embeds[1].fields.append(
         Field(
             name="Loading successful",
             value=f"You loaded {item} into your truck",
@@ -159,11 +163,14 @@ def load(ctx, player_id: str):
     )
     if job_message is not None:
         return Message(
-            embeds=[drive_embed, Embed(title="Job Notification", description=job_message, color=config.EMBED_COLOR)],
+            embeds=drive_embeds
+            + [
+                Embed(title="Job Notification", description=job_message, color=config.EMBED_COLOR),
+            ],
             components=components.get_drive_buttons(player),
             update=True,
         )
-    return Message(embed=drive_embed, components=components.get_drive_buttons(player), update=True)
+    return Message(embeds=drive_embeds, components=components.get_drive_buttons(player), update=True)
 
 
 @driving_bp.custom_handler(custom_id="unload")
@@ -172,7 +179,6 @@ def unload(ctx, player_id: str):
     player.update(int(time()), ctx.followup_url())
     current_job = player.get_job()
 
-    drive_embed = get_drive_embed(player, ctx.author.avatar_url)
     item_options: list[SelectMenuOption] = []
     for item in player.loaded_items:
         if item.name not in [o.value for o in item_options]:
@@ -194,7 +200,7 @@ def unload(ctx, player_id: str):
     )
     cancel_button = Button(custom_id=["cancel", player.id], label="Cancel", style=4)
     return Message(
-        embed=drive_embed,
+        embeds=get_drive_embeds(player, ctx.author.avatar_url),
         components=[ActionRow(components=[select]), ActionRow(components=[cancel_button])],
         update=True,
     )
@@ -217,12 +223,11 @@ def unload_items(ctx, player_id: str):
 
     place = places.get(player.position)
     current_job = player.get_job()
-    drive_embed = get_drive_embed(player, ctx.author.avatar_url)
+    drive_embeds = get_drive_embeds(player, ctx.author.avatar_url)
 
-    drive_embed.fields.append(
+    drive_embeds[1].fields.append(
         Field(name="Unloading successful", value=f"You removed {item_string} from your truck", inline=False)
     )
-    embeds = [drive_embed]
 
     # add a notification embed if a job is done
     if (
@@ -239,19 +244,18 @@ def unload_items(ctx, player_id: str):
             company.add_net_worth(int(current_job.reward / 10))
             job_message += f"\nYour company's net worth was increased by ${int(current_job.reward/10):,}"
         # get the drive embed egain to fit the job update
-        drive_embed = get_drive_embed(player, ctx.author.avatar_url)
-        drive_embed.fields.append(
+        drive_embeds = get_drive_embeds(player, ctx.author.avatar_url)
+        drive_embeds[1].fields.append(
             Field(name="Unloading successful", value=f"You removed {item_string} from your truck", inline=False)
         )
-        embeds = [
-            drive_embed,
+        drive_embeds.append(
             Embed(title="Job Notification", description=job_message, color=config.EMBED_COLOR),
-        ]
+        )
 
     # add a notification embed if a minijob is done
     if place.accepted_item in ctx.values and place.item_reward:
         player.add_money(place.item_reward)
-        embeds.append(
+        drive_embeds.append(
             Embed(
                 title="Minijob Notification",
                 description=(
@@ -262,7 +266,7 @@ def unload_items(ctx, player_id: str):
             )
         )
 
-    return Message(embeds=embeds, components=components.get_drive_buttons(player), update=True)
+    return Message(embeds=drive_embeds, components=components.get_drive_buttons(player), update=True)
 
 
 @driving_bp.custom_handler(custom_id="job_new")
@@ -281,7 +285,7 @@ def new_job(ctx, player_id: str) -> Message:
     job_embed.fields.append(Field(name="You got a new Job", value=job_message, inline=False))
     job_embed.fields.append(Field(name="Current state", value=jobs.get_state(job)))
     return Message(
-        embeds=[get_drive_embed(player, ctx.author.avatar_url), job_embed],
+        embeds=get_drive_embeds(player, ctx.author.avatar_url) + [job_embed],
         components=components.get_drive_buttons(player),
         update=True,
     )
@@ -291,7 +295,7 @@ def new_job(ctx, player_id: str) -> Message:
 def cancel(ctx, player_id: str):
     player = players.get_driving_player(ctx.author.id, check=player_id)
     return Message(
-        embed=get_drive_embed(player, ctx.author.avatar_url),
+        embeds=get_drive_embeds(player, ctx.author.avatar_url),
         components=components.get_drive_buttons(player),
         update=True,
     )
@@ -367,7 +371,7 @@ def move(ctx: Context, direction, player_id):
     )
 
     return Message(
-        embed=get_drive_embed(player, ctx.author.avatar_url),
+        embeds=get_drive_embeds(player, ctx.author.avatar_url),
         components=components.get_drive_buttons(player),
         update=True,
     )
@@ -430,7 +434,7 @@ def event_rob(ctx, player_id: str) -> Message:
 def continue_drive(ctx, player_id: str):
     player = players.get_driving_player(ctx.author.id, check=player_id)
     return Message(
-        embed=get_drive_embed(player, ctx.author.avatar_url),
+        embeds=get_drive_embeds(player, ctx.author.avatar_url),
         components=components.get_drive_buttons(player),
         update=True,
     )
@@ -448,7 +452,7 @@ def initial_drive(ctx, player_id: str):
     def start_drive():
         ctx.send(
             Message(
-                embed=get_drive_embed(player, ctx.author.avatar_url),
+                embeds=get_drive_embeds(player, ctx.author.avatar_url),
                 components=components.get_drive_buttons(player),
             )
         )
@@ -477,7 +481,7 @@ def drive(ctx) -> Message:
     )
     player.start_drive()
     return Message(
-        embed=get_drive_embed(player, ctx.author.avatar_url),
+        embeds=get_drive_embeds(player, ctx.author.avatar_url),
         components=components.get_drive_buttons(player),
     )
 
