@@ -229,6 +229,7 @@ discord.register_blueprint(admin_bp)
 
 @discord.command()
 def complain(ctx) -> str:
+    "No description."
     complain_localizations = {
         "en-US": (
             "What a crap bot this is! :rage: "
@@ -251,9 +252,7 @@ def complain(ctx) -> str:
         ),
     }
     locale = request.get_json().get("locale")
-    return (
-        complain_localizations[locale] if locale in complain_localizations.keys() else complain_localizations["en-US"]
-    )
+    return complain_localizations[locale] if locale in complain_localizations else complain_localizations["en-US"]
 
 
 discord.set_route("/interactions")

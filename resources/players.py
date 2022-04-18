@@ -294,7 +294,7 @@ def get(id: str, check: str = None) -> Player:
     Get one player from the database
 
     :param str id: The requested player's id
-    :param str check: When given, this method will compare id and check, this is used to verify component and message "owners"
+    :param str check: When given, this method will compare id and check, this is used to verify component "owners"
     :return: The corresponding player
     :raises PlayerNotRegistered: in case a player is not found in the database
     :raises PlayerBlacklisted: in case a player is on the blacklist
@@ -425,7 +425,7 @@ def get_driving_player(id: str, check: str = None) -> DrivingPlayer:
     Get a driving player from the database
 
     :param str id: The id to search for
-    :param str check: When given, this method will compare id and check, this is used to verify component and message "owners"
+    :param str check: When given, this method will compare id and check, this is used to verify component "owners"
     :raises NotDriving: When id and check mismatch
     :return: The corresponding driving player
     """

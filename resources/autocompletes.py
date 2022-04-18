@@ -14,7 +14,7 @@ def amount_all(ctx, *args):
             amount = option
     lst = []
     if not amount:
-        return
+        return []
     if len(amount.value) == 0 or amount.value in "all":
         lst.append({"name": "all", "value": player.money})
     if len(amount.value) == 0 or amount.value in "half":

@@ -6,7 +6,6 @@ After the job is done, the reward is payed out.
 from dataclasses import dataclass
 from random import randint
 from math import sqrt
-from typing import Union
 from time import time
 from resources import database
 from resources import places
