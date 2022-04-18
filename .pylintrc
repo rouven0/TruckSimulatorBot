@@ -278,9 +278,9 @@ good-names=i,
            down,
            up,
            right,
-		   id,
-		   x,
-		   y,
+           id,
+           x,
+           y,
            _
 
 # Good variable names regexes, separated by a comma. If names match any regex,
