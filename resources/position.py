@@ -37,4 +37,4 @@ class Position:
         return (self.y << 16) + self.x
 
     def __str__(self) -> str:
-        return f"x: {self.x}\ny: {self.y}"
+        return f"<:right:853352377255854090> {self.x} <:up:853353627383889980> {self.y}"
