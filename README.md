@@ -8,7 +8,7 @@ Small Truck Simulator app using the [flask-discord-interactions](https://github.
 
 ## Self-host this bot
 ### Install
-Simply install and set up this bot using `make`.
+Simply install and set up this bot using `make`. Superuser permissions are required to set up the bots systemd service
 Before, please provide a .env file containing the following variables:
 ```env
 DISCORD_CLIENT_ID
@@ -26,13 +26,10 @@ VOTE_AUTHORIZATION
 To fully make the bot working for you, feel free to adjust the values in `config.py` to your needs.
 I highly recommend to edit the guild and user ids in the enums to enable testing guilds and owner-only commands.
 
-Superuser permissions are required to set up the bots systemd service
-
 ### Remove the bot
 Use `make uninstall` to remove the bots systemd service before you delete the bot directory.
 
 ## Project Description
-
 ### Basic controls
 The virtual map is the heart of the Truck Simulator. Everything is a place that you can drive to. Some commands are bound to specific places, some are available everywhere.
 
