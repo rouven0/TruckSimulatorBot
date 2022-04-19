@@ -22,6 +22,10 @@ VOTE_WEBHOOK
 VOTE_AUTHORIZATION
 ```
 
+### Configuration
+To fully make the bot working for you, feel free to adjust the values in `config.py` to your needs.
+I highly recommend to edit the guild and user ids in the enums to enable testing guilds and owner-only commands.
+
 Superuser permissions are required to set up the bots systemd service
 
 ### Remove the bot
