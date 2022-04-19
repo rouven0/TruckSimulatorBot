@@ -76,9 +76,11 @@ def found(ctx, player_id: str):
     player = players.get(ctx.author.id, check=player_id)
     if player.company is not None:
         return Message("You already have a company. You can't found another one!", ephemeral=True)
-    if player.position in [p.position for p in places.get_all()] or player.position in [
-        c.hq_position for c in companies.get_all()
-    ]:
+    if (
+        player.position in [p.position for p in places.get_all()]
+        or player.position in [c.hq_position for c in companies.get_all()]
+        or player.position == 0
+    ):
         return Message("You can't found a company on this position, please drive to an empty field.", ephemeral=True)
 
     return Modal(
