@@ -14,12 +14,12 @@ admin_bp = DiscordInteractionsBlueprint()
 
 @admin_bp.command(
     default_permission=False,
-    permissions=[Permission(user=692796548282712074)],
+    permissions=[Permission(user=config.Users.ADMIN)],
     annotations={"query": "The query to execute."},
 )
 def sql(ctx, query: str):
     """Executes a sql query."""
-    if ctx.author.id != "692796548282712074":
+    if ctx.author.id != config.Users.ADMIN:
         return "Wait. You shouldn't be able to even read this. Something is messed up."
     try:
         database.cur.execute(query)
@@ -35,7 +35,7 @@ blacklist = admin_bp.command_group(
     name="blacklist",
     description="Manage blacklisted users.",
     default_permission=False,
-    permissions=[Permission(user=692796548282712074)],
+    permissions=[Permission(user=config.Users.ADMIN)],
 )
 
 

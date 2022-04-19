@@ -191,16 +191,16 @@ if "--remove-global" in sys.argv:
     sys.exit()
 
 if "--clear-charivari" in sys.argv:
-    discord.update_commands(guild_id=812650049565753355)
+    discord.update_commands(guild_id=config.Guilds.CHARIVARI)
     sys.exit()
 
 if "--clear-admin" in sys.argv:
-    discord.update_commands(guild_id=839580174282260510)
+    discord.update_commands(guild_id=config.Guilds.SUPPORT)
     sys.exit()
 
 if "--admin" in sys.argv:
     discord.register_blueprint(admin_bp)
-    discord.update_commands(guild_id=839580174282260510)
+    discord.update_commands(guild_id=config.Guilds.SUPPORT)
     sys.exit()
 
 discord.register_blueprint(system_bp)
@@ -213,11 +213,11 @@ discord.register_blueprint(truck_bp)
 discord.register_blueprint(company_bp)
 
 if "--update" in sys.argv:
-    discord.update_commands(guild_id=830928381100556338)
+    discord.update_commands(guild_id=config.Guilds.TESTING)
     sys.exit()
 
 if "--update-charivari" in sys.argv:
-    discord.update_commands(guild_id=812650049565753355)
+    discord.update_commands(guild_id=config.Guilds.CHARIVARI)
     sys.exit()
 
 if "--deploy" in sys.argv:
