@@ -3,7 +3,6 @@ Description=Timeout service for theTruck Simulator Discord bot
 After=network-online.target
 
 [Service]
-User=USER
 WorkingDirectory=WORKINGDIRECTORY
 ExecStart=WORKINGDIRECTORY/venv/bin/python3 timeouts.py
 

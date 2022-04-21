@@ -6,10 +6,8 @@ install:
 	@echo Done.
 	@echo Setting up the systemd service...
 	@sed -i 's|WORKINGDIRECTORY|'$(PWD)'|g' TruckSimulatorBot.service
-	@sed -i 's|USER|'$(USER)'|g' TruckSimulatorBot.service
 	@sudo cp ./TruckSimulatorBot.service /etc/systemd/system
 	@sed -i 's|WORKINGDIRECTORY|'$(PWD)'|g' TruckSimulatorTimeouts.service
-	@sed -i 's|USER|'$(USER)'|g' TruckSimulatorTimeouts.service
 	@sudo cp ./TruckSimulatorTimeouts.service /etc/systemd/system
 	@sudo systemctl daemon-reload
 	@sudo systemctl enable TruckSimulatorBot.service
@@ -21,10 +19,8 @@ uninstall:
 	@sudo systemctl disable TruckSimulatorBot.service
 	@sudo systemctl disable TruckSimulatorTimeouts.service
 	@sed -i 's|'$(PWD)'|WORKINGDIRECTORY|g' TruckSimulatorBot.service
-	@sed -i 's|'$(USER)'|USER|g' TruckSimulatorBot.service
 	@sudo rm /etc/systemd/system/TruckSimulatorBot.service
 	@sed -i 's|'$(PWD)'|WORKINGDIRECTORY|g' TruckSimulatorTimeouts.service
-	@sed -i 's|'$(USER)'|USER|g' TruckSimulatorTimeouts.service
 	@sudo rm /etc/systemd/system/TruckSimulatorTimeouts.service
 	@sudo systemctl daemon-reload
 	@echo Done.
