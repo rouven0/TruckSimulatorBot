@@ -6,7 +6,7 @@ the DrivingPlayer, used to manage driving sessions
 from dataclasses import field, dataclass
 import inspect
 from time import time
-from typing import Optional, Union, Any
+from typing import Optional, Any
 import logging
 from resources import database
 from resources import levels
@@ -101,7 +101,6 @@ class Player:
         """
         context = inspect.getouterframes(inspect.currentframe())[1][3]
         if context not in ["__init__", "__post_init__", "__next__", "__iter__"]:
-            logging.debug(f"{__name} is now {__value}")
             if __name == "position":
                 __value_db = int(__value)
             elif __name == "loaded_items":

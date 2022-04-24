@@ -59,7 +59,6 @@ class Company:
         """
         context = inspect.getouterframes(inspect.currentframe())[1][3]
         if context not in ["__init__", "__post_init__", "__next__", "__iter__"]:
-            logging.debug(f"{__name} is now {__value}")
             if __name == "hq_position":
                 __value_db = int(__value)
             else:
