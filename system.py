@@ -2,6 +2,7 @@
 # pylint: disable=unused-argument, missing-function-docstring
 from datetime import datetime
 from math import floor
+import os
 
 from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
 from flask_discord_interactions.models.embed import Field, Footer, Media
@@ -28,6 +29,9 @@ def get_info_embed() -> Embed:
         timestamp=datetime.utcnow().replace(microsecond=0).isoformat(),
     )
 
+    service_uptime = os.popen(
+        "systemctl status TruckSimulatorBot.service | head -n 3 | tail -n 1 | cut -d ';' -f2"
+    ).read()
     uptime = datetime.now() - start_time
     days = uptime.days
     hours = floor(uptime.seconds / 3600)
@@ -38,7 +42,8 @@ def get_info_embed() -> Embed:
     job_count = players.get_count("jobs")
     company_count = players.get_count("companies")
     system_info = (
-        f"```Worker Uptime: {days}d {hours}h {minutes}m {seconds}s\n"
+        f"```Total Uptime: {service_uptime[1:service_uptime.find('ago')-1]}\n"
+        f"Worker Uptime: {days}d {hours}h {minutes}m {seconds}s\n"
         f"Registered Players: {player_count}\n"
         f"Running Jobs: {job_count}\n"
         f"Registered Companies: {company_count}\n"
