@@ -5,6 +5,9 @@ import sys
 from os import getenv
 import logging
 from time import time
+import subprocess
+import hmac
+import hashlib
 
 from dotenv import load_dotenv
 from flask_discord_interactions.models.component import ActionRow, Button
@@ -94,6 +97,24 @@ def votes():
     )
     requests.post(url=getenv("VOTE_WEBHOOK", ""), json=vote_message.dump()["data"])
     return "", 204
+
+
+@app.route("/github", methods=["POST"])
+def update():
+    logging.warning("Github update received.")
+    # X-Hub-Signature-256: sha256=<hash>
+    sig_header = "X-Hub-Signature-256"
+    if sig_header in request.headers:
+        header_splitted = request.headers[sig_header].split("=")
+        if len(header_splitted) == 2:
+            req_sign = header_splitted[1]
+            computed_sign = hmac.new(getenv("GITHUB_AUTHORIZATION", ""), request.data, hashlib.sha256).hexdigest()
+            # is the provided signature ok?
+            if hmac.compare_digest(req_sign, computed_sign):
+                logging.warning("Restarting now")
+                subprocess.run(["/bin/bash", "./update.sh"])
+                return "Restart successful", 200
+    return "", 401
 
 
 @app.errorhandler(players.NotEnoughMoney)
