@@ -1,5 +1,6 @@
 [![Pylint](https://github.com/therealr5/TruckSimulatorBot/actions/workflows/pylint.yml/badge.svg)](https://github.com/therealr5/TruckSimulatorBot/actions/workflows/pylint.yml)
 [![License](https://img.shields.io/github/license/therealr5/TrucksimulatorBot)](https://github.com/therealr5/TruckSimulatorBot/blob/http-only/LICENSE)
+![Python](https://img.shields.io/badge/python-3.10-blue)
 [![Black](https://img.shields.io/badge/codestyle-black-000000)](https://github.com/psf/black)
 [![Discord](https://img.shields.io/discord/839580174282260510)](https://discord.gg/FzAxtGTUhN)
 
