@@ -44,7 +44,8 @@ def add(ctx, user: User, reason: str = "No reason provided."):
     """Adds a user to the blacklist."""
     try:
         player = players.get(user.id)
-        players.update(player, name=reason, xp=-1)
+        player.xp = -1
+        player.name = reason
         return Message(
             embed=Embed(
                 description=f":white_check_mark: **{user.username}** got blacklisted",
@@ -63,7 +64,8 @@ def remove(ctx, user: User):
         return "That Player is not on the blacklist"
     except players.PlayerBlacklisted:
         player = players.Player(user.id, user.username, user.discriminator)
-        players.update(player, xp=0, name=user.username)
+        player.xp = 0
+        player.name = user.username
         return Message(
             embed=Embed(
                 description=f":white_check_mark: **{player.name}** got removed from the blacklist",

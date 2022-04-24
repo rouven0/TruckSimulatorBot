@@ -6,7 +6,8 @@ Every time a player completes a job. The companies net worth is increased.
 
 from dataclasses import dataclass
 import logging
-from typing import Optional, Union
+import inspect
+from typing import Optional, Any
 from resources import database
 from resources import position as pos
 from resources.players import Player
@@ -49,6 +50,25 @@ class Company:
             return self.__getattribute__(attr)
         raise StopIteration
 
+    def __setattr__(self, __name: str, __value: Any) -> None:
+        """
+        Overrides the setattr method to update the database when a value is changed
+
+        :param str __name: Name of the attribute
+        :param Any __value: Value of the attribute
+        """
+        context = inspect.getouterframes(inspect.currentframe())[1][3]
+        if context not in ["__init__", "__post_init__", "__next__", "__iter__"]:
+            logging.debug(f"{__name} is now {__value}")
+            if __name == "hq_position":
+                __value_db = int(__value)
+            else:
+                __value_db = __value
+            sql_base = f"UPDATE companies SET {__name}=%s WHERE id=%s"
+            database.cur.execute(sql_base, (__value_db, self.id))
+            database.con.commit()
+        super().__setattr__(__name, __value)
+
     def __str__(self) -> str:
         return self.name
 
@@ -58,7 +78,6 @@ class Company:
 
         :param int amount: Amount to be added
         """
-        database.cur.execute("UPDATE companies SET net_worth=%s WHERE id=%s", (self.net_worth + amount, self.id))
         self.net_worth += amount
 
     def remove_net_worth(self, amount: int) -> None:
@@ -67,7 +86,6 @@ class Company:
 
         :param int amount: Amount to be removed
         """
-        database.cur.execute("UPDATE companies SET net_worth=%s WHERE id=%s", (self.net_worth - amount, self.id))
         self.net_worth -= amount
 
     def get_members(self) -> list[Player]:
@@ -153,44 +171,6 @@ def remove(company: Company) -> None:
     database.cur.execute("DELETE FROM companies WHERE id=%s", (company.id,))
     database.con.commit()
     logging.info("Company %s got deleted", company.name)
-
-
-def update(
-    company: Company,
-    name: str = None,
-    logo: str = None,
-    description: str = None,
-    hq_position: Union[pos.Position, int] = None,
-    founder: str = None,
-    net_worth: int = None,
-) -> None:
-    """
-    Updates a company in the database
-
-    Same as in players, not documented until fixed
-    """
-    if name is not None:
-        database.cur.execute("UPDATE companies SET name=%s WHERE id=%s", (name, company.id))
-        company.name = name
-    if logo is not None:
-        database.cur.execute("UPDATE companies SET logo=%s WHERE id=%s", (logo, company.id))
-        company.logo = logo
-    if description is not None:
-        database.cur.execute("UPDATE companies SET description=%s WHERE id=%s", (description, company.id))
-        company.description = description
-    if hq_position is not None:
-        if isinstance(hq_position, int):
-            hq_position = pos.Position.from_int(hq_position)
-        database.cur.execute("UPDATE companies SET hq_position=%s WHERE id=%s", (int(hq_position), company.id))
-        company.hq_position = hq_position
-    if founder is not None:
-        database.cur.execute("UPDATE companies SET founder=%s WHERE id=%s", (founder, company.id))
-        company.founder = founder
-    if net_worth is not None:
-        database.cur.execute("UPDATE companies SET net_worth=%s WHERE id=%s", (net_worth, company.id))
-        company.net_worth = net_worth
-    database.con.commit()
-    logging.debug("Updated company %s to %s", company.name, tuple(company))
 
 
 class CompanyNotFound(Exception):

@@ -44,7 +44,7 @@ if "--debug" in sys.argv:
 
 
 logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 console_handler = logging.StreamHandler()
 console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
@@ -79,7 +79,7 @@ def votes():
         )
     else:
         player = players.get(voter_id)
-        players.update(player, last_vote=round(time()))
+        player.last_vote = round(time())
         vote_message_content = (
             f"**{player.name}** just voted for the Truck Simulator. "
             "As a reward they now get double xp for the next 30 minutes."

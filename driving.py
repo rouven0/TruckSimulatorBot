@@ -113,9 +113,9 @@ def generate_minimap(player: players.Player, all_companies: list[companies.Compa
                     minimap_array[i][j] = symbols.MAP_BACKGROUND
             else:
                 minimap_array[i][j] = symbols.MAP_BACKGROUND
-                for plr in players.get_all_driving_players():
-                    if plr.position == position:
-                        minimap_array[i][j] = trucks.get(plr.truck_id).emoji
+                # for plr in players.get_all_driving_players():
+                # if plr.position == position:
+                # minimap_array[i][j] = trucks.get(plr.truck_id).emoji
 
     minimap_array[3][3] = trucks.get(player.truck_id).emoji
     minimap = ""
@@ -140,7 +140,8 @@ def stop(ctx, player_id: str):
 @driving_bp.custom_handler(custom_id="load")
 def load(ctx, player_id: str):
     player = players.get_driving_player(ctx.author.id, check=player_id)
-    player.update(int(time()), ctx.followup_url())
+    player.last_action_time = int(time())
+    player.followup_url = ctx.followup_url()
 
     item = items.get(places.get(player.position).produced_item)
     if item.name not in [i.name for i in player.loaded_items]:
@@ -176,7 +177,8 @@ def load(ctx, player_id: str):
 @driving_bp.custom_handler(custom_id="unload")
 def unload(ctx, player_id: str):
     player = players.get_driving_player(ctx.author.id, check=player_id)
-    player.update(int(time()), ctx.followup_url())
+    player.last_action_time = int(time())
+    player.followup_url = ctx.followup_url()
     current_job = player.get_job()
 
     item_options: list[SelectMenuOption] = []
@@ -325,21 +327,23 @@ def move(ctx: Context, direction, player_id):
     """Centralized function for all the directional buttons"""
     player = players.get_driving_player(ctx.author.id, check=player_id)
 
+    new_position = player.position
     if direction == symbols.LEFT:
-        player.position.x -= 1
+        new_position.x -= 1
 
     if direction == symbols.UP:
-        player.position.y += 1
+        new_position.y += 1
 
     if direction == symbols.DOWN:
-        player.position.y -= 1
+        new_position.y -= 1
 
     if direction == symbols.RIGHT:
-        player.position.x += 1
+        new_position.x += 1
 
     player.miles += 1
     player.truck_miles += 1
     player.gas -= trucks.get(player.truck_id).gas_consumption
+    player.position = new_position
 
     if player.gas <= 0:
         return Message(
@@ -361,14 +365,8 @@ def move(ctx: Context, direction, player_id):
             update=True,
         )
 
-    player.update(int(time()), ctx.followup_url())
-    players.update(
-        player,
-        position=player.position,
-        miles=player.miles,
-        truck_miles=player.truck_miles,
-        gas=player.gas,
-    )
+    player.last_action_time = int(time())
+    player.followup_url = ctx.followup_url()
 
     return Message(
         embeds=get_drive_embeds(player, ctx.author.avatar_url),
@@ -386,7 +384,6 @@ def event_hitchhike(ctx, player_id: str) -> Message:
         pass
     player.stop_drive()
     if randint(0, 1) == 0:
-        players.update(player, position=458759)
         return Message(
             (
                 "Someone stopped to take you with them, but.. **OH NO!** It's Mr. Thomas Ruck, the president of this "
@@ -395,7 +392,8 @@ def event_hitchhike(ctx, player_id: str) -> Message:
             components=[],
             update=True,
         )
-    players.update(player, position=458759, gas=140)
+    player.gas = 140
+    player.position = Position.from_int(458759)
     return Message(
         "You found someone to go with. They even were so kind to gift you some gas. You should thank them.",
         components=[],
@@ -407,7 +405,9 @@ def event_hitchhike(ctx, player_id: str) -> Message:
 def event_walk(ctx, player_id: str) -> Message:
     player = players.get_driving_player(ctx.author.id, check=player_id)
     if player.level > 0:
-        players.update(player, level=player.level - 1, xp=0, position=458759)
+        player.level -= 1
+        player.xp = 0
+        player.position = Position.from_int(458759)
     player.stop_drive()
     return Message(
         "You started walking to the gas station. As you arrived, you noticed that you lost a level.",
@@ -421,7 +421,7 @@ def event_rob(ctx, player_id: str) -> Message:
     player = players.get_driving_player(ctx.author.id, check=player_id)
     player.stop_drive()
     if randint(0, 1) == 0:
-        players.update(player, gas=player.gas + 250)
+        player.gas += 250
         return Message("Phew. Nobdody looked and you stole some gas. Be careful next time.", components=[], update=True)
     return Message(
         "Oh no! You got caught. Nothing happened but the car owner drove away angrily.",
@@ -467,9 +467,9 @@ def drive(ctx) -> Message:
     player = players.get(ctx.author.id)
     # Detect, when the player is renamed
     if player.name != ctx.author.username:
-        players.update(player, name=ctx.author.username)
+        player.name = ctx.author.username
     if player.discriminator != ctx.author.discriminator:
-        players.update(player, discriminator=ctx.author.discriminator)
+        player.discriminator = ctx.author.discriminator
 
     if players.is_driving(ctx.author.id):
         driving_player = players.get_driving_player(ctx.author.id)

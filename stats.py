@@ -81,9 +81,9 @@ def get_profile_embed(user: User) -> Embed:
     truck: trucks.Truck = trucks.get(player.truck_id)
     # Detect, when the player is renamed
     if player.name != user.username:
-        players.update(player, name=user.username)
+        player.name = user.username
     if player.discriminator != user.discriminator:
-        players.update(player, discriminator=user.discriminator)
+        player.discriminator = user.discriminator
     profile_embed = Embed(
         author=Author(name=f"{player.name}'s profile"),
         thumbnail=Media(url=user.avatar_url),

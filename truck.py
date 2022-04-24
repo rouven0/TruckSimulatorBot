@@ -40,9 +40,6 @@ def get_truck_embed(truck: trucks.Truck) -> Embed:
 def show_truck_button(ctx, player_id: str):
     """Shows the main truck page"""
     player = players.get(ctx.author.id, check=player_id)
-    # Detect, when the player is renamed
-    if player.name != ctx.author.username:
-        players.update(player, name=ctx.author.username)
     truck = trucks.get(player.truck_id)
     truck_embed = get_truck_embed(truck)
     truck_embed.author = Author(name=f"{player.name}'s truck", icon_url=ctx.author.avatar_url)
@@ -59,7 +56,9 @@ def buy(ctx, player_id: str) -> Union[Message, str]:
     end_price = new_truck.price - selling_price
     # this also adds money if the end price is negative
     player.debit_money(end_price)
-    players.update(player, truck_miles=0, gas=new_truck.gas_capacity, truck_id=new_truck.truck_id)
+    player.truck_miles = 0
+    player.gas = new_truck.gas_capacity
+    player.truck_id = new_truck.truck_id
     answer_embed = Embed(
         description=f"You sold your old {old_truck.name} for ${selling_price} and bought a brand new {new_truck.name} "
         f"for ${new_truck.price}",

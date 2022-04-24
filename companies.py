@@ -125,7 +125,7 @@ def confirm_found(ctx):
     player = players.get(ctx.author.id)
     company = companies.Company(0, name, player.position, ctx.author.id, description=description)
     company_id = companies.insert(company)
-    players.update(player, company=company_id)
+    player.company = company_id
     return Message(
         embed=Embed(
             title="Company creation successful",
@@ -172,7 +172,7 @@ def confirm_hire(ctx, company_id: int, player_id: str):
     invited_player = players.get(ctx.author.id, check=player_id)
 
     company = companies.get(company_id)
-    players.update(invited_player, company=company.id)
+    invited_player.company = company.id
     return Message(
         f"It's official! {invited_player} is now a member of **{company.name}** <:PandaHappy:869202868555624478>",
         components=[],
@@ -215,7 +215,7 @@ def confirm_fire(ctx, company_name: str, player_id: str, fired_player_id: str):
     if ctx.author.id != player_id:
         raise players.WrongPlayer()
     fired_player = players.get(fired_player_id)
-    fired_player.remove_from_company()
+    fired_player.company = None
     return Message(
         content=f"{fired_player} was removed from **{company_name}**",
         update=True,
@@ -243,9 +243,9 @@ def leave(ctx, player_id: str):
 def confirm_leave(ctx, player_id: str):
     """Confirm button to leave a company"""
     player = players.get(ctx.author.id, check=player_id)
-    player.remove_from_company()
+    player.company = None
     return Message(
-        f"<@{player.id}> You left **{companies.get(player.company).name}**",
+        f"<@{player.id}> You left your company",
         components=[ActionRow(components=[Button(label="Back", style=2, custom_id=["home", player.id])])],
         update=True,
     )
@@ -315,7 +315,8 @@ def update(ctx):
     logo: str = ctx.get_component("modal_company_update_logo").value
     if name != company.name and companies.exists(name):
         return Message("A company with this make already exists, please choose another name", ephemeral=True)
-    companies.update(company, name=name, description=description)
+    company.name = name
+    company.description = description
     if logo == "":
         logo = "🏛️"
     if not re.match(
@@ -325,7 +326,7 @@ def update(ctx):
         logo,
     ):
         return Message("The provided logo couldn't be matched as an emoji", ephemeral=True)
-    companies.update(company, logo=logo)
+    company.logo = logo
     return Message(
         embed=get_company_embed(ctx.author, player, company),
         components=components.get_company_buttons(player, company),

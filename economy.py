@@ -50,21 +50,16 @@ def refill(ctx, player_id: str):
     except players.NotEnoughMoney:
         if player.gas < 170:
             if player.level > 2:
-                players.update(
-                    player,
-                    gas=player.gas + 100,
-                    level=player.level - 2,
-                    xp=0,
-                )
-            else:
-                players.update(player, gas=player.gas + 100, xp=0)
+                player.level -= 2
+            player.gas += 100
+            player.xp = 0
             return Message(
-                f"{ctx.author.mention} We have a problem: You don't have enough money. Lets make a deal. "
+                f"<@{ctx.author.id}> We have a problem: You don't have enough money. Lets make a deal. "
                 "I will give you 100 litres of gas, and you lose 2 levels",
                 ephemeral=True,
             )
         return Message(
-            f"{ctx.author.mention} you don't have enough money to do this. "
+            f"<@{ctx.author.id}> you don't have enough money to do this. "
             "Do some jobs and come back if you have enough",
             ephemeral=True,
         )
@@ -76,7 +71,7 @@ def refill(ctx, player_id: str):
         footer=Footer(text="Current gas price: $1.2 per litre"),
     )
 
-    players.update(player, gas=trucks.get(player.truck_id).gas_capacity)
+    player.gas = trucks.get(player.truck_id).gas_capacity
     drive_embed = ctx.message.embeds[1]
     drive_embed.fields[2]["value"] = str(player.gas)
 

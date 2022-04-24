@@ -4,8 +4,9 @@ This module contains the Player class, several methods to operate with players i
 the DrivingPlayer, used to manage driving sessions
 """
 from dataclasses import field, dataclass
+import inspect
 from time import time
-from typing import Optional, Union
+from typing import Optional, Union, Any
 import logging
 from resources import database
 from resources import levels
@@ -91,6 +92,28 @@ class Player:
     def __str__(self) -> str:
         return f"**{self.name}**#{self.discriminator}"
 
+    def __setattr__(self, __name: str, __value: Any) -> None:
+        """
+        Overrides the setattr method to update the database when a value is changed
+
+        :param str __name: Name of the attribute
+        :param Any __value: Value of the attribute
+        """
+        context = inspect.getouterframes(inspect.currentframe())[1][3]
+        if context not in ["__init__", "__post_init__", "__next__", "__iter__"]:
+            logging.debug(f"{__name} is now {__value}")
+            if __name == "position":
+                __value_db = int(__value)
+            elif __name == "loaded_items":
+                __value_db = _format_items_to_db(__value)
+            else:
+                __value_db = __value
+            table = "driving_players" if __name in ["last_action_time", "followup_url"] else "players"
+            sql_base = f"UPDATE {table} SET {__name}=%s WHERE id=%s"
+            database.cur.execute(sql_base, (__value_db, self.id))
+            database.con.commit()
+        super().__setattr__(__name, __value)
+
     def add_xp(self, amount: int) -> str:
         """
         Add xp to the player and performs a level up if needed
@@ -101,9 +124,10 @@ class Player:
         answer = f"\nYou got {amount:,} xp"
         if round(time()) - self.last_vote < 1800:
             amount = amount * 2
-        update(self, xp=int(self.xp) + amount)
+        self.xp = int(self.xp) + amount
         while int(self.xp) >= levels.get_next_xp(self.level):
-            update(self, level=self.level + 1, xp=self.xp - levels.get_next_xp(self.level))
+            self.level += 1
+            self.xp -= levels.get_next_xp(self.level)
             answer += f"\n:tada: You leveled up to level {self.level} :tada:"
         return answer
 
@@ -113,8 +137,6 @@ class Player:
 
         :param int amount: Amount of money that should be added
         """
-        database.cur.execute("UPDATE players SET money=%s WHERE id=%s", (self.money + amount, self.id))
-        database.con.commit()
         self.money += amount
 
     def debit_money(self, amount) -> None:
@@ -126,8 +148,6 @@ class Player:
         """
         if amount > self.money:
             raise NotEnoughMoney()
-        database.cur.execute("UPDATE players SET money=%s WHERE id=%s", (self.money - amount, self.id))
-        database.con.commit()
         self.money -= amount
 
     def load_item(self, item: items.Item) -> None:
@@ -138,7 +158,7 @@ class Player:
         """
         new_items = self.loaded_items
         new_items.append(item)
-        update(self, loaded_items=new_items)
+        self.loaded_items = new_items
 
     def unload_item(self, item: items.Item) -> None:
         """
@@ -154,8 +174,7 @@ class Player:
 
         for loaded_item in items_to_remove:
             new_items.remove(loaded_item)
-
-        update(self, loaded_items=new_items)
+        self.loaded_items = new_items
 
     @staticmethod
     def add_job(job: Job) -> None:
@@ -203,13 +222,6 @@ class Player:
             return Job(**records[0])
         return None
 
-    def remove_from_company(self) -> None:
-        """
-        Method I had to make to set a player's company to None
-        """
-        database.cur.execute("UPDATE players SET company=%s WHERE id=%s", (None, self.id))
-        database.con.commit()
-
 
 def insert(player: Player) -> None:
     """
@@ -223,70 +235,6 @@ def insert(player: Player) -> None:
     database.cur.execute(sql, tuple(player))
     database.con.commit()
     logging.info("Inserted %s into the database as %s", player.name, tuple(player))
-
-
-def update(
-    player: Player,
-    name: str = None,
-    discriminator: str = None,
-    level: int = None,
-    xp: int = None,
-    position: Union[pos.Position, int] = None,
-    miles: int = None,
-    truck_miles: int = None,
-    gas: int = None,
-    truck_id: int = None,
-    loaded_items: list = None,
-    company: int = None,
-    last_vote: int = None,
-) -> None:
-    """
-    Updates a player in the database
-
-    Not going to document this clusterfuck until this is properly done
-    """
-    if name is not None:
-        database.cur.execute("UPDATE players SET name=%s WHERE id=%s", (name, player.id))
-        player.name = name
-    if discriminator is not None:
-        database.cur.execute("UPDATE players SET discriminator=%s WHERE id=%s", (discriminator, player.id))
-        player.discriminator = discriminator
-    if level is not None:
-        database.cur.execute("UPDATE players SET level=%s WHERE id=%s", (level, player.id))
-        player.level = level
-    if xp is not None:
-        database.cur.execute("UPDATE players SET xp=%s WHERE id=%s", (xp, player.id))
-        player.xp = xp
-    if position is not None:
-        if isinstance(position, int):
-            position = pos.Position.from_int(position)
-        database.cur.execute("UPDATE players SET position=%s WHERE id=%s", (int(position), player.id))
-        player.position = position
-    if miles is not None:
-        database.cur.execute("UPDATE players SET miles=%s WHERE id=%s", (miles, player.id))
-        player.miles = miles
-    if truck_miles is not None:
-        database.cur.execute("UPDATE players SET truck_miles=%s WHERE id=%s", (truck_miles, player.id))
-        player.truck_miles = truck_miles
-    if gas is not None:
-        database.cur.execute("UPDATE players SET gas=%s WHERE id=%s", (gas, player.id))
-        player.gas = gas
-    if truck_id is not None:
-        database.cur.execute("UPDATE players SET truck_id=%s WHERE id=%s", (truck_id, player.id))
-        player.truck_id = truck_id
-    if loaded_items is not None:
-        database.cur.execute(
-            "UPDATE players SET loaded_items=%s WHERE id=%s", (_format_items_to_db(loaded_items), player.id)
-        )
-        player.loaded_items = loaded_items
-    if company is not None:
-        database.cur.execute("UPDATE players SET company=%s WHERE id=%s", (company, player.id))
-        player.company = company
-    if last_vote is not None:
-        database.cur.execute("UPDATE players SET last_vote=%s WHERE id=%s", (last_vote, player.id))
-        player.last_vote = last_vote
-    database.con.commit()
-    logging.debug("Updated player %s to %s", player.name, tuple(player))
 
 
 def get(id: str, check: str = None) -> Player:
@@ -392,17 +340,6 @@ class DrivingPlayer(Player):
         database.cur.execute("DELETE FROM driving_players WHERE id=%s", (self.id,))
         database.con.commit()
         logging.info("%s stopped driving", self.name)
-
-    def update(self, time: int, followup_url: str) -> None:
-        """
-        Update the player on every interaction
-
-        :param int time: Unix timestamp telling the last action
-        :param str followup_url: Url giving access to the drive message
-        """
-        database.cur.execute("UPDATE driving_players SET last_action_time=%s WHERE id=%s", (time, self.id))
-        database.cur.execute("UPDATE driving_players SET followup_url=%s WHERE id=%s", (followup_url, self.id))
-        database.con.commit()
 
 
 def is_driving(id: str) -> bool:
