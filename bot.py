@@ -47,7 +47,7 @@ if "--debug" in sys.argv:
 
 
 logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 console_handler = logging.StreamHandler()
 console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
@@ -108,7 +108,9 @@ def update():
         header_splitted = request.headers[sig_header].split("=")
         if len(header_splitted) == 2:
             req_sign = header_splitted[1]
-            computed_sign = hmac.new(getenv("GITHUB_AUTHORIZATION", "").encode("utf-8"), request.data, hashlib.sha256).hexdigest()
+            computed_sign = hmac.new(
+                getenv("GITHUB_AUTHORIZATION", "").encode("utf-8"), request.data, hashlib.sha256
+            ).hexdigest()
             # is the provided signature ok?
             if hmac.compare_digest(req_sign, computed_sign):
                 if request.json.get("ref") == "refs/heads/http-only":

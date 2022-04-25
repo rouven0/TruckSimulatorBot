@@ -26,7 +26,7 @@ def sql(ctx, query: str):
         if database.cur.rowcount != 0:
             database.con.commit()
             return f"`Done. {database.cur.rowcount} row(s) affected`"
-        return f"```\n{json.dumps(database.cur.fetchall(), indent=2)}```"
+        return f"```json\n{json.dumps(database.cur.fetchall(), indent=2)}```"
     except Exception as error:
         return "Error: " + str(error)
 
