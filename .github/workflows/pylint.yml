@@ -2,9 +2,9 @@ name: Pylint
 
 on:
     push:
-        branches: [ http-only ]
+        branches: [ main ]
     pull_request:
-        branches: [ http-only ]
+        branches: [ main ]
 
 jobs:
   build:
