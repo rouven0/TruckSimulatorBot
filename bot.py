@@ -113,7 +113,7 @@ def update():
             ).hexdigest()
             # is the provided signature ok?
             if hmac.compare_digest(req_sign, computed_sign):
-                if request.json.get("ref") == "refs/heads/main:
+                if request.json.get("ref") == "refs/heads/main":
                     logging.warning("Restarting now")
                     subprocess.run(["/bin/bash", "./update.sh"])
                 return "Restart successful", 200
