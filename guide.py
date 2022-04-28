@@ -3,7 +3,7 @@
 from os import listdir
 from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
 from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
-from flask_discord_interactions.models.option import CommandOptionType
+from flask_discord_interactions.models.option import CommandOptionType, Option
 from flask_discord_interactions.models.embed import Field, Author, Media
 
 import config
@@ -77,15 +77,15 @@ def placeinfo(ctx) -> Message:
 
 @guide_bp.command(
     options=[
-        {
-            "name": "topic",
-            "description": "The topic you want to read about.",
-            "type": CommandOptionType.STRING,
-            "choices": [
+        Option(
+            name="topic",
+            description="The topic you want to read about.",
+            type=CommandOptionType.STRING,
+            choices=[
                 {"name": f[: f.find(".")].replace("_", " "), "value": f[: f.find(".")]}
                 for f in sorted(listdir("./guide"))
             ],
-        }
+        )
     ],
 )
 def guide(ctx, topic: str = "introduction") -> Message:

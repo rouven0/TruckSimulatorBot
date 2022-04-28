@@ -1,7 +1,7 @@
 "Blueprint file containing all economy-related commands and handlers"
 # pylint: disable=unused-argument,missing-function-docstring
 from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
-from flask_discord_interactions.models.option import CommandOptionType
+from flask_discord_interactions.models.option import CommandOptionType, Option
 from flask_discord_interactions.models.user import User
 from flask_discord_interactions.models.embed import Author, Field, Footer
 
@@ -80,21 +80,18 @@ def refill(ctx, player_id: str):
 
 @economy_bp.command(
     options=[
-        {
-            "name": "user",
-            "description": "The user you want to give the money to.",
-            "type": CommandOptionType.USER,
-            "required": True,
-        },
-        {
-            "name": "amount",
-            "description": "The amount you want to give.",
-            "type": CommandOptionType.INTEGER,
-            "min_value": 1,
-            "max_value": 1000000,
-            "required": True,
-            "autocomplete": True,
-        },
+        Option(
+            name="user", description="The user you want to give money to.", type=CommandOptionType.USER, required=True
+        ),
+        Option(
+            name="amount",
+            description="The amount you want to give.",
+            type=CommandOptionType.INTEGER,
+            min_value=1,
+            max_value=1000000,
+            autocomplete=True,
+            required=True,
+        ),
     ]
 )
 def give(ctx, user: User, amount: int) -> Message:

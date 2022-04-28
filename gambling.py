@@ -3,7 +3,7 @@
 from random import randint, sample, choices
 from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
 from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles
-from flask_discord_interactions.models.option import CommandOptionType
+from flask_discord_interactions.models.option import CommandOptionType, Option
 from flask_discord_interactions.models.user import User
 from flask_discord_interactions.models.embed import Author, Field
 
@@ -17,24 +17,24 @@ gambling_bp = DiscordInteractionsBlueprint()
 
 @gambling_bp.command(
     options=[
-        {
-            "name": "side",
-            "description": "The side you bet on.",
-            "type": CommandOptionType.STRING,
-            "required": True,
-            "choices": [
+        Option(
+            name="side",
+            description="The side to bet on.",
+            type=CommandOptionType.STRING,
+            required=True,
+            choices=[
                 {"name": "heads", "value": "heads"},
                 {"name": "tails", "value": "tails"},
             ],
-        },
-        {
-            "name": "amount",
-            "description": "The amount you bet.",
-            "type": CommandOptionType.INTEGER,
-            "required": True,
-            "autocomplete": True,
-            "min_value": 1,
-        },
+        ),
+        Option(
+            name="amount",
+            description="The amount to bet.",
+            type=CommandOptionType.INTEGER,
+            required=True,
+            autocomplete=True,
+            min_value=1,
+        ),
     ]
 )
 def coinflip(ctx, side: str, amount: int) -> str:
@@ -116,14 +116,14 @@ def slots_handler(ctx, player_id: str, amount: int) -> Message:
 
 @gambling_bp.command(
     options=[
-        {
-            "name": "amount",
-            "description": "The amount you bet.",
-            "type": CommandOptionType.INTEGER,
-            "autocomplete": True,
-            "required": True,
-            "min_value": 1,
-        }
+        Option(
+            name="amount",
+            description="The amount to bet.",
+            type=CommandOptionType.INTEGER,
+            required=True,
+            autocomplete=True,
+            min_value=1,
+        ),
     ]
 )
 def slots(ctx, amount: int):
