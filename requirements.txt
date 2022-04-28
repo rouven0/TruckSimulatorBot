@@ -1,4 +1,4 @@
-Flask-Discord-Interactions==1.4.2
+Flask-Discord-Interactions==1.5.0
 gunicorn==20.1.0
 mysql-connector-python==8.0.29
 python-dotenv==0.20.0
