@@ -2,7 +2,7 @@
 # pylint: disable=unused-argument,broad-except
 import json
 
-from flask_discord_interactions import DiscordInteractionsBlueprint, Permission, User
+from flask_discord_interactions import DiscordInteractionsBlueprint, User
 from flask_discord_interactions.models.message import Message, Embed
 
 from resources import database
@@ -13,8 +13,7 @@ admin_bp = DiscordInteractionsBlueprint()
 
 
 @admin_bp.command(
-    default_permission=False,
-    permissions=[Permission(user=config.Users.ADMIN)],
+    default_member_permissions=8,
     annotations={"query": "The query to execute."},
 )
 def sql(ctx, query: str):
@@ -34,8 +33,7 @@ def sql(ctx, query: str):
 blacklist = admin_bp.command_group(
     name="blacklist",
     description="Manage blacklisted users.",
-    default_permission=False,
-    permissions=[Permission(user=config.Users.ADMIN)],
+    default_member_permissions=4,
 )
 
 
