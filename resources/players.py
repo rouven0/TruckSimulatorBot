@@ -285,6 +285,17 @@ def get_top(key: str) -> tuple:
     return top_players, suffix
 
 
+def get_blacklisted() -> list[Player]:
+    """
+    Get all blacklisted players
+
+    :return: A list of blacklisted players
+    """
+    database.cur.execute("SELECT * FROM players WHERE xp=-1")
+    records = database.cur.fetchall()
+    return [Player(**record) for record in records]
+
+
 def registered(id: str) -> bool:
     """
     Checks whether a specific user is registered or not

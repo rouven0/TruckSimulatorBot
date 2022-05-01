@@ -3,6 +3,7 @@
 import json
 
 from flask_discord_interactions import DiscordInteractionsBlueprint, User
+from flask_discord_interactions.context import Context
 from flask_discord_interactions.models.message import Message, Embed
 
 from resources import database
@@ -70,3 +71,16 @@ def remove(ctx, user: User):
                 color=config.EMBED_COLOR,
             )
         )
+
+
+@blacklist.command()
+def show(ctx: Context) -> Message:
+    """Show the blacklist."""
+    blacklisted_players = players.get_blacklisted()
+    return Message(
+        embed=Embed(
+            color=config.EMBED_COLOR,
+            title="All blacklisted players",
+            description="".join([f"▫️ <@{player.id}> - {player.name}\n" for player in blacklisted_players]),
+        )
+    )
