@@ -59,6 +59,7 @@ def get_drive_buttons(player: Player) -> list:
             emoji={"name": "load", "id": symbols.LOAD},
             custom_id=["load", player.id],
             disabled=load_disabled,
+            label=f"Load {items.get(place.produced_item).name} in your truck" if place else "Load",
         ),
         Button(
             style=1
@@ -70,11 +71,7 @@ def get_drive_buttons(player: Player) -> list:
             emoji={"name": "unload", "id": symbols.UNLOAD},
             custom_id=["unload", player.id],
             disabled=unload_disabled,
-        ),
-        Button(
-            style=2,
-            label="Show loaded items",
-            custom_id=["show_load", player.id],
+            label="Unload",
         ),
     ]
 
@@ -280,10 +277,10 @@ def get_casino_buttons(player) -> list:
                     emoji={"name": "🎰", "id": None},
                 ),
                 Button(
-                    custom_id=["coinflip", player.id],
+                    custom_id=["blackjack", player.id],
                     style=2,
                     label="Coming soon",
-                    emoji={"name": "🪙", "id": None},
+                    emoji={"name": "♠️", "id": None},
                     disabled=True,
                 ),
             ]

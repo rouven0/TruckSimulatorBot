@@ -484,22 +484,3 @@ def drive(ctx) -> Message:
         embeds=get_drive_embeds(player, ctx.author.avatar_url),
         components=components.get_drive_buttons(player),
     )
-
-
-@driving_bp.custom_handler(custom_id="show_load")
-def load_show(ctx, player_id: str) -> Message:
-    """Shows what your Truck currently has loaded"""
-    player = players.get_driving_player(ctx.author.id, check=player_id)
-    item_list = ""
-    if len(player.loaded_items) == 0:
-        item_list = "Your truck is empty"
-    else:
-        for item in player.loaded_items:
-            item_list += f"{symbols.LIST_ITEM} {item}\n"
-    load_embed = Embed(
-        title="Your currently loaded items",
-        description=item_list,
-        color=config.EMBED_COLOR,
-        footer=Footer(text=f"Loaded items: {len(player.loaded_items)}/{trucks.get(player.truck_id).loading_capacity}"),
-    )
-    return Message(embed=load_embed, ephemeral=True)

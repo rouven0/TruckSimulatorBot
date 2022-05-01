@@ -104,6 +104,13 @@ def get_profile_embed(user: User) -> Embed:
     )
     profile_embed.fields.append(Field(name="Gas left", value=f"{player.gas} l", inline=False))
     profile_embed.fields.append(Field(name="Current truck", value=truck.name))
+    if player.loaded_items:
+        profile_embed.fields.append(
+            Field(
+                name=f"Current load ({len(player.loaded_items)}/{trucks.get(player.truck_id).loading_capacity})",
+                value="".join([str(item) + "\n" for item in player.loaded_items]),
+            )
+        )
 
     try:
         company = companies.get(player.company)
