@@ -23,6 +23,8 @@ def profile(ctx, user: User = None) -> Message:
 
 @profile_bp.custom_handler(custom_id="profile_register")
 def register(ctx):
+    if players.registered(ctx.author.id):
+        return Message(update=True, deferred=True)
     with open("./messages/welcome.md", "r", encoding="utf8") as welcome_file:
         welcome_embed = Embed(
             title="Hey there, fellow Trucker,",
