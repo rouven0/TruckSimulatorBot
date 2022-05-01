@@ -125,8 +125,8 @@ class Player:
             amount = amount * 2
         self.xp = int(self.xp) + amount
         while int(self.xp) >= levels.get_next_xp(self.level):
-            self.level += 1
             self.xp -= levels.get_next_xp(self.level)
+            self.level += 1
             answer += f"\n:tada: You leveled up to level {self.level} :tada:"
         return answer
 
