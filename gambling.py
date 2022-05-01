@@ -118,11 +118,10 @@ def slots_handler(ctx: Context, player_id: str, amount=0):
         amount = ctx.get_component("input_amount").value.replace(" ", "").replace("k", "000").replace("m", "000000")
         if amount == "all":
             amount = player.money
-        else:
-            if str.isnumeric(amount):
-                amount = int(amount)
-            else:
-                return Message("Invalid amount", ephemeral=True)
+    if str.isnumeric(amount):
+        amount = int(amount)
+    else:
+        return Message("Invalid amount", ephemeral=True)
     return Message(
         embed=get_slots_embed(player, amount),
         components=get_slots_components(player, amount),
