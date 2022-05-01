@@ -8,6 +8,7 @@ from resources.players import Player
 from resources import companies
 from resources import places
 from resources import symbols
+from resources import items
 from resources import trucks
 
 
@@ -81,6 +82,17 @@ def get_drive_buttons(player: Player) -> list:
         action_buttons.append(
             Button(
                 style=2, label="Refill", emoji={"name": "refill", "id": symbols.REFILL}, custom_id=["refill", player.id]
+            )
+        )
+    if place:
+        print(place.available_actions)
+    if place and "gambling" in place.available_actions:
+        action_buttons.append(
+            Button(
+                style=3,
+                label="Enter the casino",
+                custom_id=["casino", player.id],
+                emoji={"name": "money", "id": items.get(place.produced_item).emoji},
             )
         )
 
@@ -252,3 +264,40 @@ def get_truck_options(player, check_money=False) -> list[SelectMenuOption]:
             )
         )
     return choices
+
+
+def get_casino_buttons(player) -> list:
+    """
+    Returns a list of buttons for the casino menu
+    :param player: The player to get the buttons for
+    :return: A list of buttons
+    """
+    return [
+        ActionRow(
+            components=[
+                Button(
+                    custom_id=["slots_init", player.id],
+                    style=2,
+                    label="Spin a slot machine",
+                    emoji={"name": "🎰", "id": None},
+                ),
+                Button(
+                    custom_id=["coinflip", player.id],
+                    style=2,
+                    label="Coming soon",
+                    emoji={"name": "🪙", "id": None},
+                    disabled=True,
+                ),
+            ]
+        ),
+        ActionRow(
+            components=[
+                Button(
+                    custom_id=["continue_drive", player.id],
+                    style=3,
+                    label="Back to the road",
+                    emoji={"name": "logo_round", "id": "955233759278559273"},
+                ),
+            ]
+        ),
+    ]

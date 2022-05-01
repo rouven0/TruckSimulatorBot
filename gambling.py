@@ -2,58 +2,41 @@
 # pylint: disable=unused-argument, missing-function-docstring
 from random import randint, sample, choices
 from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
-from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles
+from flask_discord_interactions.context import Context
+from flask_discord_interactions.discord import InteractionType
+from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles, TextInput
+from flask_discord_interactions.models.modal import Modal
 from flask_discord_interactions.models.option import CommandOptionType, Option
 from flask_discord_interactions.models.user import User
-from flask_discord_interactions.models.embed import Author, Field
+from flask_discord_interactions.models.embed import Author, Field, Media
+from flask import json, request
 
 from resources import players
 from resources import items
+from resources import components
 from resources.autocompletes import amount_all
 import config
 
 gambling_bp = DiscordInteractionsBlueprint()
 
 
-@gambling_bp.command(
-    options=[
-        Option(
-            name="side",
-            description="The side to bet on.",
-            type=CommandOptionType.STRING,
-            required=True,
-            choices=[
-                {"name": "heads", "value": "heads"},
-                {"name": "tails", "value": "tails"},
-            ],
+@gambling_bp.custom_handler(custom_id="casino")
+def casino(ctx, player_id: str) -> Message:
+    player = players.get(ctx.author.id, check=player_id)
+    return Message(
+        embed=Embed(
+            title="Welcome to the casino",
+            color=config.EMBED_COLOR,
+            image=Media(
+                url="https://media.discordapp.net/attachments/868822515282231346/871394792947482674/vegass-default_truck.png"
+            ),
         ),
-        Option(
-            name="amount",
-            description="The amount to bet.",
-            type=CommandOptionType.INTEGER,
-            required=True,
-            autocomplete=True,
-            min_value=1,
-        ),
-    ]
-)
-def coinflip(ctx, side: str, amount: int) -> str:
-    """Tests your luck while throwing a coin."""
-    player = players.get(ctx.author.id)
-    player.debit_money(amount)
-    if randint(0, 1) == 0:
-        result = "heads"
-    else:
-        result = "tails"
-
-    if result == side:
-        player.add_money(amount * 2)
-        return f"Congratulations, it was {result}. You won ${amount:,}"
-    return f"Nope, it was {result}. You lost ${amount:,}"
+        components=components.get_casino_buttons(player),
+        update=True,
+    )
 
 
-def get_slots_embed(author: User, amount: int) -> Embed:
-    player = players.get(author.id)
+def get_slots_embed(player: players.Player, amount: int) -> Embed:
     player.debit_money(amount)
 
     chosen_items = choices(sample(items.get_all(), 8), k=3)
@@ -66,7 +49,7 @@ def get_slots_embed(author: User, amount: int) -> Embed:
     slots_embed = Embed(
         description=machine,
         color=config.EMBED_COLOR,
-        author=Author(name=f"{author.username}'s slots", icon_url=author.avatar_url),
+        author=Author(name=f"{player.name}'s slots"),
         fields=[],
     )
 
@@ -83,56 +66,65 @@ def get_slots_embed(author: User, amount: int) -> Embed:
     return slots_embed
 
 
-def get_slots_components(user: User, amount: int) -> list:
+def get_slots_components(player: players.Player, amount: int) -> list:
     return [
         ActionRow(
             components=[
                 Button(
                     label="Spin again! (double amount)",
-                    custom_id=[slots_handler, user.id, amount * 2],
+                    custom_id=[slots_handler, player.id, amount * 2],
                     style=ButtonStyles.SUCCESS,
                     emoji={"name": "🎰"},
                 ),
                 Button(
                     label="Spin again",
-                    custom_id=[slots_handler, user.id, amount],
+                    custom_id=[slots_handler, player.id, amount],
                     style=ButtonStyles.SECONDARY,
                 ),
             ]
-        )
+        ),
+        ActionRow(components=[Button(label="Back", style=2, custom_id=["casino", player.id])]),
     ]
+
+
+@gambling_bp.custom_handler(custom_id="slots_init")
+def slots_modal(ctx, player_id):
+    player = players.get(ctx.author.id, check=player_id)
+    return Modal(
+        custom_id=["slots", player.id],
+        title="Spin a slot machine",
+        components=[
+            ActionRow(
+                components=[
+                    TextInput(
+                        label="Amount", custom_id="input_amount", placeholder="The amount you want to bet. Can be 'all'"
+                    )
+                ]
+            )
+        ],
+    )
 
 
 @gambling_bp.custom_handler(custom_id="slots")
-def slots_handler(ctx, player_id: str, amount: int) -> Message:
+def slots_handler(ctx: Context, player_id: str, amount=0):
+    player = players.get(ctx.author.id, check=player_id)
     if ctx.author.id != player_id:
         raise players.WrongPlayer()
+    if ctx.author.id != player_id:
+        raise players.WrongPlayer()
+    # replace this when pr is merged
+    type = request.json.get("type")
+    if type == InteractionType.MODAL_SUBMIT:
+        amount = ctx.get_component("input_amount").value.replace(" ", "").replace("k", "000").replace("m", "000000")
+        if amount == "all":
+            amount = player.money
+        else:
+            if str.isnumeric(amount):
+                amount = int(amount)
+            else:
+                return Message("Invalid amount", ephemeral=True)
     return Message(
-        embed=get_slots_embed(ctx.author, amount),
-        components=get_slots_components(ctx.author, amount),
+        embed=get_slots_embed(player, amount),
+        components=get_slots_components(player, amount),
         update=True,
     )
-
-
-@gambling_bp.command(
-    options=[
-        Option(
-            name="amount",
-            description="The amount to bet.",
-            type=CommandOptionType.INTEGER,
-            required=True,
-            autocomplete=True,
-            min_value=1,
-        ),
-    ]
-)
-def slots(ctx, amount: int):
-    """Spins up a simple slot machine."""
-    return Message(
-        embed=get_slots_embed(ctx.author, amount),
-        components=get_slots_components(ctx.author, amount),
-    )
-
-
-gambling_bp.add_autocomplete_handler(amount_all, "slots")
-gambling_bp.add_autocomplete_handler(amount_all, "coinflip")
