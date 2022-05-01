@@ -41,7 +41,7 @@ def show_job(ctx, player_id: str) -> Message:
 
 @economy_bp.custom_handler(custom_id="refill")
 def refill(ctx, player_id: str):
-    player = players.get_driving_player(ctx.author.id, check=player_id)
+    player = players.get(ctx.author.id, check=player_id)
     gas_amount = trucks.get(player.truck_id).gas_capacity - player.gas
     price = round(gas_amount * 1.2)
 

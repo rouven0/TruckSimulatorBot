@@ -16,7 +16,6 @@ Let's assume you're at position [8, 9].
 <:load:861353140476706877> will load the current place's item into your truck. You can check your loaded items at any time as you drive.
 <:unload:861353156902256680> will ask your for the items you want to unload and then unloads the items you specified.
 <:stop:853362422298968104> removes all the buttons and stops your truck.
-_Show loaded items_ Shows all the items you currently have loaded into your truck.
 
 **Special buttons**
 <:ts_gas:859857979619541022> will refill your truck.
@@ -25,6 +24,3 @@ _Show loaded items_ Shows all the items you currently have loaded into your truc
 **Job buttons**
 _New Job_ will provide you a with a new job that you will have to complete to get paid.
 _Show Job_ will show you your current job (if you have one).
-
-**Note**
-If you are inactive for more than 15 minutes, your truck will be stopped.

@@ -1,11 +1,8 @@
 "Blueprint file containing all driving-related commands and handlers"
 # pylint: disable=missing-function-docstring
 from datetime import datetime
-from time import time
 import threading
 from random import randint
-
-import requests
 
 from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
 from flask_discord_interactions.context import Context
@@ -113,9 +110,6 @@ def generate_minimap(player: players.Player, all_companies: list[companies.Compa
                     minimap_array[i][j] = symbols.MAP_BACKGROUND
             else:
                 minimap_array[i][j] = symbols.MAP_BACKGROUND
-                # for plr in players.get_all_driving_players():
-                # if plr.position == position:
-                # minimap_array[i][j] = trucks.get(plr.truck_id).emoji
 
     minimap_array[3][3] = trucks.get(player.truck_id).emoji
     minimap = ""
@@ -128,8 +122,7 @@ def generate_minimap(player: players.Player, all_companies: list[companies.Compa
 
 @driving_bp.custom_handler(custom_id="stop")
 def stop(ctx, player_id: str):
-    player = players.get_driving_player(ctx.author.id, check=player_id)
-    player.stop_drive()
+    player = players.get(ctx.author.id, check=player_id)
     return Message(
         embeds=get_drive_embeds(player, ctx.author.avatar_url),
         components=[],
@@ -139,9 +132,7 @@ def stop(ctx, player_id: str):
 
 @driving_bp.custom_handler(custom_id="load")
 def load(ctx, player_id: str):
-    player = players.get_driving_player(ctx.author.id, check=player_id)
-    player.last_action_time = int(time())
-    player.followup_url = ctx.followup_url()
+    player = players.get(ctx.author.id, check=player_id)
 
     item = items.get(places.get(player.position).produced_item)
     if item.name not in [i.name for i in player.loaded_items]:
@@ -176,9 +167,7 @@ def load(ctx, player_id: str):
 
 @driving_bp.custom_handler(custom_id="unload")
 def unload(ctx, player_id: str):
-    player = players.get_driving_player(ctx.author.id, check=player_id)
-    player.last_action_time = int(time())
-    player.followup_url = ctx.followup_url()
+    player = players.get(ctx.author.id, check=player_id)
     current_job = player.get_job()
 
     item_options: list[SelectMenuOption] = []
@@ -210,7 +199,7 @@ def unload(ctx, player_id: str):
 
 @driving_bp.custom_handler(custom_id="unload_items")
 def unload_items(ctx, player_id: str):
-    player = players.get_driving_player(ctx.author.id, check=player_id)
+    player = players.get(ctx.author.id, check=player_id)
 
     item_string = ""
     for name in ctx.values:
@@ -273,7 +262,7 @@ def unload_items(ctx, player_id: str):
 
 @driving_bp.custom_handler(custom_id="job_new")
 def new_job(ctx, player_id: str) -> Message:
-    player = players.get_driving_player(ctx.author.id, check=player_id)
+    player = players.get(ctx.author.id, check=player_id)
     job_embed = Embed(
         color=config.EMBED_COLOR,
         author=Author(name=f"{player.name}'s Job", icon_url=ctx.author.avatar_url),
@@ -295,7 +284,7 @@ def new_job(ctx, player_id: str) -> Message:
 
 @driving_bp.custom_handler(custom_id="cancel")
 def cancel(ctx, player_id: str):
-    player = players.get_driving_player(ctx.author.id, check=player_id)
+    player = players.get(ctx.author.id, check=player_id)
     return Message(
         embeds=get_drive_embeds(player, ctx.author.avatar_url),
         components=components.get_drive_buttons(player),
@@ -325,7 +314,7 @@ def right(ctx, player_id: str):
 
 def move(ctx: Context, direction, player_id):
     """Centralized function for all the directional buttons"""
-    player = players.get_driving_player(ctx.author.id, check=player_id)
+    player = players.get(ctx.author.id, check=player_id)
 
     new_position = player.position
     if direction == symbols.LEFT:
@@ -365,9 +354,6 @@ def move(ctx: Context, direction, player_id):
             update=True,
         )
 
-    player.last_action_time = int(time())
-    player.followup_url = ctx.followup_url()
-
     return Message(
         embeds=get_drive_embeds(player, ctx.author.avatar_url),
         components=components.get_drive_buttons(player),
@@ -377,62 +363,63 @@ def move(ctx: Context, direction, player_id):
 
 @driving_bp.custom_handler(custom_id="event_hitchhike")
 def event_hitchhike(ctx, player_id: str) -> Message:
-    player = players.get_driving_player(ctx.author.id, check=player_id)
+    player = players.get(ctx.author.id, check=player_id)
     try:
         player.debit_money(3000)
     except players.NotEnoughMoney:
         pass
-    player.stop_drive()
     if randint(0, 1) == 0:
         return Message(
             (
                 "Someone stopped to take you with them, but.. **OH NO!** It's Mr. Thomas Ruck, the president of this "
                 "country. He had to have your truck towed away and you will pay $3000 for this incident."
             ),
-            components=[],
+            components=[components.get_home_buttons(player)[1]],
             update=True,
         )
     player.gas = 140
     player.position = Position.from_int(458759)
     return Message(
         "You found someone to go with. They even were so kind to gift you some gas. You should thank them.",
-        components=[],
+        components=[components.get_home_buttons(player)[1]],
         update=True,
     )
 
 
 @driving_bp.custom_handler(custom_id="event_walk")
 def event_walk(ctx, player_id: str) -> Message:
-    player = players.get_driving_player(ctx.author.id, check=player_id)
+    player = players.get(ctx.author.id, check=player_id)
     if player.level > 0:
         player.level -= 1
         player.xp = 0
         player.position = Position.from_int(458759)
-    player.stop_drive()
     return Message(
         "You started walking to the gas station. As you arrived, you noticed that you lost a level.",
-        components=[],
+        components=[components.get_home_buttons(player)[1]],
         update=True,
     )
 
 
 @driving_bp.custom_handler(custom_id="event_rob")
 def event_rob(ctx, player_id: str) -> Message:
-    player = players.get_driving_player(ctx.author.id, check=player_id)
-    player.stop_drive()
+    player = players.get(ctx.author.id, check=player_id)
     if randint(0, 1) == 0:
         player.gas += 250
-        return Message("Phew. Nobdody looked and you stole some gas. Be careful next time.", components=[], update=True)
+        return Message(
+            "Phew. Nobdody looked and you stole some gas. Be careful next time.",
+            components=[components.get_home_buttons(player)[1]],
+            update=True,
+        )
     return Message(
         "Oh no! You got caught. Nothing happened but the car owner drove away angrily.",
-        components=[],
+        components=[components.get_home_buttons(player)[1]],
         update=True,
     )
 
 
 @driving_bp.custom_handler(custom_id="continue_drive")
 def continue_drive(ctx, player_id: str):
-    player = players.get_driving_player(ctx.author.id, check=player_id)
+    player = players.get(ctx.author.id, check=player_id)
     return Message(
         embeds=get_drive_embeds(player, ctx.author.avatar_url),
         components=components.get_drive_buttons(player),
@@ -442,12 +429,7 @@ def continue_drive(ctx, player_id: str):
 
 @driving_bp.custom_handler(custom_id="initial_drive")
 def initial_drive(ctx, player_id: str):
-    if ctx.author.id != player_id:
-        raise players.WrongPlayer()
-    player = players.DrivingPlayer(
-        **vars(players.get(ctx.author.id)), followup_url=ctx.followup_url(), last_action_time=int(time())
-    )
-    player.start_drive()
+    player = players.get(ctx.author.id, check=player_id)
 
     def start_drive():
         ctx.send(
@@ -471,15 +453,6 @@ def drive(ctx) -> Message:
     if player.discriminator != ctx.author.discriminator:
         player.discriminator = ctx.author.discriminator
 
-    if players.is_driving(ctx.author.id):
-        driving_player = players.get_driving_player(ctx.author.id)
-        requests.patch(url=driving_player.followup_url + "/messages/@original", json={"components": []})
-        driving_player.stop_drive()
-
-    player = players.DrivingPlayer(
-        **vars(players.get(ctx.author.id)), followup_url=ctx.followup_url(), last_action_time=int(time())
-    )
-    player.start_drive()
     return Message(
         embeds=get_drive_embeds(player, ctx.author.avatar_url),
         components=components.get_drive_buttons(player),

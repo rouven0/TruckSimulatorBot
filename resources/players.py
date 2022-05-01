@@ -107,8 +107,7 @@ class Player:
                 __value_db = _format_items_to_db(__value)
             else:
                 __value_db = __value
-            table = "driving_players" if __name in ["last_action_time", "followup_url"] else "players"
-            sql_base = f"UPDATE {table} SET {__name}=%s WHERE id=%s"
+            sql_base = f"UPDATE players SET {__name}=%s WHERE id=%s"
             database.cur.execute(sql_base, (__value_db, self.id))
             database.con.commit()
         super().__setattr__(__name, __value)
@@ -323,91 +322,6 @@ def get_count(table: str) -> int:
     return record["COUNT(*)"]
 
 
-class DrivingPlayer(Player):
-    """
-    Object to manage current driving session and prevent duplicate driving
-
-    :ivar str followup_url: Url granting access to the drive message
-    :ivar int last_action_time: Time used to keep the list clean and time out drives
-    """
-
-    def __init__(self, followup_url="", last_action_time=0, **kwargs) -> None:
-        self.followup_url = followup_url
-        self.last_action_time = last_action_time
-        super().__init__(**kwargs)
-
-    def start_drive(self) -> None:
-        """Inserts a driving player into the database"""
-        database.cur.execute(
-            "INSERT INTO driving_players(id, followup_url, last_action_time) VALUES (%s,%s,%s)",
-            (self.id, self.followup_url, self.last_action_time),
-        )
-        database.con.commit()
-        logging.info("%s started driving", self.name)
-
-    def stop_drive(self) -> None:
-        """Removes a driving player from the database"""
-        database.cur.execute("DELETE FROM driving_players WHERE id=%s", (self.id,))
-        database.con.commit()
-        logging.info("%s stopped driving", self.name)
-
-
-def is_driving(id: str) -> bool:
-    """
-    Checks whether a specific user is driving
-
-    :param int id: The id to check
-    :return: A boolean indicating whether user is driving
-    """
-    # update the connection in case of the timeout-thread doing something
-    database.con.commit()
-    database.cur.execute("SELECT * FROM driving_players WHERE id=%s", (id,))
-    if len(database.cur.fetchall()) == 1:
-        return True
-    return False
-
-
-def get_driving_player(id: str, check: str = None) -> DrivingPlayer:
-    """
-    Get a driving player from the database
-
-    :param str id: The id to search for
-    :param str check: When given, this method will compare id and check, this is used to verify component "owners"
-    :raises NotDriving: When id and check mismatch
-    :return: The corresponding driving player
-    """
-    if check and id != check:
-        raise WrongPlayer()
-    if is_driving(id):
-        database.cur.execute("SELECT * FROM driving_players WHERE id=%s", (id,))
-        record = database.cur.fetchone()
-        followup_url = record["followup_url"]
-        last_action_time = record["last_action_time"]
-        return DrivingPlayer(**vars(get(id)), followup_url=followup_url, last_action_time=last_action_time)
-    raise WrongPlayer()
-
-
-def get_all_driving_players() -> list[DrivingPlayer]:
-    """
-    Get all driving players from the database
-
-    :return: A list of all driving players
-    """
-    # update the connection in case of the timeout-thread doing something
-    database.con.commit()
-    database.cur.execute("SELECT * from driving_players")
-    driving_players = []
-    for record in database.cur.fetchall():
-        driving_players.append(
-            DrivingPlayer(
-                **vars(get(record["id"])),
-                followup_url=record["followup_url"],
-                last_action_time=record["last_action_time"],
-            )
-        )
-    return driving_players
-
-
 class PlayerNotRegistered(Exception):
     """
     Exception raised when a player that is not registered is requested
@@ -451,8 +365,8 @@ class NotEnoughMoney(Exception):
 
 class WrongPlayer(Exception):
     """
-    Exception raised when a requested driving player is not driving
+    Exception raised when a requeste player is not the "owner" of a message
     """
 
     def __str__(self) -> str:
-        return "The requested driving player isn't driving"
+        return "The requested player is not the message owner"

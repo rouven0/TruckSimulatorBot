@@ -7,34 +7,30 @@ install:
 	@echo Setting up the systemd service...
 	@sed -i 's|WORKINGDIRECTORY|'$(PWD)'|g' TruckSimulatorBot.service
 	@sudo cp ./TruckSimulatorBot.service /etc/systemd/system
-	@sed -i 's|WORKINGDIRECTORY|'$(PWD)'|g' TruckSimulatorTimeouts.service
-	@sudo cp ./TruckSimulatorTimeouts.service /etc/systemd/system
 	@sudo systemctl daemon-reload
 	@sudo systemctl enable TruckSimulatorBot.service
-	@sudo systemctl enable TruckSimulatorTimeouts.service
-	@echo Done. The services are ready to be started
+	@echo Done. The service is ready to be started
 
 uninstall:
-	@echo Removing systemd services...
+	@echo Removing systemd service...
 	@sudo systemctl disable TruckSimulatorBot.service
-	@sudo systemctl disable TruckSimulatorTimeouts.service
 	@sed -i 's|'$(PWD)'|WORKINGDIRECTORY|g' TruckSimulatorBot.service
 	@sudo rm /etc/systemd/system/TruckSimulatorBot.service
-	@sed -i 's|'$(PWD)'|WORKINGDIRECTORY|g' TruckSimulatorTimeouts.service
-	@sudo rm /etc/systemd/system/TruckSimulatorTimeouts.service
 	@sudo systemctl daemon-reload
 	@echo Done.
 
 start:
 	@sudo systemctl start TruckSimulatorBot.service
-	@sudo systemctl start TruckSimulatorTimeouts.service
 	@echo Bot Service started
 
 stop:
 	@sudo systemctl stop TruckSimulatorBot.service
-	@sudo systemctl stop TruckSimulatorTimeouts.service
 	@echo Bot Service stopped
 
+restart:
+	@sudo systemctl restart TruckSimulatorBot.service
+	@echo Bot Service restarted
+
 documentation:
-	@sphinx-build -M html docs/ docs/_build/
+	@venv/bin/sphinx-build -M html docs/ docs/_build/
 

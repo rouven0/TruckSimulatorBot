@@ -6,6 +6,3 @@ When your job is done, your get a reward and some xp to level you up. The reward
 
 **How do I get a job?**
 Getting a job is easy, just press that big green **New Job** button while you are driving, and you're done. You will get a message telling you what to do, and the navigation will start to guide you the directions.
-
-**Important notice:**
-Jobs expire after one week. If you don't complete it in that time it will be cancelled.

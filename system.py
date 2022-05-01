@@ -38,7 +38,6 @@ def get_info_embed() -> Embed:
     minutes = floor(uptime.seconds / 60) - hours * 60
     seconds = uptime.seconds - hours * 3600 - minutes * 60
     player_count = players.get_count("players")
-    driving_player_count = players.get_count("driving_players")
     job_count = players.get_count("jobs")
     company_count = players.get_count("companies")
     system_info = (
@@ -46,8 +45,7 @@ def get_info_embed() -> Embed:
         f"Worker Uptime: {days}d {hours}h {minutes}m {seconds}s\n"
         f"Registered Players: {player_count}\n"
         f"Running Jobs: {job_count}\n"
-        f"Registered Companies: {company_count}\n"
-        f"Driving Trucks: {driving_player_count}```"
+        f"Registered Companies: {company_count}```\n"
     )
 
     credits = (
