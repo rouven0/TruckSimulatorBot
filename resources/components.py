@@ -84,8 +84,6 @@ def get_drive_buttons(player: Player) -> list:
                 style=2, label="Refill", emoji={"name": "refill", "id": symbols.REFILL}, custom_id=["refill", player.id]
             )
         )
-    if place:
-        print(place.available_actions)
     if place and "gambling" in place.available_actions:
         action_buttons.append(
             Button(

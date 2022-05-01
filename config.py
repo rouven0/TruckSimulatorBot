@@ -8,9 +8,7 @@ SELF_AVATAR_URL = "https://cdn.discordapp.com/avatars/831052837353816066/c9b904f
 
 class Guilds:
     "Guild id used for command registration"
-    TESTING = "830928381100556338"
     SUPPORT = "839580174282260510"
-    CHARIVARI = "812650049565753355"
 
 
 class Users:

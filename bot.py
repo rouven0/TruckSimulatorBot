@@ -214,10 +214,6 @@ if "--remove-global" in sys.argv:
     discord.update_commands()
     sys.exit()
 
-if "--clear-charivari" in sys.argv:
-    discord.update_commands(guild_id=config.Guilds.CHARIVARI)
-    sys.exit()
-
 if "--clear-admin" in sys.argv:
     discord.update_commands(guild_id=config.Guilds.SUPPORT)
     sys.exit()
@@ -236,13 +232,6 @@ discord.register_blueprint(guide_bp)
 discord.register_blueprint(truck_bp)
 discord.register_blueprint(company_bp)
 
-if "--update" in sys.argv:
-    discord.update_commands(guild_id=config.Guilds.TESTING)
-    sys.exit()
-
-if "--update-charivari" in sys.argv:
-    discord.update_commands(guild_id=config.Guilds.CHARIVARI)
-    sys.exit()
 
 if "--deploy" in sys.argv:
     discord.update_commands()
