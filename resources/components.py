@@ -59,7 +59,7 @@ def get_drive_buttons(player: Player) -> list:
             emoji={"name": "load", "id": symbols.LOAD},
             custom_id=["load", player.id],
             disabled=load_disabled,
-            label=f"Load {items.get(place.produced_item).name} in your truck" if place else "Load",
+            label=f"Load your truck with {items.get(place.produced_item).name}" if place else "Load",
         ),
         Button(
             style=1
