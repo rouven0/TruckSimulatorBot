@@ -1,20 +1,17 @@
 "Blueprint file containing all gambling-related commands and handlers"
 # pylint: disable=unused-argument, missing-function-docstring
-from random import randint, sample, choices
+from random import sample, choices
 from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
 from flask_discord_interactions.context import Context
 from flask_discord_interactions.discord import InteractionType
 from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles, TextInput
 from flask_discord_interactions.models.modal import Modal
-from flask_discord_interactions.models.option import CommandOptionType, Option
-from flask_discord_interactions.models.user import User
 from flask_discord_interactions.models.embed import Author, Field, Media
-from flask import json, request
+from flask import request
 
 from resources import players
 from resources import items
 from resources import components
-from resources.autocompletes import amount_all
 import config
 
 gambling_bp = DiscordInteractionsBlueprint()
@@ -28,7 +25,10 @@ def casino(ctx, player_id: str) -> Message:
             title="Welcome to the casino",
             color=config.EMBED_COLOR,
             image=Media(
-                url="https://media.discordapp.net/attachments/868822515282231346/871394792947482674/vegass-default_truck.png"
+                url=(
+                    "https://media.discordapp.net/attachments/868822515282231346/871394792947482674"
+                    "/vegass-default_truck.png"
+                )
             ),
         ),
         components=components.get_casino_buttons(player),
@@ -117,7 +117,7 @@ def slots_handler(ctx: Context, player_id: str, amount=0):
     if type == InteractionType.MODAL_SUBMIT:
         amount = ctx.get_component("input_amount").value.replace(" ", "").replace("k", "000").replace("m", "000000")
         if amount == "all":
-            amount = player.money
+            amount = str(player.money)
     if str.isnumeric(amount):
         amount = int(amount)
     else:

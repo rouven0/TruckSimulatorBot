@@ -101,6 +101,9 @@ def votes():
 
 @app.route("/github", methods=["POST"])
 def update():
+    """
+    Run an update script on every github push on main
+    """
     logging.warning("Github update received.")
     # X-Hub-Signature-256: sha256=<hash>
     sig_header = "X-Hub-Signature-256"
@@ -115,7 +118,7 @@ def update():
             if hmac.compare_digest(req_sign, computed_sign):
                 if request.json.get("ref") == "refs/heads/main":
                     logging.warning("Restarting now")
-                    subprocess.run(["/bin/bash", "./update.sh"])
+                    subprocess.run(["/bin/bash", "./update.sh"], check=True)
                 return "Restart successful", 200
     return "", 401
 
