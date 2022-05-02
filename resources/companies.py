@@ -64,8 +64,7 @@ class Company:
             else:
                 __value_db = __value
             sql_base = f"UPDATE companies SET {__name}=%s WHERE id=%s"
-            database.cur.execute(sql_base, (__value_db, self.id))
-            database.con.commit()
+            database.execute(sql_base, (__value_db, self.id))
         super().__setattr__(__name, __value)
 
     def __str__(self) -> str:
@@ -93,9 +92,8 @@ class Company:
         """
         # Maybe make this a property at some point
         members = []
-        database.cur.execute("SELECT * FROM players WHERE company=%s", (self.id,))
-        record = database.cur.fetchall()
-        for member in record:
+        records = database.fetchall("SELECT * FROM players WHERE company=%s", (self.id,))
+        for member in records:
             members.append(Player(**member))
         return members
 
@@ -107,8 +105,8 @@ def exists(name: str) -> bool:
     :param str name: A name to check
     :return: A bool defining whether that company exists
     """
-    database.cur.execute("SELECT * FROM companies WHERE name=%s", (name,))
-    if len(database.cur.fetchall()) == 1:
+    records = database.fetchall("SELECT * FROM companies WHERE name=%s", (name,))
+    if len(records) == 1:
         return True
     return False
 
@@ -123,8 +121,7 @@ def get(id: Optional[int]) -> Company:
     """
     if not id:
         raise CompanyNotFound()
-    database.cur.execute("SELECT * FROM companies WHERE id=%s", (id,))
-    record = database.cur.fetchone()
+    record = database.fetchone("SELECT * FROM companies WHERE id=%s", (id,))
     company = Company(**record)
     return company
 
@@ -133,9 +130,9 @@ def get_all() -> list[Company]:
     """
     :return: A list of all registered companies
     """
-    database.cur.execute("SELECT * from companies")
+    records = database.fetchall("SELECT * from companies")
     companies = []
-    for record in database.cur.fetchall():
+    for record in records:
         companies.append(Company(**record))
     return companies
 
@@ -152,13 +149,9 @@ def insert(company: Company) -> int:
     placeholders = ", ".join(["%s"] * len(attrs))
     columns = ", ".join(attrs.keys())
     sql = f"INSERT INTO companies ({columns}) VALUES ({placeholders})"
-    print(sql)
-    print(tuple(company))
-    database.cur.execute(sql, tuple(company))
-    database.con.commit()
+    database.execute(sql, tuple(company))
     logging.info("%s created the company %s", company.founder, company.name)
-    database.cur.execute("Select id from companies where name=%s", (company.name,))
-    return database.cur.fetchone()["id"]
+    return database.fetchone("Select id from companies where name=%s", (company.name,))["id"]
 
 
 def remove(company: Company) -> None:
@@ -167,8 +160,7 @@ def remove(company: Company) -> None:
 
     :param Company company: The company to remove
     """
-    database.cur.execute("DELETE FROM companies WHERE id=%s", (company.id,))
-    database.con.commit()
+    database.execute("DELETE FROM companies WHERE id=%s", (company.id,))
     logging.info("Company %s got deleted", company.name)
 
 

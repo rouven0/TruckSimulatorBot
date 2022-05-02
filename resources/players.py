@@ -108,8 +108,7 @@ class Player:
             else:
                 __value_db = __value
             sql_base = f"UPDATE players SET {__name}=%s WHERE id=%s"
-            database.cur.execute(sql_base, (__value_db, self.id))
-            database.con.commit()
+            database.execute(sql_base, (__value_db, self.id))
         super().__setattr__(__name, __value)
 
     def add_xp(self, amount: int) -> str:
@@ -184,8 +183,7 @@ class Player:
         placeholders = ", ".join(["%s"] * len(vars(job)))
         columns = ", ".join(vars(job).keys())
         sql = f"INSERT INTO jobs({columns}) VALUES ({placeholders})"
-        database.cur.execute(sql, tuple(job))
-        database.con.commit()
+        database.execute(sql, tuple(job))
 
     @staticmethod
     def update_job(job: Job, state: int) -> None:
@@ -195,8 +193,7 @@ class Player:
         :param jobs.Job job: The Job that should be updated
         :param int state: The new state of the job
         """
-        database.cur.execute("UPDATE jobs SET state=%s WHERE player_id=%s", (state, job.player_id))
-        database.con.commit()
+        database.execute("UPDATE jobs SET state=%s WHERE player_id=%s", (state, job.player_id))
 
     @staticmethod
     def remove_job(job: Job) -> None:
@@ -205,8 +202,7 @@ class Player:
 
         :param jobs.Job job: The Job that should be removed
         """
-        database.cur.execute("DELETE FROM jobs WHERE player_id=%s", (job.player_id,))
-        database.con.commit()
+        database.execute("DELETE FROM jobs WHERE player_id=%s", (job.player_id,))
 
     def get_job(self) -> Optional[Job]:
         """
@@ -214,8 +210,7 @@ class Player:
 
         :return: A job if the player currently has a running job
         """
-        database.cur.execute("SELECT * FROM jobs WHERE player_id=%s", (self.id,))
-        records = database.cur.fetchall()
+        records = database.fetchall("SELECT * FROM jobs WHERE player_id=%s", (self.id,))
         if len(records) > 0:
             return Job(**records[0])
         return None
@@ -230,8 +225,7 @@ def insert(player: Player) -> None:
     placeholders = ", ".join(["%s"] * len(vars(player)))
     columns = ", ".join(vars(player).keys())
     sql = f"INSERT INTO players({columns}) VALUES ({placeholders})"
-    database.cur.execute(sql, tuple(player))
-    database.con.commit()
+    database.execute(sql, tuple(player))
     logging.info("Inserted %s into the database as %s", player.name, tuple(player))
 
 
@@ -249,8 +243,7 @@ def get(id: str, check: str = None) -> Player:
         raise PlayerNotRegistered(id)
     if check and id != check:
         raise WrongPlayer()
-    database.cur.execute("SELECT * FROM players WHERE id=%s", (id,))
-    record = database.cur.fetchone()
+    record = database.fetchone("SELECT * FROM players WHERE id=%s", (id,))
     player = Player(**record)
     if player.xp == -1:
         raise PlayerBlacklisted(player.id, player.name)
@@ -267,17 +260,14 @@ def get_top(key: str) -> tuple:
         - :suffix: A suffix to be shown in the list
     """
     if key == "money":
-        database.cur.execute("SELECT * FROM players ORDER BY money DESC")
+        top_records = database.fetchmany("SELECT * FROM players ORDER BY money DESC", size=15)
         suffix = "$"
     elif key == "miles":
-        database.cur.execute("SELECT * FROM players ORDER BY miles DESC")
+        top_records = database.fetchmany("SELECT * FROM players ORDER BY miles DESC", size=15)
         suffix = " miles"
     else:
-        database.cur.execute("SELECT * FROM players ORDER BY level DESC, xp DESC")
+        top_records = database.fetchmany("SELECT * FROM players ORDER BY level DESC, xp DESC", size=15)
         suffix = ""
-    top_records = database.cur.fetchmany(15)
-    # clean the cursor to prevent errors
-    database.cur.fetchall()
     top_players = []
     for record in top_records:
         top_players.append(Player(**record))
@@ -290,8 +280,7 @@ def get_blacklisted() -> list[Player]:
 
     :return: A list of blacklisted players
     """
-    database.cur.execute("SELECT * FROM players WHERE xp=-1")
-    records = database.cur.fetchall()
+    records = database.fetchall("SELECT * FROM players WHERE xp=-1")
     return [Player(**record) for record in records]
 
 
@@ -302,8 +291,8 @@ def registered(id: str) -> bool:
     :param int id: User id to check
     :return: A boolean indicating the registered state
     """
-    database.cur.execute("SELECT * FROM players WHERE id=%s", (id,))
-    if len(database.cur.fetchall()) == 1:
+    records = database.fetchall("SELECT * FROM players WHERE id=%s", (id,))
+    if len(records) == 1:
         return True
     return False
 
@@ -315,10 +304,7 @@ def get_count(table: str) -> int:
     :param str table: Table to look at
     :return: The row count of the table
     """
-    # update the connection in case of the timeout-thread doing something
-    database.con.commit()
-    database.cur.execute("SELECT COUNT(*) FROM " + table)
-    record = database.cur.fetchone()
+    record = database.fetchone("SELECT COUNT(*) FROM " + table)
     return record["COUNT(*)"]
 
 
