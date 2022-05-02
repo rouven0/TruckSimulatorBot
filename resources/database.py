@@ -17,7 +17,7 @@ def execute(query: str, args=None) -> int:
         with con.cursor(dictionary=True) as cur:
             cur.execute(query, args)
             con.commit()
-            return con.rowcount
+            return cur.rowcount
 
 
 def fetchall(query: str, args=None) -> list[dict]:
