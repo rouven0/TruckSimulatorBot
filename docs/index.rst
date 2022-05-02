@@ -10,6 +10,7 @@ Welcome to TruckSimulatorBot's documentation!
     :maxdepth: 2
     :caption: Contents:
 
+    database.rst
     players.rst
     companies.rst
     jobs.rst

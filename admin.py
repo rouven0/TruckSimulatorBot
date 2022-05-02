@@ -1,12 +1,12 @@
 "Blueprint file containing commands locked to the bot admins"
 # pylint: disable=unused-argument,broad-except
 import json
+import mysql.connector
 
 from flask_discord_interactions import DiscordInteractionsBlueprint, User
 from flask_discord_interactions.context import Context
 from flask_discord_interactions.models.message import Message, Embed
 
-from resources import database
 from resources import players
 import config
 
@@ -22,11 +22,13 @@ def sql(ctx, query: str):
     if ctx.author.id != config.Users.ADMIN:
         return "Wait. You shouldn't be able to even read this. Something is messed up."
     try:
-        database.cur.execute(query)
-        if database.cur.rowcount != 0:
-            database.con.commit()
-            return f"`Done. {database.cur.rowcount} row(s) affected`"
-        return f"```json\n{json.dumps(database.cur.fetchall(), indent=2)}```"
+        with mysql.connector.connect(**config.DATABASE_ARGS) as con:
+            with con.cursor(dictionary=True) as cur:
+                cur.execute(query)
+                if cur.rowcount != 0:
+                    con.commit()
+                    return f"`Done. {cur.rowcount} row(s) affected`"
+                return f"```json\n{json.dumps(cur.fetchall(), indent=2)}```"
     except Exception as error:
         return "Error: " + str(error)
 

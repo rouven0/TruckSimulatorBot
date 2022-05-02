@@ -7,7 +7,6 @@ from dataclasses import dataclass
 from random import randint
 from math import sqrt
 from time import time
-from resources import database
 from resources import places
 
 STATE_CLAIMED = 0
@@ -97,17 +96,3 @@ def get_state(job: Job) -> str:
     if job.state == 2:
         return f"Your job is done and you got ${job.reward:,}."
     return "Something went wrong"
-
-
-def get_all() -> list[Job]:
-    """
-    :return: A list of all running jobs
-    """
-    # update the connection in case of the timeout-thread doing something
-    database.con.commit()
-    database.cur.execute("SELECT * FROM jobs")
-    all_jobs = []
-    record = database.cur.fetchall()
-    for job in record:
-        all_jobs.append(Job(**job))
-    return all_jobs
