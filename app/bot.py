@@ -95,30 +95,6 @@ def votes():
     return "", 204
 
 
-@app.route("/github", methods=["POST"])
-def update():
-    """
-    Run an update script on every github push on main
-    """
-    logging.warning("Github update received.")
-    # X-Hub-Signature-256: sha256=<hash>
-    sig_header = "X-Hub-Signature-256"
-    if sig_header in request.headers:
-        header_splitted = request.headers[sig_header].split("=")
-        if len(header_splitted) == 2:
-            req_sign = header_splitted[1]
-            computed_sign = hmac.new(
-                getenv("GITHUB_AUTHORIZATION", "").encode("utf-8"), request.data, hashlib.sha256
-            ).hexdigest()
-            # is the provided signature ok?
-            if hmac.compare_digest(req_sign, computed_sign):
-                if request.json.get("ref") == "refs/heads/main":
-                    logging.warning("Restarting now")
-                    subprocess.run(["/bin/bash", "./update.sh"], check=True)
-                return "Restart successful", 200
-    return "", 401
-
-
 @app.errorhandler(players.NotEnoughMoney)
 def not_enough_money(error):
     """Error handler in case a player doesn't have enough money"""
