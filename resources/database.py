@@ -44,7 +44,7 @@ def fetchmany(query: str, args=None, size=None) -> list[dict]:
     :returns: A list of records as dictionaries
     """
     with mysql.connector.connect(**config.DATABASE_ARGS) as con:
-        with con.cursor(dictionary=True) as cur:
+        with con.cursor(dictionary=True, buffered=True) as cur:
             cur.execute(query, args)
             return cur.fetchmany(size)
 
@@ -58,6 +58,6 @@ def fetchone(query: str, args=None) -> dict:
     :returns: A single record as a dictionary
     """
     with mysql.connector.connect(**config.DATABASE_ARGS) as con:
-        with con.cursor(dictionary=True) as cur:
+        with con.cursor(dictionary=True, buffered=True) as cur:
             cur.execute(query, args)
             return cur.fetchone()
