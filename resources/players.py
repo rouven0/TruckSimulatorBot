@@ -3,16 +3,15 @@
 This module contains the Player class, several methods to operate with players in the database and
 the DrivingPlayer, used to manage driving sessions
 """
-from dataclasses import field, dataclass
 import inspect
-from time import time
-from typing import Optional, Any
 import logging
-from resources import database
-from resources import levels
-from resources import items
-from resources.jobs import Job
+from dataclasses import dataclass, field
+from time import time
+from typing import Any, Optional
+
+from resources import database, items, levels
 from resources import position as pos
+from resources.jobs import Job
 
 
 def _format_items_to_db(item_list: list) -> str:

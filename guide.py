@@ -1,18 +1,17 @@
 "Blueprint file containing the guide command and its component handlers"
 # pylint: disable=unused-argument
 from os import listdir
-from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
-from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
+
+from flask_discord_interactions import (DiscordInteractionsBlueprint, Embed,
+                                        Message)
+from flask_discord_interactions.models.component import (ActionRow, Button,
+                                                         SelectMenu,
+                                                         SelectMenuOption)
+from flask_discord_interactions.models.embed import Author, Field, Media
 from flask_discord_interactions.models.option import CommandOptionType, Option
-from flask_discord_interactions.models.embed import Field, Author, Media
 
 import config
-
-from resources import items
-from resources import players
-from resources import assets
-from resources import places
-from resources import symbols
+from resources import assets, items, places, players, symbols
 
 guide_bp = DiscordInteractionsBlueprint()
 

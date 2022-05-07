@@ -1,18 +1,20 @@
 "Blueprint file containing all gambling-related commands and handlers"
 # pylint: disable=unused-argument, missing-function-docstring
-from random import sample, choices
-from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
+from random import choices, sample
+
+from flask import request
+from flask_discord_interactions import (DiscordInteractionsBlueprint, Embed,
+                                        Message)
 from flask_discord_interactions.context import Context
 from flask_discord_interactions.discord import InteractionType
-from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles, TextInput
-from flask_discord_interactions.models.modal import Modal
+from flask_discord_interactions.models.component import (ActionRow, Button,
+                                                         ButtonStyles,
+                                                         TextInput)
 from flask_discord_interactions.models.embed import Author, Field, Media
-from flask import request
+from flask_discord_interactions.models.modal import Modal
 
-from resources import players
-from resources import items
-from resources import components
 import config
+from resources import components, items, players
 
 gambling_bp = DiscordInteractionsBlueprint()
 

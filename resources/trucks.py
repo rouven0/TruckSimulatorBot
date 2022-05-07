@@ -1,8 +1,8 @@
 """
 Every player has a truck. For now these trucks are static.
 """
-from dataclasses import dataclass
 import sqlite3
+from dataclasses import dataclass
 
 
 def __generate_list(lst) -> None:

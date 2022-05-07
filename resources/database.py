@@ -2,6 +2,7 @@
 This module contains the database connection
 """
 import mysql.connector
+
 import config
 
 

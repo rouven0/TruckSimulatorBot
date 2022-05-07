@@ -1,12 +1,12 @@
 """
 Places are spread all over the map. They accept and produce certain items, used in jobs and minijobs
 """
-from dataclasses import dataclass
 import sqlite3
+from dataclasses import dataclass
 from typing import Optional, Union
 
-from resources import symbols
 from resources import position as pos
+from resources import symbols
 
 
 @dataclass

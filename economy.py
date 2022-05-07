@@ -1,19 +1,14 @@
 "Blueprint file containing all economy-related commands and handlers"
 # pylint: disable=unused-argument,missing-function-docstring
-from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
+from flask_discord_interactions import (DiscordInteractionsBlueprint, Embed,
+                                        Message)
+from flask_discord_interactions.models.embed import Author, Field, Footer
 from flask_discord_interactions.models.option import CommandOptionType, Option
 from flask_discord_interactions.models.user import User
-from flask_discord_interactions.models.embed import Author, Field, Footer
-
-from resources import players
-from resources import items
-from resources import jobs
-from resources import trucks
-from resources import levels
-from resources.autocompletes import amount_all
 
 import config
-
+from resources import items, jobs, levels, players, trucks
+from resources.autocompletes import amount_all
 
 economy_bp = DiscordInteractionsBlueprint()
 

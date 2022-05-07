@@ -4,10 +4,11 @@ Companies are a group of players that collect money together. Every company's lo
 Every time a player completes a job. The companies net worth is increased.
 """
 
-from dataclasses import dataclass
-import logging
 import inspect
-from typing import Optional, Any
+import logging
+from dataclasses import dataclass
+from typing import Any, Optional
+
 from resources import database
 from resources import position as pos
 from resources.players import Player

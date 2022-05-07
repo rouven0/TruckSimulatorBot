@@ -1,16 +1,17 @@
 "Blueprint file containing the info command and some general button handlers for abort and back buttons"
 # pylint: disable=unused-argument, missing-function-docstring
+import os
 from datetime import datetime
 from math import floor
-import os
 
-from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
+from flask_discord_interactions import (DiscordInteractionsBlueprint, Embed,
+                                        Message)
+from flask_discord_interactions.models.component import (ActionRow, Button,
+                                                         ButtonStyles)
 from flask_discord_interactions.models.embed import Field, Footer, Media
-from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles
 
 import config
 from resources import players
-
 
 start_time = datetime.now()
 

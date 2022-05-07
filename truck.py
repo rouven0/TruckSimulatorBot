@@ -1,21 +1,16 @@
 "Blueprint file containing all truck-related commands and handlers"
 # pylint: disable=unused-argument
-from typing import Union
 from math import log
-from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
-from flask_discord_interactions.models.component import (
-    ActionRow,
-    Button,
-    ButtonStyles,
-)
-from flask_discord_interactions.models.embed import Field, Media, Author
+from typing import Union
+
+from flask_discord_interactions import (DiscordInteractionsBlueprint, Embed,
+                                        Message)
+from flask_discord_interactions.models.component import (ActionRow, Button,
+                                                         ButtonStyles)
+from flask_discord_interactions.models.embed import Author, Field, Media
 
 import config
-
-from resources import players
-from resources import trucks
-from resources import symbols
-from resources import components
+from resources import components, players, symbols, trucks
 
 truck_bp = DiscordInteractionsBlueprint()
 

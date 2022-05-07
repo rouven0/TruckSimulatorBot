@@ -1,8 +1,8 @@
 """
 Items can be loaded and unloaded from the truck at all places. They mostly consist of a name and an emoji
 """
-from dataclasses import dataclass
 import sqlite3
+from dataclasses import dataclass
 
 
 @dataclass

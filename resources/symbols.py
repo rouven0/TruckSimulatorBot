@@ -2,6 +2,7 @@
 This module provides all symbols and emojis the bots operates with
 """
 import re
+
 import config
 
 LEFT = 853353650491752459

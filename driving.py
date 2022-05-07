@@ -1,26 +1,22 @@
 "Blueprint file containing all driving-related commands and handlers"
 # pylint: disable=missing-function-docstring
-from datetime import datetime
 import threading
+from datetime import datetime
 from random import randint
 
-from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed
+from flask_discord_interactions import (DiscordInteractionsBlueprint, Embed,
+                                        Message)
 from flask_discord_interactions.context import Context
-from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
-from flask_discord_interactions.models.embed import Author, Field, Footer, Media
+from flask_discord_interactions.models.component import (ActionRow, Button,
+                                                         SelectMenu,
+                                                         SelectMenuOption)
+from flask_discord_interactions.models.embed import (Author, Field, Footer,
+                                                     Media)
 
 import config
-from resources import players
-from resources import companies
-from resources import items
-from resources import levels
-from resources import places
-from resources import symbols
-from resources import assets
-from resources import jobs
-from resources import trucks
+from resources import (assets, companies, components, items, jobs, levels,
+                       places, players, symbols, trucks)
 from resources.position import Position
-from resources import components
 
 driving_bp = DiscordInteractionsBlueprint()
 

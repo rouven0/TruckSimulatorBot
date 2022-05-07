@@ -1,14 +1,14 @@
 "Blueprint file containing commands locked to the bot admins"
 # pylint: disable=unused-argument,broad-except
 import json
-import mysql.connector
 
+import mysql.connector
 from flask_discord_interactions import DiscordInteractionsBlueprint, User
 from flask_discord_interactions.context import Context
-from flask_discord_interactions.models.message import Message, Embed
+from flask_discord_interactions.models.message import Embed, Message
 
-from resources import players
 import config
+from resources import players
 
 admin_bp = DiscordInteractionsBlueprint()
 

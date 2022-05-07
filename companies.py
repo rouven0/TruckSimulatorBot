@@ -2,21 +2,16 @@
 # pylint: disable=unused-argument
 import re
 
-from flask_discord_interactions import DiscordInteractionsBlueprint, Message, Embed, User, ApplicationCommandType, Modal
-from flask_discord_interactions.models.component import (
-    ActionRow,
-    Button,
-    Component,
-    TextInput,
-)
-from flask_discord_interactions.models.embed import Author, Field, Footer, Media
+from flask_discord_interactions import (ApplicationCommandType,
+                                        DiscordInteractionsBlueprint, Embed,
+                                        Message, Modal, User)
+from flask_discord_interactions.models.component import (ActionRow, Button,
+                                                         Component, TextInput)
+from flask_discord_interactions.models.embed import (Author, Field, Footer,
+                                                     Media)
 
 import config
-
-from resources import players
-from resources import places
-from resources import companies
-from resources import components
+from resources import companies, components, places, players
 
 company_bp = DiscordInteractionsBlueprint()
 

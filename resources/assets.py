@@ -3,6 +3,7 @@ This file contains some of the image urls that the bot uses
 The images are hosted on a discord server
 """
 from random import randint
+
 from resources.places import Place
 from resources.players import Player
 

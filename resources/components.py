@@ -1,15 +1,13 @@
 """
 This module provides several lists of buttons and selects
 """
-from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
-from resources.companies import Company
+from flask_discord_interactions.models.component import (ActionRow, Button,
+                                                         SelectMenu,
+                                                         SelectMenuOption)
 
+from resources import companies, items, places, symbols, trucks
+from resources.companies import Company
 from resources.players import Player
-from resources import companies
-from resources import places
-from resources import symbols
-from resources import items
-from resources import trucks
 
 
 def get_drive_buttons(player: Player) -> list:

@@ -4,9 +4,10 @@ Jobs are the main way to get money. For every job, the player has to bring items
 After the job is done, the reward is payed out.
 """
 from dataclasses import dataclass
-from random import randint
 from math import sqrt
+from random import randint
 from time import time
+
 from resources import places
 
 STATE_CLAIMED = 0
