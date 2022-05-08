@@ -4,10 +4,8 @@ import os
 from datetime import datetime
 from math import floor
 
-from flask_discord_interactions import (DiscordInteractionsBlueprint, Embed,
-                                        Message)
-from flask_discord_interactions.models.component import (ActionRow, Button,
-                                                         ButtonStyles)
+from flask_discord_interactions import DiscordInteractionsBlueprint, Embed, Message
+from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles
 from flask_discord_interactions.models.embed import Field, Footer, Media
 
 import config

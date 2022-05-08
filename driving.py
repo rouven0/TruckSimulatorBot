@@ -4,18 +4,13 @@ import threading
 from datetime import datetime
 from random import randint
 
-from flask_discord_interactions import (DiscordInteractionsBlueprint, Embed,
-                                        Message)
+from flask_discord_interactions import DiscordInteractionsBlueprint, Embed, Message
 from flask_discord_interactions.context import Context
-from flask_discord_interactions.models.component import (ActionRow, Button,
-                                                         SelectMenu,
-                                                         SelectMenuOption)
-from flask_discord_interactions.models.embed import (Author, Field, Footer,
-                                                     Media)
+from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
+from flask_discord_interactions.models.embed import Author, Field, Footer, Media
 
 import config
-from resources import (assets, companies, components, items, jobs, levels,
-                       places, players, symbols, trucks)
+from resources import assets, companies, components, items, jobs, levels, places, players, symbols, trucks
 from resources.position import Position
 
 driving_bp = DiscordInteractionsBlueprint()

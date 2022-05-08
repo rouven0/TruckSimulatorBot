@@ -2,11 +2,8 @@
 # pylint: disable=unused-argument
 from os import listdir
 
-from flask_discord_interactions import (DiscordInteractionsBlueprint, Embed,
-                                        Message)
-from flask_discord_interactions.models.component import (ActionRow, Button,
-                                                         SelectMenu,
-                                                         SelectMenuOption)
+from flask_discord_interactions import DiscordInteractionsBlueprint, Embed, Message
+from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
 from flask_discord_interactions.models.embed import Author, Field, Media
 from flask_discord_interactions.models.option import CommandOptionType, Option
 

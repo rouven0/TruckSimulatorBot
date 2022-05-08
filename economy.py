@@ -1,7 +1,6 @@
 "Blueprint file containing all economy-related commands and handlers"
 # pylint: disable=unused-argument,missing-function-docstring
-from flask_discord_interactions import (DiscordInteractionsBlueprint, Embed,
-                                        Message)
+from flask_discord_interactions import DiscordInteractionsBlueprint, Embed, Message
 from flask_discord_interactions.models.embed import Author, Field, Footer
 from flask_discord_interactions.models.option import CommandOptionType, Option
 from flask_discord_interactions.models.user import User
