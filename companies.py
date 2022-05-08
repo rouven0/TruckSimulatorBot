@@ -7,7 +7,7 @@ from flask_discord_interactions.models.component import ActionRow, Button, Compo
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
 
 import config
-from resources import companies, components, places, players
+from resources import companies, components, places, players, symbols
 
 company_bp = DiscordInteractionsBlueprint()
 
@@ -129,11 +129,11 @@ def confirm_found(ctx):
     )
 
 
-@company_bp.command(name="Hire", type=ApplicationCommandType.USER)
-def hire(ctx, user: User):
+@company_bp.custom_handler(custom_id="hire")
+def hire(ctx, user_id: str):
     """Context menu command to hire a player"""
     player = players.get(ctx.author.id)
-    invited_player = players.get(user.id)
+    invited_player = players.get(user_id)
     company = companies.get(player.company)
     if len(company.get_members()) > 24:
         return Message("Your company can't have more than 25 members!", ephemeral=True)
@@ -145,8 +145,8 @@ def hire(ctx, user: User):
     confirm_buttons: list[Component] = [
         ActionRow(
             components=[
-                Button(style=2, label="Cancel", custom_id=["cancel_company_action", invited_player.id]),
-                Button(style=3, label="Confirm", custom_id=["confirm_company_hire", company.id, invited_player.id]),
+                Button(style=2, label="Decline", custom_id=["cancel_company_action", invited_player.id]),
+                Button(style=3, label="Accept", custom_id=["confirm_company_hire", company.id, invited_player.id]),
             ]
         )
     ]
@@ -349,12 +349,35 @@ def company_show(ctx, player_id):
     )
 
 
-@company_bp.command(name="Show company", type=ApplicationCommandType.USER)
+@company_bp.command(name="Check company", type=ApplicationCommandType.USER)
 def show_company(ctx, user: User):
     """Context menu command to view a user's company"""
     player = players.get(user.id)
+    origin_player = players.get(ctx.author.id)
     try:
         company = companies.get(player.company)
     except companies.CompanyNotFound:
-        return Message(content=f"**{user.username}** is not member of a company at the moment", ephemeral=True)
+        components = []
+        if origin_player.company:
+            company = companies.get(origin_player.company)
+            if origin_player.id == company.founder and len(company.get_members()) < 25:
+                components = [
+                    ActionRow(
+                        components=[
+                            Button(
+                                label="Hire them",
+                                custom_id=[
+                                    "hire",
+                                    user.id,
+                                ],
+                                emoji=symbols.parse_emoji(company.logo),
+                            )
+                        ]
+                    )
+                ]
+        return Message(
+            content=f"**{user.username}** is not member of a company at the moment",
+            components=components,
+            ephemeral=True,
+        )
     return Message(embed=get_company_embed(user, player, company))
