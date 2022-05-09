@@ -1,0 +1,8 @@
+version: '2'
+
+services:
+  app:
+    image: therealr5/trucksimulatorbot
+    restart: always
+    ports:
+      - 9000:9000
