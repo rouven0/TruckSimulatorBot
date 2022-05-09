@@ -6,3 +6,9 @@ services:
     restart: always
     ports:
       - 9000:9000
+    environment:
+      - MYSQL_PASSWORD=MYSQL_PASSWORD
+      - MYSQL_DATABASE=MYSQL_DATABASE
+      - MYSQL_USER=MYSQL_USER
+      - MYSQL_HOST=MYSQL_HOST
+      - DISCORD_PUBLIC_KEY=DISCORD_PUBLIC_KEY
