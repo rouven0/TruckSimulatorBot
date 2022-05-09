@@ -1,16 +1,12 @@
 "Main service file that is loaded into gunicorn"
 # pylint: disable=unused-argument
-import hashlib
-import hmac
 import logging
-import subprocess
 import sys
 import traceback
 from os import getenv
 from time import time
 
 import requests
-from dotenv import load_dotenv
 from flask import Flask, abort, json, request
 from flask_discord_interactions import DiscordInteractions, Message
 from flask_discord_interactions.models.component import ActionRow, Button
@@ -29,7 +25,6 @@ from stats import profile_bp
 from system import system_bp
 from truck import truck_bp
 
-load_dotenv("./.env")
 
 app = Flask(__name__)
 discord = DiscordInteractions(app)
