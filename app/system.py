@@ -37,7 +37,7 @@ def get_info_embed() -> Embed:
     job_count = players.get_count("jobs")
     company_count = players.get_count("companies")
     system_info = (
-        f"```Worker Uptime: {days}d {hours}h {minutes}m {seconds}s\n"
+        f"```Uptime: {days}d {hours}h {minutes}m {seconds}s\n"
         f"Registered Players: {player_count}\n"
         f"Running Jobs: {job_count}\n"
         f"Registered Companies: {company_count}```\n"
