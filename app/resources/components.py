@@ -2,7 +2,6 @@
 This module provides several lists of buttons and selects
 """
 from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
-
 from resources import companies, items, places, symbols, trucks
 from resources.companies import Company
 from resources.players import Player

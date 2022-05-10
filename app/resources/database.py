@@ -1,9 +1,8 @@
 """
 This module contains the database connection
 """
-import mysql.connector
-
 import config
+import mysql.connector
 
 
 def execute(query: str, args=None) -> int:

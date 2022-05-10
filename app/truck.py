@@ -3,11 +3,10 @@
 from math import log
 from typing import Union
 
+import config
 from flask_discord_interactions import DiscordInteractionsBlueprint, Embed, Message
 from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles
 from flask_discord_interactions.models.embed import Author, Field, Media
-
-import config
 from resources import components, players, symbols, trucks
 
 truck_bp = DiscordInteractionsBlueprint()

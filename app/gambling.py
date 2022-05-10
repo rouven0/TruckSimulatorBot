@@ -2,6 +2,7 @@
 # pylint: disable=unused-argument, missing-function-docstring
 from random import choices, sample
 
+import config
 from flask import request
 from flask_discord_interactions import DiscordInteractionsBlueprint, Embed, Message
 from flask_discord_interactions.context import Context
@@ -9,8 +10,6 @@ from flask_discord_interactions.discord import InteractionType
 from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles, TextInput
 from flask_discord_interactions.models.embed import Author, Field, Media
 from flask_discord_interactions.models.modal import Modal
-
-import config
 from resources import components, items, players
 
 gambling_bp = DiscordInteractionsBlueprint()

@@ -2,12 +2,11 @@
 # pylint: disable=unused-argument,broad-except
 import json
 
+import config
 import mysql.connector
 from flask_discord_interactions import DiscordInteractionsBlueprint, User
 from flask_discord_interactions.context import Context
 from flask_discord_interactions.models.message import Embed, Message
-
-import config
 from resources import players
 
 admin_bp = DiscordInteractionsBlueprint()
