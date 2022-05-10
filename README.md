@@ -1,4 +1,5 @@
 [![Pylint](https://github.com/therealr5/TruckSimulatorBot/actions/workflows/pylint.yml/badge.svg)](https://github.com/therealr5/TruckSimulatorBot/actions/workflows/pylint.yml)
+[![Deploy](https://github.com/therealr5/TruckSimulatorBot/actions/workflows/docker-image.yml/badge.svg)](https://github.com/therealr5/TruckSimulatorBot/actions/workflows/docker-image.yml)
 [![License](https://img.shields.io/github/license/therealr5/TrucksimulatorBot)](https://github.com/therealr5/TruckSimulatorBot/blob/http-only/LICENSE)
 ![Python](https://img.shields.io/badge/python-3.10-blue)
 [![Black](https://img.shields.io/badge/codestyle-black-000000)](https://github.com/psf/black)
@@ -8,9 +9,7 @@
 Small Truck Simulator app using the [flask-discord-interactions](https://github.com/Breq16/flask-discord-interactions) library
 
 ## Self-host this bot
-### Install
-Simply install and set up this bot using `make`. Superuser permissions are required to set up the bots systemd service
-Before, please provide a .env file containing the following variables:
+Simply self host this bot using docker. The internal server is running on port 9000. The following environment variables are required for the bot to work:
 ```env
 DISCORD_CLIENT_ID
 DISCORD_PUBLIC_KEY
@@ -19,16 +18,7 @@ MYSQL_HOST
 MYSQL_USER
 MYSQL_PASSWORD
 MYSQL_DATABASE
-VOTE_WEBHOOK
-VOTE_AUTHORIZATION
 ```
-
-### Configuration
-To fully make the bot working for you, feel free to adjust the values in `config.py` to your needs.
-I highly recommend to edit the guild and user ids in the enums to enable testing guilds and owner-only commands.
-
-### Remove the bot
-Use `make uninstall` to remove the bots systemd service before you delete the bot directory.
 
 ## Project Description
 ### Basic controls
