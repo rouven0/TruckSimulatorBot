@@ -8,10 +8,6 @@ EMBED_COLOR = int("0x918888", 16)
 SELF_AVATAR_URL = "https://cdn.discordapp.com/avatars/831052837353816066/c9b904f935580ac68f54f184f6fc620c.png"
 
 INFO_LINKS = [
-    {
-        "name": "Invite",
-        "url": "https://discord.com/api/oauth2/authorize?client_id:831052837353816066&scope:applications.commands%20bot",
-    },
     {"name": "Support", "url": "https://discord.gg/FzAxtGTUhN"},
     {"name": "Github", "url": "https://github.com/therealr5/TruckSimulatorBot)"},
     {"name": "Terms", "url": "https://trucksimulatorbot.rfive.de/terms.html"},
