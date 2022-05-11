@@ -170,4 +170,8 @@ def get_guide_selects(topic: str = ""):
         )
     if topic == "minijobs":
         selects.append(ActionRow(components=[Button(label="View minijobs", custom_id="guide_minijobs", style=2)]))
+    if topic == "introduction":
+        selects.append(
+            ActionRow(components=[Button(style=5, label=config.INFO_LINKS[0]["name"], url=config.INFO_LINKS[0]["url"])])
+        )
     return selects
