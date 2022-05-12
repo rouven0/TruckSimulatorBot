@@ -1,6 +1,7 @@
 "Blueprint file containing all driving-related commands and handlers"
 # pylint: disable=missing-function-docstring
 import threading
+import requests
 from datetime import datetime
 from random import randint
 
@@ -418,16 +419,17 @@ def continue_drive(ctx, player_id: str):
 
 
 @driving_bp.custom_handler(custom_id="initial_drive")
-def initial_drive(ctx, player_id: str):
+def initial_drive(ctx: Context, player_id: str):
     player = players.get(ctx.author.id, check=player_id)
 
     def start_drive():
-        ctx.send(
-            Message(
+        requests.post(
+            ctx.followup_url(),
+            json=Message(
                 embeds=get_drive_embeds(player, ctx.author.avatar_url),
                 components=components.get_drive_buttons(player),
-            )
-        )
+            ).dump_followup(),
+        ).raise_for_status()
 
     threading.Thread(target=start_drive).start()
     return Message(embeds=ctx.message.embeds, components=[], update=True)
