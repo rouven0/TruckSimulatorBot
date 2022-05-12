@@ -60,7 +60,12 @@ def info(ctx) -> Message:
     return Message(
         embed=get_info_embed(),
         components=[
-            ActionRow(components=[Button(style=5, url=link["url"], label=link["name"]) for link in config.INFO_LINKS]),
+            ActionRow(
+                components=[
+                    Button(style=5, url=link["url"], label=link["name"], emoji=link.get("emoji"))
+                    for link in config.INFO_LINKS
+                ]
+            ),
             ActionRow(
                 components=[
                     Button(
