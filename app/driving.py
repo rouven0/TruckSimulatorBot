@@ -419,8 +419,11 @@ def continue_drive(ctx, player_id: str):
 
 
 @driving_bp.custom_handler(custom_id="initial_drive")
-def initial_drive(ctx: Context, player_id: str):
-    player = players.get(ctx.author.id, check=player_id)
+def initial_drive(ctx: Context, player_id: str = None):
+    if player_id:
+        player = players.get(ctx.author.id, check=player_id)
+    else:
+        player = players.get(ctx.author.id)
 
     def start_drive():
         requests.post(
@@ -432,7 +435,7 @@ def initial_drive(ctx: Context, player_id: str):
         ).raise_for_status()
 
     threading.Thread(target=start_drive).start()
-    return Message(embeds=ctx.message.embeds, components=[], update=True)
+    return Message(content=ctx.message.content, embeds=ctx.message.embeds, components=[], update=True)
 
 
 @driving_bp.command()

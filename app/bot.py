@@ -97,7 +97,22 @@ def not_enough_money(error):
 @app.errorhandler(players.WrongPlayer)
 def not_driving(error):
     """Defer buttons if the wrong player clicked them"""
-    return {"type": 6}
+    return Message(
+        "This isn't your truck. Use <:logo_round:955233759278559273>`/drive` or click the button to hop into your own.",
+        ephemeral=True,
+        components=[
+            ActionRow(
+                components=[
+                    Button(
+                        label="Start driving",
+                        style=2,
+                        custom_id="initial_drive",
+                        emoji={"name": "logo_round", "id": 955233759278559273},
+                    )
+                ]
+            )
+        ],
+    ).dump()
 
 
 @app.errorhandler(players.PlayerNotRegistered)
