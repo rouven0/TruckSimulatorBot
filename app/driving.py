@@ -1,11 +1,11 @@
 "Blueprint file containing all driving-related commands and handlers"
 # pylint: disable=missing-function-docstring
 import threading
-import requests
 from datetime import datetime
 from random import randint
 
 import config
+import requests
 from flask_discord_interactions import DiscordInteractionsBlueprint, Embed, Message
 from flask_discord_interactions.context import Context
 from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
