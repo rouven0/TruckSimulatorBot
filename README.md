@@ -2,6 +2,7 @@
 [![Deploy](https://github.com/therealr5/TruckSimulatorBot/actions/workflows/docker-image.yml/badge.svg)](https://github.com/therealr5/TruckSimulatorBot/actions/workflows/docker-image.yml)
 [![License](https://img.shields.io/github/license/therealr5/TrucksimulatorBot)](https://github.com/therealr5/TruckSimulatorBot/blob/http-only/LICENSE)
 ![Python](https://img.shields.io/badge/python-3.10-blue)
+[![Database: MySQL](https://img.shields.io/badge/Database-MySQL-orange.svg)](https://www.mysql.com/)
 [![Black](https://img.shields.io/badge/codestyle-black-000000)](https://github.com/psf/black)
 [![Discord](https://img.shields.io/discord/839580174282260510)](https://discord.gg/FzAxtGTUhN)
 
