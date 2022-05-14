@@ -4,15 +4,13 @@ import logging
 import sys
 import traceback
 from os import getenv
-from time import time
 
 import config
-import requests
 from admin import admin_bp
 from companies import company_bp
 from driving import driving_bp
 from economy import economy_bp
-from flask import Flask, abort, json, request
+from flask import Flask, json, request
 from flask_discord_interactions import DiscordInteractions, Message
 from flask_discord_interactions.models.component import ActionRow, Button
 from flask_discord_interactions.models.embed import Embed, Footer
@@ -41,51 +39,6 @@ logger.setLevel(logging.INFO)
 console_handler = logging.StreamHandler()
 console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
 logger.addHandler(console_handler)
-
-
-# not made for public use, only for myself to get some webhooks and literally just copied from the discord docs
-# @app.route("/webhooks")
-# def webhook():
-# data = {
-# "client_id": getenv("DISCORD_CLIENT_ID", default=""),
-# "client_secret": getenv("DISCORD_CLIENT_SECRET", default=""),
-# "grant_type": "authorization_code",
-# "code": request.args.get("code"),
-# "redirect_uri": "https://trucksimulatorbot.rfive.de/api/beta/webhooks",
-# }
-# headers = {"Content-Type": "application/x-www-form-urlencoded"}
-# r = requests.post("https://discord.com/api/v10/oauth2/token", data=data, headers=headers)
-# r.raise_for_status()
-# return r.json()
-
-
-@app.route("/votes", methods=["POST"])
-def votes():
-    """Handle vote webhooks from top.gg"""
-    if request.headers.get("Authorization") != getenv("VOTE_AUTHORIZATION"):
-        abort(401)
-    voter_id = request.json.get("user")
-    if not players.registered(voter_id):
-        vote_message_content = (
-            f"Hmm, somebody voted that isn't even registered <:cat:892088956253011989> (id: {voter_id})"
-        )
-    else:
-        player = players.get(voter_id)
-        player.last_vote = round(time())
-        vote_message_content = (
-            f"**{player.name}** just voted for the Truck Simulator. "
-            "As a reward they now get double xp for the next 30 minutes."
-        )
-    vote_message = Message(
-        embed=Embed(
-            title="Thank you for voting for the Truck Simulator",
-            description=vote_message_content
-            + "\n\n You can vote [here](https://top.gg/bot/831052837353816066/vote) every 12 hours.",
-            color=config.EMBED_COLOR,
-        )
-    )
-    requests.post(url=getenv("VOTE_WEBHOOK", ""), json=vote_message.dump()["data"])
-    return "", 204
 
 
 @app.errorhandler(players.NotEnoughMoney)
