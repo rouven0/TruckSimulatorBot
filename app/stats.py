@@ -1,6 +1,7 @@
 "Blueprint file containing all stat-related commands and handlers"
 # pylint: disable=unused-argument, missing-function-docstring
 import config
+from utils import log_command
 from flask_discord_interactions import DiscordInteractionsBlueprint, Embed, Message
 from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
@@ -13,6 +14,7 @@ profile_bp = DiscordInteractionsBlueprint()
 @profile_bp.command(annotations={"user": "A user you want to view."})
 def profile(ctx, user: User = None) -> Message:
     "Shows your profile."
+    log_command(ctx)
     return Message(embed=get_profile_embed(user if user else ctx.author))
 
 

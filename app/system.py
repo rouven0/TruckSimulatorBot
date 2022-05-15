@@ -3,6 +3,7 @@
 from datetime import datetime
 from math import floor
 
+from utils import log_command
 import config
 from flask_discord_interactions import DiscordInteractionsBlueprint, Embed, Message
 from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles
@@ -57,6 +58,7 @@ def get_info_embed() -> Embed:
 @system_bp.command()
 def info(ctx) -> Message:
     """Prints out general information about the bot."""
+    log_command(ctx)
     return Message(
         embed=get_info_embed(),
         components=[

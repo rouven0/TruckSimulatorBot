@@ -3,6 +3,7 @@
 import threading
 from datetime import datetime
 from random import randint
+from utils import log_command
 
 import config
 import requests
@@ -441,6 +442,7 @@ def initial_drive(ctx: Context, player_id: str = None):
 @driving_bp.command()
 def drive(ctx) -> Message:
     """Starts the game."""
+    log_command(ctx)
     player = players.get(ctx.author.id)
     # Detect, when the player is renamed
     if player.name != ctx.author.username:

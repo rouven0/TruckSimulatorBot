@@ -7,6 +7,7 @@ from flask_discord_interactions import DiscordInteractionsBlueprint, Embed, Mess
 from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
 from flask_discord_interactions.models.embed import Author, Field, Media
 from flask_discord_interactions.models.option import CommandOptionType, Option
+from utils import log_command
 from resources import assets, items, places, players, symbols
 
 guide_bp = DiscordInteractionsBlueprint()
@@ -85,6 +86,7 @@ def placeinfo(ctx) -> Message:
 )
 def guide(ctx, topic: str = "introduction") -> Message:
     """Opens a guide to help you understand this game."""
+    log_command(ctx)
     return Message(embed=get_guide_embed(topic), components=get_guide_selects(topic=topic))
 
 

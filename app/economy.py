@@ -1,5 +1,6 @@
 "Blueprint file containing all economy-related commands and handlers"
 # pylint: disable=unused-argument,missing-function-docstring
+from utils import log_command
 import config
 from flask_discord_interactions import DiscordInteractionsBlueprint, Embed, Message
 from flask_discord_interactions.models.embed import Author, Field, Footer
@@ -89,6 +90,7 @@ def refill(ctx, player_id: str):
 )
 def give(ctx, user: User, amount: int) -> Message:
     """Transfers money to a specific user."""
+    log_command(ctx)
     acceptor = players.get(user.id)
     donator = players.get(ctx.author.id)
 
