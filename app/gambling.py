@@ -4,8 +4,7 @@ from random import choices, sample
 
 import config
 from flask import request
-from flask_discord_interactions import DiscordInteractionsBlueprint, Embed, Message
-from flask_discord_interactions.context import Context
+from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Embed, Message
 from flask_discord_interactions.discord import InteractionType
 from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles, TextInput
 from flask_discord_interactions.models.embed import Author, Field, Media
@@ -16,7 +15,7 @@ gambling_bp = DiscordInteractionsBlueprint()
 
 
 @gambling_bp.custom_handler(custom_id="casino")
-def casino(ctx, player_id: str) -> Message:
+def casino(ctx: Context, player_id: str) -> Message:
     player = players.get(ctx.author.id, check=player_id)
     return Message(
         embed=Embed(
@@ -86,7 +85,7 @@ def get_slots_components(player: players.Player, amount: int) -> list:
 
 
 @gambling_bp.custom_handler(custom_id="slots_init")
-def slots_modal(ctx, player_id):
+def slots_modal(ctx: Context, player_id):
     player = players.get(ctx.author.id, check=player_id)
     return Modal(
         custom_id=["slots", player.id],

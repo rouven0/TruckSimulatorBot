@@ -1,25 +1,25 @@
 "Blueprint file containing all stat-related commands and handlers"
 # pylint: disable=unused-argument, missing-function-docstring
 import config
-from utils import log_command
-from flask_discord_interactions import DiscordInteractionsBlueprint, Embed, Message
+from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Embed, Message
 from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
 from flask_discord_interactions.models.user import User
 from resources import companies, components, levels, players, trucks
+from utils import log_command
 
 profile_bp = DiscordInteractionsBlueprint()
 
 
 @profile_bp.command(annotations={"user": "A user you want to view."})
-def profile(ctx, user: User = None) -> Message:
+def profile(ctx: Context, user: User = None) -> Message:
     "Shows your profile."
     log_command(ctx)
     return Message(embed=get_profile_embed(user if user else ctx.author))
 
 
 @profile_bp.custom_handler(custom_id="profile_register")
-def register(ctx):
+def register(ctx: Context):
     if players.registered(ctx.author.id):
         return Message(update=True, deferred=True)
     with open("./messages/welcome.md", "r", encoding="utf8") as welcome_file:
@@ -69,7 +69,7 @@ def register(ctx):
 
 
 @profile_bp.custom_handler(custom_id="home")
-def profile_home(ctx, player_id):
+def profile_home(ctx: Context, player_id):
     """Shows your profile."""
     player = players.get(ctx.author.id, check=player_id)
     return Message(embed=get_profile_embed(ctx.author), components=components.get_home_buttons(player), update=True)
@@ -118,7 +118,7 @@ def get_profile_embed(user: User) -> Embed:
 
 
 @profile_bp.custom_handler(custom_id="top")
-def top(ctx, player_id) -> Message:
+def top(ctx: Context, player_id) -> Message:
     "Presents the top players."
     return Message(
         embed=get_top_embed(), components=get_top_select(players.get(ctx.author.id, check=player_id)), update=True
@@ -126,7 +126,7 @@ def top(ctx, player_id) -> Message:
 
 
 @profile_bp.custom_handler(custom_id="top_select")
-def top_select(ctx, player_id) -> Message:
+def top_select(ctx: Context, player_id) -> Message:
     "Handler for the toplist select"
     if ctx.author.id != player_id:
         raise players.WrongPlayer()

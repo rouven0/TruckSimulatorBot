@@ -16,7 +16,7 @@ admin_bp = DiscordInteractionsBlueprint()
     default_member_permissions=8,
     annotations={"query": "The query to execute."},
 )
-def sql(ctx, query: str):
+def sql(ctx: Context, query: str):
     """Executes a sql query."""
     if ctx.author.id != config.Users.ADMIN:
         return "Wait. You shouldn't be able to even read this. Something is messed up."
@@ -40,7 +40,7 @@ blacklist = admin_bp.command_group(
 
 
 @blacklist.command(annotations={"user": "The user to ban.", "reason": "The reason for this ban."})
-def add(ctx, user: User, reason: str = "No reason provided."):
+def add(ctx: Context, user: User, reason: str = "No reason provided."):
     """Adds a user to the blacklist."""
     try:
         player = players.get(user.id)
@@ -57,7 +57,7 @@ def add(ctx, user: User, reason: str = "No reason provided."):
 
 
 @blacklist.command(annotations={"user": "The user to unban."})
-def remove(ctx, user: User):
+def remove(ctx: Context, user: User):
     """Removes a user from the blacklist."""
     try:
         players.get(user.id)

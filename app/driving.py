@@ -3,7 +3,6 @@
 import threading
 from datetime import datetime
 from random import randint
-from utils import log_command
 
 import config
 import requests
@@ -13,6 +12,7 @@ from flask_discord_interactions.models.component import ActionRow, Button, Selec
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
 from resources import assets, companies, components, items, jobs, levels, places, players, symbols, trucks
 from resources.position import Position
+from utils import log_command
 
 driving_bp = DiscordInteractionsBlueprint()
 
@@ -113,7 +113,7 @@ def generate_minimap(player: players.Player, all_companies: list[companies.Compa
 
 
 @driving_bp.custom_handler(custom_id="stop")
-def stop(ctx, player_id: str):
+def stop(ctx: Context, player_id: str):
     player = players.get(ctx.author.id, check=player_id)
     return Message(
         embeds=get_drive_embeds(player, ctx.author.avatar_url),
@@ -123,7 +123,7 @@ def stop(ctx, player_id: str):
 
 
 @driving_bp.custom_handler(custom_id="load")
-def load(ctx, player_id: str):
+def load(ctx: Context, player_id: str):
     player = players.get(ctx.author.id, check=player_id)
 
     item = items.get(places.get(player.position).produced_item)
@@ -158,7 +158,7 @@ def load(ctx, player_id: str):
 
 
 @driving_bp.custom_handler(custom_id="unload")
-def unload(ctx, player_id: str):
+def unload(ctx: Context, player_id: str):
     player = players.get(ctx.author.id, check=player_id)
     current_job = player.get_job()
 
@@ -190,7 +190,7 @@ def unload(ctx, player_id: str):
 
 
 @driving_bp.custom_handler(custom_id="unload_items")
-def unload_items(ctx, player_id: str):
+def unload_items(ctx: Context, player_id: str):
     player = players.get(ctx.author.id, check=player_id)
 
     item_string = ""
@@ -253,7 +253,7 @@ def unload_items(ctx, player_id: str):
 
 
 @driving_bp.custom_handler(custom_id="job_new")
-def new_job(ctx, player_id: str) -> Message:
+def new_job(ctx: Context, player_id: str) -> Message:
     player = players.get(ctx.author.id, check=player_id)
     job_embed = Embed(
         color=config.EMBED_COLOR,
@@ -275,7 +275,7 @@ def new_job(ctx, player_id: str) -> Message:
 
 
 @driving_bp.custom_handler(custom_id="cancel")
-def cancel(ctx, player_id: str):
+def cancel(ctx: Context, player_id: str):
     player = players.get(ctx.author.id, check=player_id)
     return Message(
         embeds=get_drive_embeds(player, ctx.author.avatar_url),
@@ -285,22 +285,22 @@ def cancel(ctx, player_id: str):
 
 
 @driving_bp.custom_handler(custom_id=str(symbols.LEFT))
-def left(ctx, player_id: str):
+def left(ctx: Context, player_id: str):
     return move(ctx, symbols.LEFT, player_id)
 
 
 @driving_bp.custom_handler(custom_id=str(symbols.UP))
-def up(ctx, player_id: str):
+def up(ctx: Context, player_id: str):
     return move(ctx, symbols.UP, player_id)
 
 
 @driving_bp.custom_handler(custom_id=str(symbols.DOWN))
-def down(ctx, player_id: str):
+def down(ctx: Context, player_id: str):
     return move(ctx, symbols.DOWN, player_id)
 
 
 @driving_bp.custom_handler(custom_id=str(symbols.RIGHT))
-def right(ctx, player_id: str):
+def right(ctx: Context, player_id: str):
     return move(ctx, symbols.RIGHT, player_id)
 
 
@@ -354,7 +354,7 @@ def move(ctx: Context, direction, player_id):
 
 
 @driving_bp.custom_handler(custom_id="event_hitchhike")
-def event_hitchhike(ctx, player_id: str) -> Message:
+def event_hitchhike(ctx: Context, player_id: str) -> Message:
     player = players.get(ctx.author.id, check=player_id)
     try:
         player.debit_money(3000)
@@ -379,7 +379,7 @@ def event_hitchhike(ctx, player_id: str) -> Message:
 
 
 @driving_bp.custom_handler(custom_id="event_walk")
-def event_walk(ctx, player_id: str) -> Message:
+def event_walk(ctx: Context, player_id: str) -> Message:
     player = players.get(ctx.author.id, check=player_id)
     if player.level > 0:
         player.level -= 1
@@ -393,7 +393,7 @@ def event_walk(ctx, player_id: str) -> Message:
 
 
 @driving_bp.custom_handler(custom_id="event_rob")
-def event_rob(ctx, player_id: str) -> Message:
+def event_rob(ctx: Context, player_id: str) -> Message:
     player = players.get(ctx.author.id, check=player_id)
     if randint(0, 1) == 0:
         player.gas += 250
@@ -410,7 +410,7 @@ def event_rob(ctx, player_id: str) -> Message:
 
 
 @driving_bp.custom_handler(custom_id="continue_drive")
-def continue_drive(ctx, player_id: str):
+def continue_drive(ctx: Context, player_id: str):
     player = players.get(ctx.author.id, check=player_id)
     return Message(
         embeds=get_drive_embeds(player, ctx.author.avatar_url),
@@ -440,7 +440,7 @@ def initial_drive(ctx: Context, player_id: str = None):
 
 
 @driving_bp.command()
-def drive(ctx) -> Message:
+def drive(ctx: Context) -> Message:
     """Starts the game."""
     log_command(ctx)
     player = players.get(ctx.author.id)

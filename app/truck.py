@@ -4,7 +4,7 @@ from math import log
 from typing import Union
 
 import config
-from flask_discord_interactions import DiscordInteractionsBlueprint, Embed, Message
+from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Embed, Message
 from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles
 from flask_discord_interactions.models.embed import Author, Field, Media
 from resources import components, players, symbols, trucks
@@ -29,7 +29,7 @@ def get_truck_embed(truck: trucks.Truck) -> Embed:
 
 
 @truck_bp.custom_handler(custom_id="manage_truck")
-def show_truck_button(ctx, player_id: str):
+def show_truck_button(ctx: Context, player_id: str):
     """Shows the main truck page"""
     player = players.get(ctx.author.id, check=player_id)
     truck = trucks.get(player.truck_id)
@@ -39,7 +39,7 @@ def show_truck_button(ctx, player_id: str):
 
 
 @truck_bp.custom_handler(custom_id="truck_buy")
-def buy(ctx, player_id: str) -> Union[Message, str]:
+def buy(ctx: Context, player_id: str) -> Union[Message, str]:
     """Select handler to buy a new truck"""
     player = players.get(ctx.author.id, check=player_id)
     old_truck = trucks.get(player.truck_id)
@@ -75,7 +75,7 @@ def buy(ctx, player_id: str) -> Union[Message, str]:
 
 
 @truck_bp.custom_handler(custom_id="truck_view")
-def view(ctx, player_id: str) -> Message:
+def view(ctx: Context, player_id: str) -> Message:
     """View details about a specific truck"""
     if ctx.author.id != player_id:
         raise players.WrongPlayer()

@@ -3,18 +3,18 @@
 from os import listdir
 
 import config
-from flask_discord_interactions import DiscordInteractionsBlueprint, Embed, Message
+from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Embed, Message
 from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
 from flask_discord_interactions.models.embed import Author, Field, Media
 from flask_discord_interactions.models.option import CommandOptionType, Option
-from utils import log_command
 from resources import assets, items, places, players, symbols
+from utils import log_command
 
 guide_bp = DiscordInteractionsBlueprint()
 
 
 @guide_bp.custom_handler(custom_id="guide_minijobs")
-def minijobs(ctx) -> Message:
+def minijobs(ctx: Context) -> Message:
     """Prints out all permanently running minijobs."""
     player = players.get(ctx.author.id)
     minijob_list = ""
@@ -32,7 +32,7 @@ def minijobs(ctx) -> Message:
 
 
 @guide_bp.custom_handler(custom_id="guide_item")
-def iteminfo(ctx) -> Message:
+def iteminfo(ctx: Context) -> Message:
     """Prints some information about a specific item."""
     requested_item = items.get(ctx.values[0])
     item_embed = Embed(
@@ -49,7 +49,7 @@ def iteminfo(ctx) -> Message:
 
 
 @guide_bp.custom_handler(custom_id="guide_place")
-def placeinfo(ctx) -> Message:
+def placeinfo(ctx: Context) -> Message:
     """Prints some information about a specific place."""
     player = players.get(ctx.author.id)
     place = ctx.values[0]
@@ -84,14 +84,14 @@ def placeinfo(ctx) -> Message:
         )
     ],
 )
-def guide(ctx, topic: str = "introduction") -> Message:
+def guide(ctx: Context, topic: str = "introduction") -> Message:
     """Opens a guide to help you understand this game."""
     log_command(ctx)
     return Message(embed=get_guide_embed(topic), components=get_guide_selects(topic=topic))
 
 
 @guide_bp.custom_handler(custom_id="guide_topic")
-def guide_topic(ctx):
+def guide_topic(ctx: Context):
     """Handler for the topic select"""
     return Message(embed=get_guide_embed(ctx.values[0]), components=get_guide_selects(topic=ctx.values[0]), update=True)
 

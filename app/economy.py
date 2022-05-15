@@ -1,19 +1,19 @@
 "Blueprint file containing all economy-related commands and handlers"
 # pylint: disable=unused-argument,missing-function-docstring
-from utils import log_command
 import config
-from flask_discord_interactions import DiscordInteractionsBlueprint, Embed, Message
+from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Embed, Message
 from flask_discord_interactions.models.embed import Author, Field, Footer
 from flask_discord_interactions.models.option import CommandOptionType, Option
 from flask_discord_interactions.models.user import User
 from resources import items, jobs, levels, players, trucks
 from resources.autocompletes import amount_all
+from utils import log_command
 
 economy_bp = DiscordInteractionsBlueprint()
 
 
 @economy_bp.custom_handler(custom_id="job_show")
-def show_job(ctx, player_id: str) -> Message:
+def show_job(ctx: Context, player_id: str) -> Message:
     player = players.get(player_id)
 
     current_job = player.get_job()
@@ -34,7 +34,7 @@ def show_job(ctx, player_id: str) -> Message:
 
 
 @economy_bp.custom_handler(custom_id="refill")
-def refill(ctx, player_id: str):
+def refill(ctx: Context, player_id: str):
     player = players.get(ctx.author.id, check=player_id)
     gas_amount = trucks.get(player.truck_id).gas_capacity - player.gas
     price = round(gas_amount * 1.2)
@@ -88,7 +88,7 @@ def refill(ctx, player_id: str):
         ),
     ]
 )
-def give(ctx, user: User, amount: int) -> Message:
+def give(ctx: Context, user: User, amount: int) -> Message:
     """Transfers money to a specific user."""
     log_command(ctx)
     acceptor = players.get(user.id)

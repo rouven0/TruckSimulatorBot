@@ -3,12 +3,12 @@
 from datetime import datetime
 from math import floor
 
-from utils import log_command
 import config
-from flask_discord_interactions import DiscordInteractionsBlueprint, Embed, Message
+from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Embed, Message
 from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles
 from flask_discord_interactions.models.embed import Field, Footer, Media
 from resources import players
+from utils import log_command
 
 start_time = datetime.now()
 
@@ -56,7 +56,7 @@ def get_info_embed() -> Embed:
 
 
 @system_bp.command()
-def info(ctx) -> Message:
+def info(ctx: Context) -> Message:
     """Prints out general information about the bot."""
     log_command(ctx)
     return Message(
@@ -83,5 +83,5 @@ def info(ctx) -> Message:
 
 
 @system_bp.custom_handler(custom_id="refresh_system_info")
-def refresh(ctx):
+def refresh(ctx: Context):
     return Message(embed=get_info_embed(), update=True)
