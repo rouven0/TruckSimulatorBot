@@ -15,7 +15,7 @@ INFO_LINKS = [
     },
     {
         "name": "Github",
-        "url": "https://github.com/therealr5/TruckSimulatorBot)",
+        "url": "https://github.com/therealr5/TruckSimulatorBot",
         "emoji": {"name": "github", "id": "974289493823729714"},
     },
     {"name": "Terms", "url": "https://trucksimulatorbot.rfive.de/terms.html"},
