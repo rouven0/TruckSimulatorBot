@@ -1,6 +1,6 @@
 # pylint: disable=too-few-public-methods
 "Some configuration values"
-from os import getenv
+from os import getenv, listdir
 
 MAP_BORDER = 25
 LOG_FORMAT = "%(levelname)s [%(module)s.%(funcName)s]: %(message)s"
@@ -41,3 +41,9 @@ class Guilds:
 class Users:
     "User ids to determine some important roles"
     ADMIN = "692796548282712074"
+
+
+class I18n:
+    AVAILABLE_LOCALES = [f.split(".")[0] for f in listdir("./locales")]
+    FILENAME_FORMAT = "{locale}{format}"
+    FALLBACK = "en-US"

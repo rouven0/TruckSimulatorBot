@@ -21,6 +21,19 @@ from stats import profile_bp
 from system import system_bp
 from truck import truck_bp
 from werkzeug.exceptions import HTTPException
+import i18n
+
+i18n.set("filename_format", config.I18n.FILENAME_FORMAT)
+i18n.set("fallback", config.I18n.FALLBACK)
+i18n.set("available_locales", config.I18n.AVAILABLE_LOCALES)
+i18n.set("skip_locale_root_data", True)
+
+i18n.load_path.append("./locales")
+
+# ugly thing I have to do to support nested locales
+for locale in config.I18n.AVAILABLE_LOCALES:
+    i18n.t("name", locale=locale)
+
 
 app = Flask(__name__)
 discord = DiscordInteractions(app)
@@ -146,6 +159,13 @@ def handle_exception(error):
     return response
 
 
+@discord.command()
+def complain(ctx) -> str:
+    "No description."
+    locale = request.get_json().get("locale")
+    return i18n.t("complain.response", locale=locale)
+
+
 if "--remove-global" in sys.argv:
     discord.update_commands()
     sys.exit()
@@ -174,34 +194,6 @@ if "--deploy" in sys.argv:
     sys.exit()
 
 discord.register_blueprint(admin_bp)
-
-
-@discord.command()
-def complain(ctx) -> str:
-    "No description."
-    complain_localizations = {
-        "en-US": (
-            "What a crap bot this is! :rage: "
-            "Hours of time wasted on this useless procuct of a terrible coder and a lousy artist "
-            ":rage: :rage: Is this bot even TESTED before the updates are published... "
-            "Horrible, just HORRIBLE this spawn of incopetence. Who tf made this? A 12 year old child? "
-            "This child would probably have made it better than THAT :rage:"
-        ),
-        "fr": (
-            "Mais quel bot de merde ! J'arrive pas à croire que j'ai perdu mon temps sur ce truc ridicule. "
-            "Le développeur est pourrave, l'artiste est nulle :rage: :rage:  Est-ce que quelqu'un TESTE les mises à "
-            "jour avant leur sortie ? Horrible, juste HORRIBLE, pur concentré d'incompétence. Qui a créé cette daube ? "
-            "Un gamin de 12 ans ? Franchement un gamin aurait fait MIEUX que cette CHOSE :rage:"
-        ),
-        "de": (
-            "Junge WAS IST DENN DAS FÜR EIN SCHMUTZ :rage:. Und damit hab ich jetzt mehrere Tage verbracht :rage:. "
-            "Wird das Zeug überhaupt getestet bevor es unter die Leute geworfen wird? :rage: Einfach nur schrecklich "
-            "diese Ausgeburt der Inkompetenz; Die Spielmechanik macht keinen Sinn, der Dev macht kaum etwas und über "
-            "den Zeichner der Bilder wollen wir am besten gar nicht erst reden..."
-        ),
-    }
-    locale = request.get_json().get("locale")
-    return complain_localizations[locale] if locale in complain_localizations else complain_localizations["en-US"]
 
 
 discord.set_route("/interactions")
