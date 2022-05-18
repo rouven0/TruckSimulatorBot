@@ -1,3 +1,26 @@
 name: Truck Simulator
 complain:
   response: Junge WAS IST DENN DAS FÜR EIN SCHMUTZ 😡. Und damit hab ich jetzt mehrere Tage verbracht😡. Wird das Zeug überhaupt getestet bevor es unter die Leute geworfen wird?😡 Einfach nur schrecklich diese Ausgeburt der Inkompetenz; Die Spielmechanik macht keinen Sinn, der Dev macht kaum etwas und über den Zeichner der Bilder wollen wir am besten gar nicht erst reden...
+info:
+  name: info
+  description: Allgemeine informationen über diese app.
+  refresh: Aktualisieren
+  system: 
+    title: Systeminformationen
+    text: |
+      ```yml
+      Betriebszeit: %{uptime}
+      Registrierte Spieler: %{players}
+      Laufende Aufträge: %{jobs}
+      Registrierte Firmen: %{companies}```
+  credits: 
+    title: Besonderer Dank an
+    text: |
+      <:lebogo:897861933418565652> **LeBogo**#3073
+      <:panda:897860673898426462> **FlyingPanda**#0328
+      <:miri:897860673546117122> **Miriel**#0001
+  developer: 'Entwickler: r5#2253'
+  links:
+    support: Support
+    terms: Nutzungsbedingungen
+    privacy: Datenschutzerklärung

@@ -1,3 +1,27 @@
 name: Truck Simulator
 complain: 
   response: What a crap bot this is! 😡 Hours of time wasted on this useless procuct of a terrible coder and a lousy artist 😡 😡 Is this bot even TESTED before the updates are published... Horrible, just HORRIBLE this spawn of incopetence. Who tf made this? A 12 year old child? This child would probably have made it better than THAT 😡
+info:
+  command:
+    name: info
+    description: Prints out general information about this app.
+  refresh: Refresh data
+  system:
+    title: System inforation
+    text: |
+      ```yml
+      Uptime: %{uptime}
+      Registered players: %{players}
+      Running jobs: %{jobs}
+      Registered companies: %{companies}```
+  credits: 
+    title: Credits
+    text: |
+      <:lebogo:897861933418565652> **LeBogo**#3073 - _Testing helper_ - Contributed 2 lines of code
+      <:panda:897860673898426462> **FlyingPanda**#0328 - _EPIC Artist_ - Drew almost all of the images you see (and had the idea of this bot)
+      <:miri:897860673546117122> **Miriel**#0001 - _The brain_ - Gave a lot of great tips and constructive feedback
+  developer: 'Developer: %{developer}'
+  links:
+    support: Support
+    terms: Terms
+    privacy: Privacy Policy
