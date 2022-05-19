@@ -19,6 +19,27 @@ profile:
   load: Aktuelle Ladung
   company: Firma
 
+truck:
+  author: "%{player}'s truck"
+  gas:
+    consumption:
+      title: Benzinverbrauch
+      text: "%{consumption} Liter per Kilometer"
+    capacity:
+      title: Tankvolumen
+      text: "%{capacity} l"
+  price: Preis
+  loading_capacity:
+    title: Maximale Ladung
+    text: "%{amount} Gegenstände"
+  view:
+    placeholder: Details zu einem anderen Truck anschauen
+  buy:
+    placeholder: Kaufe einen neuen Truck
+    author: Dein neuer Truck
+    text: Du hast deinen %{old_name} für $%{selling_price} verkauft und einen brandneuen %{new_name} für $%{price} erworben.  
+    checkout: Sieh es dir an
+
 casino:
   welcome: Wilkommen im Casino
   invalid_amount: Ungültiger Einsatz

@@ -89,7 +89,7 @@ def get_profile_embed(user: User) -> Embed:
     if player.discriminator != user.discriminator:
         player.discriminator = user.discriminator
     profile_embed = Embed(
-        author=Author(name=t("profile.title", player=player.name)),
+        author=Author(name=t("profile.author", player=player.name)),
         thumbnail=Media(url=user.avatar_url),
         color=config.EMBED_COLOR,
         fields=[],
@@ -188,13 +188,5 @@ def get_top_select(player):
                 )
             ]
         ),
-        ActionRow(
-            components=[
-                Button(
-                    label="Back",
-                    custom_id=["home", player.id],
-                    style=2,
-                )
-            ]
-        ),
+        ActionRow(components=[components.back_home(player.id)]),
     ]

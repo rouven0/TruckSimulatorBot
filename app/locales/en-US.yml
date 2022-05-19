@@ -9,7 +9,7 @@ home:
   leaderboard: View the leaderboard
 
 profile:
-  title: "%{player}'s profile"
+  author: "%{player}'s profile"
   level: Level
   money: Money
   miles: Miles driven
@@ -18,6 +18,27 @@ profile:
   truck: Current truck
   load: Current load
   company: Company
+
+truck:
+  author: "%{player}'s truck"
+  gas:
+    consumption:
+      title: Gas consumption
+      text: "%{consumption} litres per mile"
+    capacity:
+      title: Gas capacity
+      text: "%{capacity} l"
+  price: Price
+  loading_capacity:
+    title: Loading capacity
+    text: "%{amount} items"
+  view:
+    placeholder: View details about a truck
+  buy:
+    placeholder: Buy a new truck
+    author: You got a new truck
+    text: You sold your old %{old_name} for $%{selling_price} and bought a brand new %{new_name} for $%{price}. 
+    checkout: Check it out
 
 casino:
   welcome: Welcome to the casino

@@ -8,6 +8,14 @@ from resources.players import Player
 from i18n import t
 
 
+def back_home(player_id) -> Button:
+    return Button(
+        style=2,
+        label=t("back"),
+        custom_id=["home", player_id],
+    )
+
+
 def back_to_road(player_id) -> Button:
     return Button(
         custom_id=["continue_drive", player_id],
@@ -174,15 +182,7 @@ def get_company_buttons(player: Player, company: Company) -> list:
                 ),
             ]
         ),
-        ActionRow(
-            components=[
-                Button(
-                    style=2,
-                    label="Back",
-                    custom_id=["home", player.id],
-                ),
-            ]
-        ),
+        ActionRow(components=[back_home(player.id)]),
     ]
     company_members = company.get_members()
     if len(company_members) > 1:
@@ -218,7 +218,7 @@ def get_truck_components(player: Player) -> list:
                 SelectMenu(
                     custom_id=["truck_view", player.id],
                     options=get_truck_options(player),
-                    placeholder="View details about a truck",
+                    placeholder=t("truck.view.placeholder"),
                 )
             ]
         ),
@@ -227,15 +227,11 @@ def get_truck_components(player: Player) -> list:
                 SelectMenu(
                     custom_id=["truck_buy", player.id],
                     options=get_truck_options(player, check_money=True),
-                    placeholder="Buy a new truck",
+                    placeholder=t("truck.buy.placeholder"),
                 ),
             ]
         ),
-        ActionRow(
-            components=[
-                Button(custom_id=["home", player.id], label="Back", style=2),
-            ]
-        ),
+        ActionRow(components=[back_home(player.id)]),
     ]
 
 
