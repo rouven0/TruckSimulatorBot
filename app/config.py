@@ -17,7 +17,7 @@ def info_links() -> list:
             "emoji": {"name": "discord", "id": "974289421706854450"},
         },
         {
-            "name": "Github",
+            "name": "GitHub",
             "url": "https://github.com/therealr5/TruckSimulatorBot",
             "emoji": {"name": "github", "id": "974289493823729714"},
         },

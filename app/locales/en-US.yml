@@ -1,6 +1,45 @@
 name: Truck Simulator
-complain: 
-  response: What a crap bot this is! 😡 Hours of time wasted on this useless procuct of a terrible coder and a lousy artist 😡 😡 Is this bot even TESTED before the updates are published... Horrible, just HORRIBLE this spawn of incopetence. Who tf made this? A 12 year old child? This child would probably have made it better than THAT 😡
+back: Back
+back_road: Back to the road
+coming_soon: Coming soon
+
+home:
+  truck: Manage your truck
+  company: Show your company
+  leaderboard: View the leaderboard
+
+profile:
+  title: "%{player}'s profile"
+  level: Level
+  money: Money
+  miles: Miles driven
+  truck_miles: (%{miles} with current truck)
+  gas: Gas left
+  truck: Current truck
+  load: Current load
+  company: Company
+
+casino:
+  welcome: Welcome to the casino
+  invalid_amount: Invalid amount
+  slots:
+    # extra quotes here because of escaping and stuff
+    author: "%{name}'s slots"
+    result:
+      title: Result
+      win3: |
+        :tada: Congratulations you won $%{amount} :tada:
+      win2: You won $%{amount}
+      loss: You lost $%{amount}
+    button:
+      again: Spin again
+      again2: Spin again (double amount)
+    modal:
+      title: Spin a slot machine
+      amount:
+        label: Amount
+        placeholder: The amount you bet. Can be 'all'
+
 info:
   command:
     name: info
@@ -20,8 +59,11 @@ info:
       <:lebogo:897861933418565652> **LeBogo**#3073 - _Testing helper_ - Contributed 2 lines of code
       <:panda:897860673898426462> **FlyingPanda**#0328 - _EPIC Artist_ - Drew almost all of the images you see (and had the idea of this bot)
       <:miri:897860673546117122> **Miriel**#0001 - _The brain_ - Gave a lot of great tips and constructive feedback
-  developer: 'Developer: %{developer}'
+  developer: 'Developer: r5#2253'
   links:
     support: Support
     terms: Terms
     privacy: Privacy Policy
+
+complain: 
+  response: What a crap bot this is! 😡 Hours of time wasted on this useless procuct of a terrible coder and a lousy artist 😡 😡 Is this bot even TESTED before the updates are published... Horrible, just HORRIBLE this spawn of incopetence. Who tf made this? A 12 year old child? This child would probably have made it better than THAT 😡

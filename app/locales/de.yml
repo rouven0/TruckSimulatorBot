@@ -1,6 +1,44 @@
 name: Truck Simulator
-complain:
-  response: Junge WAS IST DENN DAS FÜR EIN SCHMUTZ 😡. Und damit hab ich jetzt mehrere Tage verbracht😡. Wird das Zeug überhaupt getestet bevor es unter die Leute geworfen wird?😡 Einfach nur schrecklich diese Ausgeburt der Inkompetenz; Die Spielmechanik macht keinen Sinn, der Dev macht kaum etwas und über den Zeichner der Bilder wollen wir am besten gar nicht erst reden...
+back: Zurück
+back_road: Zurück zur Straße
+coming_soon: Kommt bald
+
+home:
+  truck: Dein Truck
+  company: Deine Firma
+  leaderboard: Ranglisten
+
+profile:
+  title: Profil von %{player}
+  level: Level
+  money: Konto
+  miles: Gefahrene Kilometer
+  truck_miles: (%{miles} mit dem aktuellen Truck)
+  gas: Übriges Benzin
+  truck: Aktueller Truck
+  load: Aktuelle Ladung
+  company: Firma
+
+casino:
+  welcome: Wilkommen im Casino
+  invalid_amount: Ungültiger Einsatz
+  slots:
+    author: Slots von %{name}
+    result:
+      title: Ergebnis
+      win3: |
+        :tada: Gratulation, du hast $%{amount} gewonnen :tada:
+      win2: Du hast $%{amount} gewonnen
+      loss: Du hast $%{amount} verloren
+    button:
+      again: Nochmal drehen
+      again2: Nochmal drehen (doppelter Einsatz)
+    modal:
+      title: Slots
+      amount:
+        label: Einsatz
+        placeholder: Dein Einsatz, kann 'all' sein
+
 info:
   name: info
   description: Allgemeine informationen über diese app.
@@ -24,3 +62,6 @@ info:
     support: Support
     terms: Nutzungsbedingungen
     privacy: Datenschutzerklärung
+
+complain:
+  response: Junge WAS IST DENN DAS FÜR EIN SCHMUTZ 😡. Und damit hab ich jetzt mehrere Tage verbracht😡. Wird das Zeug überhaupt getestet bevor es unter die Leute geworfen wird?😡 Einfach nur schrecklich diese Ausgeburt der Inkompetenz; Die Spielmechanik macht keinen Sinn, der Dev macht kaum etwas und über den Zeichner der Bilder wollen wir am besten gar nicht erst reden...

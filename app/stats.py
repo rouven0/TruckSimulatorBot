@@ -7,6 +7,8 @@ from flask_discord_interactions.models.embed import Author, Field, Footer, Media
 from flask_discord_interactions.models.user import User
 from resources import companies, components, levels, players, trucks
 from utils import log_command
+from flask import request
+from i18n import t, set as set_i18n
 
 profile_bp = DiscordInteractionsBlueprint()
 
@@ -15,11 +17,13 @@ profile_bp = DiscordInteractionsBlueprint()
 def profile(ctx: Context, user: User = None) -> Message:
     "Shows your profile."
     log_command(ctx)
+    set_i18n("locale", request.json.get("locale"))
     return Message(embed=get_profile_embed(user if user else ctx.author))
 
 
 @profile_bp.custom_handler(custom_id="profile_register")
 def register(ctx: Context):
+    set_i18n("locale", request.json.get("locale"))
     if players.registered(ctx.author.id):
         return Message(update=True, deferred=True)
     with open("./messages/welcome.md", "r", encoding="utf8") as welcome_file:
@@ -71,6 +75,7 @@ def register(ctx: Context):
 @profile_bp.custom_handler(custom_id="home")
 def profile_home(ctx: Context, player_id):
     """Shows your profile."""
+    set_i18n("locale", request.json.get("locale"))
     player = players.get(ctx.author.id, check=player_id)
     return Message(embed=get_profile_embed(ctx.author), components=components.get_home_buttons(player), update=True)
 
@@ -84,7 +89,7 @@ def get_profile_embed(user: User) -> Embed:
     if player.discriminator != user.discriminator:
         player.discriminator = user.discriminator
     profile_embed = Embed(
-        author=Author(name=f"{player.name}'s profile"),
+        author=Author(name=t("profile.title", player=player.name)),
         thumbnail=Media(url=user.avatar_url),
         color=config.EMBED_COLOR,
         fields=[],
@@ -92,26 +97,33 @@ def get_profile_embed(user: User) -> Embed:
     )
     profile_embed.fields.append(
         Field(
-            name="Level", value=f"{player.level} ({player.xp:,}/{levels.get_next_xp(player.level):,} xp)", inline=False
+            name=t("profile.level"),
+            value=f"{player.level} ({player.xp:,}/{levels.get_next_xp(player.level):,} xp)",
+            inline=False,
         )
     )
-    profile_embed.fields.append(Field(name="Money", value=f"${player.money:,}"))
+    profile_embed.fields.append(Field(name=t("profile.money"), value=f"${player.money:,}"))
     profile_embed.fields.append(
-        Field(name="Miles driven", value=f"{player.miles:,}\n({player.truck_miles:,} with current truck)", inline=False)
+        Field(
+            name=t("profile.miles"),
+            value=f"{player.miles:,}\n" + t("profile.truck_miles", miles=player.truck_miles),
+            inline=False,
+        )
     )
-    profile_embed.fields.append(Field(name="Gas left", value=f"{player.gas} l", inline=False))
-    profile_embed.fields.append(Field(name="Current truck", value=truck.name))
+    profile_embed.fields.append(Field(name=t("profile.gas"), value=f"{player.gas} l", inline=False))
+    profile_embed.fields.append(Field(name=t("profile.truck"), value=truck.name))
     if player.loaded_items:
         profile_embed.fields.append(
             Field(
-                name=f"Current load ({len(player.loaded_items)}/{trucks.get(player.truck_id).loading_capacity})",
+                name=t("profile.load")
+                + f" ({len(player.loaded_items)}/{trucks.get(player.truck_id).loading_capacity})",
                 value="".join([str(item) + "\n" for item in player.loaded_items]),
             )
         )
 
     try:
         company = companies.get(player.company)
-        profile_embed.fields.append(Field(name="Company", value=f"{company.logo} {company.name}"))
+        profile_embed.fields.append(Field(name=t("profile.company"), value=f"{company.logo} {company.name}"))
     except companies.CompanyNotFound:
         pass
     return profile_embed
@@ -119,6 +131,7 @@ def get_profile_embed(user: User) -> Embed:
 
 @profile_bp.custom_handler(custom_id="top")
 def top(ctx: Context, player_id) -> Message:
+    set_i18n("locale", request.json.get("locale"))
     "Presents the top players."
     return Message(
         embed=get_top_embed(), components=get_top_select(players.get(ctx.author.id, check=player_id)), update=True
@@ -127,6 +140,7 @@ def top(ctx: Context, player_id) -> Message:
 
 @profile_bp.custom_handler(custom_id="top_select")
 def top_select(ctx: Context, player_id) -> Message:
+    set_i18n("locale", request.json.get("locale"))
     "Handler for the toplist select"
     if ctx.author.id != player_id:
         raise players.WrongPlayer()

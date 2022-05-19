@@ -366,14 +366,14 @@ def event_hitchhike(ctx: Context, player_id: str) -> Message:
                 "Someone stopped to take you with them, but.. **OH NO!** It's Mr. Thomas Ruck, the president of this "
                 "country. He had to have your truck towed away and you will pay $3000 for this incident."
             ),
-            components=[components.get_home_buttons(player)[1]],
+            components=[ActionRow(components=components.back_to_road(player.id))],
             update=True,
         )
     player.gas = 140
     player.position = Position.from_int(458759)
     return Message(
         "You found someone to go with. They even were so kind to gift you some gas. You should thank them.",
-        components=[components.get_home_buttons(player)[1]],
+        components=[ActionRow(components=components.back_to_road(player.id))],
         update=True,
     )
 
@@ -387,7 +387,7 @@ def event_walk(ctx: Context, player_id: str) -> Message:
         player.position = Position.from_int(458759)
     return Message(
         "You started walking to the gas station. As you arrived, you noticed that you lost a level.",
-        components=[components.get_home_buttons(player)[1]],
+        components=[ActionRow(components=components.back_to_road(player.id))],
         update=True,
     )
 
@@ -399,12 +399,12 @@ def event_rob(ctx: Context, player_id: str) -> Message:
         player.gas += 250
         return Message(
             "Phew. Nobdody looked and you stole some gas. Be careful next time.",
-            components=[components.get_home_buttons(player)[1]],
+            components=[ActionRow(components=components.back_to_road(player.id))],
             update=True,
         )
     return Message(
         "Oh no! You got caught. Nothing happened but the car owner drove away angrily.",
-        components=[components.get_home_buttons(player)[1]],
+        components=[ActionRow(components=components.back_to_road(player.id))],
         update=True,
     )
 

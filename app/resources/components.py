@@ -5,6 +5,16 @@ from flask_discord_interactions.models.component import ActionRow, Button, Selec
 from resources import companies, items, places, symbols, trucks
 from resources.companies import Company
 from resources.players import Player
+from i18n import t
+
+
+def back_to_road(player_id) -> Button:
+    return Button(
+        custom_id=["continue_drive", player_id],
+        style=3,
+        label=t("back_road"),
+        emoji={"name": "logo_round", "id": "955233759278559273"},
+    )
 
 
 def get_drive_buttons(player: Player) -> list:
@@ -117,13 +127,13 @@ def get_home_buttons(player: Player) -> list:
                 Button(
                     custom_id=["manage_truck", player.id],
                     style=2,
-                    label="Manage your truck",
+                    label=t("home.truck"),
                     emoji=symbols.parse_emoji(trucks.get(player.truck_id).emoji),
                 ),
                 Button(
                     custom_id=["manage_company", player.id],
                     style=2,
-                    label="Show your company",
+                    label=t("home.company"),
                     emoji=symbols.parse_emoji(companies.get(player.company).logo)
                     if player.company
                     else {"name": "🏛️", "id": None},
@@ -131,21 +141,12 @@ def get_home_buttons(player: Player) -> list:
                 Button(
                     custom_id=["top", player.id],
                     style=2,
-                    label="View the leaderboard",
+                    label=t("home.leaderboard"),
                     emoji={"name": "🏆", "id": None},
                 ),
             ]
         ),
-        ActionRow(
-            components=[
-                Button(
-                    custom_id=["continue_drive", player.id],
-                    style=3,
-                    label="Back to the road",
-                    emoji={"name": "logo_round", "id": "955233759278559273"},
-                ),
-            ]
-        ),
+        ActionRow(components=[back_to_road(player.id)]),
     ]
 
 
@@ -268,26 +269,17 @@ def get_casino_buttons(player) -> list:
                 Button(
                     custom_id=["slots_init", player.id],
                     style=2,
-                    label="Spin a slot machine",
+                    label=t("casino.slots.modal.title"),
                     emoji={"name": "🎰", "id": None},
                 ),
                 Button(
                     custom_id=["blackjack", player.id],
                     style=2,
-                    label="Coming soon",
+                    label=t("coming_soon"),
                     emoji={"name": "♠️", "id": None},
                     disabled=True,
                 ),
             ]
         ),
-        ActionRow(
-            components=[
-                Button(
-                    custom_id=["continue_drive", player.id],
-                    style=3,
-                    label="Back to the road",
-                    emoji={"name": "logo_round", "id": "955233759278559273"},
-                ),
-            ]
-        ),
+        ActionRow(components=[back_to_road(player.id)]),
     ]
