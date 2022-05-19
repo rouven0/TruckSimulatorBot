@@ -6,7 +6,7 @@ from flask_discord_interactions.models.component import ActionRow, Button, Selec
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
 from flask_discord_interactions.models.user import User
 from resources import companies, components, levels, players, trucks
-from utils import log_command
+from utils import log_command, commatize
 from flask import request
 from i18n import t, set as set_i18n
 
@@ -106,11 +106,11 @@ def get_profile_embed(user: User) -> Embed:
     profile_embed.fields.append(
         Field(
             name=t("profile.miles"),
-            value=f"{player.miles:,}\n" + t("profile.truck_miles", miles=player.truck_miles),
+            value=f"{player.miles:,}\n" + t("profile.truck_miles", miles=commatize(player.truck_miles)),
             inline=False,
         )
     )
-    profile_embed.fields.append(Field(name=t("profile.gas"), value=f"{player.gas} l", inline=False))
+    profile_embed.fields.append(Field(name=t("profile.gas"), value=f"{player.gas:,} l", inline=False))
     profile_embed.fields.append(Field(name=t("profile.truck"), value=truck.name))
     if player.loaded_items:
         profile_embed.fields.append(

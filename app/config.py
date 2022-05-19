@@ -1,6 +1,6 @@
 # pylint: disable=too-few-public-methods
 "Some configuration values"
-from os import getenv, listdir
+from os import getenv
 from i18n import t
 
 MAP_BORDER = 25
@@ -48,6 +48,6 @@ class Users:
 
 
 class I18n:
-    AVAILABLE_LOCALES = [f.split(".")[0] for f in listdir("./locales")]
+    AVAILABLE_LOCALES = ["en-US", "de"]
     FILENAME_FORMAT = "{locale}{format}"
     FALLBACK = "en-US"

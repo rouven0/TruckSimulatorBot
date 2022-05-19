@@ -1,6 +1,7 @@
 "Blueprint file containing all gambling-related commands and handlers"
 # pylint: disable=unused-argument, missing-function-docstring
 from random import choices, sample
+from utils import commatize
 
 import config
 from flask import request
@@ -55,17 +56,19 @@ def get_slots_embed(player: players.Player, amount: int) -> Embed:
 
     if chosen_items.count(chosen_items[0]) == 3:
         slots_embed.fields.append(
-            Field(name=t("casino.slots.result.title"), value=t("casino.slots.result.win3", amount=amount * 10))
+            Field(
+                name=t("casino.slots.result.title"), value=t("casino.slots.result.win3", amount=commatize(amount * 10))
+            )
         )
         player.add_money(amount * 11)
     elif chosen_items.count(chosen_items[0]) == 2 or chosen_items.count(chosen_items[1]) == 2:
         slots_embed.fields.append(
-            Field(name=t("casino.slots.result.title"), value=t("casino.slots.result.win2", amount=amount))
+            Field(name=t("casino.slots.result.title"), value=t("casino.slots.result.win2", amount=commatize(amount)))
         )
         player.add_money(amount * 2)
     else:
         slots_embed.fields.append(
-            Field(name=t("casino.slots.result.title"), value=t("casino.slots.result.loss", amount=amount))
+            Field(name=t("casino.slots.result.title"), value=t("casino.slots.result.loss", amount=commatize(amount)))
         )
     return slots_embed
 

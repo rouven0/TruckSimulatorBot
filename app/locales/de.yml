@@ -9,12 +9,12 @@ home:
   leaderboard: Ranglisten
 
 profile:
-  title: Profil von %{player}
+  author: Profil von %{player}
   level: Level
   money: Konto
   miles: Gefahrene Kilometer
   truck_miles: (%{miles} mit dem aktuellen Truck)
-  gas: Übriges Benzin
+  gas: Füllstand
   truck: Aktueller Truck
   load: Aktuelle Ladung
   company: Firma
@@ -37,7 +37,7 @@ truck:
   buy:
     placeholder: Kaufe einen neuen Truck
     author: Dein neuer Truck
-    text: Du hast deinen %{old_name} für $%{selling_price} verkauft und einen brandneuen %{new_name} für $%{price} erworben.  
+    text: Du hast deinen %{old_name} für $%{selling_price} verkauft und einen brandneuen %{new_name} für $%{price} erworben.
     checkout: Sieh es dir an
 
 casino:
@@ -50,10 +50,10 @@ casino:
       win3: |
         :tada: Gratulation, du hast $%{amount} gewonnen :tada:
       win2: Du hast $%{amount} gewonnen
-      loss: Du hast $%{amount} verloren
+      loss: "Du hast $%{amount} verloren"
     button:
-      again: Nochmal drehen
-      again2: Nochmal drehen (doppelter Einsatz)
+      again: Erneut versuchen
+      again2: Erneut versuchen (doppelter Einsatz)
     modal:
       title: Slots
       amount:
@@ -64,7 +64,7 @@ info:
   name: info
   description: Allgemeine informationen über diese app.
   refresh: Aktualisieren
-  system: 
+  system:
     title: Systeminformationen
     text: |
       ```yml
@@ -72,7 +72,7 @@ info:
       Registrierte Spieler: %{players}
       Laufende Aufträge: %{jobs}
       Registrierte Firmen: %{companies}```
-  credits: 
+  credits:
     title: Besonderer Dank an
     text: |
       <:lebogo:897861933418565652> **LeBogo**#3073

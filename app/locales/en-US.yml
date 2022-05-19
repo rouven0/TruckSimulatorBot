@@ -37,7 +37,7 @@ truck:
   buy:
     placeholder: Buy a new truck
     author: You got a new truck
-    text: You sold your old %{old_name} for $%{selling_price} and bought a brand new %{new_name} for $%{price}. 
+    text: You sold your old %{old_name} for $%{selling_price} and bought a brand new %{new_name} for $%{price}.
     checkout: Check it out
 
 casino:
@@ -74,7 +74,7 @@ info:
       Registered players: %{players}
       Running jobs: %{jobs}
       Registered companies: %{companies}```
-  credits: 
+  credits:
     title: Credits
     text: |
       <:lebogo:897861933418565652> **LeBogo**#3073 - _Testing helper_ - Contributed 2 lines of code
@@ -86,5 +86,5 @@ info:
     terms: Terms
     privacy: Privacy Policy
 
-complain: 
+complain:
   response: What a crap bot this is! 😡 Hours of time wasted on this useless procuct of a terrible coder and a lousy artist 😡 😡 Is this bot even TESTED before the updates are published... Horrible, just HORRIBLE this spawn of incopetence. Who tf made this? A 12 year old child? This child would probably have made it better than THAT 😡

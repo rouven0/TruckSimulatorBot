@@ -30,10 +30,6 @@ i18n.set("skip_locale_root_data", True)
 
 i18n.load_path.append("./locales")
 
-# ugly thing I have to do to support nested locales
-for locale in config.I18n.AVAILABLE_LOCALES:
-    i18n.t("name", locale=locale)
-
 
 app = Flask(__name__)
 discord = DiscordInteractions(app)
@@ -52,6 +48,11 @@ logger.setLevel(logging.INFO)
 console_handler = logging.StreamHandler()
 console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
 logger.addHandler(console_handler)
+
+# ugly thing I have to do to support nested locales
+for locale in config.I18n.AVAILABLE_LOCALES:
+    logging.info(f"Initialized locale {locale}")
+    i18n.t("name", locale=locale)
 
 
 @app.errorhandler(players.NotEnoughMoney)

@@ -2,6 +2,7 @@
 # pylint: disable=unused-argument
 from math import log
 from typing import Union
+from utils import commatize
 
 import config
 from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Embed, Message
@@ -33,10 +34,10 @@ def get_truck_embed(truck: trucks.Truck) -> Embed:
     truck_embed.fields.append(
         Field(
             name=t("truck.gas.capacity.title"),
-            value=t("truck.gas.capacity.text", capacity=truck.gas_capacity),
+            value=t("truck.gas.capacity.text", capacity=commatize(truck.gas_capacity)),
         )
     )
-    truck_embed.fields.append(Field(name=t("truck.price"), value="$" + str(truck.price)))
+    truck_embed.fields.append(Field(name=t("truck.price"), value="$" + commatize(truck.price)))
     truck_embed.fields.append(
         Field(
             name=t("truck.loading_capacity.title"),
@@ -75,9 +76,9 @@ def buy(ctx: Context, player_id: str) -> Union[Message, str]:
         description=t(
             "truck.buy.text",
             old_name=old_truck.name,
-            selling_price=selling_price,
+            selling_price=commatize(selling_price),
             new_name=new_truck.name,
-            price=new_truck.price,
+            price=commatize(new_truck.price),
         ),
         color=config.EMBED_COLOR,
         author=Author(name=t("truck.buy.author"), icon_url=config.SELF_AVATAR_URL),

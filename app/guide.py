@@ -178,9 +178,9 @@ def get_guide_selects(topic: str = ""):
                 components=[
                     Button(
                         style=5,
-                        label=config.INFO_LINKS[0]["name"],
-                        url=config.INFO_LINKS[0]["url"],
-                        emoji=config.INFO_LINKS[0]["emoji"],
+                        label=config.info_links()[0]["name"],
+                        url=config.info_links()[0]["url"],
+                        emoji=config.info_links()[0]["emoji"],
                     )
                 ]
             )
