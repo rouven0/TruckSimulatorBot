@@ -2,16 +2,16 @@
 # pylint: disable=unused-argument
 from math import log
 from typing import Union
-from utils import commatize
 
 import config
+from flask import request
 from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Embed, Message
 from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles
 from flask_discord_interactions.models.embed import Author, Field, Media
+from i18n import set as set_i18n
+from i18n import t
 from resources import components, players, symbols, trucks
-
-from flask import request
-from i18n import t, set as set_i18n
+from utils import commatize
 
 truck_bp = DiscordInteractionsBlueprint()
 

@@ -1,6 +1,7 @@
 # pylint: disable=too-few-public-methods
 "Some configuration values"
 from os import getenv
+
 from i18n import t
 
 MAP_BORDER = 25

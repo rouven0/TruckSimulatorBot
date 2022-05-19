@@ -6,6 +6,7 @@ import traceback
 from os import getenv
 
 import config
+import i18n
 from admin import admin_bp
 from companies import company_bp
 from driving import driving_bp
@@ -21,7 +22,6 @@ from stats import profile_bp
 from system import system_bp
 from truck import truck_bp
 from werkzeug.exceptions import HTTPException
-import i18n
 
 i18n.set("filename_format", config.I18n.FILENAME_FORMAT)
 i18n.set("fallback", config.I18n.FALLBACK)

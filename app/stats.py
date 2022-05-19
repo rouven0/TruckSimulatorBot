@@ -1,14 +1,15 @@
 "Blueprint file containing all stat-related commands and handlers"
 # pylint: disable=unused-argument, missing-function-docstring
 import config
+from flask import request
 from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Embed, Message
 from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
 from flask_discord_interactions.models.user import User
+from i18n import set as set_i18n
+from i18n import t
 from resources import companies, components, levels, players, trucks
-from utils import log_command, commatize
-from flask import request
-from i18n import t, set as set_i18n
+from utils import commatize, log_command
 
 profile_bp = DiscordInteractionsBlueprint()
 

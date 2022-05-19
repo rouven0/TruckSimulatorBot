@@ -4,15 +4,16 @@ from datetime import datetime
 from math import floor
 
 import config
-from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Embed, Message
-from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles
-from flask_discord_interactions.models.embed import Field, Footer, Media
-from resources import players
-from utils import log_command
 
 # remove this as soon as locales are in ctx
 from flask import request
-from i18n import t, set as set_i18n
+from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Embed, Message
+from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles
+from flask_discord_interactions.models.embed import Field, Footer, Media
+from i18n import set as set_i18n
+from i18n import t
+from resources import players
+from utils import log_command
 
 start_time = datetime.now()
 
