@@ -11,6 +11,9 @@ SELF_AVATAR_URL = "https://cdn.discordapp.com/avatars/831052837353816066/c9b904f
 
 
 def info_links() -> list:
+    """
+    :return: the link buttons as a list
+    """
     return [
         {
             "name": t("info.links.support"),
@@ -49,6 +52,7 @@ class Users:
 
 
 class I18n:
+    "I18n configuration values"
     AVAILABLE_LOCALES = ["en-US", "de"]
     FILENAME_FORMAT = "{locale}{format}"
     FALLBACK = "en-US"

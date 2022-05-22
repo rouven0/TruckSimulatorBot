@@ -9,6 +9,7 @@ from resources.players import Player
 
 
 def back_home(player_id) -> Button:
+    "Returns a simple 'back' button that opens the home screen"
     return Button(
         style=2,
         label=t("back"),
@@ -17,6 +18,7 @@ def back_home(player_id) -> Button:
 
 
 def back_to_road(player_id) -> Button:
+    "Returns a 'back to the road' button that opens the drive screen"
     return Button(
         custom_id=["continue_drive", player_id],
         style=3,

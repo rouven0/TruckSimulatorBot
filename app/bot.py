@@ -51,7 +51,7 @@ logger.addHandler(console_handler)
 
 # ugly thing I have to do to support nested locales
 for locale in config.I18n.AVAILABLE_LOCALES:
-    logging.info(f"Initialized locale {locale}")
+    logging.info("Initialized locale %s", locale)
     i18n.t("name", locale=locale)
 
 
@@ -163,8 +163,7 @@ def handle_exception(error):
 @discord.command()
 def complain(ctx) -> str:
     "No description."
-    locale = request.get_json().get("locale")
-    return i18n.t("complain.response", locale=locale)
+    return i18n.t("complain.response", locale=ctx.locale)
 
 
 if "--remove-global" in sys.argv:

@@ -82,9 +82,10 @@ def generate_minimap(player: players.Player, all_companies: list[companies.Compa
             minimap_array[i].append("")
             position = Position(player.position.x - 3 + j, player.position.y + 3 - i)
             map_place = places.get(position)
-            # show other trucks on the map
+            # Show the place's item
             if map_place:
                 minimap_array[i][j] = f"<:i:{items.get(map_place.produced_item).emoji}>"
+            # Show other company locos
             elif int(position) in [int(c.hq_position) for c in all_companies]:
                 for company in all_companies:
                     if int(company.hq_position) == int(position):
@@ -103,7 +104,9 @@ def generate_minimap(player: players.Player, all_companies: list[companies.Compa
             else:
                 minimap_array[i][j] = symbols.MAP_BACKGROUND
 
+    # own truck in the middle
     minimap_array[3][3] = trucks.get(player.truck_id).emoji
+    # build the actual map
     minimap = ""
     for i in range(0, 7):
         for j in range(0, 7):
@@ -366,14 +369,14 @@ def event_hitchhike(ctx: Context, player_id: str) -> Message:
                 "Someone stopped to take you with them, but.. **OH NO!** It's Mr. Thomas Ruck, the president of this "
                 "country. He had to have your truck towed away and you will pay $3000 for this incident."
             ),
-            components=[ActionRow(components=components.back_to_road(player.id))],
+            components=[ActionRow(components=[components.back_to_road(player.id)])],
             update=True,
         )
     player.gas = 140
     player.position = Position.from_int(458759)
     return Message(
         "You found someone to go with. They even were so kind to gift you some gas. You should thank them.",
-        components=[ActionRow(components=components.back_to_road(player.id))],
+        components=[ActionRow(components=[components.back_to_road(player.id)])],
         update=True,
     )
 
@@ -387,7 +390,7 @@ def event_walk(ctx: Context, player_id: str) -> Message:
         player.position = Position.from_int(458759)
     return Message(
         "You started walking to the gas station. As you arrived, you noticed that you lost a level.",
-        components=[ActionRow(components=components.back_to_road(player.id))],
+        components=[ActionRow(components=[components.back_to_road(player.id)])],
         update=True,
     )
 
@@ -399,12 +402,12 @@ def event_rob(ctx: Context, player_id: str) -> Message:
         player.gas += 250
         return Message(
             "Phew. Nobdody looked and you stole some gas. Be careful next time.",
-            components=[ActionRow(components=components.back_to_road(player.id))],
+            components=[ActionRow(components=[components.back_to_road(player.id)])],
             update=True,
         )
     return Message(
         "Oh no! You got caught. Nothing happened but the car owner drove away angrily.",
-        components=[ActionRow(components=components.back_to_road(player.id))],
+        components=[ActionRow(components=[components.back_to_road(player.id)])],
         update=True,
     )
 

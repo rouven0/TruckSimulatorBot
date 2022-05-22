@@ -4,7 +4,6 @@ from math import log
 from typing import Union
 
 import config
-from flask import request
 from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Embed, Message
 from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles
 from flask_discord_interactions.models.embed import Author, Field, Media
@@ -50,7 +49,7 @@ def get_truck_embed(truck: trucks.Truck) -> Embed:
 @truck_bp.custom_handler(custom_id="manage_truck")
 def show_truck_button(ctx: Context, player_id: str):
     """Shows the main truck page"""
-    set_i18n("locale", request.json.get("locale"))
+    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     truck = trucks.get(player.truck_id)
     truck_embed = get_truck_embed(truck)
@@ -61,7 +60,7 @@ def show_truck_button(ctx: Context, player_id: str):
 @truck_bp.custom_handler(custom_id="truck_buy")
 def buy(ctx: Context, player_id: str) -> Union[Message, str]:
     """Select handler to buy a new truck"""
-    set_i18n("locale", request.json.get("locale"))
+    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     old_truck = trucks.get(player.truck_id)
     new_truck = trucks.get(int(ctx.values[0]))
@@ -103,7 +102,7 @@ def buy(ctx: Context, player_id: str) -> Union[Message, str]:
 @truck_bp.custom_handler(custom_id="truck_view")
 def view(ctx: Context, player_id: str) -> Message:
     """View details about a specific truck"""
-    set_i18n("locale", request.json.get("locale"))
+    set_i18n("locale", ctx.locale)
     if ctx.author.id != player_id:
         raise players.WrongPlayer()
     truck_embed = get_truck_embed(trucks.get(int(ctx.values[0])))

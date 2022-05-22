@@ -5,8 +5,6 @@ from math import floor
 
 import config
 
-# remove this as soon as locales are in ctx
-from flask import request
 from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Embed, Message
 from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles
 from flask_discord_interactions.models.embed import Field, Footer, Media
@@ -55,7 +53,7 @@ def get_info_embed() -> Embed:
 @system_bp.command()
 def info(ctx: Context) -> Message:
     """Prints out general information about this app."""
-    set_i18n("locale", request.json.get("locale"))
+    set_i18n("locale", ctx.locale)
     log_command(ctx)
     return Message(
         embed=get_info_embed(),
@@ -82,5 +80,5 @@ def info(ctx: Context) -> Message:
 
 @system_bp.custom_handler(custom_id="refresh_system_info")
 def refresh(ctx: Context):
-    set_i18n("locale", request.json.get("locale"))
+    set_i18n("locale", ctx.locale)
     return Message(embed=get_info_embed(), update=True)
