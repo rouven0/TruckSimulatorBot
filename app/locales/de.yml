@@ -68,7 +68,6 @@ info:
     title: Systeminformationen
     text: |
       ```yml
-      Betriebszeit: %{uptime}
       Registrierte Spieler: %{players}
       Laufende Aufträge: %{jobs}
       Registrierte Firmen: %{companies}```

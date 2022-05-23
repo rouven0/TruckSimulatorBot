@@ -1,7 +1,6 @@
 "Blueprint file containing the info command and some general button handlers for abort and back buttons"
 # pylint: disable=unused-argument, missing-function-docstring
 from datetime import datetime
-from math import floor
 
 import config
 
@@ -12,8 +11,6 @@ from i18n import set as set_i18n
 from i18n import t
 from resources import players
 from utils import log_command
-
-start_time = datetime.now()
 
 system_bp = DiscordInteractionsBlueprint()
 
@@ -27,18 +24,11 @@ def get_info_embed() -> Embed:
         timestamp=datetime.utcnow().replace(microsecond=0).isoformat(),
     )
 
-    uptime = datetime.now() - start_time
-    days = uptime.days
-    hours = floor(uptime.seconds / 3600)
-    minutes = floor(uptime.seconds / 60) - hours * 60
-    seconds = uptime.seconds - hours * 3600 - minutes * 60
-
     info_embed.fields = [
         Field(
             name=t("info.system.title"),
             value=t(
                 "info.system.text",
-                uptime=f"{days}d {hours}h {minutes}m {seconds}s",
                 players=players.get_count("players"),
                 jobs=players.get_count("jobs"),
                 companies=players.get_count("companies"),

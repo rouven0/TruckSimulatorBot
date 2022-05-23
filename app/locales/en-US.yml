@@ -70,7 +70,6 @@ info:
     title: System inforation
     text: |
       ```yml
-      Uptime: %{uptime}
       Registered players: %{players}
       Running jobs: %{jobs}
       Registered companies: %{companies}```
