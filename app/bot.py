@@ -7,20 +7,12 @@ from os import getenv
 
 import config
 import i18n
-from admin import admin_bp
 from companies import company_bp
-from driving import driving_bp
-from economy import economy_bp
 from flask import Flask, json, request
 from flask_discord_interactions import DiscordInteractions, Message
 from flask_discord_interactions.models.component import ActionRow, Button
 from flask_discord_interactions.models.embed import Embed, Footer
-from gambling import gambling_bp
-from guide import guide_bp
 from resources import companies, players
-from stats import profile_bp
-from system import system_bp
-from truck import truck_bp
 from werkzeug.exceptions import HTTPException
 
 i18n.set("filename_format", config.I18n.FILENAME_FORMAT)
@@ -53,6 +45,8 @@ logger.addHandler(console_handler)
 for locale in config.I18n.AVAILABLE_LOCALES:
     logging.info("Initialized locale %s", locale)
     i18n.t("name", locale=locale)
+
+print(i18n.t("commands.drive.name", locale=config.I18n.FALLBACK))
 
 
 @app.errorhandler(players.NotEnoughMoney)
@@ -160,12 +154,6 @@ def handle_exception(error):
     return response
 
 
-@discord.command()
-def complain(ctx) -> str:
-    "No description."
-    return i18n.t("complain.response", locale=ctx.locale)
-
-
 if "--remove-global" in sys.argv:
     discord.update_commands()
     sys.exit()
@@ -174,10 +162,20 @@ if "--clear-admin" in sys.argv:
     discord.update_commands(guild_id=config.Guilds.SUPPORT)
     sys.exit()
 
+from admin import admin_bp
+
 if "--admin" in sys.argv:
     discord.register_blueprint(admin_bp)
     discord.update_commands(guild_id=config.Guilds.SUPPORT)
     sys.exit()
+
+from driving import driving_bp
+from economy import economy_bp
+from gambling import gambling_bp
+from guide import guide_bp
+from stats import profile_bp
+from system import system_bp
+from truck import truck_bp
 
 discord.register_blueprint(system_bp)
 discord.register_blueprint(profile_bp)
@@ -192,6 +190,13 @@ discord.register_blueprint(company_bp)
 if "--deploy" in sys.argv:
     discord.update_commands()
     sys.exit()
+
+
+@discord.command()
+def complain(ctx) -> str:
+    "No description."
+    return i18n.t("complain.response", locale=ctx.locale)
+
 
 discord.register_blueprint(admin_bp)
 

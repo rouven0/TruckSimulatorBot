@@ -5,9 +5,10 @@ from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Em
 from flask_discord_interactions.models.embed import Author, Field, Footer
 from flask_discord_interactions.models.option import CommandOptionType, Option
 from flask_discord_interactions.models.user import User
+from i18n import t
 from resources import items, jobs, levels, players, trucks
 from resources.autocompletes import amount_all
-from utils import log_command
+from utils import get_localizations, log_command
 
 economy_bp = DiscordInteractionsBlueprint()
 
@@ -73,20 +74,31 @@ def refill(ctx: Context, player_id: str):
 
 
 @economy_bp.command(
+    name=t("commands.give.name", locale=config.I18n.FALLBACK),
+    name_localizations=get_localizations("commands.give.name"),
+    description=t("commands.give.description", locale=config.I18n.FALLBACK),
+    description_localizations=get_localizations("commands.give.description"),
     options=[
         Option(
-            name="user", description="The user you want to give money to.", type=CommandOptionType.USER, required=True
+            name=t("commands.give.options.user.name", locale=config.I18n.FALLBACK),
+            name_localizations=get_localizations("commands.give.options.user.name"),
+            description=t("commands.give.options.user.description", locale=config.I18n.FALLBACK),
+            description_localizations=get_localizations("commands.give.options.user.description"),
+            type=CommandOptionType.USER,
+            required=True,
         ),
         Option(
-            name="amount",
-            description="The amount you want to give.",
+            name=t("commands.give.options.amount.name", locale=config.I18n.FALLBACK),
+            name_localizations=get_localizations("commands.give.options.amount.name"),
+            description=t("commands.give.options.amount.description", locale=config.I18n.FALLBACK),
+            description_localizations=get_localizations("commands.give.options.amount.description"),
             type=CommandOptionType.INTEGER,
             min_value=1,
             max_value=1000000,
             autocomplete=True,
             required=True,
         ),
-    ]
+    ],
 )
 def give(ctx: Context, user: User, amount: int) -> Message:
     """Transfers money to a specific user."""

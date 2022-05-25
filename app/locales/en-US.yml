@@ -3,6 +3,38 @@ back: Back
 back_road: Back to the road
 coming_soon: Coming soon
 
+commands:
+  drive:
+    name: drive
+    description: Starts the game.
+  give:
+    name: give
+    description: Transfers money to a specific user.
+    options:
+      user:
+        name: user
+        description: The user you want to give money to.
+      amount:
+        name: amount
+        description: The amount to give.
+  guide:
+    name: guide
+    description: Handy guide to help you understand this game.
+    options:
+      topic:
+        name: topic
+        description: The topic you want to read about.
+  info:
+    name: info
+    description: Prints out general information about this app.
+  profile:
+    name: profile
+    description: Shows your profile.
+    options:
+      user: 
+        name: user
+        description: A user you want to view.
+
 home:
   truck: Manage your truck
   company: Show your company

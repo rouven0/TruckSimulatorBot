@@ -10,9 +10,11 @@ from flask_discord_interactions import DiscordInteractionsBlueprint, Embed, Mess
 from flask_discord_interactions.context import Context
 from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
+from i18n import set as set_i18n
+from i18n import t
 from resources import assets, companies, components, items, jobs, levels, places, players, symbols, trucks
 from resources.position import Position
-from utils import log_command
+from utils import get_localizations, log_command
 
 driving_bp = DiscordInteractionsBlueprint()
 
@@ -442,7 +444,12 @@ def initial_drive(ctx: Context, player_id: str = None):
     return Message(content=ctx.message.content, embeds=ctx.message.embeds, components=[], update=True)
 
 
-@driving_bp.command()
+@driving_bp.command(
+    name=t("commands.drive.name", locale=config.I18n.FALLBACK),
+    name_localizations=get_localizations("commands.drive.name"),
+    description=t("commands.drive.description", locale=config.I18n.FALLBACK),
+    description_localizations=get_localizations("commands.drive.description"),
+)
 def drive(ctx: Context) -> Message:
     """Starts the game."""
     log_command(ctx)

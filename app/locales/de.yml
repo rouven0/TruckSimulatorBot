@@ -3,6 +3,38 @@ back: Zurück
 back_road: Zurück zur Straße
 coming_soon: Kommt bald
 
+commands:
+  drive:
+    name: drive
+    description: Startet das Spiel.
+  give:
+    name: überweisung
+    description: Sendet Geld an einen anderen Spieler.
+    options:
+      user:
+        name: nutzer
+        description: Der nutzer, dem du Geld geben willst.
+      amount:
+        name: betrag
+        description: Der zu überweisende Betrag.
+  guide:
+    name: handbuch
+    description: Hilfe und Anleitung zu diesem Spiel.
+    options:
+      topic:
+        name: artikel
+        description: Den Artikel, den du lesen willst.
+  info:
+    name: status
+    description: Allgemeine Informationen zu dieser App.
+  profile:
+    name: profil
+    description: Zeigt dein Profil
+    options:
+      user:
+        name: nutzer
+        description: Ein Nutzer, den du anschauen willst.
+
 home:
   truck: Dein Truck
   company: Deine Firma

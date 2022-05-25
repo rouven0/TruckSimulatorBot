@@ -4,16 +4,31 @@ import config
 from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Embed, Message
 from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
+from flask_discord_interactions.models.option import CommandOptionType, Option
 from flask_discord_interactions.models.user import User
 from i18n import set as set_i18n
 from i18n import t
 from resources import companies, components, levels, players, trucks
-from utils import commatize, log_command
+from utils import commatize, get_localizations, log_command
 
 profile_bp = DiscordInteractionsBlueprint()
 
 
-@profile_bp.command(annotations={"user": "A user you want to view."})
+@profile_bp.command(
+    name=t("commands.profile.name", locale=config.I18n.FALLBACK),
+    name_localizations=get_localizations("commands.profile.name"),
+    description=t("commands.profile.description", locale=config.I18n.FALLBACK),
+    description_localizations=get_localizations("commands.profile.description"),
+    options=[
+        Option(
+            type=CommandOptionType.USER,
+            name=t("commands.profile.options.user.name", locale=config.I18n.FALLBACK),
+            name_localizations=get_localizations("commands.profile.options.user.name"),
+            description=t("commands.profile.options.user.description", locale=config.I18n.FALLBACK),
+            description_localizations=get_localizations("commands.profile.options.user.description"),
+        )
+    ],
+)
 def profile(ctx: Context, user: User = None) -> Message:
     "Shows your profile."
     log_command(ctx)
