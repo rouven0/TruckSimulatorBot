@@ -167,7 +167,7 @@ def get_top_embed(key="level") -> Embed:
     top_players = players.get_top(key)
     top_body = ""
     count = 0
-    top_embed = Embed(title="Truck Simulator top list 🎉", color=config.EMBED_COLOR, fields=[])
+    top_embed = Embed(title=t("top.title"), color=config.EMBED_COLOR, fields=[])
 
     for player in top_players[0]:
         if key == "money":
@@ -178,8 +178,8 @@ def get_top_embed(key="level") -> Embed:
             val = f"{player.level:,} ({player.xp:,}/{levels.get_next_xp(player.level):,} xp)"
         count += 1
         top_body += f"**{count}**. {player} ~ {val}{top_players[1]}\n"
-    top_embed.fields.append(Field(name=f"Top players sorted by {key}", value=top_body))
-    top_embed.footer = Footer(text="Congratulations if you see yourself in that list!", icon_url=config.SELF_AVATAR_URL)
+    top_embed.fields.append(Field(name=t(f"top.fields.{key}"), value=top_body))
+    top_embed.footer = Footer(text=t("top.footer"), icon_url=config.SELF_AVATAR_URL)
     return top_embed
 
 
@@ -190,14 +190,18 @@ def get_top_select(player):
             components=[
                 SelectMenu(
                     custom_id=["top_select", player.id],
-                    placeholder="View another toplist",
+                    placeholder=t("top.select"),
                     options=[
-                        SelectMenuOption(label="Level", value="level", emoji={"name": "🎉", "id": None}),
+                        SelectMenuOption(label=t("top.keys.level"), value="level", emoji={"name": "🎉", "id": None}),
                         SelectMenuOption(
-                            label="Money", value="money", emoji={"name": "ts_money", "id": "868480873157242930"}
+                            label=t("top.keys.money"),
+                            value="money",
+                            emoji={"name": "ts_money", "id": "868480873157242930"},
                         ),
                         SelectMenuOption(
-                            label="Miles", value="miles", emoji={"name": "default_truck", "id": "861674264737087519"}
+                            label=t("top.keys.miles"),
+                            value="miles",
+                            emoji={"name": "default_truck", "id": "861674264737087519"},
                         ),
                     ],
                 )

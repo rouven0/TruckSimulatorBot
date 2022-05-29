@@ -51,6 +51,19 @@ profile:
   load: Aktuelle Ladung
   company: Firma
 
+top:
+  title: Ranglisten 🎉
+  fields: 
+    level: Die besten Spieler sortiert nach ihrem Level
+    money: Die besten Spieler sortiert nach ihrem Kontostand
+    miles: Die besten Spieler sortiert nach ihren gefahrenen Kilometern
+  footer: Herzlichen Glückwunsch an die Elite!
+  select: Wähle eine Liste
+  keys:
+    level: Level
+    money: Kontostand
+    miles: Gefahrene Kilometer
+
 truck:
   author: "%{player}'s truck"
   gas:
@@ -101,7 +114,7 @@ info:
     text: |
       ```yml
       Registrierte Spieler: %{players}
-      Laufende Aufträge: %{jobs}
+      Laufende Auftragsfahrten: %{jobs}
       Registrierte Firmen: %{companies}```
   credits:
     title: Besonderer Dank an

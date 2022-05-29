@@ -51,6 +51,20 @@ profile:
   load: Current load
   company: Company
 
+top:
+  title: Truck Simulator Toplist 🎉
+  fields: 
+    level: Top players sorted by level
+    money: Top players sorted by money
+    miles: Top players sorted by miles
+  footer: Congratulations if you see yourself in that list!
+  select: View another toplist
+  keys:
+    level: Level
+    money: Money
+    miles: Miles
+  
+
 truck:
   author: "%{player}'s truck"
   gas:
