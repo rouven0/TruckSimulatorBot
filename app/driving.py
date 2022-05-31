@@ -27,15 +27,19 @@ def get_drive_embeds(player: players.Player, avatar_url: str) -> list:
     drive_embed = Embed(
         color=config.EMBED_COLOR,
         timestamp=datetime.utcnow().replace(microsecond=0).isoformat(),
-        author=Author(name=f"{player.name} is driving", icon_url=avatar_url),
-        footer=Footer(text=f"Loaded items: {len(player.loaded_items)}/{trucks.get(player.truck_id).loading_capacity}"),
+        author=Author(name=t("driving.title", player=player.name), icon_url=avatar_url),
+        footer=Footer(
+            text=t("profile.load") + f" {len(player.loaded_items)}/{trucks.get(player.truck_id).loading_capacity}",
+        ),
         fields=[],
     )
 
-    drive_embed.fields.append(Field(name="Minimap", value=generate_minimap(player, all_companies), inline=False))
-    drive_embed.fields.append(Field(name="Position", value=str(player.position)))
     drive_embed.fields.append(
-        Field(name="Gas left", value=f"{player.gas} l" if player.gas > 100 else f"{player.gas} l :warning:")
+        Field(name=t("driving.minimap"), value=generate_minimap(player, all_companies), inline=False)
+    )
+    drive_embed.fields.append(Field(name=t("driving.position"), value=str(player.position)))
+    drive_embed.fields.append(
+        Field(name=t("profile.gas"), value=f"{player.gas} l" if player.gas > 100 else f"{player.gas} l :warning:")
     )
 
     current_job = player.get_job()
@@ -43,7 +47,7 @@ def get_drive_embeds(player: players.Player, avatar_url: str) -> list:
         navigation_place = current_job.target_place
         drive_embed.fields.append(
             Field(
-                name=f"Navigation: Drive to {navigation_place}",
+                name=t("driving.navigation", place=navigation_place),
                 value=f"<:n:{places.get_direction(player, navigation_place)}>",
             )
         )
@@ -51,7 +55,7 @@ def get_drive_embeds(player: players.Player, avatar_url: str) -> list:
     if place is not None:
         drive_embed.fields.append(
             Field(
-                name="What is here?",
+                name=t("driving.info.title"),
                 value=f"<:i:{items.get(place.produced_item).emoji}> {place}",
                 inline=False,
             )
@@ -67,8 +71,8 @@ def get_drive_embeds(player: players.Player, avatar_url: str) -> list:
             if int(company.hq_position) == int(player.position):
                 drive_embed.fields.append(
                     Field(
-                        name="What is here?",
-                        value=f"A company called {company.logo} **{company}**",
+                        name=t("driving.info.title"),
+                        value=t("driving.info.company", name=f"{company.logo} **{company}**"),
                         inline=False,
                     )
                 )
@@ -119,6 +123,7 @@ def generate_minimap(player: players.Player, all_companies: list[companies.Compa
 
 @driving_bp.custom_handler(custom_id="stop")
 def stop(ctx: Context, player_id: str):
+    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     return Message(
         embeds=get_drive_embeds(player, ctx.author.avatar_url),
@@ -129,6 +134,7 @@ def stop(ctx: Context, player_id: str):
 
 @driving_bp.custom_handler(custom_id="load")
 def load(ctx: Context, player_id: str):
+    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
 
     item = items.get(places.get(player.position).produced_item)
@@ -145,8 +151,8 @@ def load(ctx: Context, player_id: str):
     drive_embeds = get_drive_embeds(player, ctx.author.avatar_url)
     drive_embeds[1].fields.append(
         Field(
-            name="Loading successful",
-            value=f"You loaded {item} into your truck",
+            name=t("driving.load.title"),
+            value=t("driving.load.value", item=item),
             inline=False,
         )
     )
@@ -164,6 +170,7 @@ def load(ctx: Context, player_id: str):
 
 @driving_bp.custom_handler(custom_id="unload")
 def unload(ctx: Context, player_id: str):
+    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     current_job = player.get_job()
 
@@ -172,7 +179,7 @@ def unload(ctx: Context, player_id: str):
         if item.name not in [o.value for o in item_options]:
             item_options.append(
                 SelectMenuOption(
-                    label=f"{item.name} (Required for your job)"
+                    label=f"{item.name} " + t("driving.unload.item_required")
                     if current_job is not None and item.name == current_job.place_from.produced_item
                     else item.name,
                     value=item.name,
@@ -181,12 +188,12 @@ def unload(ctx: Context, player_id: str):
             )
     select = SelectMenu(
         custom_id=["unload_items", player.id],
-        placeholder="Choose which items to unload",
+        placeholder=t("driving.unload.placeholder"),
         options=item_options,
         min_values=1,
         max_values=len(item_options),
     )
-    cancel_button = Button(custom_id=["cancel", player.id], label="Cancel", style=4)
+    cancel_button = Button(custom_id=["cancel", player.id], label=t("cancel"), style=4)
     return Message(
         embeds=get_drive_embeds(player, ctx.author.avatar_url),
         components=[ActionRow(components=[select]), ActionRow(components=[cancel_button])],
@@ -205,7 +212,7 @@ def unload_items(ctx: Context, player_id: str):
         if name == ctx.values[0]:
             item_string += str(item)
         elif name == ctx.values[-1]:
-            item_string += " and " + str(item)
+            item_string += t("driving.unload.and_separator") + str(item)
         else:
             item_string += ", " + str(item)
 
@@ -214,7 +221,7 @@ def unload_items(ctx: Context, player_id: str):
     drive_embeds = get_drive_embeds(player, ctx.author.avatar_url)
 
     drive_embeds[1].fields.append(
-        Field(name="Unloading successful", value=f"You removed {item_string} from your truck", inline=False)
+        Field(name=t("driving.unload.title"), value=t("driving.unload.value", items=item_string), inline=False)
     )
 
     # add a notification embed if a job is done
@@ -234,7 +241,7 @@ def unload_items(ctx: Context, player_id: str):
         # get the drive embed egain to fit the job update
         drive_embeds = get_drive_embeds(player, ctx.author.avatar_url)
         drive_embeds[1].fields.append(
-            Field(name="Unloading successful", value=f"You removed {item_string} from your truck", inline=False)
+            Field(name=t("driving.unload.title"), value=t("driving.unload.value", items=item_string), inline=False)
         )
         drive_embeds.append(
             Embed(title="Job Notification", description=job_message, color=config.EMBED_COLOR),
@@ -259,6 +266,7 @@ def unload_items(ctx: Context, player_id: str):
 
 @driving_bp.custom_handler(custom_id="job_new")
 def new_job(ctx: Context, player_id: str) -> Message:
+    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     job_embed = Embed(
         color=config.EMBED_COLOR,
@@ -281,6 +289,7 @@ def new_job(ctx: Context, player_id: str) -> Message:
 
 @driving_bp.custom_handler(custom_id="cancel")
 def cancel(ctx: Context, player_id: str):
+    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     return Message(
         embeds=get_drive_embeds(player, ctx.author.avatar_url),
@@ -291,21 +300,25 @@ def cancel(ctx: Context, player_id: str):
 
 @driving_bp.custom_handler(custom_id=str(symbols.LEFT))
 def left(ctx: Context, player_id: str):
+    set_i18n("locale", ctx.locale)
     return move(ctx, symbols.LEFT, player_id)
 
 
 @driving_bp.custom_handler(custom_id=str(symbols.UP))
 def up(ctx: Context, player_id: str):
+    set_i18n("locale", ctx.locale)
     return move(ctx, symbols.UP, player_id)
 
 
 @driving_bp.custom_handler(custom_id=str(symbols.DOWN))
 def down(ctx: Context, player_id: str):
+    set_i18n("locale", ctx.locale)
     return move(ctx, symbols.DOWN, player_id)
 
 
 @driving_bp.custom_handler(custom_id=str(symbols.RIGHT))
 def right(ctx: Context, player_id: str):
+    set_i18n("locale", ctx.locale)
     return move(ctx, symbols.RIGHT, player_id)
 
 
@@ -360,6 +373,7 @@ def move(ctx: Context, direction, player_id):
 
 @driving_bp.custom_handler(custom_id="event_hitchhike")
 def event_hitchhike(ctx: Context, player_id: str) -> Message:
+    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     try:
         player.debit_money(3000)
@@ -385,6 +399,7 @@ def event_hitchhike(ctx: Context, player_id: str) -> Message:
 
 @driving_bp.custom_handler(custom_id="event_walk")
 def event_walk(ctx: Context, player_id: str) -> Message:
+    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     if player.level > 0:
         player.level -= 1
@@ -399,6 +414,7 @@ def event_walk(ctx: Context, player_id: str) -> Message:
 
 @driving_bp.custom_handler(custom_id="event_rob")
 def event_rob(ctx: Context, player_id: str) -> Message:
+    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     if randint(0, 1) == 0:
         player.gas += 250
@@ -416,6 +432,7 @@ def event_rob(ctx: Context, player_id: str) -> Message:
 
 @driving_bp.custom_handler(custom_id="continue_drive")
 def continue_drive(ctx: Context, player_id: str):
+    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     return Message(
         embeds=get_drive_embeds(player, ctx.author.avatar_url),
@@ -426,6 +443,7 @@ def continue_drive(ctx: Context, player_id: str):
 
 @driving_bp.custom_handler(custom_id="initial_drive")
 def initial_drive(ctx: Context, player_id: str = None):
+    set_i18n("locale", ctx.locale)
     if player_id:
         player = players.get(ctx.author.id, check=player_id)
     else:
@@ -452,6 +470,7 @@ def initial_drive(ctx: Context, player_id: str = None):
 )
 def drive(ctx: Context) -> Message:
     """Starts the game."""
+    set_i18n("locale", ctx.locale)
     log_command(ctx)
     player = players.get(ctx.author.id)
     # Detect, when the player is renamed

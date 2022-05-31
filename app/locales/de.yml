@@ -1,5 +1,6 @@
 name: Truck Simulator
 back: Zurück
+cancel: Abbrechen
 back_road: Zurück zur Straße
 coming_soon: Kommt bald
 
@@ -35,6 +36,33 @@ commands:
         name: nutzer
         description: Ein Nutzer, den du anschauen willst.
 
+driving:
+  title: |
+    %{player} genießt den Asphalt
+  minimap: Karte
+  position: Position
+  info:
+    title: Was ist hier?
+    company: Eine Firma mit dem Namen %{name}
+  navigation: "Nagivation: Dein Ziel ist %{place}"
+  buttons:
+    load: Beladen
+    unload: Entladen
+    job:
+      new: Neuer Auftrag
+      show: Auftrag anzeigen
+    home: Menü
+    refill: Tanken
+  load:
+    title: Beladen erfolgreich
+    value: Du hast %{item} geladen.
+  unload:
+    placeholder: Wähle aus, was abgeladen werden soll
+    item_required: (Benötigt für deinen Auftrag)
+    title: Entladen erfolgreich
+    value: Du hast %{items} abgeladen.
+    and_separator: " und "
+
 home:
   truck: Dein Truck
   company: Deine Firma
@@ -46,7 +74,7 @@ profile:
   money: Konto
   miles: Gefahrene Kilometer
   truck_miles: (%{miles} mit dem aktuellen Truck)
-  gas: Füllstand
+  gas: Restbenzin
   truck: Aktueller Truck
   load: Aktuelle Ladung
   company: Firma
@@ -86,6 +114,7 @@ truck:
     checkout: Sieh es dir an
 
 casino:
+  enter: Casino betreten
   welcome: Wilkommen im Casino
   invalid_amount: Ungültiger Einsatz
   slots:

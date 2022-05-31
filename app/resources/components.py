@@ -74,7 +74,7 @@ def get_drive_buttons(player: Player) -> list:
             emoji={"name": "load", "id": symbols.LOAD},
             custom_id=["load", player.id],
             disabled=load_disabled,
-            label=f"Load your truck with {items.get(place.produced_item).name}" if place else "Load",
+            label=t("driving.buttons.load"),
         ),
         Button(
             style=1
@@ -86,21 +86,24 @@ def get_drive_buttons(player: Player) -> list:
             emoji={"name": "unload", "id": symbols.UNLOAD},
             custom_id=["unload", player.id],
             disabled=unload_disabled,
-            label="Unload",
+            label=t("driving.buttons.unload"),
         ),
     ]
 
     if place and "refill" in place.available_actions:
         action_buttons.append(
             Button(
-                style=2, label="Refill", emoji={"name": "refill", "id": symbols.REFILL}, custom_id=["refill", player.id]
+                style=2,
+                label=t("driving.buttons.refill"),
+                emoji={"name": "refill", "id": symbols.REFILL},
+                custom_id=["refill", player.id],
             )
         )
     if place and "gambling" in place.available_actions:
         action_buttons.append(
             Button(
                 style=3,
-                label="Enter the casino",
+                label=t("casino.enter"),
                 custom_id=["casino", player.id],
                 emoji={"name": "money", "id": items.get(place.produced_item).emoji},
             )
@@ -112,12 +115,17 @@ def get_drive_buttons(player: Player) -> list:
             components=[
                 Button(
                     style=1 if current_job is None else 2,
-                    label="New Job",
+                    label=t("driving.buttons.job.new"),
                     custom_id=["job_new", player.id],
                     disabled=(current_job is not None),
                 ),
-                Button(style=2, label="Show Job", custom_id=["job_show", player.id], disabled=(current_job is None)),
-                Button(style=3, label="Home", custom_id=["home", player.id]),
+                Button(
+                    style=2,
+                    label=t("driving.buttons.job.show"),
+                    custom_id=["job_show", player.id],
+                    disabled=(current_job is None),
+                ),
+                Button(style=3, label=t("driving.buttons.home"), custom_id=["home", player.id]),
             ]
         )
     )

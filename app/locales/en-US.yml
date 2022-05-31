@@ -1,5 +1,6 @@
 name: Truck Simulator
 back: Back
+cancel: Cancel
 back_road: Back to the road
 coming_soon: Coming soon
 
@@ -34,6 +35,35 @@ commands:
       user: 
         name: user
         description: A user you want to view.
+
+driving:
+  title: |
+    %{player} is driving
+  minimap: Minimap
+  position: Position
+  info:
+    title: What is here?
+    company: A company called %{name}
+  navigation: "Nagivation: Drive to %{place}"
+  buttons:
+    load: Load
+    unload: Unload
+    job:
+      new: New Job
+      show: Show Job
+    home: Home
+    refill: Refill
+  load:
+    title: Loading successful
+    value: You loaded %{item} into your truck.
+  unload:
+    placeholder: Choose which items to unload
+    item_required: (Required for your job)
+    title: Unloading successful
+    value: You removed %{items} from your truck.
+    and_separator: " and "
+
+
 
 home:
   truck: Manage your truck
@@ -87,6 +117,7 @@ truck:
     checkout: Check it out
 
 casino:
+  enter: Enter the casino
   welcome: Welcome to the casino
   invalid_amount: Invalid amount
   slots:
