@@ -157,5 +157,13 @@ info:
     terms: Nutzungsbedingungen
     privacy: Datenschutzerklärung
 
+autocomplete:
+  all: alles
+  half: die Hälfte
+  thousand: |
+    %{amount} tausend
+  million: |
+    %{amount} million
+
 complain:
   response: Junge WAS IST DENN DAS FÜR EIN SCHMUTZ 😡. Und damit hab ich jetzt mehrere Tage verbracht😡. Wird das Zeug überhaupt getestet bevor es unter die Leute geworfen wird?😡 Einfach nur schrecklich diese Ausgeburt der Inkompetenz; Die Spielmechanik macht keinen Sinn, der Dev macht kaum etwas und über den Zeichner der Bilder wollen wir am besten gar nicht erst reden...
