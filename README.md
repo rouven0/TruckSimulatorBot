@@ -12,7 +12,6 @@ Simply self host this bot using docker. The internal server is running on port 9
 ```env
 DISCORD_CLIENT_ID
 DISCORD_PUBLIC_KEY
-DISCORD_CLIENT_SECRET
 MYSQL_HOST
 MYSQL_USER
 MYSQL_PASSWORD
