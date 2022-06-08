@@ -19,6 +19,9 @@ MYSQL_PASSWORD
 MYSQL_DATABASE
 ```
 
+### Setting up the database
+To make the setup easier, `database.sql` contains a full table structure dump, you can apply to your mysql instance.
+
 ## Project Description
 ### Basic controls
 The virtual map is the heart of the Truck Simulator. Everything is a place that you can drive to. Some commands are bound to specific places, some are available everywhere.
