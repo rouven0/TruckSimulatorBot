@@ -184,6 +184,11 @@ def unload(ctx: Context, player_id: str):
                     else item.name,
                     value=item.name,
                     emoji={"name": item.name, "id": item.emoji},
+                    default=True
+                    if current_job is not None
+                    and item.name == current_job.place_from.produced_item
+                    and int(player.position) == int(current_job.place_to.position)
+                    else False,
                 )
             )
     select = SelectMenu(
