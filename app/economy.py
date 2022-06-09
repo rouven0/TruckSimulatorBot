@@ -5,16 +5,17 @@ from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Em
 from flask_discord_interactions.models.embed import Author, Field, Footer
 from flask_discord_interactions.models.option import CommandOptionType, Option
 from flask_discord_interactions.models.user import User
-from i18n import t
+from i18n import t, set as set_i18n
 from resources import items, jobs, levels, players, trucks
 from resources.autocompletes import amount_all
-from utils import get_localizations, log_command
+from utils import get_localizations, log_command, commatize
 
 economy_bp = DiscordInteractionsBlueprint()
 
 
 @economy_bp.custom_handler(custom_id="job_show")
 def show_job(ctx: Context, player_id: str) -> Message:
+    set_i18n("locale", ctx.locale)
     player = players.get(player_id)
 
     current_job = player.get_job()
@@ -22,15 +23,19 @@ def show_job(ctx: Context, player_id: str) -> Message:
         raise players.WrongPlayer()
     job_embed = Embed(
         color=config.EMBED_COLOR,
-        author=Author(name=f"{player.name}'s Job"),
+        author=Author(name=t("job.title", player=player.name), icon_url=ctx.author.avatar_url),
         fields=[],
     )
-    place_from = current_job.place_from
-    place_to = current_job.place_to
-    item = items.get(place_from.produced_item)
-    job_message = f"Bring {item} from {place_from.name} to {place_to.name}."
-    job_embed.fields.append(Field(name="Current job", value=job_message, inline=False))
-    job_embed.fields.append(Field(name="Current state", value=jobs.get_state(current_job)))
+    item = items.get(current_job.place_from.produced_item)
+    job_message = t(
+        "job.message",
+        place_to=current_job.place_to,
+        item=item,
+        place_from=current_job.place_from,
+        reward=commatize(current_job.reward),
+    )
+    job_embed.fields.append(Field(name=t("job.current"), value=job_message, inline=False))
+    job_embed.fields.append(Field(name=t("job.state.current"), value=jobs.get_state(current_job)))
     return Message(embed=job_embed, ephemeral=True)
 
 

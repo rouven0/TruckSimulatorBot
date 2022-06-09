@@ -63,7 +63,25 @@ driving:
     value: You removed %{items} from your truck.
     and_separator: " and "
 
+job:
+  title: |
+    %{player}`s Job
+  new: You got a new Job
+  current: Current Job
+  state:
+    current: Current state
+    claimed: You claimed this kob. Drive to %{place} and load your truck.
+    loaded: You loaded your truck with the needed items. Now drive to %{place} and unload them.
+    done: Your job is done and you got $%{reward}.
+  notification: Job Notification
+  company_notice: Your company's net worth was increased by $%{amount}.
+  message: |
+    %{place_to} needs %{item} from %{place_from}. You get $%{reward} for this transport.
 
+minijob:
+  notification: Minijob notification
+  message: |
+    %{place} gave you $%{reward} for brining them %{item}.
 
 home:
   truck: Manage your truck

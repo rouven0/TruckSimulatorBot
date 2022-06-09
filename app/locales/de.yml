@@ -63,6 +63,25 @@ driving:
     value: Du hast %{items} abgeladen.
     and_separator: " und "
 
+job:
+  title: Auftrag von %{player}
+  new: Du hast einen neuen Auftrag
+  current: Aktueller Auftrag
+  state:
+    current: Status
+    claimed: Du hast diesen Auftrag angenommen. Dein Ziel ist %{place}. Belade deinen Truck dort.
+    loaded: Du hast alles benötigte geladen. Dein neues Ziel ist %{place}. Endlade deine Ladung dort.
+    done: Dein Auftrag ist ausgeführt und dir wurde $%{reward} gezahlt.
+  notification: Auftragsbenachrichtigung
+  company_notice: Deiner Firma wurden $%{amount} gutgeschrieben.
+  message: |
+    %{place_to} braucht %{item} von %{place_from}. Du bekommst $%{reward} für diesen Transport.
+
+minijob:
+  notification: Minijobsbenachrichtigung
+  message: |
+    %{place} hat dir $%{reward} für das gebrachte %{item} gegeben.
+
 home:
   truck: Dein Truck
   company: Deine Firma

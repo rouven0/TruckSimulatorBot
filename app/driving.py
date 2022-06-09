@@ -6,7 +6,7 @@ from random import randint
 
 import config
 import requests
-from flask_discord_interactions import DiscordInteractionsBlueprint, Embed, Message
+from flask_discord_interactions import DiscordInteractionsBlueprint, Embed, Message, Modal
 from flask_discord_interactions.context import Context
 from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
@@ -14,7 +14,7 @@ from i18n import set as set_i18n
 from i18n import t
 from resources import assets, companies, components, items, jobs, levels, places, players, symbols, trucks
 from resources.position import Position
-from utils import get_localizations, log_command
+from utils import get_localizations, log_command, commatize
 
 driving_bp = DiscordInteractionsBlueprint()
 
@@ -160,7 +160,7 @@ def load(ctx: Context, player_id: str):
         return Message(
             embeds=drive_embeds
             + [
-                Embed(title="Job Notification", description=job_message, color=config.EMBED_COLOR),
+                Embed(title=t("job.notification"), description=job_message, color=config.EMBED_COLOR),
             ],
             components=components.get_drive_buttons(player),
             update=True,
@@ -187,31 +187,29 @@ def unload(ctx: Context, player_id: str):
                 )
             )
     select = SelectMenu(
-        custom_id=["unload_items", player.id],
+        custom_id=["item_select"],
         placeholder=t("driving.unload.placeholder"),
         options=item_options,
         min_values=1,
         max_values=len(item_options),
     )
-    cancel_button = Button(custom_id=["cancel", player.id], label=t("cancel"), style=4)
-    return Message(
-        embeds=get_drive_embeds(player, ctx.author.avatar_url),
-        components=[ActionRow(components=[select]), ActionRow(components=[cancel_button])],
-        update=True,
+    return Modal(
+        custom_id=["unload_items", player_id], title=t("driving.unload.placeholder"), components=[ActionRow([select])]
     )
 
 
 @driving_bp.custom_handler(custom_id="unload_items")
 def unload_items(ctx: Context, player_id: str):
     player = players.get(ctx.author.id, check=player_id)
+    select = ctx.get_component("item_select")
 
     item_string = ""
-    for name in ctx.values:
+    for name in select.values:
         item = items.get(name)
         player.unload_item(item)
-        if name == ctx.values[0]:
+        if name == select.values[0]:
             item_string += str(item)
-        elif name == ctx.values[-1]:
+        elif name == select.values[-1]:
             item_string += t("driving.unload.and_separator") + str(item)
         else:
             item_string += ", " + str(item)
@@ -227,7 +225,7 @@ def unload_items(ctx: Context, player_id: str):
     # add a notification embed if a job is done
     if (
         current_job is not None
-        and current_job.place_from.produced_item in ctx.values
+        and current_job.place_from.produced_item in select.values
         and int(player.position) == int(current_job.place_to.position)
     ):
         current_job.state = jobs.STATE_DONE
@@ -237,25 +235,27 @@ def unload_items(ctx: Context, player_id: str):
         if player.company is not None:
             company = companies.get(player.company)
             company.add_net_worth(int(current_job.reward / 10))
-            job_message += f"\nYour company's net worth was increased by ${int(current_job.reward/10):,}"
+            job_message += "\n" + t("job.company_notice", amount=commatize(int(current_job.reward / 10)))
         # get the drive embed egain to fit the job update
         drive_embeds = get_drive_embeds(player, ctx.author.avatar_url)
         drive_embeds[1].fields.append(
             Field(name=t("driving.unload.title"), value=t("driving.unload.value", items=item_string), inline=False)
         )
         drive_embeds.append(
-            Embed(title="Job Notification", description=job_message, color=config.EMBED_COLOR),
+            Embed(title=t("job.notification"), description=job_message, color=config.EMBED_COLOR),
         )
 
     # add a notification embed if a minijob is done
-    if place.accepted_item in ctx.values and place.item_reward:
+    if place.accepted_item in select.values and place.item_reward:
         player.add_money(place.item_reward)
         drive_embeds.append(
             Embed(
-                title="Minijob Notification",
-                description=(
-                    f"{place} gave you ${place.item_reward * (player.level + 1):,} for bringing them "
-                    f"{place.accepted_item}"
+                title=t("minijob.notification"),
+                description=t(
+                    "minijob.message",
+                    place=place,
+                    reward=commatize(place.item_reward * (player.level + 1)),
+                    item=place.accepted_item,
                 ),
                 color=config.EMBED_COLOR,
             )
@@ -270,29 +270,20 @@ def new_job(ctx: Context, player_id: str) -> Message:
     player = players.get(ctx.author.id, check=player_id)
     job_embed = Embed(
         color=config.EMBED_COLOR,
-        author=Author(name=f"{player.name}'s Job", icon_url=ctx.author.avatar_url),
+        author=Author(name=t("job.title", player=player.name), icon_url=ctx.author.avatar_url),
         fields=[],
     )
     job = jobs.generate(player)
     player.add_job(job)
 
     item = items.get(job.place_from.produced_item)
-    job_message = f"{job.place_to} needs {item} from {job.place_from}. You get ${job.reward:,} for this transport"
-    job_embed.fields.append(Field(name="You got a new Job", value=job_message, inline=False))
-    job_embed.fields.append(Field(name="Current state", value=jobs.get_state(job)))
+    job_message = t(
+        "job.message", place_to=job.place_to, item=item, place_from=job.place_from, reward=commatize(job.reward)
+    )
+    job_embed.fields.append(Field(name=t("job.new"), value=job_message, inline=False))
+    job_embed.fields.append(Field(name=t("job.state.current"), value=jobs.get_state(job)))
     return Message(
         embeds=get_drive_embeds(player, ctx.author.avatar_url) + [job_embed],
-        components=components.get_drive_buttons(player),
-        update=True,
-    )
-
-
-@driving_bp.custom_handler(custom_id="cancel")
-def cancel(ctx: Context, player_id: str):
-    set_i18n("locale", ctx.locale)
-    player = players.get(ctx.author.id, check=player_id)
-    return Message(
-        embeds=get_drive_embeds(player, ctx.author.avatar_url),
         components=components.get_drive_buttons(player),
         update=True,
     )
@@ -450,13 +441,11 @@ def initial_drive(ctx: Context, player_id: str = None):
         player = players.get(ctx.author.id)
 
     def start_drive():
-        requests.post(
-            ctx.followup_url(),
-            json=Message(
-                embeds=get_drive_embeds(player, ctx.author.avatar_url),
-                components=components.get_drive_buttons(player),
-            ).dump_followup(),
-        ).raise_for_status()
+        ctx.send(
+            Message(
+                embeds=get_drive_embeds(player, ctx.author.avatar_url), components=components.get_drive_buttons(player)
+            )
+        )
 
     threading.Thread(target=start_drive).start()
     return Message(content=ctx.message.content, embeds=ctx.message.embeds, components=[], update=True)

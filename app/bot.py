@@ -46,8 +46,6 @@ for locale in config.I18n.AVAILABLE_LOCALES:
     logging.info("Initialized locale %s", locale)
     i18n.t("name", locale=locale)
 
-print(i18n.t("commands.drive.name", locale=config.I18n.FALLBACK))
-
 
 @app.errorhandler(players.NotEnoughMoney)
 def not_enough_money(error):
