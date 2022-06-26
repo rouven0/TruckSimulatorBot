@@ -48,12 +48,13 @@ def add(ctx: Context, user: User, reason: str = "No reason provided."):
         player.name = reason
         return Message(
             embed=Embed(
-                description=f":white_check_mark: **{user.username}** got blacklisted",
+                description=f":white_check_mark: **{user.username}** got blacklisted.",
                 color=config.EMBED_COLOR,
-            )
+            ),
+            ephemeral=True,
         )
     except players.PlayerBlacklisted:
-        return "Player already blacklisted."
+        return Message("Player already blacklisted.", ephemeral=True)
 
 
 @blacklist.command(annotations={"user": "The user to unban."})
@@ -61,16 +62,17 @@ def remove(ctx: Context, user: User):
     """Removes a user from the blacklist."""
     try:
         players.get(user.id)
-        return "That Player is not on the blacklist"
+        return Message("That Player is not on the blacklist.", ephemeral=True)
     except players.PlayerBlacklisted:
         player = players.Player(user.id, user.username, user.discriminator)
         player.xp = 0
         player.name = user.username
         return Message(
             embed=Embed(
-                description=f":white_check_mark: **{player.name}** got removed from the blacklist",
+                description=f":white_check_mark: **{player.name}** got removed from the blacklist.",
                 color=config.EMBED_COLOR,
-            )
+            ),
+            ephemeral=True,
         )
 
 
@@ -83,5 +85,6 @@ def show(ctx: Context) -> Message:
             color=config.EMBED_COLOR,
             title="All blacklisted players",
             description="".join([f"▫️ <@{player.id}> - {player.name}\n" for player in blacklisted_players]),
-        )
+        ),
+        ephemeral=True,
     )
