@@ -192,29 +192,31 @@ def unload(ctx: Context, player_id: str):
                 )
             )
     select = SelectMenu(
-        custom_id=["item_select"],
+        custom_id=["unload_items", player_id],
         placeholder=t("driving.unload.placeholder"),
         options=item_options,
         min_values=1,
         max_values=len(item_options),
     )
-    return Modal(
-        custom_id=["unload_items", player_id], title=t("driving.unload.placeholder"), components=[ActionRow([select])]
+    cancel_button = Button(custom_id=["cancel", player.id], label=t("cancel"), style=4)
+    return Message(
+        embeds=get_drive_embeds(player, ctx.author.avatar_url),
+        components=[ActionRow(components=[select]), ActionRow(components=[cancel_button])],
+        update=True,
     )
 
 
 @driving_bp.custom_handler(custom_id="unload_items")
 def unload_items(ctx: Context, player_id: str):
     player = players.get(ctx.author.id, check=player_id)
-    select = ctx.get_component("item_select")
 
     item_string = ""
-    for name in select.values:
+    for name in ctx.values:
         item = items.get(name)
         player.unload_item(item)
-        if name == select.values[0]:
+        if name == ctx.values[0]:
             item_string += str(item)
-        elif name == select.values[-1]:
+        elif name == ctx.values[-1]:
             item_string += t("driving.unload.and_separator") + str(item)
         else:
             item_string += ", " + str(item)
@@ -230,7 +232,7 @@ def unload_items(ctx: Context, player_id: str):
     # add a notification embed if a job is done
     if (
         current_job is not None
-        and current_job.place_from.produced_item in select.values
+        and current_job.place_from.produced_item in ctx.values
         and int(player.position) == int(current_job.place_to.position)
     ):
         current_job.state = jobs.STATE_DONE
@@ -251,7 +253,7 @@ def unload_items(ctx: Context, player_id: str):
         )
 
     # add a notification embed if a minijob is done
-    if place.accepted_item in select.values and place.item_reward:
+    if place.accepted_item in ctx.values and place.item_reward:
         player.add_money(place.item_reward)
         drive_embeds.append(
             Embed(
@@ -267,6 +269,17 @@ def unload_items(ctx: Context, player_id: str):
         )
 
     return Message(embeds=drive_embeds, components=components.get_drive_buttons(player), update=True)
+
+
+@driving_bp.custom_handler(custom_id="cancel")
+def cancel(ctx: Context, player_id: str):
+    set_i18n("locale", ctx.locale)
+    player = players.get(ctx.author.id, check=player_id)
+    return Message(
+        embeds=get_drive_embeds(player, ctx.author.avatar_url),
+        components=components.get_drive_buttons(player),
+        update=True,
+    )
 
 
 @driving_bp.custom_handler(custom_id="job_new")
