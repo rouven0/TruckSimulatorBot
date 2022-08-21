@@ -52,9 +52,6 @@ def get_drive_buttons(player: Player) -> list:
             directional_buttons.append(
                 Button(style=2, emoji={"name": "placeholder", "id": symbol}, custom_id=str(symbol), disabled=True)
             )
-    directional_buttons.append(
-        Button(style=4, emoji={"name": "stop", "id": symbols.STOP}, custom_id=["stop", player.id])
-    )
     buttons.append(ActionRow(components=directional_buttons))
 
     load_disabled = not len(player.loaded_items) < trucks.get(player.truck_id).loading_capacity

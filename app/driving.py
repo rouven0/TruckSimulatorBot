@@ -5,8 +5,7 @@ from datetime import datetime
 from random import randint
 
 import config
-import requests
-from flask_discord_interactions import DiscordInteractionsBlueprint, Embed, Message, Modal
+from flask_discord_interactions import DiscordInteractionsBlueprint, Embed, Message
 from flask_discord_interactions.context import Context
 from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
@@ -119,17 +118,6 @@ def generate_minimap(player: players.Player, all_companies: list[companies.Compa
             minimap = minimap + minimap_array[i][j]
         minimap = minimap + "\n"
     return minimap
-
-
-@driving_bp.custom_handler(custom_id="stop")
-def stop(ctx: Context, player_id: str):
-    set_i18n("locale", ctx.locale)
-    player = players.get(ctx.author.id, check=player_id)
-    return Message(
-        embeds=get_drive_embeds(player, ctx.author.avatar_url),
-        components=[],
-        update=True,
-    )
 
 
 @driving_bp.custom_handler(custom_id="load")
