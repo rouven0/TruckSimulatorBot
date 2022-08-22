@@ -2,9 +2,9 @@
 Some nice autocomplete handlers that are used everywhere
 """
 
+from flask_discord_interactions.models.option import Choice
 from i18n import set as set_i18n
 from i18n import t
-from flask_discord_interactions.models.option import Choice
 from resources import players
 
 

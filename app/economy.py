@@ -5,10 +5,11 @@ from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Em
 from flask_discord_interactions.models.embed import Author, Field, Footer
 from flask_discord_interactions.models.option import CommandOptionType, Option
 from flask_discord_interactions.models.user import User
-from i18n import t, set as set_i18n
+from i18n import set as set_i18n
+from i18n import t
 from resources import items, jobs, levels, players, trucks
 from resources.autocompletes import amount_all
-from utils import get_localizations, log_command, commatize
+from utils import commatize, get_localizations, log_command
 
 economy_bp = DiscordInteractionsBlueprint()
 

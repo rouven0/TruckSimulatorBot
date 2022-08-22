@@ -13,7 +13,7 @@ from i18n import set as set_i18n
 from i18n import t
 from resources import assets, companies, components, items, jobs, levels, places, players, symbols, trucks
 from resources.position import Position
-from utils import get_localizations, log_command, commatize
+from utils import commatize, get_localizations, log_command
 
 driving_bp = DiscordInteractionsBlueprint()
 

@@ -7,10 +7,10 @@ from dataclasses import dataclass
 from math import sqrt
 from random import randint
 from time import time
-from i18n import t
-from utils import commatize
 
+from i18n import t
 from resources import places
+from utils import commatize
 
 STATE_CLAIMED = 0
 STATE_LOADED = 1

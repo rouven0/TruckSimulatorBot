@@ -3,22 +3,14 @@
 import re
 
 import config
-from flask_discord_interactions import (
-    ApplicationCommandType,
-    Context,
-    DiscordInteractionsBlueprint,
-    Embed,
-    Message,
-    Modal,
-    User,
-)
+from flask_discord_interactions import (ApplicationCommandType, Context, DiscordInteractionsBlueprint, Embed, Message,
+                                        Modal, User)
 from flask_discord_interactions.models.component import ActionRow, Button, Component, TextInput
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
 from i18n import set as set_i18n
 from i18n import t
 from resources import companies, components, places, players, symbols
 from utils import get_localizations
-
 
 company_bp = DiscordInteractionsBlueprint()
 

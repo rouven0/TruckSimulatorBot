@@ -12,9 +12,8 @@ from flask_discord_interactions import DiscordInteractions, Message
 from flask_discord_interactions.models.component import ActionRow, Button
 from flask_discord_interactions.models.embed import Embed, Footer
 from resources import players
-from werkzeug.exceptions import HTTPException
 from utils import get_localizations
-
+from werkzeug.exceptions import HTTPException
 
 i18n.set("filename_format", config.I18n.FILENAME_FORMAT)
 i18n.set("fallback", config.I18n.FALLBACK)
@@ -159,6 +158,7 @@ if "--admin" in sys.argv:
     discord.update_commands(guild_id=config.Guilds.SUPPORT)
     sys.exit()
 
+from companies import company_bp
 from driving import driving_bp
 from economy import economy_bp
 from gambling import gambling_bp
@@ -166,7 +166,6 @@ from guide import guide_bp
 from stats import profile_bp
 from system import system_bp
 from truck import truck_bp
-from companies import company_bp
 
 discord.register_blueprint(system_bp)
 discord.register_blueprint(profile_bp)
