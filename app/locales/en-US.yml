@@ -35,6 +35,8 @@ commands:
       user: 
         name: user
         description: A user you want to view.
+  company:
+    name: Check company
 
 driving:
   title: |
@@ -134,6 +136,74 @@ truck:
     text: You sold your old %{old_name} for $%{selling_price} and bought a brand new %{new_name} for $%{price}.
     checkout: Check it out
 
+company:
+  author: |
+    %{name}`s company
+  hq_position: Headquarters position
+  net_worth: Net worth
+  members: Members (%{count}/25)
+  founder: Founded by %{user}
+  components:
+    update: Edit your company
+    leave: Leave
+    fire: Select a member to fire
+  notfound:
+    self:
+      message: You are not the member of a company at the moment.
+      cta: Found one
+      back: Nevermind
+    other:
+      message: |
+        %{player} is not a member of a company at the moment.
+      cta: Hire them
+  founding:
+    errors:
+      already_existing: You already have a company. You can't found another one.
+      wrong_position: You can't found a company on this position, please drive to an empty field.
+      doubled_name: A company with this name already exists, please choose another name.
+    modal:
+      title: Found a company
+      name:
+        label: Name
+        placeholder: Your company's name
+      description:
+        label: Description
+        placeholder: Describe your company
+    success:
+      title: Company creation successful
+      body: |
+        %{logo} **%{name}** has been created and placed in the market. Your company's headquarters have been built at your current position.
+      cta: Check it out
+  update:
+    modal:
+      logo:
+        label: Logo (empy to reset)
+        placeholder: Your company's logo. Must be an emoji
+    errors:
+      invalid_emoji: The provided logo couldn't be matched as an emoji.
+      not_founder: You are not the company founder.
+  hire:
+    message: <@%{hired_id}>, **%{employer}** wants to hire you for their company. Please confirm that you want to work for **%{company}**.
+    decline: Decline
+    accept: Accept
+    success: It's official! %{player} is now a member of **%{company}**.
+    errors:
+      too_many_members: Your company can't have more than 25 members.
+      already_member: This player already is member of a company.
+  fire:
+    confirmation: Are you sure that you want to fire {player}?
+    cta: Fire
+    success: |
+      %{player} was removed from **%{company}**.
+    errors:
+      self_firing: You can't fire yourself.
+      not_member: This player is not a member of your company.
+  leave:
+    confirmation: Are you sure that you want to leave your company?
+    cta: Leave
+    success: <@%{player_id}>, You left your company.
+    
+
 casino:
   enter: Enter the casino
   welcome: Welcome to the casino
@@ -157,9 +227,6 @@ casino:
         placeholder: The amount you bet. Can be 'all'
 
 info:
-  command:
-    name: info
-    description: Prints out general information about this app.
   refresh: Refresh data
   system:
     title: System inforation

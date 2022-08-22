@@ -35,6 +35,8 @@ commands:
       user:
         name: nutzer
         description: Ein Nutzer, den du anschauen willst.
+  company:
+    name: Firma anzeigen
 
 driving:
   title: |
@@ -132,6 +134,73 @@ truck:
     text: Du hast deinen %{old_name} für $%{selling_price} verkauft und einen brandneuen %{new_name} für $%{price} erworben.
     checkout: Sieh es dir an
 
+company:
+  author: Firma von %{name}
+  hq_position: Firmensitz
+  net_worth: Vermögen
+  members: Mitglieder (%{count}/25)
+  founder: Gegründet von %{user}
+  components:
+    update: Daten ändern
+    leave: Verlassen
+    fire: Wähle ein Mitglied zum feuern
+  notfound:
+    self:
+      message: Du bist gerade kein Mitglied einer Firma.
+      cta: Gründe eine
+      back: Zurück
+    other:
+      message: |
+        %{player} ist gerade bei keiner Firma angestellt.
+      cta: In deiner Firma einstellen
+  founding:
+    errors:
+      already_existing: Du bist bereits in einer Firma.
+      wrong_position: Du kannst hier keine Firma gründen. Bitte fahre auf ein freies Feld.
+      doubled_name: Eine Firma mit diesem Namen existiert bereits. Bitte wähle einen Anderen.
+    modal:
+      title: Gründe eine Firma
+      name:
+        label: Name
+        placeholder: Wie soll deine Firma heißen?
+      description:
+        label: Beschreibung
+        placeholder: Beschreibe deine Firma
+    success:
+      title: Firmengründung erfolgreich
+      body: |
+        %{logo} **%{name}** wurde erstellt und eingetragen. Das Hauptquartier wurde an deiner aktuallen Position gebaut.
+      cta: Sieh es dir an
+  update:
+    modal:
+      logo:
+        label: Logo (leer lassen zum Zurücksetzen)
+        placeholder: Dein Firmenlogo. Muss ein Emoji sein.
+    errors:
+      invalid_emoji: Das Logo konnte nicht als Emoji identifiziert werden.
+      not_founder: Du bist nicht der Inhaber dieser Firma!
+  hire:
+    message: <@%{hired_id}>, **%{employer}** will dich für seine/ihre Firma anstellen. Bitte bestätige, dass du für **%{company}** arbeiten willst.
+    decline: Ablehnen
+    accept: Akzeptieren
+    success: Es ist offiziell! %{player} ist jetzt Mitglied von **%{company}**.
+    errors:
+      too_many_members: Deine Firma kann nicht mehr als 25 Mitglieder haben.
+      already_member: Dieser Spieler ist bereits bei einer anderen Firma angestellt.
+  fire:
+    confirmation: Bist du sicher, dass du %{player} feuern willst?
+    cta: Feuern
+    success: |
+      %{player} wurde von **%{company}** entfernt.
+    errors:
+      self_firing: Du kannst dich nicht selbst feuern.
+      not_member: Dieser Spieler ist kein Mitglied deiner Firma.
+  leave:
+    confirmation: Bist du sicher, dass du deine Firma verlassen willst?
+    cta: Verlassen
+    success: <@%{player_id}>, Du hast deine Firma verlassen.
+
+
 casino:
   enter: Casino betreten
   welcome: Wilkommen im Casino
@@ -154,8 +223,6 @@ casino:
         placeholder: Dein Einsatz, kann 'all' sein
 
 info:
-  name: info
-  description: Allgemeine informationen über diese app.
   refresh: Aktualisieren
   system:
     title: Systeminformationen

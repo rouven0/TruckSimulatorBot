@@ -176,13 +176,13 @@ def get_company_buttons(player: Player, company: Company) -> list:
         ActionRow(
             components=[
                 Button(
-                    label="Update",
+                    label=t("company.components.update"),
                     custom_id=["company_update", player.id],
-                    style=1,
+                    style=2,
                     disabled=(player.id != company.founder),
                 ),
                 Button(
-                    label="Leave",
+                    label=t("company.components.leave"),
                     custom_id=["company_leave", player.id],
                     style=4,
                     disabled=(player.id == company.founder),
@@ -198,7 +198,7 @@ def get_company_buttons(player: Player, company: Company) -> list:
             ActionRow(
                 components=[
                     SelectMenu(
-                        placeholder="Select a member to fire",
+                        placeholder=t("company.components.fire"),
                         custom_id=["company_fire", player.id],
                         options=[
                             SelectMenuOption(label=f"{plr.name}#{plr.discriminator}", value=plr.id)

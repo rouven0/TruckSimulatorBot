@@ -7,13 +7,14 @@ from os import getenv
 
 import config
 import i18n
-from companies import company_bp
 from flask import Flask, json, request
 from flask_discord_interactions import DiscordInteractions, Message
 from flask_discord_interactions.models.component import ActionRow, Button
 from flask_discord_interactions.models.embed import Embed, Footer
-from resources import companies, players
+from resources import players
 from werkzeug.exceptions import HTTPException
+from utils import get_localizations
+
 
 i18n.set("filename_format", config.I18n.FILENAME_FORMAT)
 i18n.set("fallback", config.I18n.FALLBACK)
@@ -97,15 +98,6 @@ def not_registered(error):
     ).dump()
 
 
-@app.errorhandler(companies.CompanyNotFound)
-def company_not_found(error):
-    """Error handler in case a player's company isn't found in the database"""
-    return Message(
-        content="You don't have a company at the moment. Get hired or found one.",
-        ephemeral=True,
-    ).dump()
-
-
 @app.errorhandler(players.PlayerBlacklisted)
 def blacklisted(error: players.PlayerBlacklisted):
     """Error handler in case a player is on the blalist"""
@@ -174,6 +166,7 @@ from guide import guide_bp
 from stats import profile_bp
 from system import system_bp
 from truck import truck_bp
+from companies import company_bp
 
 discord.register_blueprint(system_bp)
 discord.register_blueprint(profile_bp)
