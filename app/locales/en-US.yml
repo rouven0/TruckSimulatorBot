@@ -203,7 +203,6 @@ company:
     cta: Leave
     success: <@%{player_id}>, You left your company.
     
-
 casino:
   enter: Enter the casino
   welcome: Welcome to the casino
@@ -226,6 +225,15 @@ casino:
         label: Amount
         placeholder: The amount you bet. Can be 'all'
 
+refill:
+  not_enough_money:
+    jobs: <@%{player_id}> You don't have enough money to do this. Do some jobs and come back once you have enough.
+    deal: "<@%{player_id}> We have a problem: You don't have enough money. Let's make a deal. I will give you 100 litres of gas and you lose 2 levels."
+  success:
+    title: Thank you for visiting our gas station
+    description: You filled %{amount} litres into your truck and payed $%{price}.
+
+
 info:
   refresh: Refresh data
   system:
@@ -246,6 +254,10 @@ info:
     support: Support
     terms: Terms
     privacy: Privacy Policy
+
+leveling:
+  xp: You got %{amount} xp.
+  levelup: ":tada: You leveled up to level %{level} :tada:"
 
 autocomplete:
   all: all

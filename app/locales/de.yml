@@ -222,6 +222,14 @@ casino:
         label: Einsatz
         placeholder: Dein Einsatz, kann 'all' sein
 
+refill:
+  not_enough_money:
+    jobs: <@%{player_id}> Du hast nicht genug Geld. Erledige ein paar Aufträge und komm' wieder wenn du genug hast.
+    deal: "<@%{player_id}> Wir haben ein Problem: Du hast nicht genug Geld. Aber ich bin Großzügig. Ich gebe dir 100 liter und du verlierst 2 Level."
+  success:
+    title: Vielen Dank, für's Tankenlbei uns
+    description: "Du hast %{amount} Liter für %{price}€ getankt."
+
 info:
   refresh: Aktualisieren
   system:
@@ -242,6 +250,10 @@ info:
     support: Support
     terms: Nutzungsbedingungen
     privacy: Datenschutzerklärung
+
+leveling:
+  xp: Du hast %{amount} xp bekommen.
+  levelup: ":tada: Du hast Level %{level} erreicht :tada:"
 
 autocomplete:
   all: alles

@@ -42,6 +42,7 @@ def show_job(ctx: Context, player_id: str) -> Message:
 
 @economy_bp.custom_handler(custom_id="refill")
 def refill(ctx: Context, player_id: str):
+    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     gas_amount = trucks.get(player.truck_id).gas_capacity - player.gas
     price = round(gas_amount * 1.2)
@@ -55,21 +56,18 @@ def refill(ctx: Context, player_id: str):
             player.gas += 100
             player.xp = 0
             return Message(
-                f"<@{ctx.author.id}> We have a problem: You don't have enough money. Lets make a deal. "
-                "I will give you 100 litres of gas, and you lose 2 levels",
+                t("refill.not_enough_money.deal", player_id=ctx.author.id),
                 ephemeral=True,
             )
         return Message(
-            f"<@{ctx.author.id}> you don't have enough money to do this. "
-            "Do some jobs and come back if you have enough",
+            t("refill.not_enough_money.jobs", player_id=ctx.author.id),
             ephemeral=True,
         )
 
     refill_embed = Embed(
-        title="Thank you for visiting our gas station",
-        description=f"You filled {gas_amount} litres into your truck and payed ${price}",
+        title=t("refill.success.title"),
+        description=t("refill.success.description", amount=gas_amount, price=price),
         color=config.EMBED_COLOR,
-        footer=Footer(text="Current gas price: $1.2 per litre"),
     )
 
     player.gas = trucks.get(player.truck_id).gas_capacity
@@ -108,6 +106,7 @@ def refill(ctx: Context, player_id: str):
 )
 def give(ctx: Context, user: User, amount: int) -> Message:
     """Transfers money to a specific user."""
+    set_i18n("locale", ctx.locale)
     log_command(ctx)
     acceptor = players.get(user.id)
     donator = players.get(ctx.author.id)

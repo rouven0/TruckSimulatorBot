@@ -12,7 +12,6 @@ from flask_discord_interactions import DiscordInteractions, Message
 from flask_discord_interactions.models.component import ActionRow, Button
 from flask_discord_interactions.models.embed import Embed, Footer
 from resources import players
-from utils import get_localizations
 from werkzeug.exceptions import HTTPException
 
 i18n.set("filename_format", config.I18n.FILENAME_FORMAT)
