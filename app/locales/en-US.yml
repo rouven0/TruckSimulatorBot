@@ -237,8 +237,8 @@ give:
   errors:
     title: Hey %{name}
     self: You can't give money to yourself!
-    cap: Yo can't give more than $%{cap} to this user.
-  success: "%{donator} gave $%{amount} to %{acceptor}."
+    cap: You can't give more than $%{cap} to this user.
+  success: "**%{donator}** gave $%{amount} to %{acceptor}."
 
 info:
   refresh: Refresh data
