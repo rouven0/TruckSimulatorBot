@@ -230,6 +230,13 @@ refill:
     title: Vielen Dank, für's Tankenlbei uns
     description: "Du hast %{amount} Liter für %{price}€ getankt."
 
+give:
+  errors:
+    title: Hey %{name}
+    self: Du kannst dir nicht selbst Geld überweisen!
+    cap: Du kannst nicht mehr als $%{cap} an diesen Spieler überweisen.
+  success: "**%{donator}** hat $%{amount} an %{acceptor} überwiesen."
+
 info:
   refresh: Aktualisieren
   system:

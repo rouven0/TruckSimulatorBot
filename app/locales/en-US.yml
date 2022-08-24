@@ -233,6 +233,12 @@ refill:
     title: Thank you for visiting our gas station
     description: You filled %{amount} litres into your truck and payed $%{price}.
 
+give:
+  errors:
+    title: Hey %{name}
+    self: You can't give money to yourself!
+    cap: Yo can't give more than $%{cap} to this user.
+  success: "%{donator} gave $%{amount} to %{acceptor}."
 
 info:
   refresh: Refresh data

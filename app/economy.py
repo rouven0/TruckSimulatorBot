@@ -114,8 +114,8 @@ def give(ctx: Context, user: User, amount: int) -> Message:
     if ctx.author.id == acceptor.id:
         return Message(
             embed=Embed(
-                title=f"Hey {ctx.author.username}",
-                description="You can't give money to yourself!",
+                title=t("give.errors.title", name=ctx.author.username),
+                description=t("give.errors.self"),
                 color=config.EMBED_COLOR,
             )
         )
@@ -124,15 +124,20 @@ def give(ctx: Context, user: User, amount: int) -> Message:
     if amount > cap:
         return Message(
             embed=Embed(
-                title=f"Hey {ctx.author.username}",
-                description=f"You can't give more than ${cap:,} to this user.",
+                title=t("give.errors.title", name=ctx.author.username),
+                description=t("give.errors.cap", cap=commatize(cap)),
                 color=config.EMBED_COLOR,
             )
         )
 
     donator.debit_money(amount)
     acceptor.add_money(amount)
-    return Message(embed=Embed(description=f"{donator.name} gave ${amount} to {acceptor}", color=config.EMBED_COLOR))
+    return Message(
+        embed=Embed(
+            description=t("give.success", amount=commatize(amount), donator=donator.name, acceptor=acceptor),
+            color=config.EMBED_COLOR,
+        )
+    )
 
 
 economy_bp.add_autocomplete_handler(amount_all, "give")
