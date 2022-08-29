@@ -1,11 +1,11 @@
 "Blueprint file containing the info command and some general button handlers for abort and back buttons"
 # pylint: disable=unused-argument, missing-function-docstring
-from datetime import datetime
+from typing import Optional
 
 import config
 from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Embed, Message
 from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles
-from flask_discord_interactions.models.embed import Field, Footer, Media
+from flask_discord_interactions.models.embed import Field, Media
 from i18n import set as set_i18n
 from i18n import t
 from resources import players
@@ -18,9 +18,7 @@ def get_info_embed() -> Embed:
     info_embed = Embed(
         title="Truck Simulator Info",
         color=config.EMBED_COLOR,
-        footer=Footer(text=t("info.developer")),
         thumbnail=Media(url=config.SELF_AVATAR_URL),
-        timestamp=datetime.utcnow().replace(microsecond=0).isoformat(),
     )
 
     info_embed.fields = [
@@ -73,6 +71,6 @@ def info(ctx: Context) -> Message:
 
 
 @system_bp.custom_handler(custom_id="refresh_system_info")
-def refresh(ctx: Context):
-    set_i18n("locale", ctx.locale)
+def refresh(ctx: Context, locale: Optional[str] = None):
+    set_i18n("locale", locale if locale else ctx.locale)
     return Message(embed=get_info_embed(), update=True)
