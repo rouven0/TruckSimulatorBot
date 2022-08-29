@@ -47,31 +47,38 @@ for locale in config.I18n.AVAILABLE_LOCALES:
     i18n.t("name", locale=locale)
 
 
+def dump(message: Message) -> dict:
+    """Dumps a message as json to send raw data back to discord"""
+    return json.loads(message.encode()[0])
+
+
 @app.errorhandler(players.NotEnoughMoney)
 def not_enough_money(error):
     """Error handler in case a player doesn't have enough money"""
-    return Message(content=t("errors.not_enough_money.message"), ephemeral=True).dump()
+    return dump(Message(content=t("errors.not_enough_money.message"), ephemeral=True))
 
 
 @app.errorhandler(players.WrongPlayer)
 def not_driving(error):
     """Defer buttons if the wrong player clicked them"""
-    return Message(
-        t("errors.not_driving.message"),
-        ephemeral=True,
-        components=[
-            ActionRow(
-                components=[
-                    Button(
-                        label=t("errors.not_driving.cta"),
-                        style=2,
-                        custom_id="initial_drive",
-                        emoji={"name": "logo_round", "id": 955233759278559273},
-                    )
-                ]
-            )
-        ],
-    ).dump()
+    return dump(
+        Message(
+            t("errors.not_driving.message"),
+            ephemeral=True,
+            components=[
+                ActionRow(
+                    components=[
+                        Button(
+                            label=t("errors.not_driving.cta"),
+                            style=2,
+                            custom_id="initial_drive",
+                            emoji={"name": "logo_round", "id": 955233759278559273},
+                        )
+                    ]
+                )
+            ],
+        )
+    )
 
 
 @app.errorhandler(players.PlayerNotRegistered)
@@ -92,17 +99,19 @@ def not_registered(error):
         content = t("errors.not_registered.other.message", player_id=error.requested_id)
         components = []
 
-    return Message(
-        content=content,
-        components=components,
-        ephemeral=True,
-    ).dump()
+    return dump(
+        Message(
+            content=content,
+            components=components,
+            ephemeral=True,
+        )
+    )
 
 
 @app.errorhandler(players.PlayerBlacklisted)
 def blacklisted(error: players.PlayerBlacklisted):
     """Error handler in case a player is on the blalist"""
-    return Message(t("errors.blacklisted", player_id=error.requested_id, reason=error.reason), ephemeral=True).dump()
+    return dump(Message(t("errors.blacklisted", player_id=error.requested_id, reason=error.reason), ephemeral=True))
 
 
 @app.errorhandler(Exception)
@@ -110,20 +119,22 @@ def general_error(error):
     """Log any error to journal and to discord"""
     logging.error(error)
     traceback.print_tb(error.__traceback__)
-    return Message(
-        embed=Embed(
-            title="Looks like we got an error here.",
-            description=f" ```py\n {error.__class__.__name__}: {error}```",
-            footer=Footer(
-                text="If this occurs multiple times feel free to report it.",
-                icon_url=config.SELF_AVATAR_URL,
+    return dump(
+        Message(
+            embed=Embed(
+                title="Looks like we got an error here.",
+                description=f" ```py\n {error.__class__.__name__}: {error}```",
+                footer=Footer(
+                    text="If this occurs multiple times feel free to report it.",
+                    icon_url=config.SELF_AVATAR_URL,
+                ),
+                color=int("ff0000", 16),
             ),
-            color=int("ff0000", 16),
-        ),
-        components=[
-            ActionRow(components=[Button(style=5, label="Support Server", url="https://discord.gg/FzAxtGTUhN")])
-        ],
-    ).dump()
+            components=[
+                ActionRow(components=[Button(style=5, label="Support Server", url="https://discord.gg/FzAxtGTUhN")])
+            ],
+        )
+    )
 
 
 @app.errorhandler(HTTPException)
