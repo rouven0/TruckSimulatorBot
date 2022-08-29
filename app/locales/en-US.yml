@@ -239,6 +239,19 @@ give:
     cap: You can't give more than $%{cap} to this user.
   success: "**%{donator}** gave $%{amount} to %{acceptor}."
 
+registering:
+  title: Hey there, fellow Trucker,
+  welcome: Welcome to the Truck Simulator
+  footer: Your profile has been created
+  rules:
+    title: Rules
+    trading:
+      title: Trading ingame currency for real money
+      content: Not only that it is pretty stupid to trade real world's money in exchange of a number somewhere in a random database it will also get you banned from this bot.
+    autotypers:
+      title: Autotypers
+      content: Don't even try, it's just wasted work only to get you blacklisted.
+
 info:
   refresh: Refresh data
   system:

@@ -227,7 +227,7 @@ refill:
     jobs: <@%{player_id}> Du hast nicht genug Geld. Erledige ein paar Aufträge und komm' wieder wenn du genug hast.
     deal: "<@%{player_id}> Wir haben ein Problem: Du hast nicht genug Geld. Aber ich bin Großzügig. Ich gebe dir 100 liter und du verlierst 2 Level."
   success:
-    title: Vielen Dank, für's Tankenlbei uns
+    title: Vielen Dank, für's Tanken bei uns
     description: "Du hast %{amount} Liter für %{price}€ getankt."
 
 give:
@@ -236,6 +236,20 @@ give:
     self: Du kannst dir nicht selbst Geld überweisen!
     cap: Du kannst nicht mehr als $%{cap} an diesen Spieler überweisen.
   success: "**%{donator}** hat $%{amount} an %{acceptor} überwiesen."
+
+registering:
+  title: Sehr geerhter Fahrer,
+  welcome: Willkommen beim Truck Simulator
+  footer: Dein Profil wurde erstellt
+  rules:
+    title: Regeln
+    trading:
+      title: Handeln von Echtgeld gegen Ingame-währung
+      content: Es ist nicht nur ziemlich dämlich, echtes Geld für eine Zahl irgendwo in einer Datenbank auszugeben; es führt zudem auch zum Ausschluss von dieser app.
+    autotypers:
+      title: Autoclicker
+      content: Jegliche Automatisierung führt zum Ausschluss von dieser App.
+  cta: Auf geht's
 
 info:
   refresh: Aktualisieren

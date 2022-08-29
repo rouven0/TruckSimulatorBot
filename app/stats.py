@@ -9,6 +9,7 @@ from flask_discord_interactions.models.user import User
 from i18n import set as set_i18n
 from i18n import t
 from resources import companies, components, levels, players, trucks
+import config
 from utils import commatize, get_localizations, log_command
 
 profile_bp = DiscordInteractionsBlueprint()
@@ -41,42 +42,38 @@ def register(ctx: Context):
     set_i18n("locale", ctx.locale)
     if players.registered(ctx.author.id):
         return Message(update=True, deferred=True)
-    with open("./messages/welcome.md", "r", encoding="utf8") as welcome_file:
+    with open(
+        f"./messages/{ctx.locale if ctx.locale in config.I18n.AVAILABLE_LOCALES else config.I18n.FALLBACK}/welcome.md",
+        "r",
+        encoding="utf8",
+    ) as welcome_file:
         welcome_embed = Embed(
-            title="Hey there, fellow Trucker,",
+            title=t("registering.title"),
             description=welcome_file.read(),
             color=config.EMBED_COLOR,
             author=Author(
-                name="Welcome to the Truck Simulator",
+                name=t("registering.welcome"),
                 icon_url=config.SELF_AVATAR_URL,
             ),
-            footer=Footer(text="Your profile has been created", icon_url=ctx.author.avatar_url),
+            footer=Footer(text=t("registering.footer"), icon_url=ctx.author.avatar_url),
         )
-    rules_embed = Embed(title="Rules", color=config.EMBED_COLOR, fields=[])
+    rules_embed = Embed(title=t("registering.rules.title"), color=config.EMBED_COLOR, fields=[])
     rules_embed.fields.append(
-        Field(
-            name="Trading ingame currency for real money",
-            value="Not only that it is pretty stupid to trade real world's money in exchange of a number "
-            "somewhere in a random database it will also get you banned from this bot.",
-            inline=False,
-        )
+        Field(name=t("registering.rules.trading.title"), value=t("registering.rules.trading.content"))
     )
     rules_embed.fields.append(
-        Field(
-            name="Autotypers",
-            value="Don't even try, it's just wasted work only to get you blacklisted.",
-        )
+        Field(name=t("registering.rules.autotypers.title"), value=t("registering.rules.autotypers.content"))
     )
-    players.insert(
-        players.Player(ctx.author.id, ctx.author.username, discriminator=ctx.author.discriminator, money=1000, gas=600)
-    )
+    # players.insert(
+    # players.Player(ctx.author.id, ctx.author.username, discriminator=ctx.author.discriminator, money=1000, gas=600)
+    # )
     return Message(
         embeds=[welcome_embed, rules_embed],
         components=[
             ActionRow(
                 components=[
                     Button(
-                        label="Let's go!",
+                        label=t("registering.cta"),
                         custom_id=["initial_drive", ctx.author.id],
                         style=3,
                         emoji={"name": "default_truck", "id": 861674264737087519},
