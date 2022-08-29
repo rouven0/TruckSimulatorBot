@@ -263,11 +263,11 @@ info:
       Running jobs: %{jobs}
       Registered companies: %{companies}```
   credits:
-    title: Credits
+    title: Special thanks to
     text: |
-      <:lebogo:897861933418565652> **LeBogo**#3073 - _Testing helper_ - Contributed 2 lines of code
-      <:panda:897860673898426462> **FlyingPanda**#0328 - _EPIC Artist_ - Drew almost all of the images you see (and had the idea of this bot)
-      <:miri:897860673546117122> **Miriel**#0001 - _The brain_ - Gave a lot of great tips and constructive feedback
+      <:lebogo:897861933418565652> **LeBogo**#3073
+      <:panda:897860673898426462> **FlyingPanda**#0328
+      <:miri:897860673546117122> **Miriel**#0001
   developer: 'Developer: r5#2253'
   links:
     support: Support
