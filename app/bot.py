@@ -7,6 +7,7 @@ from os import getenv
 
 import config
 import i18n
+from i18n import t
 from flask import Flask, json, request
 from flask_discord_interactions import DiscordInteractions, Message
 from flask_discord_interactions.models.component import ActionRow, Button
@@ -49,20 +50,20 @@ for locale in config.I18n.AVAILABLE_LOCALES:
 @app.errorhandler(players.NotEnoughMoney)
 def not_enough_money(error):
     """Error handler in case a player doesn't have enough money"""
-    return Message(content="You don't have enough money to do this.", ephemeral=True).dump()
+    return Message(content=t("errors.not_enough_money.message"), ephemeral=True).dump()
 
 
 @app.errorhandler(players.WrongPlayer)
 def not_driving(error):
     """Defer buttons if the wrong player clicked them"""
     return Message(
-        "This isn't your truck. Use <:logo_round:955233759278559273>`/drive` or click the button to hop into your own.",
+        t("errors.not_driving.message"),
         ephemeral=True,
         components=[
             ActionRow(
                 components=[
                     Button(
-                        label="Start driving",
+                        label=t("errors.not_driving.cta"),
                         style=2,
                         custom_id="initial_drive",
                         emoji={"name": "logo_round", "id": 955233759278559273},
@@ -83,10 +84,12 @@ def not_registered(error):
         else interaction_data.get("user").get("id")
     )
     if author == error.requested_id:
-        content = f"<@{error.requested_id}> You are not registered yet. Click the button below to get started."
-        components = [ActionRow(components=[Button(label="Click here to register", custom_id="profile_register")])]
+        content = t("errors.not_registered.self.message", player_id=error.requested_id)
+        components = [
+            ActionRow(components=[Button(label=t("errors.not_registered.self.cta"), custom_id="profile_register")])
+        ]
     else:
-        content = f"<@{error.requested_id}> is not registered yet. Maybe somebody should tell them to do so."
+        content = t("errors.not_registered.other.message", player_id=error.requested_id)
         components = []
 
     return Message(
@@ -99,9 +102,7 @@ def not_registered(error):
 @app.errorhandler(players.PlayerBlacklisted)
 def blacklisted(error: players.PlayerBlacklisted):
     """Error handler in case a player is on the blalist"""
-    return Message(
-        content=f"<@{error.requested_id}> You are blacklisted for the following reason: {error.reason}", ephemeral=True
-    ).dump()
+    return Message(t("errors.blacklisted", player_id=error.requested_id, reason=error.reason), ephemeral=True).dump()
 
 
 @app.errorhandler(Exception)

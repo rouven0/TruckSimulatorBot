@@ -32,7 +32,7 @@ commands:
     name: profile
     description: Shows your profile.
     options:
-      user: 
+      user:
         name: user
         description: A user you want to view.
   company:
@@ -103,7 +103,7 @@ profile:
 
 top:
   title: Truck Simulator Toplist 🎉
-  fields: 
+  fields:
     level: Top players sorted by level
     money: Top players sorted by money
     miles: Top players sorted by miles
@@ -113,7 +113,6 @@ top:
     level: Level
     money: Money
     miles: Miles
-  
 
 truck:
   author: "%{player}'s truck"
@@ -202,7 +201,7 @@ company:
     confirmation: Are you sure that you want to leave your company?
     cta: Leave
     success: <@%{player_id}>, You left your company.
-    
+
 casino:
   enter: Enter the casino
   welcome: Welcome to the casino
@@ -272,6 +271,24 @@ autocomplete:
     %{amount} thousand
   million: |
     %{amount} million
+
+errors:
+  not_driving:
+    message: This isn't your truck. Use </drive:966656844946882593> or click the button to hop into your own.
+    cta: Start driving
+  not_enough_money:
+    message: You don't have enough money to do this.
+  blacklisted:
+    message: |
+      <@%{player_id}> You are blacklisted for the following reason: %{reason}
+  not_registered:
+    self:
+      message: |
+        <@%{player_id}> You are not registered yet. Click the Button below to get started.
+      cta: Click here to register
+    other:
+      message: |
+        <@%{player_id}> is not registered yet. Maybe someone should tell them to do so.
 
 complain:
   response: What a crap bot this is! 😡 Hours of time wasted on this useless procuct of a terrible coder and a lousy artist 😡 😡 Is this bot even TESTED before the updates are published... Horrible, just HORRIBLE this spawn of incopetence. Who tf made this? A 12 year old child? This child would probably have made it better than THAT 😡
