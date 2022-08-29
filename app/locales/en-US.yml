@@ -251,6 +251,7 @@ registering:
     autotypers:
       title: Autotypers
       content: Don't even try, it's just wasted work only to get you blacklisted.
+  cta: Let's go
 
 info:
   refresh: Refresh data
