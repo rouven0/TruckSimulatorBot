@@ -123,9 +123,7 @@ def slots_handler(ctx: Context, player_id: str, amount=0):
         raise players.WrongPlayer()
     if ctx.author.id != player_id:
         raise players.WrongPlayer()
-    # replace this when pr is merged
-    type = request.json.get("type")
-    if type == InteractionType.MODAL_SUBMIT:
+    if ctx.type == InteractionType.MODAL_SUBMIT:
         amount = ctx.get_component("input_amount").value.replace(" ", "").replace("k", "000").replace("m", "000000")
         if amount == "all":
             amount = str(player.money)
