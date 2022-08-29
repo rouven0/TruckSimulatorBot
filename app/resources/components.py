@@ -2,9 +2,29 @@
 This module provides several lists of buttons and selects
 """
 from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
+from i18n import t
 from resources import companies, items, places, symbols, trucks
 from resources.companies import Company
 from resources.players import Player
+
+
+def back_home(player_id) -> Button:
+    "Returns a simple 'back' button that opens the home screen"
+    return Button(
+        style=2,
+        label=t("back"),
+        custom_id=["home", player_id],
+    )
+
+
+def back_to_road(player_id) -> Button:
+    "Returns a 'back to the road' button that opens the drive screen"
+    return Button(
+        custom_id=["continue_drive", player_id],
+        style=3,
+        label=t("back_road"),
+        emoji={"name": "logo_round", "id": "955233759278559273"},
+    )
 
 
 def get_drive_buttons(player: Player) -> list:
@@ -32,9 +52,6 @@ def get_drive_buttons(player: Player) -> list:
             directional_buttons.append(
                 Button(style=2, emoji={"name": "placeholder", "id": symbol}, custom_id=str(symbol), disabled=True)
             )
-    directional_buttons.append(
-        Button(style=4, emoji={"name": "stop", "id": symbols.STOP}, custom_id=["stop", player.id])
-    )
     buttons.append(ActionRow(components=directional_buttons))
 
     load_disabled = not len(player.loaded_items) < trucks.get(player.truck_id).loading_capacity
@@ -54,7 +71,7 @@ def get_drive_buttons(player: Player) -> list:
             emoji={"name": "load", "id": symbols.LOAD},
             custom_id=["load", player.id],
             disabled=load_disabled,
-            label=f"Load your truck with {items.get(place.produced_item).name}" if place else "Load",
+            label=t("driving.buttons.load"),
         ),
         Button(
             style=1
@@ -66,21 +83,24 @@ def get_drive_buttons(player: Player) -> list:
             emoji={"name": "unload", "id": symbols.UNLOAD},
             custom_id=["unload", player.id],
             disabled=unload_disabled,
-            label="Unload",
+            label=t("driving.buttons.unload"),
         ),
     ]
 
     if place and "refill" in place.available_actions:
         action_buttons.append(
             Button(
-                style=2, label="Refill", emoji={"name": "refill", "id": symbols.REFILL}, custom_id=["refill", player.id]
+                style=2,
+                label=t("driving.buttons.refill"),
+                emoji={"name": "refill", "id": symbols.REFILL},
+                custom_id=["refill", player.id],
             )
         )
     if place and "gambling" in place.available_actions:
         action_buttons.append(
             Button(
                 style=3,
-                label="Enter the casino",
+                label=t("casino.enter"),
                 custom_id=["casino", player.id],
                 emoji={"name": "money", "id": items.get(place.produced_item).emoji},
             )
@@ -92,12 +112,17 @@ def get_drive_buttons(player: Player) -> list:
             components=[
                 Button(
                     style=1 if current_job is None else 2,
-                    label="New Job",
+                    label=t("driving.buttons.job.new"),
                     custom_id=["job_new", player.id],
                     disabled=(current_job is not None),
                 ),
-                Button(style=2, label="Show Job", custom_id=["job_show", player.id], disabled=(current_job is None)),
-                Button(style=3, label="Home", custom_id=["home", player.id]),
+                Button(
+                    style=2,
+                    label=t("driving.buttons.job.show"),
+                    custom_id=["job_show", player.id],
+                    disabled=(current_job is None),
+                ),
+                Button(style=3, label=t("driving.buttons.home"), custom_id=["home", player.id]),
             ]
         )
     )
@@ -117,13 +142,13 @@ def get_home_buttons(player: Player) -> list:
                 Button(
                     custom_id=["manage_truck", player.id],
                     style=2,
-                    label="Manage your truck",
+                    label=t("home.truck"),
                     emoji=symbols.parse_emoji(trucks.get(player.truck_id).emoji),
                 ),
                 Button(
                     custom_id=["manage_company", player.id],
                     style=2,
-                    label="Show your company",
+                    label=t("home.company"),
                     emoji=symbols.parse_emoji(companies.get(player.company).logo)
                     if player.company
                     else {"name": "🏛️", "id": None},
@@ -131,21 +156,12 @@ def get_home_buttons(player: Player) -> list:
                 Button(
                     custom_id=["top", player.id],
                     style=2,
-                    label="View the leaderboard",
+                    label=t("home.leaderboard"),
                     emoji={"name": "🏆", "id": None},
                 ),
             ]
         ),
-        ActionRow(
-            components=[
-                Button(
-                    custom_id=["continue_drive", player.id],
-                    style=3,
-                    label="Back to the road",
-                    emoji={"name": "logo_round", "id": "955233759278559273"},
-                ),
-            ]
-        ),
+        ActionRow(components=[back_to_road(player.id)]),
     ]
 
 
@@ -160,28 +176,20 @@ def get_company_buttons(player: Player, company: Company) -> list:
         ActionRow(
             components=[
                 Button(
-                    label="Update",
+                    label=t("company.components.update"),
                     custom_id=["company_update", player.id],
-                    style=1,
+                    style=2,
                     disabled=(player.id != company.founder),
                 ),
                 Button(
-                    label="Leave",
+                    label=t("company.components.leave"),
                     custom_id=["company_leave", player.id],
                     style=4,
                     disabled=(player.id == company.founder),
                 ),
             ]
         ),
-        ActionRow(
-            components=[
-                Button(
-                    style=2,
-                    label="Back",
-                    custom_id=["home", player.id],
-                ),
-            ]
-        ),
+        ActionRow(components=[back_home(player.id)]),
     ]
     company_members = company.get_members()
     if len(company_members) > 1:
@@ -190,7 +198,7 @@ def get_company_buttons(player: Player, company: Company) -> list:
             ActionRow(
                 components=[
                     SelectMenu(
-                        placeholder="Select a member to fire",
+                        placeholder=t("company.components.fire"),
                         custom_id=["company_fire", player.id],
                         options=[
                             SelectMenuOption(label=f"{plr.name}#{plr.discriminator}", value=plr.id)
@@ -217,7 +225,7 @@ def get_truck_components(player: Player) -> list:
                 SelectMenu(
                     custom_id=["truck_view", player.id],
                     options=get_truck_options(player),
-                    placeholder="View details about a truck",
+                    placeholder=t("truck.view.placeholder"),
                 )
             ]
         ),
@@ -226,15 +234,11 @@ def get_truck_components(player: Player) -> list:
                 SelectMenu(
                     custom_id=["truck_buy", player.id],
                     options=get_truck_options(player, check_money=True),
-                    placeholder="Buy a new truck",
+                    placeholder=t("truck.buy.placeholder"),
                 ),
             ]
         ),
-        ActionRow(
-            components=[
-                Button(custom_id=["home", player.id], label="Back", style=2),
-            ]
-        ),
+        ActionRow(components=[back_home(player.id)]),
     ]
 
 
@@ -268,26 +272,17 @@ def get_casino_buttons(player) -> list:
                 Button(
                     custom_id=["slots_init", player.id],
                     style=2,
-                    label="Spin a slot machine",
+                    label=t("casino.slots.modal.title"),
                     emoji={"name": "🎰", "id": None},
                 ),
                 Button(
                     custom_id=["blackjack", player.id],
                     style=2,
-                    label="Coming soon",
+                    label=t("coming_soon"),
                     emoji={"name": "♠️", "id": None},
                     disabled=True,
                 ),
             ]
         ),
-        ActionRow(
-            components=[
-                Button(
-                    custom_id=["continue_drive", player.id],
-                    style=3,
-                    label="Back to the road",
-                    emoji={"name": "logo_round", "id": "955233759278559273"},
-                ),
-            ]
-        ),
+        ActionRow(components=[back_to_road(player.id)]),
     ]

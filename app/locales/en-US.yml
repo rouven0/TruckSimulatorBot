@@ -1,0 +1,308 @@
+name: Truck Simulator
+back: Back
+cancel: Cancel
+back_road: Back to the road
+coming_soon: Coming soon
+
+commands:
+  drive:
+    name: drive
+    description: Starts the game.
+  give:
+    name: give
+    description: Transfers money to a specific user.
+    options:
+      user:
+        name: user
+        description: The user you want to give money to.
+      amount:
+        name: amount
+        description: The amount to give.
+  guide:
+    name: guide
+    description: Handy guide to help you understand this game.
+    options:
+      topic:
+        name: topic
+        description: The topic you want to read about.
+  info:
+    name: info
+    description: Prints out general information about this app.
+  profile:
+    name: profile
+    description: Shows your profile.
+    options:
+      user:
+        name: user
+        description: A user you want to view.
+  company:
+    name: Check company
+
+driving:
+  title: |
+    %{player} is driving
+  minimap: Minimap
+  position: Position
+  info:
+    title: What is here?
+    company: A company called %{name}
+  navigation: "Nagivation: Drive to %{place}"
+  buttons:
+    load: Load
+    unload: Unload
+    job:
+      new: New Job
+      show: Show Job
+    home: Home
+    refill: Refill
+  load:
+    title: Loading successful
+    value: You loaded %{item} into your truck.
+  unload:
+    placeholder: Choose which items to unload
+    item_required: (Required for your job)
+    title: Unloading successful
+    value: You removed %{items} from your truck.
+    and_separator: " and "
+
+job:
+  title: |
+    %{player}`s Job
+  new: You got a new Job
+  current: Current Job
+  state:
+    current: Current state
+    claimed: You claimed this kob. Drive to %{place} and load your truck.
+    loaded: You loaded your truck with the needed items. Now drive to %{place} and unload them.
+    done: Your job is done and you got $%{reward}.
+  notification: Job Notification
+  company_notice: Your company's net worth was increased by $%{amount}.
+  message: |
+    %{place_to} needs %{item} from %{place_from}. You get $%{reward} for this transport.
+
+minijob:
+  notification: Minijob notification
+  message: |
+    %{place} gave you $%{reward} for brining them %{item}.
+
+home:
+  truck: Manage your truck
+  company: Show your company
+  leaderboard: View the leaderboard
+
+profile:
+  author: "%{player}'s profile"
+  level: Level
+  money: Money
+  miles: Miles driven
+  truck_miles: (%{miles} with current truck)
+  gas: Gas left
+  truck: Current truck
+  load: Current load
+  company: Company
+
+top:
+  title: Truck Simulator Toplist 🎉
+  fields:
+    level: Top players sorted by level
+    money: Top players sorted by money
+    miles: Top players sorted by miles
+  footer: Congratulations if you see yourself in that list!
+  select: View another toplist
+  keys:
+    level: Level
+    money: Money
+    miles: Miles
+
+truck:
+  author: "%{player}'s truck"
+  gas:
+    consumption:
+      title: Gas consumption
+      text: "%{consumption} litres per mile"
+    capacity:
+      title: Gas capacity
+      text: "%{capacity} l"
+  price: Price
+  loading_capacity:
+    title: Loading capacity
+    text: "%{amount} items"
+  view:
+    placeholder: View details about a truck
+  buy:
+    placeholder: Buy a new truck
+    author: You got a new truck
+    text: You sold your old %{old_name} for $%{selling_price} and bought a brand new %{new_name} for $%{price}.
+    checkout: Check it out
+
+company:
+  author: |
+    %{name}`s company
+  hq_position: Headquarters position
+  net_worth: Net worth
+  members: Members (%{count}/25)
+  founder: Founded by %{user}
+  components:
+    update: Edit your company
+    leave: Leave
+    fire: Select a member to fire
+  notfound:
+    self:
+      message: You are not the member of a company at the moment.
+      cta: Found one
+      back: Nevermind
+    other:
+      message: |
+        %{player} is not a member of a company at the moment.
+      cta: Hire them
+  founding:
+    errors:
+      already_existing: You already have a company. You can't found another one.
+      wrong_position: You can't found a company on this position, please drive to an empty field.
+      doubled_name: A company with this name already exists, please choose another name.
+    modal:
+      title: Found a company
+      name:
+        label: Name
+        placeholder: Your company's name
+      description:
+        label: Description
+        placeholder: Describe your company
+    success:
+      title: Company creation successful
+      body: |
+        %{logo} **%{name}** has been created and placed in the market. Your company's headquarters have been built at your current position.
+      cta: Check it out
+  update:
+    modal:
+      logo:
+        label: Logo (empy to reset)
+        placeholder: Your company's logo. Must be an emoji
+    errors:
+      invalid_emoji: The provided logo couldn't be matched as an emoji.
+      not_founder: You are not the company founder.
+  hire:
+    message: <@%{hired_id}>, **%{employer}** wants to hire you for their company. Please confirm that you want to work for **%{company}**.
+    decline: Decline
+    accept: Accept
+    success: It's official! %{player} is now a member of **%{company}**.
+    errors:
+      too_many_members: Your company can't have more than 25 members.
+      already_member: This player already is member of a company.
+  fire:
+    confirmation: Are you sure that you want to fire {player}?
+    cta: Fire
+    success: |
+      %{player} was removed from **%{company}**.
+    errors:
+      self_firing: You can't fire yourself.
+      not_member: This player is not a member of your company.
+  leave:
+    confirmation: Are you sure that you want to leave your company?
+    cta: Leave
+    success: <@%{player_id}>, You left your company.
+
+casino:
+  enter: Enter the casino
+  welcome: Welcome to the casino
+  invalid_amount: Invalid amount
+  slots:
+    # extra quotes here because of escaping and stuff
+    author: "%{name}'s slots"
+    result:
+      title: Result
+      win3: |
+        :tada: Congratulations you won $%{amount} :tada:
+      win2: You won $%{amount}
+      loss: You lost $%{amount}
+    button:
+      again: Spin again
+      again2: Spin again (double amount)
+    modal:
+      title: Spin a slot machine
+      amount:
+        label: Amount
+        placeholder: The amount you bet. Can be 'all'
+
+refill:
+  not_enough_money:
+    jobs: <@%{player_id}> You don't have enough money to do this. Do some jobs and come back once you have enough.
+    deal: "<@%{player_id}> We have a problem: You don't have enough money. Let's make a deal. I will give you 100 litres of gas and you lose 2 levels."
+  success:
+    title: Thank you for visiting our gas station
+    description: You filled %{amount} litres into your truck and payed $%{price}.
+
+give:
+  errors:
+    title: Hey %{name}
+    self: You can't give money to yourself!
+    cap: You can't give more than $%{cap} to this user.
+  success: "**%{donator}** gave $%{amount} to %{acceptor}."
+
+registering:
+  title: Hey there, fellow Trucker,
+  welcome: Welcome to the Truck Simulator
+  footer: Your profile has been created
+  rules:
+    title: Rules
+    trading:
+      title: Trading ingame currency for real money
+      content: Not only that it is pretty stupid to trade real world's money in exchange of a number somewhere in a random database it will also get you banned from this bot.
+    autotypers:
+      title: Autotypers
+      content: Don't even try, it's just wasted work only to get you blacklisted.
+  cta: Let's go
+
+info:
+  refresh: Refresh data
+  system:
+    title: System inforation
+    text: |
+      ```yml
+      Registered players: %{players}
+      Running jobs: %{jobs}
+      Registered companies: %{companies}```
+  credits:
+    title: Credits
+    text: |
+      <:lebogo:897861933418565652> **LeBogo**#3073 - _Testing helper_ - Contributed 2 lines of code
+      <:panda:897860673898426462> **FlyingPanda**#0328 - _EPIC Artist_ - Drew almost all of the images you see (and had the idea of this bot)
+      <:miri:897860673546117122> **Miriel**#0001 - _The brain_ - Gave a lot of great tips and constructive feedback
+  developer: 'Developer: r5#2253'
+  links:
+    support: Support
+    terms: Terms
+    privacy: Privacy Policy
+
+leveling:
+  xp: You got %{amount} xp.
+  levelup: ":tada: You leveled up to level %{level} :tada:"
+
+autocomplete:
+  all: all
+  half: half
+  thousand: |
+    %{amount} thousand
+  million: |
+    %{amount} million
+
+errors:
+  not_driving:
+    message: This isn't your truck. Use </drive:966656844946882593> or click the button to hop into your own.
+    cta: Start driving
+  not_enough_money:
+    message: You don't have enough money to do this.
+  blacklisted:
+    message: |
+      <@%{player_id}> You are blacklisted for the following reason: %{reason}
+  not_registered:
+    self:
+      message: |
+        <@%{player_id}> You are not registered yet. Click the Button below to get started.
+      cta: Click here to register
+    other:
+      message: |
+        <@%{player_id}> is not registered yet. Maybe someone should tell them to do so.
+
+complain:
+  response: What a crap bot this is! 😡 Hours of time wasted on this useless procuct of a terrible coder and a lousy artist 😡 😡 Is this bot even TESTED before the updates are published... Horrible, just HORRIBLE this spawn of incopetence. Who tf made this? A 12 year old child? This child would probably have made it better than THAT 😡

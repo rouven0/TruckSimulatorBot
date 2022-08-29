@@ -8,10 +8,12 @@ import logging
 from dataclasses import dataclass, field
 from time import time
 from typing import Any, Optional
+from i18n import t
 
 from resources import database, items, levels
 from resources import position as pos
 from resources.jobs import Job
+from utils import commatize
 
 
 def _format_items_to_db(item_list: list) -> str:
@@ -117,14 +119,14 @@ class Player:
         :param int amount: Amount of xp that should be added
         :return: A string containing a message reflecting the xp increase, displayed in some embeds
         """
-        answer = f"\nYou got {amount:,} xp"
+        answer = "\n" + t("leveling.xp", amount=commatize(amount))
         if round(time()) - self.last_vote < 1800:
             amount = amount * 2
         self.xp = int(self.xp) + amount
         while int(self.xp) >= levels.get_next_xp(self.level):
             self.xp -= levels.get_next_xp(self.level)
             self.level += 1
-            answer += f"\n:tada: You leveled up to level {self.level} :tada:"
+            answer += "\n" + t("leveling.levelup", level=self.level)
         return answer
 
     def add_money(self, amount) -> None:
