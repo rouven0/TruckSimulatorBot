@@ -111,7 +111,9 @@ def not_registered(error):
 @app.errorhandler(players.PlayerBlacklisted)
 def blacklisted(error: players.PlayerBlacklisted):
     """Error handler in case a player is on the blalist"""
-    return dump(Message(t("errors.blacklisted", player_id=error.requested_id, reason=error.reason), ephemeral=True))
+    return dump(
+        Message(t("errors.blacklisted.message", player_id=error.requested_id, reason=error.reason), ephemeral=True)
+    )
 
 
 @app.errorhandler(Exception)
