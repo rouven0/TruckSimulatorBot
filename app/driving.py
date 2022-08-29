@@ -1,7 +1,6 @@
 "Blueprint file containing all driving-related commands and handlers"
 # pylint: disable=missing-function-docstring
 import threading
-from datetime import datetime
 from random import randint
 
 import config
@@ -25,7 +24,6 @@ def get_drive_embeds(player: players.Player, avatar_url: str) -> list:
     image_embed = Embed(color=config.EMBED_COLOR)
     drive_embed = Embed(
         color=config.EMBED_COLOR,
-        timestamp=datetime.utcnow().replace(microsecond=0).isoformat(),
         author=Author(name=t("driving.title", player=player.name), icon_url=avatar_url),
         footer=Footer(
             text=t("profile.load") + f" {len(player.loaded_items)}/{trucks.get(player.truck_id).loading_capacity}",
@@ -34,11 +32,15 @@ def get_drive_embeds(player: players.Player, avatar_url: str) -> list:
     )
 
     drive_embed.fields.append(
-        Field(name=t("driving.minimap"), value=generate_minimap(player, all_companies), inline=False)
+        Field(name=t("driving.minimap"), value=generate_minimap(player, all_companies), inline=True)
     )
-    drive_embed.fields.append(Field(name=t("driving.position"), value=str(player.position)))
+    drive_embed.fields.append(Field(name=t("driving.position"), value=str(player.position), inline=True))
     drive_embed.fields.append(
-        Field(name=t("profile.gas"), value=f"{player.gas} l" if player.gas > 100 else f"{player.gas} l :warning:")
+        Field(
+            name=t("profile.gas"),
+            value=f"{player.gas} l" if player.gas > 100 else f"{player.gas} l :warning:",
+            inline=True,
+        )
     )
 
     current_job = player.get_job()
@@ -53,11 +55,7 @@ def get_drive_embeds(player: players.Player, avatar_url: str) -> list:
 
     if place is not None:
         drive_embed.fields.append(
-            Field(
-                name=t("driving.info.title"),
-                value=f"<:i:{items.get(place.produced_item).emoji}> {place}",
-                inline=False,
-            )
+            Field(name=t("driving.info.title"), value=f"<:i:{items.get(place.produced_item).emoji}> {place}")
         )
         image_embed.image = Media(url=assets.get_place_image(player, place))
     else:
@@ -72,7 +70,6 @@ def get_drive_embeds(player: players.Player, avatar_url: str) -> list:
                     Field(
                         name=t("driving.info.title"),
                         value=t("driving.info.company", name=f"{company.logo} **{company}**"),
-                        inline=False,
                     )
                 )
     return [image_embed, drive_embed]
