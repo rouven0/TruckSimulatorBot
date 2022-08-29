@@ -238,14 +238,14 @@ give:
   success: "**%{donator}** hat $%{amount} an %{acceptor} überwiesen."
 
 registering:
-  title: Sehr geerhter Fahrer,
+  title: Sehr geehrter Fahrer,
   welcome: Willkommen beim Truck Simulator
   footer: Dein Profil wurde erstellt
   rules:
     title: Regeln
     trading:
-      title: Handeln von Echtgeld gegen Ingame-währung
-      content: Es ist nicht nur ziemlich dämlich, echtes Geld für eine Zahl irgendwo in einer Datenbank auszugeben; es führt zudem auch zum Ausschluss von dieser app.
+      title: Handeln von Echtgeld gegen Ingame-Währung
+      content: Es ist nicht nur ziemlich dämlich, echtes Geld für eine Zahl irgendwo in einer Datenbank auszugeben, es führt zudem auch zum Ausschluss von dieser app.
     autotypers:
       title: Autoclicker
       content: Jegliche Automatisierung führt zum Ausschluss von dieser App.
