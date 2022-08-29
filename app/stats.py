@@ -64,9 +64,9 @@ def register(ctx: Context):
     rules_embed.fields.append(
         Field(name=t("registering.rules.autotypers.title"), value=t("registering.rules.autotypers.content"))
     )
-    # players.insert(
-    # players.Player(ctx.author.id, ctx.author.username, discriminator=ctx.author.discriminator, money=1000, gas=600)
-    # )
+    players.insert(
+        players.Player(ctx.author.id, ctx.author.username, discriminator=ctx.author.discriminator, money=1000, gas=600)
+    )
     return Message(
         embeds=[welcome_embed, rules_embed],
         components=[
