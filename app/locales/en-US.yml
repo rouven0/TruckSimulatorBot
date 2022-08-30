@@ -256,7 +256,7 @@ registering:
 info:
   refresh: Refresh data
   system:
-    title: System inforation
+    title: System information
     text: |
       ```yml
       Registered players: %{players}

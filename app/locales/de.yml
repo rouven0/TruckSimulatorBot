@@ -30,7 +30,7 @@ commands:
     description: Allgemeine Informationen zu dieser App.
   profile:
     name: profil
-    description: Zeigt dein Profil
+    description: Zeigt dein Profil.
     options:
       user:
         name: nutzer
