@@ -29,12 +29,7 @@ commands:
     name: status
     description: Allgemeine Informationen zu dieser App.
   profile:
-    name: profil
-    description: Zeigt dein Profil.
-    options:
-      user:
-        name: nutzer
-        description: Ein Nutzer, den du anschauen willst.
+    name: Profil anschauen
   company:
     name: Firma anzeigen
 

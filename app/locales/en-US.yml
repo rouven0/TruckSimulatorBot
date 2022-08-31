@@ -29,12 +29,7 @@ commands:
     name: info
     description: Prints out general information about this app.
   profile:
-    name: profile
-    description: Shows your profile.
-    options:
-      user:
-        name: user
-        description: A user you want to view.
+    name: View profile
   company:
     name: Check company
 

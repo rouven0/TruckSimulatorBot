@@ -1,10 +1,9 @@
 "Blueprint file containing all stat-related commands and handlers"
 # pylint: disable=unused-argument, missing-function-docstring
 import config
-from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Embed, Message
+from flask_discord_interactions import ApplicationCommandType, Context, DiscordInteractionsBlueprint, Embed, Message
 from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
-from flask_discord_interactions.models.option import CommandOptionType, Option
 from flask_discord_interactions.models.user import User
 from i18n import set as set_i18n
 from i18n import t
@@ -18,23 +17,13 @@ profile_bp = DiscordInteractionsBlueprint()
 @profile_bp.command(
     name=t("commands.profile.name", locale=config.I18n.FALLBACK),
     name_localizations=get_localizations("commands.profile.name"),
-    description=t("commands.profile.description", locale=config.I18n.FALLBACK),
-    description_localizations=get_localizations("commands.profile.description"),
-    options=[
-        Option(
-            type=CommandOptionType.USER,
-            name=t("commands.profile.options.user.name", locale=config.I18n.FALLBACK),
-            name_localizations=get_localizations("commands.profile.options.user.name"),
-            description=t("commands.profile.options.user.description", locale=config.I18n.FALLBACK),
-            description_localizations=get_localizations("commands.profile.options.user.description"),
-        )
-    ],
+    type=ApplicationCommandType.USER,
 )
-def profile(ctx: Context, user: User = None) -> Message:
+def profile(ctx: Context, user: User) -> Message:
     "Shows your profile."
     log_command(ctx)
     set_i18n("locale", ctx.locale)
-    return Message(embed=get_profile_embed(user if user else ctx.author))
+    return Message(embed=get_profile_embed(user))
 
 
 @profile_bp.custom_handler(custom_id="profile_register")
