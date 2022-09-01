@@ -6,10 +6,10 @@ coming_soon: Kommt bald
 
 commands:
   drive:
-    name: drive
+    name: fahren
     description: Startet das Spiel.
   give:
-    name: überweisung
+    name: geben
     description: Sendet Geld an einen anderen Spieler.
     options:
       user:
@@ -29,7 +29,7 @@ commands:
     name: status
     description: Allgemeine Informationen zu dieser App.
   profile:
-    name: Profil anschauen
+    name: Profil anzeigen
   company:
     name: Firma anzeigen
 
