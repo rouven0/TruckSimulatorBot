@@ -95,6 +95,7 @@ def get_profile_embed(user: User) -> Embed:
         color=config.EMBED_COLOR,
         fields=[],
         image=Media(url=truck.image_url),
+        footer=Footer(text=t("profile.rank", rank=player.rank), icon_url=config.SELF_AVATAR_URL),
     )
     profile_embed.fields.append(
         Field(

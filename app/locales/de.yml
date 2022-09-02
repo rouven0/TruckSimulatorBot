@@ -94,6 +94,7 @@ profile:
   truck: Aktueller Truck
   load: Aktuelle Ladung
   company: Firma
+  rank: "Dein Rang: %{rank}"
 
 top:
   title: Ranglisten 🎉

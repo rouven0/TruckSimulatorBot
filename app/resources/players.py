@@ -112,6 +112,16 @@ class Player:
             database.execute(sql_base, (__value_db, self.id))
         super().__setattr__(__name, __value)
 
+    @property
+    def rank(self) -> int:
+        """
+        :return: The player's rank sorted by level
+        """
+        return database.fetchone(
+            "select player_rank from (SELECT id, (rank() over (order by level DESC, xp DESC)) as player_rank FROM players) as ranks where id=%s",
+            (self.id,),
+        )["player_rank"]
+
     def add_xp(self, amount: int) -> str:
         """
         Add xp to the player and performs a level up if needed

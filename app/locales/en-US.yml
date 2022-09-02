@@ -95,6 +95,7 @@ profile:
   truck: Current truck
   load: Current load
   company: Company
+  rank: "Your rank: %{rank}"
 
 top:
   title: Truck Simulator Toplist 🎉
