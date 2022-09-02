@@ -118,7 +118,7 @@ class Player:
         :return: The player's rank sorted by level
         """
         return database.fetchone(
-            "select player_rank from (SELECT id, (rank() over (order by level DESC, xp DESC)) as player_rank FROM players) as ranks where id=%s",
+            "SELECT player_rank FROM (SELECT id, (rank() OVER (ORDER BY level DESC, xp DESC)) AS player_rank FROM players) AS ranks WHERE id=%s",
             (self.id,),
         )["player_rank"]
 
