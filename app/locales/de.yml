@@ -34,8 +34,6 @@ commands:
     name: Firma anzeigen
 
 driving:
-  title: |
-    %{player} genießt den Asphalt
   minimap: Karte
   position: Position
   info:

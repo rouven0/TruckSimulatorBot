@@ -34,8 +34,6 @@ commands:
     name: Check company
 
 driving:
-  title: |
-    %{player} is driving
   minimap: Minimap
   position: Position
   info:

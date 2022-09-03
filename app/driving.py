@@ -21,12 +21,14 @@ def get_drive_embeds(player: players.Player, avatar_url: str) -> list:
     """Returns the drive embed that includes all the information about the current position and gas"""
     place = places.get(player.position)
     all_companies = companies.get_all()
-    image_embed = Embed(color=config.EMBED_COLOR)
+    image_embed = Embed(
+        color=config.EMBED_COLOR,
+    )
     drive_embed = Embed(
         color=config.EMBED_COLOR,
-        author=Author(name=t("driving.title", player=player.name), icon_url=avatar_url),
         footer=Footer(
             text=t("profile.load") + f" {len(player.loaded_items)}/{trucks.get(player.truck_id).loading_capacity}",
+            icon_url=avatar_url,
         ),
         fields=[],
     )
