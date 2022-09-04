@@ -281,8 +281,11 @@ autocomplete:
 
 errors:
   not_driving:
-    message: This isn't your truck. Use </drive:966656844946882593> or click the button to hop into your own.
-    cta: Start driving
+    driving_allowed:
+      message: This isn't your truck. Use </drive:966656844946882593> or click the button to hop into your own.
+      cta: Start driving
+    driving_forbidden: 
+      message: This isn't your truck.
   not_enough_money:
     message: You don't have enough money to do this.
   blacklisted:

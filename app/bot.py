@@ -61,24 +61,27 @@ def not_enough_money(error):
 @app.errorhandler(players.WrongPlayer)
 def not_driving(error):
     """Defer buttons if the wrong player clicked them"""
-    return dump(
-        Message(
-            t("errors.not_driving.message"),
-            ephemeral=True,
-            components=[
-                ActionRow(
-                    components=[
-                        Button(
-                            label=t("errors.not_driving.cta"),
-                            style=2,
-                            custom_id="initial_drive",
-                            emoji={"name": "logo_round", "id": 955233759278559273},
-                        )
-                    ]
-                )
-            ],
+    required_permissions = [10, 11, 31]  # view_channels, send_messages, use_application_commands
+    if all([int(request.json.get("member").get("permissions")) & (1 << n) for n in required_permissions]):
+        return dump(
+            Message(
+                t("errors.not_driving.driving_allowed.message"),
+                ephemeral=True,
+                components=[
+                    ActionRow(
+                        components=[
+                            Button(
+                                label=t("errors.not_driving.driving_allowed.cta"),
+                                style=2,
+                                custom_id="initial_drive",
+                                emoji={"name": "logo_round", "id": 955233759278559273},
+                            )
+                        ]
+                    )
+                ],
+            )
         )
-    )
+    return dump(Message(t("errors.not_driving.driving_forbidden.message"), ephemeral=True))
 
 
 @app.errorhandler(players.PlayerNotRegistered)

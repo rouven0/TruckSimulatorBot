@@ -279,8 +279,11 @@ autocomplete:
 
 errors:
   not_driving:
-    message: Das ist nicht dein Truck. Nutze </drive:966656844946882593> oder den Button um in deinen Eigenen zu steigen.
-    cta: Losfahren
+    driving_allowed:
+      message: Das ist nicht dein Truck. Nutze </drive:966656844946882593> oder den Button um in deinen Eigenen zu steigen.
+      cta: Losfahren
+    driving_forbidden:
+      message: Das ist nicht dein Truck.
   not_enough_money:
     message: Du hast nicht genug Geld für diese Aktion.
   blacklisted:
