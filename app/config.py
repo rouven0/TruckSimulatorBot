@@ -25,8 +25,16 @@ def info_links() -> list:
             "url": "https://github.com/therealr5/TruckSimulatorBot",
             "emoji": {"name": "github", "id": "974289493823729714"},
         },
-        {"name": t("info.links.terms"), "url": "https://trucksimulatorbot.rfive.de/terms.html"},
-        {"name": t("info.links.privacy"), "url": "https://trucksimulatorbot.rfive.de/privacypolicy.html"},
+        {
+            "name": t("info.links.terms"),
+            "url": "https://trucksimulatorbot.rfive.de/terms.html",
+            "emoji": {"name": "tos", "id": "1015951200476217394"},
+        },
+        {
+            "name": t("info.links.privacy"),
+            "url": "https://trucksimulatorbot.rfive.de/privacypolicy.html",
+            "emoji": {"name": "privacy", "id": "1015950153951232044"},
+        },
     ]
 
 
