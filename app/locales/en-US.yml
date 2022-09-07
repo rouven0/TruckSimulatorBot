@@ -124,7 +124,7 @@ truck:
   view:
     placeholder: View details about a truck
   buy:
-    placeholder: Buy a new truck
+    cta: Buy this truck
     author: You got a new truck
     text: You sold your old %{old_name} for $%{selling_price} and bought a brand new %{new_name} for $%{price}.
     checkout: Check it out

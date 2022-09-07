@@ -224,31 +224,19 @@ def get_truck_components(player: Player) -> list:
             components=[
                 SelectMenu(
                     custom_id=["truck_view", player.id],
-                    options=get_truck_options(player),
+                    options=get_truck_options(),
                     placeholder=t("truck.view.placeholder"),
                 )
-            ]
-        ),
-        ActionRow(
-            components=[
-                SelectMenu(
-                    custom_id=["truck_buy", player.id],
-                    options=get_truck_options(player, check_money=True),
-                    placeholder=t("truck.buy.placeholder"),
-                ),
             ]
         ),
         ActionRow(components=[back_home(player.id)]),
     ]
 
 
-def get_truck_options(player, check_money=False) -> list[SelectMenuOption]:
+def get_truck_options() -> list[SelectMenuOption]:
     """Returns choices shown up in several truck commands"""
     choices = []
     for truck in trucks.get_all():
-        if check_money:
-            if player.money < truck.price:
-                continue
         choices.append(
             SelectMenuOption(
                 label=truck.name,

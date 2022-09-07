@@ -58,12 +58,12 @@ def show_truck_button(ctx: Context, player_id: str):
 
 
 @truck_bp.custom_handler(custom_id="truck_buy")
-def buy(ctx: Context, player_id: str) -> Union[Message, str]:
+def buy(ctx: Context, player_id: str, truck_id: int) -> Union[Message, str]:
     """Select handler to buy a new truck"""
     set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     old_truck = trucks.get(player.truck_id)
-    new_truck = trucks.get(int(ctx.values[0]))
+    new_truck = trucks.get(truck_id)
     selling_price = round(old_truck.price - (old_truck.price / 10) * log(player.truck_miles + 1))
     end_price = new_truck.price - selling_price
     # this also adds money if the end price is negative
@@ -91,6 +91,7 @@ def buy(ctx: Context, player_id: str) -> Union[Message, str]:
                         label=t("truck.buy.checkout"),
                         custom_id=["manage_truck", player.id],
                         emoji=symbols.parse_emoji(new_truck.emoji),
+                        style=ButtonStyles.SUCCESS,
                     )
                 ]
             )
@@ -103,15 +104,21 @@ def buy(ctx: Context, player_id: str) -> Union[Message, str]:
 def view(ctx: Context, player_id: str) -> Message:
     """View details about a specific truck"""
     set_i18n("locale", ctx.locale)
-    if ctx.author.id != player_id:
-        raise players.WrongPlayer()
-    truck_embed = get_truck_embed(trucks.get(int(ctx.values[0])))
+    player = players.get(ctx.author.id, check=player_id)
+    truck = trucks.get(int(ctx.values[0]))
+    truck_embed = get_truck_embed(truck)
     return Message(
         embed=truck_embed,
         components=[
             ActionRow(
                 components=[
-                    Button(label=t("back"), custom_id=["manage_truck", player_id], style=ButtonStyles.SECONDARY)
+                    Button(label=t("back"), custom_id=["manage_truck", player_id], style=ButtonStyles.SECONDARY),
+                    Button(
+                        label=t("truck.buy.cta"),
+                        custom_id=["truck_buy", player_id, ctx.values[0]],
+                        style=ButtonStyles.SUCCESS,
+                        disabled=player.money < truck.price,
+                    ),
                 ]
             )
         ],
