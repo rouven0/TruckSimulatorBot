@@ -19,7 +19,6 @@ class Truck:
     :ivar int price: Price the player has to pay to use this Truck
     :ivar int gas_consumptions: Amount of Gas used per mile
     :ivar int gas_capacity: Amount of gas the player can fill in the Truck
-    :ivar str image_url: Url of an image that is show to the user
     """
 
     truck_id: int
@@ -29,7 +28,6 @@ class Truck:
     gas_consumption: int
     gas_capacity: int
     loading_capacity: int
-    image_url: str
     emoji: str
 
     def __str__(self) -> str:

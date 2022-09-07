@@ -1,4 +1,3 @@
-https://media.discordapp.net/attachments/916793752968921158/947463853191594044/unknown.png
 Changing a logo is a bit tricky since modals don't come with an emoji selector.
 There are 2 ways to set a logo.
 

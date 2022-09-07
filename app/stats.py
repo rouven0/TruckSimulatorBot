@@ -7,7 +7,7 @@ from flask_discord_interactions.models.embed import Author, Field, Footer, Media
 from flask_discord_interactions.models.user import User
 from i18n import set as set_i18n
 from i18n import t
-from resources import companies, components, levels, players, trucks
+from resources import assets, companies, components, levels, players, trucks
 import config
 from utils import commatize, get_localizations, log_command
 
@@ -94,7 +94,7 @@ def get_profile_embed(user: User) -> Embed:
         thumbnail=Media(url=user.avatar_url),
         color=config.EMBED_COLOR,
         fields=[],
-        image=Media(url=truck.image_url),
+        image=Media(url=assets.get(f"/trucks/{player.truck_id}")),
         footer=Footer(text=t("profile.rank", rank=player.rank), icon_url=config.SELF_AVATAR_URL),
     )
     profile_embed.fields.append(

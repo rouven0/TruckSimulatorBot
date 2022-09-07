@@ -3,7 +3,6 @@
 from random import choices, sample
 
 import config
-from flask import request
 from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Embed, Message
 from flask_discord_interactions.discord import InteractionType
 from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles, TextInput
@@ -11,7 +10,7 @@ from flask_discord_interactions.models.embed import Author, Field, Media
 from flask_discord_interactions.models.modal import Modal
 from i18n import set as set_i18n
 from i18n import t
-from resources import components, items, players
+from resources import assets, components, items, players
 from utils import commatize
 
 gambling_bp = DiscordInteractionsBlueprint()
@@ -25,12 +24,7 @@ def casino(ctx: Context, player_id: str) -> Message:
         embed=Embed(
             title=t("casino.welcome"),
             color=config.EMBED_COLOR,
-            image=Media(
-                url=(
-                    "https://media.discordapp.net/attachments/868822515282231346/871394792947482674"
-                    "/vegass-default_truck.png"
-                )
-            ),
+            image=Media(url=(assets.get("/places/393223"))),
         ),
         components=components.get_casino_buttons(player),
         update=True,

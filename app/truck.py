@@ -9,7 +9,7 @@ from flask_discord_interactions.models.component import ActionRow, Button, Butto
 from flask_discord_interactions.models.embed import Author, Field, Media
 from i18n import set as set_i18n
 from i18n import t
-from resources import components, players, symbols, trucks
+from resources import assets, components, players, symbols, trucks
 from utils import commatize
 
 truck_bp = DiscordInteractionsBlueprint()
@@ -21,7 +21,7 @@ def get_truck_embed(truck: trucks.Truck) -> Embed:
         title=truck.name,
         description=truck.description,
         color=config.EMBED_COLOR,
-        image=Media(url=truck.image_url),
+        image=Media(url=assets.get(f"/trucks/{truck.truck_id}")),
         fields=[],
     )
     truck_embed.fields.append(

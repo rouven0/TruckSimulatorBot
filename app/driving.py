@@ -59,12 +59,14 @@ def get_drive_embeds(player: players.Player, avatar_url: str) -> list:
         drive_embed.fields.append(
             Field(name=t("driving.info.title"), value=f"<:i:{items.get(place.produced_item).emoji}> {place}")
         )
-        image_embed.image = Media(url=assets.get_place_image(player, place))
+        image_embed.image = Media(url=assets.get(f"/{config.BASE_IMAGE}/{int(player.position)}/{player.truck_id}"))
     else:
-        image_embed.image = Media(url=assets.get_default(player))
-    drive_embed.image = Media(
-        url="https://cdn.discordapp.com/attachments/965229095447306240/965229146873675786/transparent.png"
-    )
+        image_embed.image = Media(
+            url=assets.get(
+                f"/{config.BASE_IMAGE}/default{randint(1,10)}/{player.truck_id}"
+            )  # done like this to save loading time. 5 different images will be cached altought being different for every player
+        )
+    drive_embed.image = Media(url=assets.get("/transparent"))
     if int(player.position) in [int(c.hq_position) for c in all_companies]:
         for company in all_companies:
             if int(company.hq_position) == int(player.position):

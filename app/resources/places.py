@@ -15,11 +15,6 @@ class Place:
     :ivar str name: The name of the place
     :ivar position.Postion position: the Place's position as int
     :ivar list available_actions: all local available commands stored as strings in a list
-    :ivar str image_url: Every place has an image that is shown while driving.
-        Images are hosted on a resource discord server and displayed in embeds via URL
-    :ivar str image_url_better: image with the better truck
-    :ivar str image_url_tropical: image with the tropical truck
-    :ivar str image_url_ultimate: image with the ultimate truck
     :ivar str produced_item: Item this place produces in jobs.
     :ivar str accepted_item: Item this place rewards
     :ivar int item_reward: money paid when the accepted_item is unloaded
@@ -28,10 +23,6 @@ class Place:
     name: str
     position: pos.Position
     available_actions: list
-    image_url_default: Optional[str]
-    image_url_jungle: Optional[str]
-    image_url_tropical: Optional[str]
-    image_url_hell: Optional[str]
     produced_item: Optional[str]
     accepted_item: Optional[str]
     item_reward: Optional[int]

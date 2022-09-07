@@ -63,9 +63,8 @@ def placeinfo(ctx: Context) -> Message:
         color=config.EMBED_COLOR,
         fields=[Field(name="Position", value=str(queried_place.position))],
     )
-    if queried_place.image_url_default is not None:
-        position_embed.fields.append(Field(name="Produced item", value=str(items.get(queried_place.produced_item))))
-        position_embed.image = Media(url=assets.get_place_image(player, queried_place))
+    position_embed.fields.append(Field(name="Produced item", value=str(items.get(queried_place.produced_item))))
+    position_embed.image = Media(url=assets.get(f"/places/{int(queried_place.position)}"))
     if queried_place.accepted_item:
         position_embed.fields.append(Field(name="Accepted item", value=str(items.get(queried_place.accepted_item))))
 
@@ -107,17 +106,13 @@ def get_guide_embed(topic: str) -> Embed:
     """Returns the fitting guide embed for a topic"""
     with open(f"./guide/{topic}.md", "r", encoding="utf8") as guide_file:
         topic = str.lower(topic)
-        image_url = guide_file.readline()
         guide_embed = Embed(
             title=f"{str.upper(topic[0])}{topic[1:]}".replace("_", " "),
             description=guide_file.read(),
             color=config.EMBED_COLOR,
             author=Author(name="Truck Simulator Guide", icon_url=config.SELF_AVATAR_URL),
         )
-        if image_url.startswith("https"):
-            guide_embed.image = Media(url=image_url)
-        else:
-            guide_embed.description = image_url + guide_embed.description
+        guide_embed.image = Media(url=assets.get(f"/guide/{topic}"))
         return guide_embed
 
 
