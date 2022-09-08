@@ -1,0 +1,33 @@
+version: '2'
+
+volumes:
+  db:
+
+services:
+  database:
+    image: mariadb
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=trucksimulator
+      - MYSQL_USER=trucksimulator
+  app:
+    image: therealr5/trucksimulatorbot
+    restart: always
+    ports:
+      - 9000:9000
+    links:
+      - database
+    environment:
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=trucksimulator
+      - MYSQL_USER=trucksimulator
+      - MYSQL_HOST=database
+      - DISCORD_PUBLIC_KEY=${DISCORD_PUBLIC_KEY}
+      - DISCORD_CLIENT_ID=${DISCORD_CLIENT_ID}
+  imageserver:
+    image: therealr5/trucksimulatorbot-images
+    restart: always
+    ports:
+      - 9001:9001
