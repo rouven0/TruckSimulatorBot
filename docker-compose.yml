@@ -12,6 +12,8 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_DATABASE=trucksimulator
       - MYSQL_USER=trucksimulator
+    volumes:
+      - db:/var/lib/mysql
   app:
     image: therealr5/trucksimulatorbot
     restart: always
