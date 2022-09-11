@@ -9,7 +9,7 @@ from flask_discord_interactions.models.embed import Field, Media
 from i18n import set as set_i18n
 from i18n import t
 from resources import players
-from utils import get_localizations, log_command
+from utils import get_localizations
 
 system_bp = DiscordInteractionsBlueprint()
 
@@ -45,8 +45,6 @@ def get_info_embed() -> Embed:
 )
 def info(ctx: Context) -> Message:
     """Prints out general information about this app."""
-    set_i18n("locale", ctx.locale)
-    log_command(ctx)
     return Message(
         embed=get_info_embed(),
         components=[
@@ -72,5 +70,6 @@ def info(ctx: Context) -> Message:
 
 @system_bp.custom_handler(custom_id="refresh_system_info")
 def refresh(ctx: Context, locale: Optional[str] = None):
-    set_i18n("locale", locale if locale else ctx.locale)
+    if locale:
+        set_i18n("locale", locale)
     return Message(embed=get_info_embed(), update=True)

@@ -5,11 +5,10 @@ from flask_discord_interactions import ApplicationCommandType, Context, DiscordI
 from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
 from flask_discord_interactions.models.user import User
-from i18n import set as set_i18n
 from i18n import t
 from resources import assets, companies, components, levels, players, trucks
 import config
-from utils import commatize, get_localizations, log_command
+from utils import commatize, get_localizations
 
 profile_bp = DiscordInteractionsBlueprint()
 
@@ -21,14 +20,11 @@ profile_bp = DiscordInteractionsBlueprint()
 )
 def profile(ctx: Context, user: User) -> Message:
     "Shows your profile."
-    log_command(ctx)
-    set_i18n("locale", ctx.locale)
     return Message(embed=get_profile_embed(user))
 
 
 @profile_bp.custom_handler(custom_id="profile_register")
 def register(ctx: Context):
-    set_i18n("locale", ctx.locale)
     if players.registered(ctx.author.id):
         return Message(update=True, deferred=True)
     with open(
@@ -76,7 +72,6 @@ def register(ctx: Context):
 @profile_bp.custom_handler(custom_id="home")
 def profile_home(ctx: Context, player_id):
     """Shows your profile."""
-    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     return Message(embed=get_profile_embed(ctx.author), components=components.get_home_buttons(player), update=True)
 
@@ -134,7 +129,6 @@ def get_profile_embed(user: User) -> Embed:
 @profile_bp.custom_handler(custom_id="top")
 def top(ctx: Context, player_id) -> Message:
     "Presents the top players."
-    set_i18n("locale", ctx.locale)
     return Message(
         embed=get_top_embed(), components=get_top_select(players.get(ctx.author.id, check=player_id)), update=True
     )
@@ -143,7 +137,6 @@ def top(ctx: Context, player_id) -> Message:
 @profile_bp.custom_handler(custom_id="top_select")
 def top_select(ctx: Context, player_id) -> Message:
     "Handler for the toplist select"
-    set_i18n("locale", ctx.locale)
     if ctx.author.id != player_id:
         raise players.WrongPlayer()
     return Message(embed=get_top_embed(ctx.values[0]), update=True)

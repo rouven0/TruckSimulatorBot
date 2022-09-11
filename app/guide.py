@@ -9,7 +9,7 @@ from flask_discord_interactions.models.embed import Author, Field, Media
 from flask_discord_interactions.models.option import CommandOptionType, Option
 from i18n import t
 from resources import assets, items, places, players, symbols
-from utils import get_localizations, log_command
+from utils import get_localizations
 
 guide_bp = DiscordInteractionsBlueprint()
 
@@ -92,7 +92,6 @@ def placeinfo(ctx: Context) -> Message:
 )
 def guide(ctx: Context, topic: str = "introduction") -> Message:
     """Opens a guide to help you understand this game."""
-    log_command(ctx)
     return Message(embed=get_guide_embed(topic), components=get_guide_selects(topic=topic))
 
 

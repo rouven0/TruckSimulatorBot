@@ -8,11 +8,10 @@ from flask_discord_interactions import DiscordInteractionsBlueprint, Embed, Mess
 from flask_discord_interactions.context import Context
 from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
-from i18n import set as set_i18n
 from i18n import t
 from resources import assets, companies, components, items, jobs, levels, places, players, symbols, trucks
 from resources.position import Position
-from utils import commatize, get_localizations, log_command
+from utils import commatize, get_localizations
 
 driving_bp = DiscordInteractionsBlueprint()
 
@@ -123,7 +122,6 @@ def generate_minimap(player: players.Player, all_companies: list[companies.Compa
 
 @driving_bp.custom_handler(custom_id="load")
 def load(ctx: Context, player_id: str):
-    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
 
     item = items.get(places.get(player.position).produced_item)
@@ -159,7 +157,6 @@ def load(ctx: Context, player_id: str):
 
 @driving_bp.custom_handler(custom_id="unload")
 def unload(ctx: Context, player_id: str):
-    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     current_job = player.get_job()
 
@@ -257,7 +254,6 @@ def unload_items(ctx: Context, player_id: str):
 
 @driving_bp.custom_handler(custom_id="cancel")
 def cancel(ctx: Context, player_id: str):
-    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     return Message(
         embeds=get_drive_embeds(player, ctx.author.avatar_url),
@@ -268,7 +264,6 @@ def cancel(ctx: Context, player_id: str):
 
 @driving_bp.custom_handler(custom_id="job_new")
 def new_job(ctx: Context, player_id: str) -> Message:
-    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     job_embed = Embed(
         color=config.EMBED_COLOR,
@@ -293,25 +288,21 @@ def new_job(ctx: Context, player_id: str) -> Message:
 
 @driving_bp.custom_handler(custom_id=str(symbols.LEFT))
 def left(ctx: Context, player_id: str):
-    set_i18n("locale", ctx.locale)
     return move(ctx, symbols.LEFT, player_id)
 
 
 @driving_bp.custom_handler(custom_id=str(symbols.UP))
 def up(ctx: Context, player_id: str):
-    set_i18n("locale", ctx.locale)
     return move(ctx, symbols.UP, player_id)
 
 
 @driving_bp.custom_handler(custom_id=str(symbols.DOWN))
 def down(ctx: Context, player_id: str):
-    set_i18n("locale", ctx.locale)
     return move(ctx, symbols.DOWN, player_id)
 
 
 @driving_bp.custom_handler(custom_id=str(symbols.RIGHT))
 def right(ctx: Context, player_id: str):
-    set_i18n("locale", ctx.locale)
     return move(ctx, symbols.RIGHT, player_id)
 
 
@@ -366,7 +357,6 @@ def move(ctx: Context, direction, player_id):
 
 @driving_bp.custom_handler(custom_id="event_hitchhike")
 def event_hitchhike(ctx: Context, player_id: str) -> Message:
-    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     try:
         player.debit_money(3000)
@@ -392,7 +382,6 @@ def event_hitchhike(ctx: Context, player_id: str) -> Message:
 
 @driving_bp.custom_handler(custom_id="event_walk")
 def event_walk(ctx: Context, player_id: str) -> Message:
-    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     if player.level > 0:
         player.level -= 1
@@ -407,7 +396,6 @@ def event_walk(ctx: Context, player_id: str) -> Message:
 
 @driving_bp.custom_handler(custom_id="event_rob")
 def event_rob(ctx: Context, player_id: str) -> Message:
-    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     if randint(0, 1) == 0:
         player.gas += 250
@@ -425,7 +413,6 @@ def event_rob(ctx: Context, player_id: str) -> Message:
 
 @driving_bp.custom_handler(custom_id="continue_drive")
 def continue_drive(ctx: Context, player_id: str):
-    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     return Message(
         embeds=get_drive_embeds(player, ctx.author.avatar_url),
@@ -436,7 +423,6 @@ def continue_drive(ctx: Context, player_id: str):
 
 @driving_bp.custom_handler(custom_id="initial_drive")
 def initial_drive(ctx: Context, player_id: str = None):
-    set_i18n("locale", ctx.locale)
     if player_id:
         player = players.get(ctx.author.id, check=player_id)
     else:
@@ -461,8 +447,6 @@ def initial_drive(ctx: Context, player_id: str = None):
 )
 def drive(ctx: Context) -> Message:
     """Starts the game."""
-    set_i18n("locale", ctx.locale)
-    log_command(ctx)
     player = players.get(ctx.author.id)
     # Detect, when the player is renamed
     if player.name != ctx.author.username:

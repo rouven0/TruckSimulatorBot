@@ -8,7 +8,6 @@ from flask_discord_interactions.discord import InteractionType
 from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles, TextInput
 from flask_discord_interactions.models.embed import Author, Field, Media
 from flask_discord_interactions.models.modal import Modal
-from i18n import set as set_i18n
 from i18n import t
 from resources import assets, components, items, players
 from utils import commatize
@@ -18,7 +17,6 @@ gambling_bp = DiscordInteractionsBlueprint()
 
 @gambling_bp.custom_handler(custom_id="casino")
 def casino(ctx: Context, player_id: str) -> Message:
-    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     return Message(
         embed=Embed(
@@ -90,7 +88,6 @@ def get_slots_components(player: players.Player, amount: int) -> list:
 
 @gambling_bp.custom_handler(custom_id="slots_init")
 def slots_modal(ctx: Context, player_id):
-    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     return Modal(
         custom_id=["slots", player.id],
@@ -111,7 +108,6 @@ def slots_modal(ctx: Context, player_id):
 
 @gambling_bp.custom_handler(custom_id="slots")
 def slots_handler(ctx: Context, player_id: str, amount=0):
-    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     if ctx.author.id != player_id:
         raise players.WrongPlayer()

@@ -2,21 +2,19 @@
 # pylint: disable=unused-argument,missing-function-docstring
 import config
 from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Embed, Message
-from flask_discord_interactions.models.embed import Author, Field, Footer
+from flask_discord_interactions.models.embed import Author, Field
 from flask_discord_interactions.models.option import CommandOptionType, Option
 from flask_discord_interactions.models.user import User
-from i18n import set as set_i18n
 from i18n import t
 from resources import items, jobs, levels, players, trucks
 from resources.autocompletes import amount_all
-from utils import commatize, get_localizations, log_command
+from utils import commatize, get_localizations
 
 economy_bp = DiscordInteractionsBlueprint()
 
 
 @economy_bp.custom_handler(custom_id="job_show")
 def show_job(ctx: Context, player_id: str) -> Message:
-    set_i18n("locale", ctx.locale)
     player = players.get(player_id)
 
     current_job = player.get_job()
@@ -42,7 +40,6 @@ def show_job(ctx: Context, player_id: str) -> Message:
 
 @economy_bp.custom_handler(custom_id="refill")
 def refill(ctx: Context, player_id: str):
-    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     gas_amount = trucks.get(player.truck_id).gas_capacity - player.gas
     price = round(gas_amount * 1.2)
@@ -106,8 +103,6 @@ def refill(ctx: Context, player_id: str):
 )
 def give(ctx: Context, user: User, amount: int) -> Message:
     """Transfers money to a specific user."""
-    set_i18n("locale", ctx.locale)
-    log_command(ctx)
     acceptor = players.get(user.id)
     donator = players.get(ctx.author.id)
 

@@ -3,11 +3,17 @@
 import re
 
 import config
-from flask_discord_interactions import (ApplicationCommandType, Context, DiscordInteractionsBlueprint, Embed, Message,
-                                        Modal, User)
+from flask_discord_interactions import (
+    ApplicationCommandType,
+    Context,
+    DiscordInteractionsBlueprint,
+    Embed,
+    Message,
+    Modal,
+    User,
+)
 from flask_discord_interactions.models.component import ActionRow, Button, Component, TextInput
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
-from i18n import set as set_i18n
 from i18n import t
 from resources import companies, components, places, players, symbols
 from utils import get_localizations
@@ -49,7 +55,6 @@ def get_company_embed(user: User, player: players.Player, company: companies.Com
 @company_bp.custom_handler(custom_id="cancel_company_action")
 def cancel(ctx: Context, player_id: str):
     """Cancel hire and fire"""
-    set_i18n("locale", ctx.locale)
     if ctx.author.id != player_id:
         raise players.WrongPlayer()
     return Message(content=ctx.message.content, embeds=ctx.message.embeds, components=[], update=True)
@@ -58,7 +63,6 @@ def cancel(ctx: Context, player_id: str):
 @company_bp.custom_handler(custom_id="company_main")
 def back(ctx: Context, player_id: str):
     """Shows the main buttons again"""
-    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     company = companies.get(player.company)
     return Message(
@@ -71,7 +75,6 @@ def back(ctx: Context, player_id: str):
 @company_bp.custom_handler(custom_id="company_found")
 def found(ctx: Context, player_id: str):
     """Returns a modal to found a company"""
-    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     if player.company is not None:
         return Message(t("company.founding.errors.already_existing"), ephemeral=True)
@@ -116,7 +119,6 @@ def found(ctx: Context, player_id: str):
 @company_bp.custom_handler(custom_id="modal_company_found")
 def confirm_found(ctx: Context):
     """Modal handler for the company founding"""
-    set_i18n("locale", ctx.locale)
     name = ctx.get_component("modal_company_found_name").value
     description = ctx.get_component("modal_company_found_description").value
 
@@ -144,7 +146,6 @@ def confirm_found(ctx: Context):
 @company_bp.custom_handler(custom_id="hire")
 def hire(ctx: Context, user_id: str):
     """Button to hire a player"""
-    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id)
     invited_player = players.get(user_id)
     company = companies.get(player.company)
@@ -183,7 +184,6 @@ def hire(ctx: Context, user_id: str):
 @company_bp.custom_handler(custom_id="confirm_company_hire")
 def confirm_hire(ctx: Context, company_id: int, player_id: str):
     """Confirm button the hired player has to click"""
-    set_i18n("locale", ctx.guild_locale)
     invited_player = players.get(ctx.author.id, check=player_id)
 
     company = companies.get(company_id)
@@ -198,7 +198,6 @@ def confirm_hire(ctx: Context, company_id: int, player_id: str):
 @company_bp.custom_handler("company_fire")
 def fire(ctx: Context, player_id: str):
     """Select menu handler to fire a player"""
-    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     fired_player = players.get(ctx.values[0])
     company = companies.get(player.company)
@@ -228,7 +227,6 @@ def fire(ctx: Context, player_id: str):
 @company_bp.custom_handler(custom_id="confirm_company_fire")
 def confirm_fire(ctx: Context, company_name: str, player_id: str, fired_player_id: str):
     """Confirm button for the company owner"""
-    set_i18n("locale", ctx.locale)
     if ctx.author.id != player_id:
         raise players.WrongPlayer()
     fired_player = players.get(fired_player_id)
@@ -245,7 +243,6 @@ def confirm_fire(ctx: Context, company_name: str, player_id: str, fired_player_i
 @company_bp.custom_handler(custom_id="company_leave")
 def leave(ctx: Context, player_id: str):
     """Leave your company"""
-    set_i18n("locale", ctx.locale)
     if ctx.author.id != player_id:
         raise players.WrongPlayer()
     confirm_buttons: list[Component] = [
@@ -262,7 +259,6 @@ def leave(ctx: Context, player_id: str):
 @company_bp.custom_handler(custom_id="confirm_company_leave")
 def confirm_leave(ctx: Context, player_id: str):
     """Confirm button to leave a company"""
-    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     player.company = None
     return Message(
@@ -275,7 +271,6 @@ def confirm_leave(ctx: Context, player_id: str):
 @company_bp.custom_handler(custom_id="company_update")
 def company_update(ctx: Context, player_id: str):
     """A button handler that promts a select to select the options than should be changed"""
-    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id, check=player_id)
     company = companies.get(player.company)
     if ctx.author.id != company.founder:
@@ -330,7 +325,6 @@ def company_update(ctx: Context, player_id: str):
 @company_bp.custom_handler(custom_id="modal_company_update")
 def update(ctx: Context):
     """Update a company's attributes"""
-    set_i18n("locale", ctx.locale)
     player = players.get(ctx.author.id)
     company = companies.get(player.company)
     name: str = ctx.get_component("modal_company_update_name").value
@@ -361,7 +355,6 @@ def update(ctx: Context):
 @company_bp.custom_handler(custom_id="manage_company")
 def company_show(ctx: Context, player_id):
     """Manages your company."""
-    set_i18n("locale", ctx.locale)
 
     player = players.get(ctx.author.id, check=player_id)
     try:
@@ -396,7 +389,6 @@ def company_show(ctx: Context, player_id):
 )
 def show_company(ctx: Context, user: User):
     """Context menu command to view a user's company"""
-    set_i18n("locale", ctx.locale)
     player = players.get(user.id)
     origin_player = players.get(ctx.author.id)
     try:

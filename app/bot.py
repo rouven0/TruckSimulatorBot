@@ -7,9 +7,9 @@ from os import getenv
 
 import config
 import i18n
-from i18n import t
+from i18n import t, set as set_i18n
 from flask import Flask, json, request
-from flask_discord_interactions import DiscordInteractions, Message
+from flask_discord_interactions import Context, DiscordInteractions, Message
 from flask_discord_interactions.models.component import ActionRow, Button
 from flask_discord_interactions.models.embed import Embed, Footer
 from resources import players
@@ -22,9 +22,35 @@ i18n.set("skip_locale_root_data", True)
 
 i18n.load_path.append("./locales")
 
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
+logger.addHandler(console_handler)
 
 app = Flask(__name__)
-discord = DiscordInteractions(app)
+
+
+class CustomDiscordInteractions(DiscordInteractions):
+    def handle_request(self):
+        set_i18n("locale", request.json.get("locale"))
+        return super().handle_request()
+
+    def run_command(self, data: dict):
+        ctx = Context.from_data(self, app, data)
+        logging.info(
+            "%s#%s used /%s in guild %s with locale %s.",
+            ctx.author.username,
+            ctx.author.discriminator,
+            ctx.command_name,
+            ctx.guild_id,
+            ctx.locale,
+        )
+        return super().run_command(data)
+
+
+discord = CustomDiscordInteractions(app)
 
 app.config["DISCORD_CLIENT_ID"] = getenv("DISCORD_CLIENT_ID", default="")
 app.config["DISCORD_PUBLIC_KEY"] = getenv("DISCORD_PUBLIC_KEY", default="")
@@ -33,13 +59,6 @@ app.config["DISCORD_CLIENT_SECRET"] = getenv("DISCORD_CLIENT_SECRET", default=""
 if "--debug" in sys.argv:
     app.config["DONT_VALIDATE_SIGNATURE"] = True
 
-
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-
-console_handler = logging.StreamHandler()
-console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
-logger.addHandler(console_handler)
 
 # ugly thing I have to do to support nested locales
 for locale in config.I18n.AVAILABLE_LOCALES:
