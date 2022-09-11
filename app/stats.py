@@ -7,7 +7,6 @@ from flask_discord_interactions.models.embed import Author, Field, Footer, Media
 from flask_discord_interactions.models.user import User
 from i18n import t
 from resources import assets, companies, components, levels, players, trucks
-import config
 from utils import commatize, get_localizations
 
 profile_bp = DiscordInteractionsBlueprint()

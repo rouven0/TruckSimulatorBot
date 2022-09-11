@@ -76,10 +76,10 @@ def generate(player) -> Job:
     place_to = available_places[randint(0, len(available_places) - 1)]
     arrival_miles_x = abs(player.position.x - place_from.position.x)
     arrival_miles_y = abs(player.position.y - place_from.position.y)
-    arrival_reward = round(sqrt(arrival_miles_x ** 2 + arrival_miles_y ** 2) * 14)
+    arrival_reward = round(sqrt(arrival_miles_x**2 + arrival_miles_y**2) * 14)
     job_miles_x = abs(place_from.position.x - place_to.position.x)
     job_miles_y = abs(place_from.position.y - place_to.position.y)
-    job_reward = round(sqrt(job_miles_x ** 2 + job_miles_y ** 2) * 79)
+    job_reward = round(sqrt(job_miles_x**2 + job_miles_y**2) * 79)
     reward = round((job_reward + arrival_reward) * (player.level + 1))
     new_job = Job(player.id, place_from, place_to, 0, reward, int(time()))
     return new_job

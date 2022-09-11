@@ -26,4 +26,4 @@ def get_job_reward_xp(level: int) -> int:
     :param int level: The player's level
     :return: The xp to give when a job is finished
     """
-    return randint(round((level ** 3) / 20), round((get_next_xp(level) / 6) + 7))
+    return randint(round((level**3) / 20), round((get_next_xp(level) / 6) + 7))

@@ -8,8 +8,8 @@ import logging
 from dataclasses import dataclass, field
 from time import time
 from typing import Any, Optional
-from i18n import t
 
+from i18n import t
 from resources import database, items, levels
 from resources import position as pos
 from resources.jobs import Job

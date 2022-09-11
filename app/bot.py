@@ -7,11 +7,12 @@ from os import getenv
 
 import config
 import i18n
-from i18n import t, set as set_i18n
 from flask import Flask, json, request
 from flask_discord_interactions import Context, DiscordInteractions, Message
 from flask_discord_interactions.models.component import ActionRow, Button
 from flask_discord_interactions.models.embed import Embed, Footer
+from i18n import set as set_i18n
+from i18n import t
 from resources import players
 from werkzeug.exceptions import HTTPException
 
