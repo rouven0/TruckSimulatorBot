@@ -1,6 +1,9 @@
 "Blueprint file containing commands locked to the bot admins"
 # pylint: disable=unused-argument,broad-except
 import json
+from threading import Thread
+
+import requests
 
 import config
 import mysql.connector
@@ -88,3 +91,16 @@ def show(ctx: Context) -> Message:
         ),
         ephemeral=True,
     )
+
+
+@admin_bp.command()
+def ping(ctx: Context) -> str:
+    """Checks the Api latency."""
+    start_time = int(ctx.id) >> 22
+
+    def measure_time():
+        end_time = int(requests.get(ctx.followup_url(message="@original")).json()["id"]) >> 22
+        ctx.send(f"{end_time - start_time} ms")
+
+    Thread(target=measure_time).start()
+    return "Pong"
