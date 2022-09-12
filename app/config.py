@@ -28,6 +28,11 @@ def info_links() -> list:
             "emoji": {"name": "github", "id": "974289493823729714"},
         },
         {
+            "name": "GitHub (Imageserver)",
+            "url": "https://github.com/therealr5/TruckSimulatorBot-Images",
+            "emoji": {"name": "github", "id": "974289493823729714"},
+        },
+        {
             "name": t("info.links.terms"),
             "url": "https://trucksimulatorbot.rfive.de/terms.html",
             "emoji": {"name": "tos", "id": "1015951200476217394"},
