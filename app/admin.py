@@ -100,7 +100,7 @@ def ping(ctx: Context) -> str:
 
     def measure_time():
         end_time = int(requests.get(ctx.followup_url(message="@original")).json()["id"]) >> 22
-        ctx.send(f"{end_time - start_time} ms")
+        ctx.edit(Message(f"Pong ({end_time - start_time} ms)"))
 
     Thread(target=measure_time).start()
     return "Pong"
