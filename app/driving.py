@@ -267,7 +267,7 @@ def new_job(ctx: Context, player_id: str) -> Message:
     player = players.get(ctx.author.id, check=player_id)
     job_embed = Embed(
         color=config.EMBED_COLOR,
-        author=Author(name=t("job.title", player=player.name), icon_url=ctx.author.avatar_url),
+        author=Author(name=t("job.title", player=player.name)),
         fields=[],
     )
     job = jobs.generate(player)
