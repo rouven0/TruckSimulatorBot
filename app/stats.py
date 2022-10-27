@@ -23,7 +23,9 @@ def profile(ctx: Context, user: User) -> Message:
 
 
 @profile_bp.custom_handler(custom_id="profile_register")
-def register(ctx: Context):
+def register(ctx: Context, player_id: str):
+    if ctx.author.id != player_id:
+        return Message(update=True, deferred=True)
     if players.registered(ctx.author.id):
         return Message(update=True, deferred=True)
     with open(
@@ -65,6 +67,7 @@ def register(ctx: Context):
                 ]
             )
         ],
+        update=True,
     )
 
 

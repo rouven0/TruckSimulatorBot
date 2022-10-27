@@ -116,7 +116,13 @@ def not_registered(error):
     if author == error.requested_id:
         content = t("errors.not_registered.self.message", player_id=error.requested_id)
         components = [
-            ActionRow(components=[Button(label=t("errors.not_registered.self.cta"), custom_id="profile_register")])
+            ActionRow(
+                components=[
+                    Button(
+                        label=t("errors.not_registered.self.cta"), custom_id=["profile_register", error.requested_id]
+                    )
+                ]
+            )
         ]
     else:
         content = t("errors.not_registered.other.message", player_id=error.requested_id)
@@ -126,7 +132,6 @@ def not_registered(error):
         Message(
             content=content,
             components=components,
-            ephemeral=True,
         )
     )
 
