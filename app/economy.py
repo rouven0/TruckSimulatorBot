@@ -71,7 +71,9 @@ def refill(ctx: Context, player_id: str):
     drive_embed = ctx.message.embeds[1]
     drive_embed.fields[2]["value"] = str(player.gas)
 
-    return Message(embeds=[ctx.message.embeds[0], drive_embed, refill_embed], update=True)
+    return Message(
+        embeds=[ctx.message.embeds[0], drive_embed, refill_embed], update=True, components=ctx.message.components
+    )
 
 
 @economy_bp.command(

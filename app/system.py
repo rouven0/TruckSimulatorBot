@@ -72,4 +72,4 @@ def info(ctx: Context) -> Message:
 def refresh(ctx: Context, locale: Optional[str] = None):
     if locale:
         set_i18n("locale", locale)
-    return Message(embed=get_info_embed(), update=True)
+    return Message(embed=get_info_embed(), components=ctx.message.components, update=True)
