@@ -1,7 +1,7 @@
 "Blueprint file containing all economy-related commands and handlers"
 # pylint: disable=unused-argument,missing-function-docstring
 import config
-from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Embed, Message
+from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Embed, Message, Component
 from flask_discord_interactions.models.embed import Author, Field
 from flask_discord_interactions.models.option import CommandOptionType, Option
 from flask_discord_interactions.models.user import User
@@ -72,7 +72,9 @@ def refill(ctx: Context, player_id: str):
     drive_embed.fields[2]["value"] = str(player.gas)
 
     return Message(
-        embeds=[ctx.message.embeds[0], drive_embed, refill_embed], update=True, components=ctx.message.components
+        embeds=[ctx.message.embeds[0], drive_embed, refill_embed],
+        update=True,
+        components=[Component.from_dict(c) for c in ctx.message.components],
     )
 
 

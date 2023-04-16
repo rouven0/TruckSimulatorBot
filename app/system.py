@@ -3,7 +3,7 @@
 from typing import Optional
 
 import config
-from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Embed, Message
+from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Embed, Message, Component
 from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles
 from flask_discord_interactions.models.embed import Field, Media
 from i18n import set as set_i18n
@@ -72,4 +72,8 @@ def info(ctx: Context) -> Message:
 def refresh(ctx: Context, locale: Optional[str] = None):
     if locale:
         set_i18n("locale", locale)
-    return Message(embed=get_info_embed(), components=ctx.message.components, update=True)
+    return Message(
+        embed=get_info_embed(),
+        components=[Component.from_dict(c) for c in ctx.message.components],
+        update=True,
+    )

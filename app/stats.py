@@ -1,7 +1,7 @@
 "Blueprint file containing all stat-related commands and handlers"
 # pylint: disable=unused-argument, missing-function-docstring
 import config
-from flask_discord_interactions import ApplicationCommandType, Context, DiscordInteractionsBlueprint, Embed, Message
+from flask_discord_interactions import ApplicationCommandType, Context, DiscordInteractionsBlueprint, Embed, Message, Component
 from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
 from flask_discord_interactions.models.user import User
@@ -141,7 +141,11 @@ def top_select(ctx: Context, player_id) -> Message:
     "Handler for the toplist select"
     if ctx.author.id != player_id:
         raise players.WrongPlayer()
-    return Message(embed=get_top_embed(ctx.values[0]), update=True)
+    return Message(
+        embed=get_top_embed(ctx.values[0]),
+        update=True,
+        components=[Component.from_dict(c) for c in ctx.message.components],
+    )
 
 
 def get_top_embed(key="level") -> Embed:
