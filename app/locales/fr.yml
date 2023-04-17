@@ -1,0 +1,304 @@
+name: Truck Simulator
+back: Retour
+cancel: Annuler
+back_road: Retour sur la route
+coming_soon: Bientôt
+
+commands:
+  drive:
+    name: pilote
+    description: Commencez le jeu.
+  give:
+    name: faire un don
+    description: Fait un don à un joueur.
+    options:
+      user:
+        name: joueur
+        description: Le joueur veut vous donner de l'argent.
+      amount:
+        name: quantité
+        description: La quantité à donner.
+  guide:
+    name: guide
+    description: Guide pratique pour vous aider à comprendre ce jeu.
+    options:
+      topic:
+        name: sujet
+        description: Le sujet que tu veux lire.
+  info:
+    name: info
+    description: Obtiens les informations du bot.
+  profile:
+    name: Profil
+  company:
+    name: Entreprise
+
+driving:
+  minimap: Carte
+  position: Position
+  info:
+    title: Qu'il y a t-il ici ?
+    company: L'entreprise %{name}
+  navigation: "Nagivation: Allez à %{place}"
+  buttons:
+    load: Charger
+    unload: Décharger
+    job:
+      new: Nouveau travail
+      show: Montre le travail
+    home: Retour au menu
+    refill: Fait le plein
+  load:
+    title: Chargement réussi
+    value: Vous avez chargé %{item} dans votre camion.
+  unload:
+    placeholder: Choisissez les éléments à décharger
+    item_required: (Requis pour votre travail)
+    title: Déchargement réussi
+    value: Vous avez retiré %{items} de votre camion.
+    and_separator: " et "
+
+job:
+  title: |
+    Travail de %{player}
+  new: Vous avez un nouveau travail
+  current: Travail actuel
+  state:
+    current: État actuel
+    claimed: Vous avez choisi ce travail. Dirige-toi vers %{place} et charge ton camion.
+    loaded: Vous avez chargé votre camion avec les articles nécessaires. Dirige-toi vers %{place} et décharge la cargaison.
+    done: Votre travail est terminé et vous avez reçu %{reward}$.
+  notification: Notification
+  company_notice: La valeur nette de votre entreprise a augmenté de %{amount}$.
+  message: |
+    %{place_to} a besoin de %{item} de %{place_from}. Vous avez reçu %{reward}$ pour cette livraison.
+
+minijob:
+  notification: Notification
+  message: |
+    %{place} vous a donné %{reward}$ pour avoir amenés %{item}.
+
+home:
+  truck: Gérez votre camion
+  company: Checkez votre entreprise
+  leaderboard: Voir le classement
+
+profile:
+  author: "Profil de %{player}"
+  level: Niveau
+  money: Argents
+  miles: Kilomètres parcourus
+  truck_miles: (%{miles} kilomètres avec votre camion actuel)
+  gas: Carburants restants
+  truck: Camion actuel
+  load: Chargements actuel
+  company: Entreprise
+  rank: "Votre place dans le classement: %{rank}"
+
+top:
+  title: Liste de classements Truck Simulator 🎉
+  fields:
+    level: Les meilleurs joueurs triés par niveaux
+    money: Les meilleurs joueurs triés par argents
+    miles: Les meilleurs joueurs triés par kilomètres
+  footer: Félicitations si vous vous voyez dans cette liste !
+  select: View another toplist
+  keys:
+    level: Niveau
+    money: Argent
+    miles: Kilomètres
+
+truck:
+  author: "Camion de %{player}"
+  gas:
+    consumption:
+      title: Consommation de carburants
+      text: "%{consumption} litres par kilomètre"
+    capacity:
+      title: Capacité de carburants
+      text: "%{capacity} litres"
+  price: Prix
+  loading_capacity:
+    title: Capacité de chargements
+    text: "%{amount} articles"
+  view:
+    placeholder: Afficher les détails d'un camion
+  buy:
+    cta: Achetez ce camion
+    author: Vous avez un nouveau camion
+    text: Vous avez vendu votre %{old_name} pour %{selling_price}$ et acheté un tout nouveau %{new_name} pour %{price}$.
+    checkout: Retour
+
+company:
+  author: |
+    Entreprise %{name}
+  hq_position: Siège sociale
+  net_worth: Valeur nette
+  members: Employés (%{count}/25)
+  founder: Fondé par %{user}
+  components:
+    update: Modifier votre entreprise
+    leave: Démissionner
+    fire: Sélectionnez un employé à licencier
+  notfound:
+    self:
+      message: Vous n'êtes pas employé d'une entreprise pour le moment.
+      cta: Créer une entreprise
+      back: Retour
+    other:
+      message: |
+        %{player} n'est pas employé d'une entreprise pour le moment.
+      cta: Recrutez-le
+  founding:
+    errors:
+      already_existing: Vous avez déjà une entreprise. Vous ne pouvez pas en trouver une autre.
+      wrong_position: Vous ne pouvez pas trouver d'entreprise pour ce poste, veuillez vous rendre dans un endroit vide.
+      doubled_name: Une entreprise avec ce nom existe déjà, veuillez choisir un autre nom.
+    modal:
+      title: Trouvez une entreprise
+      name:
+        label: Nom
+        placeholder: Choisi le nom de ton entreprise
+      description:
+        label: Description
+        placeholder: Décrivez les ambitions de votre entreprise
+    success:
+      title: Création de votre entreprise réussie
+      body: |
+        %{logo} **%{name}** a été créé et mis sur le marché. Le siège social de votre entreprise a été construit à votre position actuelle.
+      cta: Retour
+  update:
+    modal:
+      logo:
+        label: Logo (Retire l'émoji pour pouvoir le changer)
+        placeholder: Le logo de votre entreprise doit être un emoji.
+    errors:
+      invalid_emoji: Le logo fourni n'a pas pu être associé à un emoji.
+      not_founder: Vous n'êtes pas le fondateur de l'entreprise.
+  hire:
+    message: <@%{hired_id}>, **%{employer}** souhaite vous embauchez dans son entreprise. Confirmez si vous voulez travailler pour l'entreprise **%{company}**.
+    decline: Refuser
+    accept: Confirmer
+    success: Génial! %{player} est maintenant l'employé de l'entreprise **%{company}**.
+    errors:
+      too_many_members: Votre entreprise a une capacité maximum de 25 employés.
+      already_member: Le joueur est actuellement un employé de l'entreprise.
+  fire:
+    confirmation: Êtes-vous sûr de vouloir licencié %{player} ?
+    cta: Confirmer
+    success: |
+      %{player} a été viré de l'entreprise **%{company}**.
+    errors:
+      self_firing: Ben voyons, vous ne pouvez pas vous licencié vous-même.
+      not_member: Le joueur n'est pas un employé de votre entreprise.
+  leave:
+    confirmation: Êtes-vous sûr de vouloir démissionné de l'entreprise actuel ?
+    cta: Démissionne
+    success: <@%{player_id}>, vous avez quitté l'entreprise.
+
+casino:
+  enter: Entrez dans le casino
+  welcome: Bienvenue au casino !
+  invalid_amount: Montant incorrect !
+  slots:
+    # extra quotes here because of escaping and stuff
+    author: "Machine à sous de %{name}"
+    result:
+      title: Résultats
+      win3: |
+        :tada: Félicitations, vous avez gagné %{amount}$ :tada:
+      win2: Vous avez gagné %{amount}$
+      loss: Vous avez perdu %{amount}$
+    button:
+      again: Réessayez
+      again2: Réessayez (Doublez votre mise)
+    modal:
+      title: Faites tourner une machine à sous
+      amount:
+        label: Montant
+        placeholder: Le montant de la mise, ou 'all' pour tout miser
+
+refill:
+  not_enough_money:
+    jobs: <@%{player_id}>, vous avez pas assez d'argents pour faire le plein! Faites une livraison et revenez lorsque vous en aurez suffisament.
+    deal: "<@%{player_id}> Nous avons un problème : vous n'avez pas assez d'argent. Faisons un deal. Je te donne 100 litres de carburants et tu perds 2 niveaux."
+  success:
+    title: Merci d'avoir visité notre station-service
+    description: Vous avez mis %{amount} litres de carburants pour un prix de %{price}$.
+
+give:
+  errors:
+    title: Hey %{name}
+    self: Vous ne pouvez pas vous donner de l'argent vous-même !
+    cap: Vous ne pouvez pas donner plus de %{cap}$ à ce joueur.
+  success: "**%{donator}** a donné %{amount}$ à %{acceptor}."
+
+registering:
+  title: Hey le forain,
+  welcome: Bienvenue sur Truck Simulator
+  footer: Ton profil a été créer avec succés
+  rules:
+    title: Règlements
+    trading:
+      title: Échanger la monnaie du jeu contre de l'argent réel
+      content: Non seulement il est assez stupide d'échanger de l'argent en échange d'un numéro quelque part dans une base de données aléatoire, mais cela vous fera également bannir de ce bot.
+    autotypers:
+      title: Autoclick
+      content: N'essayez même pas, c'est juste du travail gaspillé pour vous mettre sur la blacklist.
+  cta: J'ai compris
+
+info:
+  refresh: Actualise les données
+  system:
+    title: Informations du bot
+    text: |
+      ```yml
+      Joueurs enregistrés: %{players}
+      Travails effectués: %{jobs}
+      Entreprises enregistrés: %{companies}```
+  credits:
+    title: Remerciements
+    text: |
+      <:lebogo:897861933418565652> **LeBogo**#3073
+      <:panda:897860673898426462> **FlyingPanda**#0328
+      <:miri:897860673546117122> **Miriel**#0001
+  links:
+    support: Support
+    terms: Conditions
+    privacy: Politique de confidentialité
+
+leveling:
+  xp: Vous avez reçu %{amount} xp.
+  levelup: ":tada: Vous êtes maintenant au niveau %{level} :tada:"
+
+autocomplete:
+  all: all
+  half: half
+  thousand: |
+    %{amount} mille(s)
+  million: |
+    %{amount} million(s)
+
+errors:
+  not_driving:
+    driving_allowed:
+      message: Ce n'est pas ton camion. Utilise la commande </drive:966656844946882593> ou cliquez sur le bouton pour accéder à votre camion.
+      cta: Conduire
+    driving_forbidden: 
+      message: Ce n'est pas votre camion.
+  not_enough_money:
+    message: Vous n'avez pas assez d'argent pour faire cela.
+  blacklisted:
+    message: |
+      <@%{player_id}> Vous avez été blacklist pour la raison: %{reason}
+  not_registered:
+    self:
+      message: |
+        <@%{player_id}> Vous n'êtes pas encore enregistré. Clique sur le bouton ci-dessous pour démarrer.
+      cta: Clique ici pour t'enregistré
+    other:
+      message: |
+        <@%{player_id}> n'est pas encore enregistré. Demande-lui en DM pour qu'il puisse s'enregistré.
+
+complain:
+  response: La piraterie n'est jamais fini .Tendinite-Berdah 😡

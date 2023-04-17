@@ -68,6 +68,6 @@ class Users:
 
 class I18n:
     "I18n configuration values"
-    AVAILABLE_LOCALES = ["en-US", "de"]
+    AVAILABLE_LOCALES = ["en-US", "de" "fr"]
     FILENAME_FORMAT = "{locale}{format}"
     FALLBACK = "en-US"
