@@ -9,7 +9,7 @@ commands:
     name: pilote
     description: Commencez le jeu.
   give:
-    name: faire un don
+    name: faire-un-don
     description: Fait un don à un joueur.
     options:
       user:
