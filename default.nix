@@ -1,6 +1,10 @@
-{ pkgs ? import <nixpkgs> { } }:
-pkgs.mkShell {
-  nativeBuildInputs = with pkgs.python310Packages; [
+{ lib, buildPythonPackage, fetchPypi, python310Packages, python, ... }:
+
+buildPythonPackage {
+  name = "TruckSimulatorBot";
+  src = ./app;
+
+  propagatedBuildInputs = with python310Packages; [
     python-i18n
     mysql-connector
     gunicorn
@@ -40,4 +44,14 @@ pkgs.mkShell {
         };
       })
   ];
+
+  installPhase = ''
+    runHook preInstall
+    mkdir -p $out/${python.sitePackages}
+    cp -r . $out/${python.sitePackages}/trucksimulatorbot
+    runHook postInstall '';
+
+  shellHook = "export FLASK_APP=trucksimulatorbot";
+
+  format = "other";
 }

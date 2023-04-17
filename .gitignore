@@ -5,6 +5,9 @@ __pycache__
 .env
 players.db
 
+# nix builds
+result
+
 # log and temp files
 *.swp
 
