@@ -34,14 +34,39 @@ in
         Port the image-server will run on.
       '';
     };
+    database = {
+      name = mkOption {
+        type = types.str;
+        default = "trucksimulator";
+        description = mdDoc ''
+          Database name
+        '';
+      };
+      user = mkOption {
+        type = types.str;
+        default = "trucksimulator";
+        description = mdDoc ''
+          Database user
+        '';
+      };
+      socketPath = mkOption {
+        type = types.path;
+        default = "/run/mysqld/mysqld.sock";
+        description = mdDoc ''
+          Database unix socket path
+        '';
+      };
+
+
+    };
   };
 
   config = mkIf (cfg.enable) {
-    users.users.trucksimulatorbot = {
+    users.users.trucksimulator = {
       isSystemUser = true;
-      group = "trucksimulatorbot";
+      group = "trucksimulator";
     };
-    users.groups.trucksimulatorbot = { };
+    users.groups.trucksimulator = { };
 
     systemd.services.trucksimulatorbot = {
       enable = true;
@@ -50,11 +75,15 @@ in
       environment = {
         DISCORD_CLIENT_ID = cfg.discord.clientId;
         DISCORD_PUBLIC_KEY = cfg.discord.publicKey;
+        MYSQL_USER = cfg.database.user;
+        MYSQL_DATABASE = cfg.database.name;
+        MYSQL_SOCKET = cfg.database.socketPath;
+
       };
       serviceConfig = {
         ExecStart = "${appEnv}/bin/gunicorn trucksimulator:app -b 0.0.0.0:${toString cfg.listenPort} --error-logfile -";
-        User = "trucksimulatorbot";
-        Group = "trucksimulatorbot";
+        User = "trucksimulator";
+        Group = "trucksimulator";
       };
     };
     systemd.services.trucksimulatorbot-images = {
@@ -63,8 +92,8 @@ in
       wantedBy = [ "multi-user.target" ];
       serviceConfig = {
         ExecStart = "${imageEnv}/bin/gunicorn trucksimulatorbot-images:app -b 0.0.0.0:${toString cfg.images.listenPort} --error-logfile -";
-        User = "trucksimulatorbot";
-        Group = "trucksimulatorbot";
+        User = "trucksimulator";
+        Group = "trucksimulator";
       };
     };
   };

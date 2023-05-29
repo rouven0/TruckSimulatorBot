@@ -52,6 +52,7 @@ DATABASE_ARGS = {
     "user": getenv("MYSQL_USER"),
     "passwd": getenv("MYSQL_PASSWORD"),
     "database": getenv("MYSQL_DATABASE"),
+    "unix_socket": getenv("MYSQL_SOCKET"),
     "charset": "utf8mb4",
     "collation": "utf8mb4_unicode_ci",
     "use_unicode": True,
