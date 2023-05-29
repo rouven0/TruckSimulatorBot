@@ -5,8 +5,9 @@ import sqlite3
 from dataclasses import dataclass
 from typing import Optional, Union
 
-from resources import position as pos
-from resources import symbols
+from trucksimulator.resources import position as pos
+from trucksimulator.resources import symbols
+import trucksimulator.config as config
 
 
 @dataclass
@@ -78,7 +79,7 @@ def get_all() -> list:
     return __all_places__
 
 
-__con__ = sqlite3.connect("./resources/objects.db")
+__con__ = sqlite3.connect(config.BASE_PATH + "/resources/objects.db")
 __cur__ = __con__.cursor()
 
 __all_places__ = []

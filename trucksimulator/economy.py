@@ -1,14 +1,20 @@
 "Blueprint file containing all economy-related commands and handlers"
 # pylint: disable=unused-argument,missing-function-docstring
-import config
-from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Embed, Message, Component
+from trucksimulator import config
+from flask_discord_interactions import (
+    Context,
+    DiscordInteractionsBlueprint,
+    Embed,
+    Message,
+    Component,
+)
 from flask_discord_interactions.models.embed import Author, Field
 from flask_discord_interactions.models.option import CommandOptionType, Option
 from flask_discord_interactions.models.user import User
 from i18n import t
-from resources import items, jobs, levels, players, trucks
-from resources.autocompletes import amount_all
-from utils import commatize, get_localizations
+from trucksimulator.resources import items, jobs, levels, players, trucks
+from trucksimulator.resources.autocompletes import amount_all
+from trucksimulator.utils import commatize, get_localizations
 
 economy_bp = DiscordInteractionsBlueprint()
 
@@ -133,7 +139,12 @@ def give(ctx: Context, user: User, amount: int) -> Message:
     acceptor.add_money(amount)
     return Message(
         embed=Embed(
-            description=t("give.success", amount=commatize(amount), donator=donator.name, acceptor=acceptor),
+            description=t(
+                "give.success",
+                amount=commatize(amount),
+                donator=donator.name,
+                acceptor=acceptor,
+            ),
             color=config.EMBED_COLOR,
         )
     )

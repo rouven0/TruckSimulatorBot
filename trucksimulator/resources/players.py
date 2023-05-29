@@ -10,10 +10,10 @@ from time import time
 from typing import Any, Optional
 
 from i18n import t
-from resources import database, items, levels
-from resources import position as pos
-from resources.jobs import Job
-from utils import commatize
+from trucksimulator.resources import database, items, levels
+from trucksimulator.resources import position as pos
+from trucksimulator.resources.jobs import Job
+from trucksimulator.utils import commatize
 
 
 def _format_items_to_db(item_list: list) -> str:

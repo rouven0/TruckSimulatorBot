@@ -1,0 +1,46 @@
+{
+  "nodes": {
+    "images": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1685252271,
+        "narHash": "sha256-Yytfm4nZFTeF80PP/WVbuDKQp4mvC5qXsUkcZlMbRFo=",
+        "owner": "therealr5",
+        "repo": "TruckSimulatorBot-images",
+        "rev": "3f827365df8f17f549d60e616a945969d059e0d0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "therealr5",
+        "repo": "TruckSimulatorBot-images",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1685012353,
+        "narHash": "sha256-U3oOge4cHnav8OLGdRVhL45xoRj4Ppd+It6nPC9nNIU=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "aeb75dba965e790de427b73315d5addf91a54955",
+        "type": "github"
+      },
+      "original": {
+        "id": "nixpkgs",
+        "type": "indirect"
+      }
+    },
+    "root": {
+      "inputs": {
+        "images": "images",
+        "nixpkgs": "nixpkgs"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

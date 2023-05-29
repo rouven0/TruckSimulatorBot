@@ -9,8 +9,8 @@ from random import randint
 from time import time
 
 from i18n import t
-from resources import places
-from utils import commatize
+from trucksimulator.resources import places
+from trucksimulator.utils import commatize
 
 STATE_CLAIMED = 0
 STATE_LOADED = 1

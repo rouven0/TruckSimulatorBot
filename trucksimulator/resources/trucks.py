@@ -3,6 +3,7 @@ Every player has a truck. For now these trucks are static.
 """
 import sqlite3
 from dataclasses import dataclass
+from trucksimulator import config
 
 
 def __generate_list(lst) -> None:
@@ -55,7 +56,7 @@ def get_all() -> list[Truck]:
     return __all_trucks__
 
 
-__con__ = sqlite3.connect("./resources/objects.db")
+__con__ = sqlite3.connect(config.BASE_PATH + "/resources/objects.db")
 __cur__ = __con__.cursor()
 
 __cur__.execute("SELECT * FROM trucks")

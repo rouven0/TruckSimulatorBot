@@ -3,6 +3,7 @@
 from os import getenv
 
 from i18n import t
+import pathlib
 
 MAP_BORDER = 25
 LOG_FORMAT = "%(levelname)s [%(module)s.%(funcName)s]: %(message)s"
@@ -10,6 +11,7 @@ EMBED_COLOR = int("0x2f3136", 16)
 SELF_AVATAR_URL = "https://images.trucksimulatorbot.rfive.de/logo"
 BASE_IMAGE = 0
 IMAGE_HOST = "https://images.trucksimulatorbot.rfive.de"
+BASE_PATH = str(pathlib.Path(__file__).parent.resolve())
 
 
 def info_links() -> list:
@@ -50,6 +52,7 @@ DATABASE_ARGS = {
     "user": getenv("MYSQL_USER"),
     "passwd": getenv("MYSQL_PASSWORD"),
     "database": getenv("MYSQL_DATABASE"),
+    "unix_socket": getenv("MYSQL_SOCKET"),
     "charset": "utf8mb4",
     "collation": "utf8mb4_unicode_ci",
     "use_unicode": True,

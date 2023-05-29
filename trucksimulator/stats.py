@@ -1,13 +1,32 @@
 "Blueprint file containing all stat-related commands and handlers"
 # pylint: disable=unused-argument, missing-function-docstring
-import config
-from flask_discord_interactions import ApplicationCommandType, Context, DiscordInteractionsBlueprint, Embed, Message, Component
-from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
+from trucksimulator import config
+from flask_discord_interactions import (
+    ApplicationCommandType,
+    Context,
+    DiscordInteractionsBlueprint,
+    Embed,
+    Message,
+    Component,
+)
+from flask_discord_interactions.models.component import (
+    ActionRow,
+    Button,
+    SelectMenu,
+    SelectMenuOption,
+)
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
 from flask_discord_interactions.models.user import User
 from i18n import t
-from resources import assets, companies, components, levels, players, trucks
-from utils import commatize, get_localizations
+from trucksimulator.resources import (
+    assets,
+    companies,
+    components,
+    levels,
+    players,
+    trucks,
+)
+from trucksimulator.utils import commatize, get_localizations
 
 profile_bp = DiscordInteractionsBlueprint()
 
@@ -45,13 +64,25 @@ def register(ctx: Context, player_id: str):
         )
     rules_embed = Embed(title=t("registering.rules.title"), color=config.EMBED_COLOR, fields=[])
     rules_embed.fields.append(
-        Field(name=t("registering.rules.trading.title"), value=t("registering.rules.trading.content"))
+        Field(
+            name=t("registering.rules.trading.title"),
+            value=t("registering.rules.trading.content"),
+        )
     )
     rules_embed.fields.append(
-        Field(name=t("registering.rules.autotypers.title"), value=t("registering.rules.autotypers.content"))
+        Field(
+            name=t("registering.rules.autotypers.title"),
+            value=t("registering.rules.autotypers.content"),
+        )
     )
     players.insert(
-        players.Player(ctx.author.id, ctx.author.username, discriminator=ctx.author.discriminator, money=1000, gas=600)
+        players.Player(
+            ctx.author.id,
+            ctx.author.username,
+            discriminator=ctx.author.discriminator,
+            money=1000,
+            gas=600,
+        )
     )
     return Message(
         embeds=[welcome_embed, rules_embed],
@@ -75,7 +106,11 @@ def register(ctx: Context, player_id: str):
 def profile_home(ctx: Context, player_id):
     """Shows your profile."""
     player = players.get(ctx.author.id, check=player_id)
-    return Message(embed=get_profile_embed(ctx.author), components=components.get_home_buttons(player), update=True)
+    return Message(
+        embed=get_profile_embed(ctx.author),
+        components=components.get_home_buttons(player),
+        update=True,
+    )
 
 
 def get_profile_embed(user: User) -> Embed:
@@ -132,7 +167,9 @@ def get_profile_embed(user: User) -> Embed:
 def top(ctx: Context, player_id) -> Message:
     "Presents the top players."
     return Message(
-        embed=get_top_embed(), components=get_top_select(players.get(ctx.author.id, check=player_id)), update=True
+        embed=get_top_embed(),
+        components=get_top_select(players.get(ctx.author.id, check=player_id)),
+        update=True,
     )
 
 
@@ -178,7 +215,11 @@ def get_top_select(player):
                     custom_id=["top_select", player.id],
                     placeholder=t("top.select"),
                     options=[
-                        SelectMenuOption(label=t("top.keys.level"), value="level", emoji={"name": "🎉", "id": None}),
+                        SelectMenuOption(
+                            label=t("top.keys.level"),
+                            value="level",
+                            emoji={"name": "🎉", "id": None},
+                        ),
                         SelectMenuOption(
                             label=t("top.keys.money"),
                             value="money",

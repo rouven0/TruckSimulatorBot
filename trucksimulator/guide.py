@@ -2,14 +2,25 @@
 # pylint: disable=unused-argument
 from os import listdir
 
-import config
-from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Embed, Message
-from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
+from flask_discord_interactions import (
+    Context,
+    DiscordInteractionsBlueprint,
+    Embed,
+    Message,
+)
+from flask_discord_interactions.models.component import (
+    ActionRow,
+    Button,
+    SelectMenu,
+    SelectMenuOption,
+)
 from flask_discord_interactions.models.embed import Author, Field, Media
 from flask_discord_interactions.models.option import CommandOptionType, Option
 from i18n import t
-from resources import assets, items, places, players, symbols
-from utils import get_localizations
+
+from trucksimulator import config
+from trucksimulator.resources import assets, items, places, players, symbols
+from trucksimulator.utils import get_localizations
 
 guide_bp = DiscordInteractionsBlueprint()
 
@@ -26,7 +37,11 @@ def minijobs(ctx: Context) -> Message:
                 f"${place.item_reward*(player.level+1):,} if you bring them *{place.accepted_item}*."
             )
     return Message(
-        embed=Embed(title="All available minijobs", description=minijob_list, color=config.EMBED_COLOR),
+        embed=Embed(
+            title="All available minijobs",
+            description=minijob_list,
+            color=config.EMBED_COLOR,
+        ),
         update=True,
         components=get_guide_selects(),
     )
@@ -85,7 +100,7 @@ def placeinfo(ctx: Context) -> Message:
             type=CommandOptionType.STRING,
             choices=[
                 {"name": f[: f.find(".")].replace("_", " "), "value": f[: f.find(".")]}
-                for f in sorted(listdir("./guide"))
+                for f in sorted(listdir(config.BASE_PATH + "/guide"))
             ],
         )
     ],
@@ -98,12 +113,16 @@ def guide(ctx: Context, topic: str = "introduction") -> Message:
 @guide_bp.custom_handler(custom_id="guide_topic")
 def guide_topic(ctx: Context):
     """Handler for the topic select"""
-    return Message(embed=get_guide_embed(ctx.values[0]), components=get_guide_selects(topic=ctx.values[0]), update=True)
+    return Message(
+        embed=get_guide_embed(ctx.values[0]),
+        components=get_guide_selects(topic=ctx.values[0]),
+        update=True,
+    )
 
 
 def get_guide_embed(topic: str) -> Embed:
     """Returns the fitting guide embed for a topic"""
-    with open(f"./guide/{topic}.md", "r", encoding="utf8") as guide_file:
+    with open(config.BASE_PATH + f"/guide/{topic}.md", "r", encoding="utf8") as guide_file:
         topic = str.lower(topic)
         guide_embed = Embed(
             title=f"{str.upper(topic[0])}{topic[1:]}".replace("_", " "),
@@ -124,9 +143,10 @@ def get_guide_selects(topic: str = ""):
                     custom_id="guide_topic",
                     options=[
                         SelectMenuOption(
-                            label=str.upper(f[:1]) + f[1 : f.find(".")].replace("_", " "), value=f[: f.find(".")]
+                            label=str.upper(f[:1]) + f[1 : f.find(".")].replace("_", " "),
+                            value=f[: f.find(".")],
                         )
-                        for f in sorted(listdir("./guide"))
+                        for f in sorted(listdir(config.BASE_PATH + "/guide"))
                     ],
                     placeholder="Select a topic",
                 )
@@ -143,7 +163,10 @@ def get_guide_selects(topic: str = ""):
                             SelectMenuOption(
                                 label=place.name,
                                 value=str(int(place.position)),
-                                emoji={"name": "place", "id": items.get(place.produced_item).emoji},
+                                emoji={
+                                    "name": "place",
+                                    "id": items.get(place.produced_item).emoji,
+                                },
                             )
                             for place in places.get_all()
                         ],

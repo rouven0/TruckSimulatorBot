@@ -5,12 +5,12 @@ from threading import Thread
 
 import requests
 
-import config
+from trucksimulator import config
 import mysql.connector
 from flask_discord_interactions import DiscordInteractionsBlueprint, User
 from flask_discord_interactions.context import Context
 from flask_discord_interactions.models.message import Embed, Message
-from resources import players
+from trucksimulator.resources import players
 
 admin_bp = DiscordInteractionsBlueprint()
 

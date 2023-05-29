@@ -1,7 +1,7 @@
 """
 This module contains the database connection
 """
-import config
+import trucksimulator.config as config
 import mysql.connector
 
 

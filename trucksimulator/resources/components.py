@@ -1,11 +1,16 @@
 """
 This module provides several lists of buttons and selects
 """
-from flask_discord_interactions.models.component import ActionRow, Button, SelectMenu, SelectMenuOption
+from flask_discord_interactions.models.component import (
+    ActionRow,
+    Button,
+    SelectMenu,
+    SelectMenuOption,
+)
 from i18n import t
-from resources import companies, items, places, symbols, trucks
-from resources.companies import Company
-from resources.players import Player
+from trucksimulator.resources import companies, items, places, symbols, trucks
+from trucksimulator.resources.companies import Company
+from trucksimulator.resources.players import Player
 
 
 def back_home(player_id) -> Button:
@@ -50,7 +55,12 @@ def get_drive_buttons(player: Player) -> list:
             )
         else:
             directional_buttons.append(
-                Button(style=2, emoji={"name": "placeholder", "id": symbol}, custom_id=str(symbol), disabled=True)
+                Button(
+                    style=2,
+                    emoji={"name": "placeholder", "id": symbol},
+                    custom_id=str(symbol),
+                    disabled=True,
+                )
             )
     buttons.append(ActionRow(components=directional_buttons))
 
@@ -122,7 +132,11 @@ def get_drive_buttons(player: Player) -> list:
                     custom_id=["job_show", player.id],
                     disabled=(current_job is None),
                 ),
-                Button(style=3, label=t("driving.buttons.home"), custom_id=["home", player.id]),
+                Button(
+                    style=3,
+                    label=t("driving.buttons.home"),
+                    custom_id=["home", player.id],
+                ),
             ]
         )
     )
