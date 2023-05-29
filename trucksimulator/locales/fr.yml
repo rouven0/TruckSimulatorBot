@@ -1,19 +1,19 @@
 name: Truck Simulator
 back: Retour
 cancel: Annuler
-back_road: Retour sur la route
+back_road: Se remettre en route
 coming_soon: Bientôt
 
 commands:
   drive:
-    name: pilote
+    name: drive
     description: Commencez le jeu.
   give:
-    name: faire-un-don
+    name: donation
     description: Fait un don à un joueur.
     options:
       user:
-        name: joueur
+        name: utilisateur
         description: Le joueur veut vous donner de l'argent.
       amount:
         name: quantité
@@ -24,10 +24,10 @@ commands:
     options:
       topic:
         name: sujet
-        description: Le sujet que tu veux lire.
+        description: Les sujets que vous souhaitez lire.
   info:
     name: info
-    description: Obtiens les informations du bot.
+    description: Obtenez les informations du Bot.
   profile:
     name: Profil
   company:
@@ -44,16 +44,16 @@ driving:
     load: Charger
     unload: Décharger
     job:
-      new: Nouveau travail
-      show: Montre le travail
-    home: Retour au menu
+      new: Nouvelle livraison
+      show: Montre la livraison
+    home: Menu
     refill: Fait le plein
   load:
-    title: Chargement réussi
+    title: Chargements réussi
     value: Vous avez chargé %{item} dans votre camion.
   unload:
     placeholder: Choisissez les éléments à décharger
-    item_required: (Requis pour votre travail)
+    item_required: (Cette cargaison)
     title: Déchargement réussi
     value: Vous avez retiré %{items} de votre camion.
     and_separator: " et "
@@ -61,62 +61,62 @@ driving:
 job:
   title: |
     Travail de %{player}
-  new: Vous avez un nouveau travail
-  current: Travail actuel
+  new: Vous avez une nouvelle livraison
+  current: Livraison en cours
   state:
     current: État actuel
-    claimed: Vous avez choisi ce travail. Dirige-toi vers %{place} et charge ton camion.
-    loaded: Vous avez chargé votre camion avec les articles nécessaires. Dirige-toi vers %{place} et décharge la cargaison.
-    done: Votre travail est terminé et vous avez reçu %{reward}$.
+    claimed: Vous avez choisi cette livraison. Dirigez-vous vers %{place} pour chargez votre camion.
+    loaded: Vous avez chargé votre camion avec les articles nécessaires. Dirigez-vous vers %{place} et déchargez la cargaison.
+    done: Vous avez obtenu %{reward}$ pour la livraison effectué.
   notification: Notification
   company_notice: La valeur nette de votre entreprise a augmenté de %{amount}$.
   message: |
-    %{place_to} a besoin de %{item} de %{place_from}. Vous avez reçu %{reward}$ pour cette livraison.
+    %{place_to} a besoin de %{item} de %{place_from}. Vous recevrez %{reward}$ pour cette livraison.
 
 minijob:
   notification: Notification
   message: |
-    %{place} vous a donné %{reward}$ pour avoir amenés %{item}.
+    %{place} vous a donné %{reward}$ pour avoir amené %{item}.
 
 home:
-  truck: Gérez votre camion
-  company: Checkez votre entreprise
+  truck: Achetez un camion
+  company: Gérez votre entreprise
   leaderboard: Voir le classement
 
 profile:
   author: "Profil de %{player}"
   level: Niveau
-  money: Argents
-  miles: Kilomètres parcourus
-  truck_miles: (%{miles} kilomètres avec votre camion actuel)
+  money: Portefeuille
+  miles: Le total des kilomètres parcourus
+  truck_miles: (%{miles} km avec votre camion actuel)
   gas: Carburants restants
   truck: Camion actuel
-  load: Chargements actuel
+  load: Capacité de chargements
   company: Entreprise
-  rank: "Votre place dans le classement: %{rank}"
+  rank: "Votre position au classement: %{rank}"
 
 top:
-  title: Liste de classements Truck Simulator 🎉
+  title: Liste des classements de Truck Simulator 🎉
   fields:
     level: Les meilleurs joueurs triés par niveaux
-    money: Les meilleurs joueurs triés par argents
-    miles: Les meilleurs joueurs triés par kilomètres
-  footer: Félicitations si vous vous voyez dans cette liste !
-  select: View another toplist
+    money: Les meilleurs joueurs triés par richesse
+    miles: Les meilleurs joueurs triés par kilomètre
+  footer: Félicitations si vous vous trouvez sur la liste !
+  select: Voir d'autres classements
   keys:
-    level: Niveau
-    money: Argent
-    miles: Kilomètres
+    level: Classement par niveaux
+    money: Classement par richesses
+    miles: Classement par km parcourus
 
 truck:
   author: "Camion de %{player}"
   gas:
     consumption:
-      title: Consommation de carburants
-      text: "%{consumption} litres par kilomètre"
+      title: Consommation de carburant
+      text: "%{consumption}L/km"
     capacity:
-      title: Capacité de carburants
-      text: "%{capacity} litres"
+      title: Capacité du réservoir
+      text: "%{capacity}L"
   price: Prix
   loading_capacity:
     title: Capacité de chargements
@@ -131,7 +131,7 @@ truck:
 
 company:
   author: |
-    Entreprise %{name}
+    Entreprise de %{name}
   hq_position: Siège sociale
   net_worth: Valeur nette
   members: Employés (%{count}/25)
@@ -139,16 +139,16 @@ company:
   components:
     update: Modifier votre entreprise
     leave: Démissionner
-    fire: Sélectionnez un employé à licencier
+    fire: Mettre à la porte un employé de l'entreprise
   notfound:
     self:
-      message: Vous n'êtes pas employé d'une entreprise pour le moment.
+      message: Vous n'êtes membre d'une entreprise pour le moment.
       cta: Créer une entreprise
       back: Retour
     other:
       message: |
-        %{player} n'est pas employé d'une entreprise pour le moment.
-      cta: Recrutez-le
+        %{player} n'est pas membre d'une entreprise pour le moment.
+      cta: Embauchez-le
   founding:
     errors:
       already_existing: Vous avez déjà une entreprise. Vous ne pouvez pas en trouver une autre.
@@ -165,12 +165,12 @@ company:
     success:
       title: Création de votre entreprise réussie
       body: |
-        %{logo} **%{name}** a été créé et mis sur le marché. Le siège social de votre entreprise a été construit à votre position actuelle.
+        %{logo} **%{name}** a été créé, le siège de votre entreprise a été établi à votre position actuel.
       cta: Retour
   update:
     modal:
       logo:
-        label: Logo (Retire l'émoji pour pouvoir le changer)
+        label: Logo (Tuto disponible dans /guide)
         placeholder: Le logo de votre entreprise doit être un emoji.
     errors:
       invalid_emoji: Le logo fourni n'a pas pu être associé à un emoji.
@@ -184,7 +184,7 @@ company:
       too_many_members: Votre entreprise a une capacité maximum de 25 employés.
       already_member: Le joueur est actuellement un employé de l'entreprise.
   fire:
-    confirmation: Êtes-vous sûr de vouloir licencié %{player} ?
+    confirmation: Êtes-vous sûr de vouloir licencier %{player} ?
     cta: Confirmer
     success: |
       %{player} a été viré de l'entreprise **%{company}**.
@@ -192,28 +192,28 @@ company:
       self_firing: Ben voyons, vous ne pouvez pas vous licencié vous-même.
       not_member: Le joueur n'est pas un employé de votre entreprise.
   leave:
-    confirmation: Êtes-vous sûr de vouloir démissionné de l'entreprise actuel ?
+    confirmation: Êtes-vous sûr de vouloir démissionner de l'entreprise actuel ?
     cta: Démissionne
-    success: <@%{player_id}>, vous avez quitté l'entreprise.
+    success: <@%{player_id}>, tu as démissionné de l'entreprise **%{company}**.
 
 casino:
-  enter: Entrez dans le casino
+  enter: Casino
   welcome: Bienvenue au casino !
   invalid_amount: Montant incorrect !
   slots:
     # extra quotes here because of escaping and stuff
-    author: "Machine à sous de %{name}"
+    author: "%{name}"
     result:
       title: Résultats
       win3: |
-        :tada: Félicitations, vous avez gagné %{amount}$ :tada:
+        :tada: Votre gain s'élève à %{amount}$ :tada:
       win2: Vous avez gagné %{amount}$
       loss: Vous avez perdu %{amount}$
     button:
       again: Réessayez
       again2: Réessayez (Doublez votre mise)
     modal:
-      title: Faites tourner une machine à sous
+      title: Lance la machine à sous
       amount:
         label: Montant
         placeholder: Le montant de la mise, ou 'all' pour tout miser
@@ -224,7 +224,7 @@ refill:
     deal: "<@%{player_id}> Nous avons un problème : vous n'avez pas assez d'argent. Faisons un deal. Je te donne 100 litres de carburants et tu perds 2 niveaux."
   success:
     title: Merci d'avoir visité notre station-service
-    description: Vous avez mis %{amount} litres de carburants pour un prix de %{price}$.
+    description: Vous avez mis %{amount}L de carburant pour un prix de %{price}$.
 
 give:
   errors:
@@ -254,7 +254,7 @@ info:
     text: |
       ```yml
       Joueurs enregistrés: %{players}
-      Travails effectués: %{jobs}
+      Livraisons en cours: %{jobs}
       Entreprises enregistrés: %{companies}```
   credits:
     title: Remerciements
@@ -268,7 +268,7 @@ info:
     privacy: Politique de confidentialité
 
 leveling:
-  xp: Vous avez reçu %{amount} xp.
+  xp: Vous avez reçu %{amount} XP.
   levelup: ":tada: Vous êtes maintenant au niveau %{level} :tada:"
 
 autocomplete:
@@ -282,23 +282,23 @@ autocomplete:
 errors:
   not_driving:
     driving_allowed:
-      message: Ce n'est pas ton camion. Utilise la commande </drive:966656844946882593> ou cliquez sur le bouton pour accéder à votre camion.
+      message: Ce n'est pas votre camion. Utilisez la commande </drive:966656844946882593> ou cliquez sur le bouton pour accéder à votre camion.
       cta: Conduire
     driving_forbidden: 
       message: Ce n'est pas votre camion.
   not_enough_money:
-    message: Vous n'avez pas assez d'argent pour faire cela.
+    message: Vous n'avez pas l'argent nécessaire.
   blacklisted:
     message: |
       <@%{player_id}> Vous avez été blacklist pour la raison: %{reason}
   not_registered:
     self:
       message: |
-        <@%{player_id}> Vous n'êtes pas encore enregistré. Clique sur le bouton ci-dessous pour démarrer.
-      cta: Clique ici pour t'enregistré
+        <@%{player_id}> Vous n'êtes pas encore enregistré. Cliquez sur le bouton ci-dessous afin de commencer.
+      cta: Clique ici pour t'enregistrer
     other:
       message: |
-        <@%{player_id}> n'est pas encore enregistré. Demande-lui en DM pour qu'il puisse s'enregistré.
+        <@%{player_id}> n'est pas encore enregistré. Demande-lui en DM pour qu'il puisse s'enregistrer.
 
 complain:
-  response: La piraterie n'est jamais fini .Tendinite-Berdah 😡
+  response: La piraterie n'est jamais fini. Tendinite-Berdah 😡
