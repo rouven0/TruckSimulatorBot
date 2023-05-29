@@ -48,7 +48,7 @@ def register(ctx: Context, player_id: str):
     if players.registered(ctx.author.id):
         return Message(update=True, deferred=True)
     with open(
-        f"./messages/{ctx.locale if ctx.locale in config.I18n.AVAILABLE_LOCALES else config.I18n.FALLBACK}/welcome.md",
+        config.BASE_PATH + f"/messages/{ctx.locale if ctx.locale in config.I18n.AVAILABLE_LOCALES else config.I18n.FALLBACK}/welcome.md",
         "r",
         encoding="utf8",
     ) as welcome_file:
