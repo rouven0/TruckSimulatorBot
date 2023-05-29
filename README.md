@@ -5,20 +5,6 @@
 # TruckSimulatorBot
 Small Truck Simulator app using the [flask-discord-interactions](https://github.com/breqdev/flask-discord-interactions) library
 
-## Self-host this bot
-Simply self host this bot using docker. The internal server is running on port 9000. The following environment variables are required for the bot to work:
-```env
-DISCORD_CLIENT_ID
-DISCORD_PUBLIC_KEY
-MYSQL_HOST
-MYSQL_USER
-MYSQL_PASSWORD
-MYSQL_DATABASE
-```
-
-### Setting up the database
-To make the setup easier, `database.sql` contains a full table structure dump, you can apply to your mysql instance.
-
 ## Project Description
 ### Basic controls
 The virtual map is the heart of the Truck Simulator. Everything is a place that you can drive to. Some commands are bound to specific places, some are available everywhere.
