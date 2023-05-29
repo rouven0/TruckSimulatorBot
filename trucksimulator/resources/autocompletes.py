@@ -5,7 +5,7 @@ Some nice autocomplete handlers that are used everywhere
 from flask_discord_interactions.models.option import Choice
 from i18n import set as set_i18n
 from i18n import t
-from resources import players
+from trucksimulator.resources import players
 
 
 def amount_all(ctx, *args):
@@ -26,8 +26,18 @@ def amount_all(ctx, *args):
     if amount.value.isnumeric() and player.money >= int(amount.value):
         lst.append(Choice(name=amount.value, value=int(amount.value)))
     if amount.value.isnumeric() and player.money >= int(amount.value) * 1000:
-        lst.append(Choice(name=t("autocomplete.thousand", amount=amount.value), value=int(amount.value) * 1000))
+        lst.append(
+            Choice(
+                name=t("autocomplete.thousand", amount=amount.value),
+                value=int(amount.value) * 1000,
+            )
+        )
     if amount.value.isnumeric() and player.money >= int(amount.value) * 1000000:
-        lst.append(Choice(name=t("autocomplete.million", amount=amount.value), value=int(amount.value) * 1000000))
+        lst.append(
+            Choice(
+                name=t("autocomplete.million", amount=amount.value),
+                value=int(amount.value) * 1000000,
+            )
+        )
 
     return lst

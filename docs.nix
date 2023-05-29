@@ -62,8 +62,8 @@ stdenv.mkDerivation {
   installPhase = ''
     runHook preInstall
     mkdir -p $out/
-    cd ./app
-    sphinx-build ../docs/ $out
+    # cd ./trucksimulator
+    sphinx-build ./docs/ $out
     runHook postInstall
   '';
 

@@ -2,7 +2,7 @@
 This file contains some of the image urls that the bot uses
 """
 
-import config
+from trucksimulator import config
 
 
 def get(route: str) -> str:

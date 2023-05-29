@@ -3,13 +3,18 @@
 from math import log
 from typing import Union
 
-import config
-from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Embed, Message
+from trucksimulator import config
+from flask_discord_interactions import (
+    Context,
+    DiscordInteractionsBlueprint,
+    Embed,
+    Message,
+)
 from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles
 from flask_discord_interactions.models.embed import Author, Field, Media
 from i18n import t
-from resources import assets, components, players, symbols, trucks
-from utils import commatize
+from trucksimulator.resources import assets, components, players, symbols, trucks
+from trucksimulator.utils import commatize
 
 truck_bp = DiscordInteractionsBlueprint()
 
@@ -52,7 +57,11 @@ def show_truck_button(ctx: Context, player_id: str):
     truck = trucks.get(player.truck_id)
     truck_embed = get_truck_embed(truck)
     truck_embed.author = Author(name=t("truck.author", player=player.name), icon_url=ctx.author.avatar_url)
-    return Message(embed=truck_embed, components=components.get_truck_components(player), update=True)
+    return Message(
+        embed=truck_embed,
+        components=components.get_truck_components(player),
+        update=True,
+    )
 
 
 @truck_bp.custom_handler(custom_id="truck_buy")
@@ -108,7 +117,11 @@ def view(ctx: Context, player_id: str) -> Message:
         components=[
             ActionRow(
                 components=[
-                    Button(label=t("back"), custom_id=["manage_truck", player_id], style=ButtonStyles.SECONDARY),
+                    Button(
+                        label=t("back"),
+                        custom_id=["manage_truck", player_id],
+                        style=ButtonStyles.SECONDARY,
+                    ),
                     Button(
                         label=t("truck.buy.cta"),
                         custom_id=["truck_buy", player_id, ctx.values[0]],

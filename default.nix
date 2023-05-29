@@ -2,7 +2,7 @@
 
 buildPythonPackage {
   name = "TruckSimulatorBot";
-  src = ./app;
+  src = ./trucksimulator;
 
   propagatedBuildInputs = with python310Packages; [
     python-i18n
@@ -48,10 +48,10 @@ buildPythonPackage {
   installPhase = ''
     runHook preInstall
     mkdir -p $out/${python.sitePackages}
-    cp -r . $out/${python.sitePackages}/trucksimulatorbot
+    cp -r . $out/${python.sitePackages}/trucksimulator
     runHook postInstall '';
 
-  shellHook = "export FLASK_APP=trucksimulatorbot";
+  shellHook = "export FLASK_APP=trucksimulator";
 
   format = "other";
 }

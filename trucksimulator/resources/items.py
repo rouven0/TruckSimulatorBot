@@ -4,6 +4,8 @@ Items can be loaded and unloaded from the truck at all places. They mostly consi
 import sqlite3
 from dataclasses import dataclass
 
+from trucksimulator import config
+
 
 @dataclass
 class Item:
@@ -49,7 +51,7 @@ def get_all() -> list:
     return __all_items__
 
 
-__con__ = sqlite3.connect("./resources/objects.db")
+__con__ = sqlite3.connect(config.BASE_PATH + "/resources/objects.db")
 __cur__ = __con__.cursor()
 
 __cur__.execute("SELECT * FROM items")

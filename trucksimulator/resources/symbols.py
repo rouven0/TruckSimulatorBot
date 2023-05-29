@@ -3,7 +3,7 @@ This module provides all symbols and emojis the bots operates with
 """
 import re
 
-import config
+from trucksimulator import config
 
 LEFT = 853353650491752459
 DOWN = 853353650905677884

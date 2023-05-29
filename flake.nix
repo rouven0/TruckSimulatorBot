@@ -1,8 +1,13 @@
 {
   description = "The Truck Simulator Discord bot";
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+  inputs = {
+    images = {
+      url = "github:therealr5/TruckSimulatorBot-images";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
 
-  outputs = { self, nixpkgs }:
+  outputs = inputs @ { self, nixpkgs, images }:
     let
       supportedSystems = [ "x86_64-linux" "x86_64-darwin" "aarch64-linux" "aarch64-darwin" ];
       forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
@@ -13,12 +18,28 @@
         default = pkgs.${system}.python310Packages.callPackage ./default.nix { };
         docs = pkgs.${system}.python310Packages.callPackage ./docs.nix { };
       });
-      nixosModules.default = import ./module.nix;
+      nixosModules.default = import ./module.nix inputs;
 
-           devShells = forAllSystems (system: {
+      devShells = forAllSystems (system: {
         default =
           let
-            pythonEnv = pkgs.${system}.python3.withPackages (p: with p; [ gunicorn (self.packages.${system}.default) ]);
+            pythonEnv = pkgs.${system}.python3.withPackages (p: with p; [
+              gunicorn
+              sphinx
+              (self.packages.${system}.default)
+
+              (buildPythonPackage
+                rec {
+                  pname = "sphinx-readable-theme";
+                  version = "1.3.0";
+
+                  src = fetchPypi {
+                    inherit pname version;
+                    sha256 = "9f5louESy5VrNm30Hg/IlP9rbw5KSBT8v/aSVm20f8A=";
+                  };
+                })
+
+            ]);
           in
 
           pkgs.${system}.mkShell {

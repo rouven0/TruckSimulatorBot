@@ -2,14 +2,20 @@
 # pylint: disable=unused-argument, missing-function-docstring
 from typing import Optional
 
-import config
-from flask_discord_interactions import Context, DiscordInteractionsBlueprint, Embed, Message, Component
+from trucksimulator import config
+from flask_discord_interactions import (
+    Context,
+    DiscordInteractionsBlueprint,
+    Embed,
+    Message,
+    Component,
+)
 from flask_discord_interactions.models.component import ActionRow, Button, ButtonStyles
 from flask_discord_interactions.models.embed import Field, Media
 from i18n import set as set_i18n
 from i18n import t
-from resources import players
-from utils import get_localizations
+from trucksimulator.resources import players
+from trucksimulator.utils import get_localizations
 
 system_bp = DiscordInteractionsBlueprint()
 
@@ -50,7 +56,12 @@ def info(ctx: Context) -> Message:
         components=[
             ActionRow(
                 components=[
-                    Button(style=5, url=link["url"], label=link["name"], emoji=link.get("emoji"))
+                    Button(
+                        style=5,
+                        url=link["url"],
+                        label=link["name"],
+                        emoji=link.get("emoji"),
+                    )
                     for link in config.info_links()
                 ]
             ),

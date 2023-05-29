@@ -5,7 +5,7 @@ import sys
 import traceback
 from os import getenv
 
-import config
+from trucksimulator import config
 import i18n
 from flask import Flask, json, request
 from flask_discord_interactions import Context, DiscordInteractions, Message
@@ -13,15 +13,14 @@ from flask_discord_interactions.models.component import ActionRow, Button
 from flask_discord_interactions.models.embed import Embed, Footer
 from i18n import set as set_i18n
 from i18n import t
-from resources import players
+from trucksimulator.resources import players
 from werkzeug.exceptions import HTTPException
 
 i18n.set("filename_format", config.I18n.FILENAME_FORMAT)
 i18n.set("fallback", config.I18n.FALLBACK)
 i18n.set("available_locales", config.I18n.AVAILABLE_LOCALES)
 i18n.set("skip_locale_root_data", True)
-
-i18n.load_path.append("./locales")
+i18n.load_path.append(config.BASE_PATH + "/locales")
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -81,7 +80,11 @@ def not_enough_money(error):
 @app.errorhandler(players.WrongPlayer)
 def not_driving(error):
     """Defer buttons if the wrong player clicked them"""
-    required_permissions = [10, 11, 31]  # view_channels, send_messages, use_application_commands
+    required_permissions = [
+        10,
+        11,
+        31,
+    ]  # view_channels, send_messages, use_application_commands
     if all([int(request.json.get("member").get("permissions")) & (1 << n) for n in required_permissions]):
         return dump(
             Message(
@@ -119,7 +122,8 @@ def not_registered(error):
             ActionRow(
                 components=[
                     Button(
-                        label=t("errors.not_registered.self.cta"), custom_id=["profile_register", error.requested_id]
+                        label=t("errors.not_registered.self.cta"),
+                        custom_id=["profile_register", error.requested_id],
                     )
                 ]
             )
@@ -140,7 +144,14 @@ def not_registered(error):
 def blacklisted(error: players.PlayerBlacklisted):
     """Error handler in case a player is on the blalist"""
     return dump(
-        Message(t("errors.blacklisted.message", player_id=error.requested_id, reason=error.reason), ephemeral=True)
+        Message(
+            t(
+                "errors.blacklisted.message",
+                player_id=error.requested_id,
+                reason=error.reason,
+            ),
+            ephemeral=True,
+        )
     )
 
 
@@ -161,7 +172,15 @@ def general_error(error):
                 color=int("ff0000", 16),
             ),
             components=[
-                ActionRow(components=[Button(style=5, label="Support Server", url="https://discord.gg/FzAxtGTUhN")])
+                ActionRow(
+                    components=[
+                        Button(
+                            style=5,
+                            label="Support Server",
+                            url="https://discord.gg/FzAxtGTUhN",
+                        )
+                    ]
+                )
             ],
         )
     )
@@ -192,21 +211,21 @@ if "--clear-admin" in sys.argv:
     discord.update_commands(guild_id=config.Guilds.SUPPORT)
     sys.exit()
 
-from admin import admin_bp
+from trucksimulator.admin import admin_bp
 
 if "--admin" in sys.argv:
     discord.register_blueprint(admin_bp)
     discord.update_commands(guild_id=config.Guilds.SUPPORT)
     sys.exit()
 
-from companies import company_bp
-from driving import driving_bp
-from economy import economy_bp
-from gambling import gambling_bp
-from guide import guide_bp
-from stats import profile_bp
-from system import system_bp
-from truck import truck_bp
+from trucksimulator.companies import company_bp
+from trucksimulator.driving import driving_bp
+from trucksimulator.economy import economy_bp
+from trucksimulator.gambling import gambling_bp
+from trucksimulator.guide import guide_bp
+from trucksimulator.stats import profile_bp
+from trucksimulator.system import system_bp
+from trucksimulator.truck import truck_bp
 
 discord.register_blueprint(system_bp)
 discord.register_blueprint(profile_bp)

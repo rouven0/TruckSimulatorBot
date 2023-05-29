@@ -2,7 +2,7 @@
 # pylint: disable=unused-argument
 import re
 
-import config
+import trucksimulator.config as config
 from flask_discord_interactions import (
     ApplicationCommandType,
     Context,
@@ -15,8 +15,8 @@ from flask_discord_interactions import (
 from flask_discord_interactions.models.component import ActionRow, Button, Component, TextInput
 from flask_discord_interactions.models.embed import Author, Field, Footer, Media
 from i18n import t
-from resources import companies, components, places, players, symbols
-from utils import get_localizations
+from trucksimulator.resources import companies, components, places, players, symbols
+from trucksimulator.utils import get_localizations
 
 company_bp = DiscordInteractionsBlueprint()
 

@@ -9,9 +9,9 @@ import logging
 from dataclasses import dataclass
 from typing import Any, Optional
 
-from resources import database
-from resources import position as pos
-from resources.players import Player
+from trucksimulator.resources import database
+from trucksimulator.resources import position as pos
+from trucksimulator.resources.players import Player
 
 
 @dataclass
@@ -22,7 +22,7 @@ class Company:
     :ivar str logo: Emoji displayed as logo on the map
     :ivar str description: A description for that company
     :ivar list hq_position: Position of the company's headquarters
-    :ivar str founder: Id of the founder of the company, who has control over it
+    :ivar str founder: ID of the founder of the company
     :ivar int net_worth: Money the company holds
     """
 
