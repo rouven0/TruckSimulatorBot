@@ -1,5 +1,5 @@
 Places
 ======
 
-.. automodule:: resources.places
+.. automodule:: trucksimulator.resources.places
    :members:

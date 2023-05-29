@@ -1,5 +1,5 @@
 Database
 ========
 
-.. automodule:: resources.database
+.. automodule:: trucksimulator.resources.database
    :members:

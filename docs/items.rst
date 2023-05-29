@@ -1,5 +1,5 @@
 Items
 =====
 
-.. automodule:: resources.items
+.. automodule:: trucksimulator.resources.items
    :members:

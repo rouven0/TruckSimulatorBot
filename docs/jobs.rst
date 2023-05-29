@@ -1,5 +1,5 @@
 Jobs
 ====
 
-.. automodule:: resources.jobs
+.. automodule:: trucksimulator.resources.jobs
    :members:

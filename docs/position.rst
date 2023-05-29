@@ -1,6 +1,6 @@
 Position
 ========
 
-.. automodule:: resources.position
+.. automodule:: trucksimulator.resources.position
    :members:
    :special-members: __int__

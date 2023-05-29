@@ -1,5 +1,5 @@
 Companies
 =========
 
-.. automodule:: resources.companies
+.. automodule:: trucksimulator.resources.companies
    :members:

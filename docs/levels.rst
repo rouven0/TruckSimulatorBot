@@ -1,5 +1,5 @@
 Levels
 ======
 
-.. automodule:: resources.levels
+.. automodule:: trucksimulator.resources.levels
    :members:

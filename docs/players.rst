@@ -1,5 +1,5 @@
 Players
 =======
 
-.. automodule:: resources.players
+.. automodule:: trucksimulator.resources.players
    :members:

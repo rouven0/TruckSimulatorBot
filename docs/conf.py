@@ -16,7 +16,7 @@ import sys
 
 import sphinx_readable_theme
 
-sys.path.insert(0, os.path.abspath("../trucksimulator"))
+sys.path.insert(0, os.path.abspath("../"))
 
 
 # -- Project information -----------------------------------------------------
