@@ -7,7 +7,7 @@ from os import getenv
 
 from trucksimulator import config
 import i18n
-from flask import Flask, json, request
+from flask import Flask, json, request, send_file
 from flask_discord_interactions import Context, DiscordInteractions, Message
 from flask_discord_interactions.models.component import ActionRow, Button
 from flask_discord_interactions.models.embed import Embed, Footer
@@ -30,6 +30,11 @@ console_handler.setFormatter(logging.Formatter(config.LOG_FORMAT))
 logger.addHandler(console_handler)
 
 app = Flask(__name__)
+
+
+@app.route("/robots.txt")
+def get_robots():
+    return send_file(f"{config.BASE_PATH}/robots.txt")
 
 
 class CustomDiscordInteractions(DiscordInteractions):
