@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1688282687,
-        "narHash": "sha256-OS8ua5R5r3R7D6sGN3dQteELASn1ZN6E7xxkAY81J/0=",
+        "lastModified": 1689427686,
+        "narHash": "sha256-8bmjK6SsS2wvusgZvgqqE0GzSLMavUIv52fRVQHquwc=",
         "owner": "therealr5",
         "repo": "TruckSimulatorBot-images",
-        "rev": "f27975d1d364cab329077e53a7021e99146cbc65",
+        "rev": "2b9bb4ec7aca230d8df32d1a617cc21d5e5b7d78",
         "type": "github"
       },
       "original": {
@@ -22,11 +22,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1688829822,
-        "narHash": "sha256-hv56yK1fPHPt7SU2DboxBtdSbIuv9nym7Dss7Cn2jic=",
+        "lastModified": 1690833316,
+        "narHash": "sha256-+YU+/pTJmVKNW12R07/SJiTn7PQk90xwCI4D2PfLRPs=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "ed6afb10dfdfc97b6bcf0703f1bad8118e9e961b",
+        "rev": "9418167277f665de6f4a29f414d438cf39c55b9e",
         "type": "github"
       },
       "original": {
