@@ -1,4 +1,4 @@
-{ lib, stdenv, buildPythonPackage, fetchPypi, python310Packages, python, ... }:
+{ lib, stdenv, buildPythonPackage, fetchPypi, python311Packages, python, ... }:
 
 
 stdenv.mkDerivation {
@@ -6,7 +6,7 @@ stdenv.mkDerivation {
   version = "0.0.1";
   src = ./.;
 
-  propagatedBuildInputs = with python310Packages; [
+  propagatedBuildInputs = with python311Packages; [
     sphinx
     (buildPythonPackage
       rec {
