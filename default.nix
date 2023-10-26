@@ -1,10 +1,10 @@
-{ lib, buildPythonPackage, fetchPypi, python310Packages, python, ... }:
+{ lib, buildPythonPackage, fetchPypi, python311Packages, python, ... }:
 
 buildPythonPackage {
   name = "TruckSimulatorBot";
   src = ./trucksimulator;
 
-  propagatedBuildInputs = with python310Packages; [
+  propagatedBuildInputs = with python311Packages; [
     python-i18n
     mysql-connector
     gunicorn
