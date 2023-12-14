@@ -37,6 +37,11 @@ def get_robots():
     return send_file(f"{config.BASE_PATH}/robots.txt")
 
 
+@app.route("/health")
+def health():
+    return "OK"
+
+
 class CustomDiscordInteractions(DiscordInteractions):
     def handle_request(self):
         set_i18n("locale", request.json.get("locale"))
