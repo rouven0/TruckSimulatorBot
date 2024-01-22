@@ -13,13 +13,14 @@ buildPythonPackage {
       rec {
         pname = "Flask-Discord-Interactions";
         version = "2.1.2";
+        # tests require quart, which is currently broken
+        doCheck = false;
         propagatedBuildInputs = [
           flask
           requests
           requests-toolbelt
           pynacl
           pytest
-          quart
         ];
 
         src = fetchPypi {
