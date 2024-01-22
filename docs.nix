@@ -27,6 +27,8 @@ stdenv.mkDerivation {
       rec {
         pname = "Flask-Discord-Interactions";
         version = "2.1.2";
+        # tests require quart, which is currently broken
+        doCheck = false;
         propagatedBuildInputs = [
           flask
           requests
