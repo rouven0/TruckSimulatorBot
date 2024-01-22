@@ -35,7 +35,6 @@ stdenv.mkDerivation {
           requests-toolbelt
           pynacl
           pytest
-          quart
         ];
 
         src = fetchPypi {
