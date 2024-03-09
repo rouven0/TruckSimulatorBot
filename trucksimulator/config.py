@@ -8,9 +8,9 @@ import pathlib
 MAP_BORDER = 25
 LOG_FORMAT = "%(levelname)s [%(module)s.%(funcName)s]: %(message)s"
 EMBED_COLOR = int("0x2f3136", 16)
-SELF_AVATAR_URL = "https://images.trucksimulatorbot.rfive.de/logo"
+SELF_AVATAR_URL = "https://img.trucks.rfive.de/logo"
 BASE_IMAGE = 0
-IMAGE_HOST = "https://images.trucksimulatorbot.rfive.de"
+IMAGE_HOST = "https://img.trucks.rfive.de"
 BASE_PATH = str(pathlib.Path(__file__).parent.resolve())
 
 
@@ -34,16 +34,16 @@ def info_links() -> list:
             "url": "https://github.com/therealr5/TruckSimulatorBot-Images",
             "emoji": {"name": "github", "id": "974289493823729714"},
         },
-        {
-            "name": t("info.links.terms"),
-            "url": "https://trucksimulatorbot.rfive.de/terms.html",
-            "emoji": {"name": "tos", "id": "1015951200476217394"},
-        },
-        {
-            "name": t("info.links.privacy"),
-            "url": "https://trucksimulatorbot.rfive.de/privacypolicy.html",
-            "emoji": {"name": "privacy", "id": "1015950153951232044"},
-        },
+        # {
+        #     "name": t("info.links.terms"),
+        #     "url": "https://trucksimulatorbot.rfive.de/terms.html",
+        #     "emoji": {"name": "tos", "id": "1015951200476217394"},
+        # },
+        # {
+        #     "name": t("info.links.privacy"),
+        #     "url": "https://trucksimulatorbot.rfive.de/privacypolicy.html",
+        #     "emoji": {"name": "privacy", "id": "1015950153951232044"},
+        # },
     ]
 
 

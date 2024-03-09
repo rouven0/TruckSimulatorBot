@@ -54,7 +54,7 @@ stdenv.mkDerivation {
 
   meta = with lib; {
     description = "Truck Simulator docs";
-    homepage = "https://trucksimulatorbot.rfive.de/docs";
+    homepage = "https://trucks.rfive.de/docs";
     platforms = platforms.all;
     maintainers = with maintainers; [ therealr5 ];
   };
