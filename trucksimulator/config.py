@@ -8,9 +8,9 @@ import pathlib
 MAP_BORDER = 25
 LOG_FORMAT = "%(levelname)s [%(module)s.%(funcName)s]: %(message)s"
 EMBED_COLOR = int("0x2f3136", 16)
-SELF_AVATAR_URL = "https://img.trucks.rfive.de/logo"
+SELF_AVATAR_URL = "https://trucks.rfive.de/images/logo"
 BASE_IMAGE = 0
-IMAGE_HOST = "https://img.trucks.rfive.de"
+IMAGE_HOST = "https://trucks.rfive.de/images"
 BASE_PATH = str(pathlib.Path(__file__).parent.resolve())
 
 
