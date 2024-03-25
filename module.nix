@@ -112,7 +112,7 @@ in
           proxyPass = "http://unix:/run/trucksimulator/app.sock";
         };
         locations."/images/" = {
-          proxyPass = "http://unix:/run/trucksimulator/images.sock/";
+          proxyPass = "http://unix:/run/trucksimulator/images.sock:/";
         };
         locations."/docs" = {
           root = "${docs}";
