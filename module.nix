@@ -111,8 +111,8 @@ in
         locations."/" = {
           proxyPass = "http://unix:/run/trucksimulator/app.sock";
         };
-        locations."/images" = {
-          proxyPass = "http://unix:/run/trucksimulator/images.sock";
+        locations."/images/" = {
+          proxyPass = "http://unix:/run/trucksimulator/images.sock/";
         };
         locations."/docs" = {
           root = "${docs}";
