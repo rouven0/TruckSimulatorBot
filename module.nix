@@ -94,7 +94,7 @@ in
     systemd.sockets.trucksimulator-images = {
       wantedBy = [ "sockets.target" ];
       before = [ "nginx.service" ];
-      socketConfig.ListenStream = "/run/trucksimulator/app.sock";
+      socketConfig.ListenStream = "/run/trucksimulator/images.sock";
     };
     systemd.services.trucksimulator-images = {
       enable = true;
