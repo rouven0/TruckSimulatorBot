@@ -2,7 +2,7 @@ inputs: { lib, pkgs, config, ... }:
 with lib;
 let
   cfg = config.services.trucksimulatorbot;
-  docs = pkgs.callPackage ./docs.nix { };
+  docs = pkgs.python311Packages.callPackage ./docs.nix { };
   appEnv = pkgs.python311.withPackages (p: with p; [ gunicorn (pkgs.python311Packages.callPackage ./default.nix { }) ]);
   imageEnv = pkgs.python311.withPackages (p: with p; [ gunicorn inputs.images.packages.x86_64-linux.default ]);
 in
