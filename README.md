@@ -1,7 +1,3 @@
-[![Black](https://img.shields.io/badge/codestyle-black-000000)](https://github.com/psf/black)
-![Lines of code](https://img.shields.io/tokei/lines/github/therealr5/TruckSimulatorBot)
-[![Discord](https://img.shields.io/discord/839580174282260510)](https://discord.gg/FzAxtGTUhN)
-
 # TruckSimulatorBot
 Small Truck Simulator app using the [flask-discord-interactions](https://github.com/breqdev/flask-discord-interactions) library
 
