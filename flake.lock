@@ -7,27 +7,26 @@
         ]
       },
       "locked": {
-        "lastModified": 1709110024,
-        "narHash": "sha256-5gJQgQAYZPvT5vzSrR2yHD4wGCQNO7Pds618MMGUTD8=",
-        "owner": "rouven0",
-        "repo": "TruckSimulatorBot-images",
-        "rev": "05f98442b21c771c90699b55eed8f1e1c0dd50cd",
-        "type": "github"
+        "lastModified": 1712701678,
+        "narHash": "sha256-L/sr5Wi+ePvB2huYOxRUWR2D3BnCSAdl0RdbChRTrqs=",
+        "owner": "~rouven",
+        "repo": "trucksimulator-images",
+        "rev": "f8622b0a9f7541dee806113c005b69cd08e5a0bd",
+        "type": "sourcehut"
       },
       "original": {
-        "owner": "rouven0",
-        "repo": "TruckSimulatorBot-images",
-        "type": "github"
+        "owner": "~rouven",
+        "repo": "trucksimulator-images",
+        "type": "sourcehut"
       }
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1709200309,
-        "narHash": "sha256-lKdtMbhnBNU1lr978T+wEYet3sfIXXgyiDZNEgx8CV8=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "ebe6e807793e7c9cc59cf81225fdee1a03413811",
-        "type": "github"
+        "lastModified": 1712608508,
+        "narHash": "sha256-vMZ5603yU0wxgyQeHJryOI+O61yrX2AHwY6LOFyV1gM=",
+        "path": "/nix/store/450afzqlzzgw6wnyc3dwysf3i5yxyqkr-source",
+        "rev": "4cba8b53da471aea2ab2b0c1f30a81e7c451f4b6",
+        "type": "path"
       },
       "original": {
         "id": "nixpkgs",
