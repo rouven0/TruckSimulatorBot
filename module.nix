@@ -105,19 +105,5 @@ in
         ExecStart = "${imageEnv}/bin/gunicorn trucksimulatorbot-images:app -b /run/trucksimulator/images.sock --error-logfile -";
       };
     };
-    services.nginx.virtualHosts = {
-      "${cfg.domain}" = {
-        locations."/invite".return = "301 https://discord.com/api/oauth2/authorize?client_id=831052837353816066&permissions=262144&scope=bot%20applications.commands";
-        locations."/" = {
-          proxyPass = "http://unix:/run/trucksimulator/app.sock";
-        };
-        locations."/images/" = {
-          proxyPass = "http://unix:/run/trucksimulator/images.sock:/";
-        };
-        locations."/docs" = {
-          root = "${docs}";
-        };
-      };
-    };
   };
 }
