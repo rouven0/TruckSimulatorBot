@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1712701678,
-        "narHash": "sha256-L/sr5Wi+ePvB2huYOxRUWR2D3BnCSAdl0RdbChRTrqs=",
+        "lastModified": 1728819790,
+        "narHash": "sha256-9Uj9uoP/hFs2fkkINKkFZaa9eBFQL4/eTAQpTJouyzA=",
         "owner": "~rouven",
         "repo": "trucksimulator-images",
-        "rev": "f8622b0a9f7541dee806113c005b69cd08e5a0bd",
+        "rev": "04b915f006ac8823480b313d099035b14fc0f40a",
         "type": "sourcehut"
       },
       "original": {
@@ -22,10 +22,10 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1712608508,
-        "narHash": "sha256-vMZ5603yU0wxgyQeHJryOI+O61yrX2AHwY6LOFyV1gM=",
-        "path": "/nix/store/450afzqlzzgw6wnyc3dwysf3i5yxyqkr-source",
-        "rev": "4cba8b53da471aea2ab2b0c1f30a81e7c451f4b6",
+        "lastModified": 1728492678,
+        "narHash": "sha256-9UTxR8eukdg+XZeHgxW5hQA9fIKHsKCdOIUycTryeVw=",
+        "path": "/nix/store/60sn02zhawl3kwn0r515zff3h6hg6ydz-source",
+        "rev": "5633bcff0c6162b9e4b5f1264264611e950c8ec7",
         "type": "path"
       },
       "original": {
