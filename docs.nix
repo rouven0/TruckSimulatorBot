@@ -1,4 +1,4 @@
-{ lib, stdenv, buildPythonPackage, fetchPypi, python311Packages, python, ... }:
+{ lib, stdenv, buildPythonPackage, sphinx, python-i18n, mysql-connector, gunicorn, flask, requests, requests-toolbelt, pynacl, pytest, fetchPypi, ... }:
 
 
 stdenv.mkDerivation {
@@ -6,7 +6,7 @@ stdenv.mkDerivation {
   version = "0.0.1";
   src = ./.;
 
-  propagatedBuildInputs = with python311Packages; [
+  propagatedBuildInputs = [
     sphinx
     (buildPythonPackage
       rec {
