@@ -1,4 +1,4 @@
-{ lib, stdenv, buildPythonPackage, sphinx, python-i18n, mysql-connector, gunicorn, flask, requests, requests-toolbelt, pynacl, pytest, fetchPypi, ... }:
+{ lib, stdenv, buildPythonPackage, sphinx, python-i18n, mysql-connector, pyyaml, gunicorn, flask, requests, requests-toolbelt, pynacl, pytest, fetchPypi, ... }:
 
 
 stdenv.mkDerivation {
