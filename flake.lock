@@ -9,15 +9,15 @@
       "locked": {
         "lastModified": 1744201608,
         "narHash": "sha256-s/3mjCx3hNSDFDHuf1yNLLcmQlD7c6obSiMGEKTlfLA=",
-        "owner": "~rouven",
-        "repo": "trucksimulator-images",
+        "owner": "rouven0",
+        "repo": "TruckSimulatorBot-images",
         "rev": "2035846fd7d41188e9ad465dcd03ba129ed37528",
-        "type": "sourcehut"
+        "type": "github"
       },
       "original": {
-        "owner": "~rouven",
-        "repo": "trucksimulator-images",
-        "type": "sourcehut"
+        "owner": "rouven0",
+        "repo": "TruckSimulatorBot-images",
+        "type": "github"
       }
     },
     "nixpkgs": {

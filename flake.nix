@@ -2,7 +2,7 @@
   description = "The Truck Simulator Discord bot";
   inputs = {
     images = {
-      url = "sourcehut:~rouven/trucksimulator-images";
+      url = "github:rouven0/TruckSimulatorBot-images";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
