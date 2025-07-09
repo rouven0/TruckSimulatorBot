@@ -1,4 +1,4 @@
-{ lib, buildPythonPackage, fetchPypi, python-i18n, mysql-connector, gunicorn, pyyaml, flask, requests, requests-toolbelt, pynacl, pytest, python, ... }:
+{ buildPythonPackage, fetchPypi, python-i18n, mysql-connector, gunicorn, pyyaml, flask, requests, requests-toolbelt, pynacl, pytest, python, setuptools, ... }:
 
 buildPythonPackage {
   name = "TruckSimulatorBot";
@@ -13,6 +13,9 @@ buildPythonPackage {
       rec {
         pname = "Flask-Discord-Interactions";
         version = "2.1.2";
+        pyproject = true;
+        build-system = [ setuptools ];
+
         # tests require quart, which is currently broken
         doCheck = false;
         propagatedBuildInputs = [

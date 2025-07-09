@@ -1,4 +1,4 @@
-{ lib, stdenv, buildPythonPackage, sphinx, python-i18n, mysql-connector, pyyaml, gunicorn, flask, requests, requests-toolbelt, pynacl, pytest, fetchPypi, ... }:
+{ lib, stdenv, buildPythonPackage, sphinx, python-i18n, mysql-connector, pyyaml, gunicorn, flask, requests, requests-toolbelt, pynacl, pytest, fetchPypi, setuptools, poetry-core, ... }:
 
 
 stdenv.mkDerivation {
@@ -12,7 +12,8 @@ stdenv.mkDerivation {
       rec {
         pname = "sphinx-readable-theme";
         version = "1.3.0";
-
+        pyproject = true;
+        build-system = [ setuptools ];
         src = fetchPypi {
           inherit pname version;
           sha256 = "9f5louESy5VrNm30Hg/IlP9rbw5KSBT8v/aSVm20f8A=";
@@ -29,6 +30,8 @@ stdenv.mkDerivation {
         version = "2.1.2";
         # tests require quart, which is currently broken
         doCheck = false;
+        pyproject = true;
+        build-system = [ setuptools ];
         propagatedBuildInputs = [
           flask
           requests
