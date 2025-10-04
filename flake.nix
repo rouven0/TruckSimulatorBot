@@ -15,15 +15,15 @@
     in
     {
       packages = forAllSystems (system: {
-        default = pkgs.${system}.python311Packages.callPackage ./default.nix { };
-        docs = pkgs.${system}.python311Packages.callPackage ./docs.nix { };
+        default = pkgs.${system}.python3Packages.callPackage ./default.nix { };
+        docs = pkgs.${system}.python3Packages.callPackage ./docs.nix { };
       });
       nixosModules.default = import ./module.nix inputs;
 
       devShells = forAllSystems (system: {
         default =
           let
-            pythonEnv = pkgs.${system}.python311.withPackages (p: with p; [
+            pythonEnv = pkgs.${system}.python3.withPackages (p: with p; [
               gunicorn
               sphinx
               (self.packages.${system}.default)
